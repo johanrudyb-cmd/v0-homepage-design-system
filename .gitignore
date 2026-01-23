@@ -1,0 +1,32 @@
+# IDE et éditeurs
+.cursor/
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Fichiers système
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Fichiers temporaires
+*.tmp
+*.log
+*.cache
+
+# Fichiers de configuration locaux
+.env
+.env.local
+*.local
+
+# Dossiers de build et dépendances
+node_modules/
+dist/
+build/
+*.pyc
+__pycache__/
+
+# Fichiers BMad spécifiques (si nécessaire)
+.bmad-core/
