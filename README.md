@@ -1,66 +1,126 @@
-# Médias Biangory
+# SaaS Mode - Application
 
-Plateforme média dédiée au business de la mode - Articles, podcasts, vidéos et boutique e-commerce.
+Plateforme SaaS complète pour créer et lancer une marque de vêtements de A à Z avec IA.
 
-## 🚀 Déploiement
+## 🚀 Technologies
 
-Ce projet est synchronisé avec [v0.app](https://v0.app) et déployé sur Vercel.
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/johanbiango-3408s-projects/v0-homepage-design-system)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/ixtnpIKcD9J)
+- **Next.js 16+** (App Router, TypeScript)
+- **Tailwind CSS** (Design System)
+- **Prisma** (ORM, PostgreSQL)
+- **NextAuth.js v5** (Authentification)
+- **ChatGPT API** (Scripts, Tech Packs)
+- **Higgsfield API** (Designs, Virtual Try-On, Vidéos)
 
 ## 📁 Structure du Projet
 
 ```
-.
-├── docs/              # Documentation (Brief, PRD, Front-end Spec)
-├── web/               # Application Next.js
-│   ├── app/           # Pages et layouts
-│   ├── components/    # Composants React
-│   │   ├── ui/        # Composants UI de base
-│   │   ├── layout/     # Navigation, Footer
-│   │   └── sections/  # Sections de la homepage
-│   └── lib/           # Utilitaires
-└── web-bundles/       # Bundles BMAD agents
+├── app/                    # Next.js App Router
+│   ├── (auth)/            # Routes authentification
+│   ├── (dashboard)/      # Routes dashboard
+│   ├── api/               # API Routes
+│   └── ...
+├── components/            # Composants React
+│   ├── layout/           # Layout components
+│   ├── modules/          # Modules spécifiques
+│   └── ui/               # UI primitives
+├── lib/                  # Utilities & helpers
+│   ├── api/              # API clients (ChatGPT, Higgsfield)
+│   ├── auth.ts           # Configuration NextAuth
+│   └── ...
+└── prisma/               # Prisma schema
 ```
 
-## 🛠️ Technologies
+## 🛠️ Installation
 
-- **Framework**: Next.js 14+ (App Router)
-- **Styling**: Tailwind CSS v4
-- **UI Components**: shadcn/ui
-- **Language**: TypeScript
-- **Deployment**: Vercel
-
-## 📚 Documentation
-
-- [Project Brief](docs/brief.md)
-- [Product Requirements Document](docs/prd.md)
-- [Front-end Specification](docs/front-end-spec.md)
-- [AI Design Prompt](docs/ai-design-prompt.md)
-
-## 🎨 Design System
-
-Palette de couleurs :
-- **Primary (Noir)**: #000000 / #1a1a1a
-- **Secondary (Doré)**: #D4AF37 / #F5D76E
-- **Accent (Rose)**: #FF69B4 / #FFB6C1
-- **Neutral (Blanc)**: #FFFFFF / #F8F8F8
-
-## 🚀 Développement Local
-
+1. **Installer les dépendances** :
 ```bash
-cd web
 npm install
+```
+
+2. **Configurer les variables d'environnement** :
+```bash
+cp .env.example .env
+# Éditer .env avec vos clés API
+```
+
+3. **Configurer la base de données** :
+```bash
+# Générer le client Prisma
+npm run db:generate
+
+# Créer la base de données (si nécessaire)
+npm run db:push
+
+# Ou utiliser les migrations
+npm run db:migrate
+```
+
+4. **Lancer le serveur de développement** :
+```bash
 npm run dev
 ```
 
-Le site sera accessible sur http://localhost:3000
+Ouvrir [http://localhost:3000](http://localhost:3000) dans votre navigateur.
 
-## 📝 BMAD-Method
+## 📚 Documentation
 
-Ce projet utilise le framework BMAD-Method pour la gestion du développement. Voir [ACTIVATION-BMAD.md](ACTIVATION-BMAD.md) pour plus d'informations.
+- **Brief** : `docs/saas-brief.md`
+- **PRD** : `docs/saas-prd.md`
+- **Architecture** : `docs/saas-architecture.md`
+- **UX/UI** : `docs/saas-ux-ui-spec.md`
+- **Intégrations IA** : `docs/integrations-higgsfield-chatgpt.md`
 
-## 📄 Licence
+## 🎯 Modules
 
-Voir le fichier LICENSE pour plus de détails.
+1. **Launch Map** - Onboarding structuré (4 phases)
+2. **Tendances & Hits** - Product Discovery
+3. **Brand Spy** - Audit de marques concurrentes
+4. **Design Studio IA** - Génération Tech Packs
+5. **Sourcing Hub** - Base de données usines
+6. **UGC AI Lab** - Marketing automatisé
+
+## 🔑 Variables d'Environnement Requises
+
+- `DATABASE_URL` - URL PostgreSQL
+- `NEXTAUTH_SECRET` - Secret pour NextAuth (générer avec `openssl rand -base64 32`)
+- `NEXTAUTH_URL` - URL de l'application (ex: http://localhost:3000)
+- `CHATGPT_API_KEY` - Clé API ChatGPT (OpenAI)
+- `HIGGSFIELD_API_KEY` - Clé API Higgsfield
+- `HIGGSFIELD_API_URL` - URL API Higgsfield
+
+## 📝 Scripts Disponibles
+
+- `npm run dev` - Serveur de développement
+- `npm run build` - Build production
+- `npm run start` - Serveur production
+- `npm run lint` - Linter
+- `npm run db:generate` - Générer client Prisma
+- `npm run db:push` - Push schema vers DB
+- `npm run db:migrate` - Créer migration
+- `npm run db:studio` - Ouvrir Prisma Studio
+
+## 🔐 Authentification
+
+L'authentification est implémentée avec NextAuth.js v5 :
+- Pages login/signup : `/auth/signin` et `/auth/signup`
+- Protection automatique des routes dashboard
+- Gestion de session JWT
+- Hashage des mots de passe avec bcrypt
+
+## 🚧 Status
+
+**MVP en développement**
+
+- ✅ Setup projet Next.js
+- ✅ Design System
+- ✅ Composants UI de base
+- ✅ Layout (Header, Sidebar)
+- ✅ Prisma schema
+- ✅ Clients API (ChatGPT, Higgsfield)
+- ✅ Authentification (NextAuth v5)
+- ⏳ Implémentation modules
+- ⏳ Intégrations complètes
+
+---
+
+**Créé via BMAD-Method** 🎯
