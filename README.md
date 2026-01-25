@@ -1,46 +1,66 @@
-# MEDIA BIANGORY - CURSOR
+# Médias Biangory
 
-Collection de bundles d'agents et d'équipes pour le framework BMad-Method.
+Plateforme média dédiée au business de la mode - Articles, podcasts, vidéos et boutique e-commerce.
 
-## Structure
+## 🚀 Déploiement
 
-Ce dépôt contient des bundles web-compatibles d'agents spécialisés et d'équipes organisées selon la méthode BMad.
+Ce projet est synchronisé avec [v0.app](https://v0.app) et déployé sur Vercel.
 
-### Agents de base
-- Analyst
-- Architect
-- Developer
-- Product Manager
-- Product Owner
-- QA
-- Scrum Master
-- UX Expert
-- BMad Master
-- BMad Orchestrator
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/johanbiango-3408s-projects/v0-homepage-design-system)
+[![Built with v0](https://img.shields.io/badge/Built%20with-v0.app-black?style=for-the-badge)](https://v0.app/chat/ixtnpIKcD9J)
 
-### Expansion Packs
+## 📁 Structure du Projet
 
-#### Développement de jeux
-- **BMad 2D Phaser Game Dev** : Agents et équipes pour le développement de jeux 2D avec Phaser
-- **BMad 2D Unity Game Dev** : Agents et équipes pour le développement de jeux 2D avec Unity
-- **BMad Godot Game Dev** : Agents et équipes pour le développement de jeux avec Godot
+```
+.
+├── docs/              # Documentation (Brief, PRD, Front-end Spec)
+├── web/               # Application Next.js
+│   ├── app/           # Pages et layouts
+│   ├── components/    # Composants React
+│   │   ├── ui/        # Composants UI de base
+│   │   ├── layout/     # Navigation, Footer
+│   │   └── sections/  # Sections de la homepage
+│   └── lib/           # Utilitaires
+└── web-bundles/       # Bundles BMAD agents
+```
 
-#### Écriture créative
-- **BMad Creative Writing** : Agents spécialisés pour l'écriture créative (narrative designer, plot architect, world builder, etc.)
+## 🛠️ Technologies
 
-#### Infrastructure & DevOps
-- **BMad Infrastructure DevOps** : Agents pour la plateforme infrastructure et DevOps
+- **Framework**: Next.js 14+ (App Router)
+- **Styling**: Tailwind CSS v4
+- **UI Components**: shadcn/ui
+- **Language**: TypeScript
+- **Deployment**: Vercel
 
-### Équipes
-- Team All
-- Team Fullstack
-- Team IDE Minimal
-- Team No UI
+## 📚 Documentation
 
-## Utilisation
+- [Project Brief](docs/brief.md)
+- [Product Requirements Document](docs/prd.md)
+- [Front-end Specification](docs/front-end-spec.md)
+- [AI Design Prompt](docs/ai-design-prompt.md)
 
-Ces bundles sont conçus pour être utilisés avec des systèmes d'agents compatibles avec le framework BMad-Method.
+## 🎨 Design System
 
-## Licence
+Palette de couleurs :
+- **Primary (Noir)**: #000000 / #1a1a1a
+- **Secondary (Doré)**: #D4AF37 / #F5D76E
+- **Accent (Rose)**: #FF69B4 / #FFB6C1
+- **Neutral (Blanc)**: #FFFFFF / #F8F8F8
+
+## 🚀 Développement Local
+
+```bash
+cd web
+npm install
+npm run dev
+```
+
+Le site sera accessible sur http://localhost:3000
+
+## 📝 BMAD-Method
+
+Ce projet utilise le framework BMAD-Method pour la gestion du développement. Voir [ACTIVATION-BMAD.md](ACTIVATION-BMAD.md) pour plus d'informations.
+
+## 📄 Licence
 
 Voir le fichier LICENSE pour plus de détails.
