@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+:root {
+  /* Médias Biangory - Palette de couleurs */
+  --primary: #000000;
+  --primary-light: #1a1a1a;
+  --secondary: #D4AF37;
+  --secondary-light: #F5D76E;
+  --accent: #FF69B4;
+  --accent-light: #FFB6C1;
+  --neutral: #FFFFFF;
+  --neutral-gray: #F8F8F8;
+  --success: #10B981;
+  --warning: #F59E0B;
+  --error: #EF4444;
+  --gray-600: #6B7280;
+  --gray-400: #9CA3AF;
+  
+  /* Background & Foreground */
+  --background: #ffffff;
+  --foreground: #000000;
+}
+
+@theme inline {
+  /* Couleurs principales */
+  --color-primary: var(--primary);
+  --color-primary-light: var(--primary-light);
+  --color-secondary: var(--secondary);
+  --color-secondary-light: var(--secondary-light);
+  --color-accent: var(--accent);
+  --color-accent-light: var(--accent-light);
+  --color-neutral: var(--neutral);
+  --color-neutral-gray: var(--neutral-gray);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-error: var(--error);
+  --color-gray-600: var(--gray-600);
+  --color-gray-400: var(--gray-400);
+  
+  /* Background & Foreground */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  
+  /* Typography */
+  --font-sans: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Courier New", Courier, monospace;
+  
+  /* Spacing scale (4px base) */
+  --spacing-xs: 0.25rem;   /* 4px */
+  --spacing-sm: 0.5rem;    /* 8px */
+  --spacing-md: 1rem;      /* 16px */
+  --spacing-lg: 1.5rem;    /* 24px */
+  --spacing-xl: 2rem;      /* 32px */
+  --spacing-2xl: 3rem;     /* 48px */
+  --spacing-3xl: 4rem;     /* 64px */
+  --spacing-4xl: 6rem;     /* 96px */
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
