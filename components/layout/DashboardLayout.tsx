@@ -9,11 +9,11 @@ export function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-stone-50">
+    <div className="min-h-screen bg-background">
       <Sidebar />
       <div className="pl-72">
         <Header />
-        <main className="p-10 bg-stone-50">{children}</main>
+        <main className="min-h-[calc(100vh-5rem)]">{children}</main>
       </div>
     </div>
   );

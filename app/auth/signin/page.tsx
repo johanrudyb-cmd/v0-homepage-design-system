@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
@@ -21,40 +20,47 @@ export default function SignInPage() {
     setLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
       });
 
-      if (result?.error) {
-        setError(result.error);
-      } else {
-        router.push('/dashboard');
-        router.refresh();
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || 'Email ou mot de passe incorrect');
+        setLoading(false);
+        return;
       }
-    } catch (err) {
-      setError('Une erreur est survenue');
-    } finally {
+
+      // Connexion réussie, redirection
+      window.location.href = '/dashboard';
+    } catch (err: any) {
+      console.error('Erreur lors de la connexion:', err);
+      setError('Une erreur est survenue. Vérifiez votre connexion.');
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-50 px-4">
-      <Card className="w-full max-w-md border border-stone-200 shadow-lg">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-light tracking-wide text-center">
-            Connexion
-          </CardTitle>
-          <CardDescription className="text-center text-stone-600">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-background px-4">
+      <Card className="w-full max-w-md border-2 shadow-modern-lg">
+        <CardHeader className="space-y-4 text-center">
+          <div>
+            <CardTitle className="text-3xl font-bold">Connexion</CardTitle>
+            <div className="w-12 h-1 bg-gradient-to-r from-primary via-secondary to-accent mx-auto mt-3 rounded-full"></div>
+          </div>
+          <CardDescription className="text-base font-medium">
             Accédez à votre compte SaaS Mode
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {error && (
-              <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-lg">
+              <div className="p-4 text-sm text-error bg-error/10 border-2 border-error/20 rounded-lg font-medium">
                 {error}
               </div>
             )}
@@ -79,19 +85,19 @@ export default function SignInPage() {
 
             <Button
               type="submit"
-              variant="primary"
-              className="w-full bg-stone-900 hover:bg-stone-800 text-white font-light tracking-wide uppercase text-xs py-3"
+              variant="default"
+              className="w-full shadow-modern-lg"
               loading={loading}
             >
               Se connecter
             </Button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-stone-600">
-            <span className="font-light">Pas encore de compte ? </span>
+          <div className="mt-8 text-center text-sm text-muted-foreground font-medium">
+            <span>Pas encore de compte ? </span>
             <Link
               href="/auth/signup"
-              className="text-amber-600 hover:text-amber-700 font-medium"
+              className="text-primary hover:underline font-semibold"
             >
               Créer un compte
             </Link>

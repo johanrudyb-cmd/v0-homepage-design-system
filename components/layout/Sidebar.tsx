@@ -3,97 +3,77 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
+import {
+  LayoutDashboard,
+  TrendingUp,
+  Building2,
+  Search,
+  Palette,
+  ShoppingBag,
+  Sparkles,
+  Map,
+  Settings,
+  LogOut,
+} from 'lucide-react';
 
 const navigation = [
-  { name: 'Tableau de bord', href: '/dashboard' },
-  { name: 'Tendances & Hits', href: '/trends' },
-  { name: 'Mes Marques', href: '/brands' },
-  { name: 'Brand Spy', href: '/spy' },
+  { name: 'Tableau de bord', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'Tendances & Hits', href: '/trends', icon: TrendingUp },
+  { name: 'Marques Tendances', href: '/brands', icon: Building2 },
+  { name: 'Brand Spy', href: '/spy', icon: Search, badge: 'NEW' },
 ];
 
 const tools = [
-  { name: 'Design Studio IA', href: '/brands/new', badge: 'NEW' },
-  { name: 'Sourcing Hub', href: '/sourcing' },
-  { name: 'UGC AI Lab', href: '/ugc' },
-  { name: 'Launch Map', href: '/launch-map' },
-];
-
-const resources = [
-  { name: 'Fournisseurs', href: '/sourcing' },
-  { name: 'Documentation', href: '/docs' },
-  { name: 'FAQ', href: '/faq' },
+  { name: 'Design Studio', href: '/design-studio', icon: Palette, badge: 'NEW' },
+  { name: 'Sourcing Hub', href: '/sourcing', icon: ShoppingBag },
+  { name: 'UGC AI Lab', href: '/ugc', icon: Sparkles, badge: 'NEW' },
+  { name: 'Launch Map', href: '/launch-map', icon: Map },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-72 bg-stone-900 text-white flex flex-col border-r border-stone-800">
-      {/* Logo & Settings */}
-      <div className="flex items-center justify-between p-8 border-b border-stone-800">
+    <aside className="fixed left-0 top-0 h-screen w-64 border-r border-border bg-sidebar flex flex-col z-50 shadow-modern">
+      {/* Logo Moderne */}
+      <div className="flex items-center gap-3 px-6 h-16 border-b border-border">
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl gradient-primary text-white shadow-modern">
+          <span className="text-sm font-bold">SM</span>
+        </div>
         <div className="flex flex-col">
-          <span className="text-3xl font-light tracking-wider text-stone-100">
-            SaaS
-          </span>
-          <span className="text-3xl font-light tracking-wider text-amber-200">
-            Mode
+          <span className="text-base font-semibold text-foreground">SaaS Mode</span>
+          <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+            Fashion Tools
           </span>
         </div>
-        <button className="text-stone-400 hover:text-stone-200 transition-colors p-2 rounded hover:bg-stone-800">
-          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-          </svg>
-        </button>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto p-6 space-y-2">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-4 px-5 py-3.5 rounded-md transition-all text-sm font-light tracking-wide uppercase text-xs',
-                isActive
-                  ? 'bg-amber-900/30 text-amber-200 border-l-2 border-amber-400'
-                  : 'text-stone-400 hover:bg-stone-800/50 hover:text-stone-200'
-              )}
-            >
-              <span className="w-1 h-1 rounded-full bg-current opacity-60" />
-              {item.name}
-            </Link>
-          );
-        })}
-
-        {/* OUTILS Section */}
-        <div className="mt-10 mb-6">
-          <h3 className="px-5 text-xs font-light text-stone-500 uppercase tracking-widest mb-4">
-            Outils
-          </h3>
-          <div className="space-y-2">
-            {tools.map((item) => {
-              const isActive = pathname === item.href;
+      {/* Navigation Moderne */}
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-1">
+        <div className="px-3 mb-4">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
+            Navigation
+          </p>
+          <div className="space-y-1">
+            {navigation.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'flex items-center justify-between gap-3 px-5 py-3 rounded-md transition-all text-sm font-light relative group',
+                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+                    'hover:bg-sidebar-accent',
                     isActive
-                      ? 'bg-amber-900/30 text-amber-200'
-                      : 'text-stone-400 hover:bg-stone-800/50 hover:text-stone-200'
+                      ? 'bg-primary/10 text-primary shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  <span className="flex items-center gap-3">
-                    <span className="w-1 h-1 rounded-full bg-current opacity-60" />
-                    {item.name}
-                  </span>
+                  <Icon className={cn('w-4 h-4', isActive && 'text-primary')} />
+                  <span className="flex-1">{item.name}</span>
                   {item.badge && (
-                    <span className="text-xs bg-amber-600/20 text-amber-300 px-2.5 py-0.5 rounded-full font-medium border border-amber-600/30">
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold bg-primary text-primary-foreground rounded-md">
                       {item.badge}
                     </span>
                   )}
@@ -103,27 +83,33 @@ export function Sidebar() {
           </div>
         </div>
 
-        {/* RESSOURCES Section */}
-        <div className="mt-6 mb-6">
-          <h3 className="px-5 text-xs font-light text-stone-500 uppercase tracking-widest mb-4">
-            Ressources
-          </h3>
-          <div className="space-y-2">
-            {resources.map((item) => {
-              const isActive = pathname === item.href;
+        <div className="px-3 mt-6">
+          <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider mb-3 px-2">
+            Outils
+          </p>
+          <div className="space-y-1">
+            {tools.map((item) => {
+              const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+              const Icon = item.icon;
               return (
                 <Link
                   key={item.name}
                   href={item.href}
                   className={cn(
-                    'flex items-center gap-3 px-5 py-3 rounded-md transition-all text-sm font-light',
+                    'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+                    'hover:bg-sidebar-accent',
                     isActive
-                      ? 'bg-amber-900/30 text-amber-200'
-                      : 'text-stone-400 hover:bg-stone-800/50 hover:text-stone-200'
+                      ? 'bg-primary/10 text-primary shadow-sm'
+                      : 'text-muted-foreground hover:text-foreground'
                   )}
                 >
-                  <span className="w-1 h-1 rounded-full bg-current opacity-60" />
-                  {item.name}
+                  <Icon className={cn('w-4 h-4', isActive && 'text-primary')} />
+                  <span className="flex-1">{item.name}</span>
+                  {item.badge && (
+                    <span className="px-1.5 py-0.5 text-[10px] font-bold bg-primary text-primary-foreground rounded-md">
+                      {item.badge}
+                    </span>
+                  )}
                 </Link>
               );
             })}
@@ -131,34 +117,31 @@ export function Sidebar() {
         </div>
       </nav>
 
-      {/* Bottom Section */}
-      <div className="p-6 border-t border-stone-800 space-y-4 bg-stone-950/50">
-        <Button
-          variant="primary"
-          className="w-full bg-stone-800 hover:bg-stone-700 text-stone-100 border border-stone-700 font-light tracking-wide uppercase text-xs py-3"
+      {/* Bottom Section Moderne */}
+      <div className="border-t border-border p-3 space-y-1">
+        <Link
+          href="/settings"
+          className={cn(
+            'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200',
+            'hover:bg-sidebar-accent',
+            pathname === '/settings'
+              ? 'bg-primary/10 text-primary'
+              : 'text-muted-foreground hover:text-foreground'
+          )}
         >
-          Guide de démarrage
-        </Button>
-
-        <div className="bg-stone-800/50 rounded-lg p-5 space-y-4 border border-stone-700/50">
-          <div className="flex items-center justify-between">
-            <p className="text-xs text-stone-400 font-light">
-              Essai gratuit
-            </p>
-            <p className="text-sm text-amber-200 font-medium">
-              3 jours restants
-            </p>
-          </div>
-          <div className="w-full h-1 bg-stone-700 rounded-full overflow-hidden">
-            <div className="h-full bg-gradient-to-r from-amber-600 to-amber-400" style={{ width: '60%' }} />
-          </div>
-          <Button
-            variant="primary"
-            className="w-full bg-amber-600/20 hover:bg-amber-600/30 text-amber-200 border border-amber-600/30 text-xs font-light tracking-wide uppercase py-2.5"
-          >
-            Débloquer l'accès complet
-          </Button>
-        </div>
+          <Settings className="w-4 h-4" />
+          <span>Paramètres</span>
+        </Link>
+        <button
+          onClick={async () => {
+            await fetch('/api/auth/logout', { method: 'POST' });
+            window.location.href = '/';
+          }}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 hover:bg-sidebar-accent text-muted-foreground hover:text-foreground"
+        >
+          <LogOut className="w-4 h-4" />
+          <span>Déconnexion</span>
+        </button>
       </div>
     </aside>
   );

@@ -469,3 +469,4 @@ L'IA génère automatiquement :
 **Date** : 2025-01-23  
 **Version** : 1.0  
 **Status** : À affiner avec vos retours
+tu

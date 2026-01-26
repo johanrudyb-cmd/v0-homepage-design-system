@@ -4,26 +4,149 @@
 
 @layer base {
   :root {
-    /* Mode/Fashion Colors */
-    --primary-500: #d4a574; /* Camel/Beige mode */
-    --primary-600: #c4955f;
-    --primary-700: #b8854a;
-    --secondary-500: #e8d5c4; /* Rose poudré */
-    --accent-500: #8b5a3c; /* Marron mode */
-    --fashion-black: #1a1a1a;
-    --fashion-beige: #f5f1eb;
-    --fashion-cream: #faf8f4;
+    /* Design System - App Moderne & Jeune */
+    /* Palette moderne : Violet/Indigo moderne, Blanc, Accents vifs */
+    
+    --background: 0 0% 100%;
+    --foreground: 240 10% 4%;
+    
+    /* Primary - Violet/Indigo moderne (confiance, créativité) */
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    
+    /* Secondary - Rose moderne (jeune, dynamique) */
+    --secondary: 330 81% 60%;
+    --secondary-foreground: 0 0% 100%;
+    
+    /* Accent - Cyan moderne (tech, moderne) */
+    --accent: 188 94% 43%;
+    --accent-foreground: 0 0% 100%;
+    
+    /* Muted - Gris moderne */
+    --muted: 240 5% 96%;
+    --muted-foreground: 240 4% 46%;
+    
+    /* Border & Input - Gris subtil */
+    --border: 240 6% 90%;
+    --input: 240 6% 90%;
+    --ring: 262 83% 58%;
+    
+    /* Status Colors - Moderne */
+    --success: 142 76% 36%;
+    --error: 0 84% 60%;
+    --warning: 38 92% 50%;
+    --info: 188 94% 43%;
+    
+    /* Sidebar - Fond moderne */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 240 10% 4%;
+    --sidebar-border: 240 6% 90%;
+    --sidebar-accent: 240 5% 96%;
+    
+    /* Card - Blanc avec ombre moderne */
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 4%;
+    
+    /* Radius - Arrondis modernes */
+    --radius: 0.75rem;
   }
 
+  .dark {
+    --background: 240 10% 4%;
+    --foreground: 0 0% 98%;
+    
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 330 81% 60%;
+    --secondary-foreground: 0 0% 100%;
+    
+    --accent: 188 94% 43%;
+    --accent-foreground: 0 0% 100%;
+    
+    --muted: 240 6% 15%;
+    --muted-foreground: 240 5% 65%;
+    
+    --border: 240 6% 15%;
+    --input: 240 6% 15%;
+    --ring: 262 83% 58%;
+    
+    --sidebar-background: 240 10% 4%;
+    --sidebar-foreground: 0 0% 98%;
+    --sidebar-border: 240 6% 15%;
+    --sidebar-accent: 240 6% 15%;
+    
+    --card: 240 10% 6%;
+    --card-foreground: 0 0% 98%;
+  }
+}
+
+@layer base {
   * {
-    @apply border-stone-200;
+    @apply border-border;
   }
-
+  
   body {
-    @apply bg-stone-50 text-stone-900;
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
+  
+  /* Typography Moderne */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold;
+    letter-spacing: -0.02em;
+  }
+  
+  h1 {
+    @apply text-4xl lg:text-5xl;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+  
+  h2 {
+    @apply text-3xl lg:text-4xl;
+    font-weight: 600;
+  }
+  
+  h3 {
+    @apply text-2xl lg:text-3xl;
+    font-weight: 600;
+  }
+  
+  /* Body text - Moderne et lisible */
+  p {
+    @apply leading-relaxed;
+  }
+}
 
-  .dark body {
-    @apply bg-stone-900 text-stone-50;
+@layer utilities {
+  /* Smooth scrolling */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+  
+  /* Focus visible moderne */
+  .focus-visible-ring {
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
+  }
+  
+  /* Gradient moderne */
+  .gradient-primary {
+    background: linear-gradient(135deg, hsl(262 83% 58%), hsl(330 81% 60%));
+  }
+  
+  .gradient-accent {
+    background: linear-gradient(135deg, hsl(188 94% 43%), hsl(262 83% 58%));
+  }
+  
+  /* Shadow moderne */
+  .shadow-modern {
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  }
+  
+  .shadow-modern-lg {
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
   }
 }

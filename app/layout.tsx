@@ -3,7 +3,12 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { SessionProvider } from '@/components/providers/SessionProvider';
 
-const inter = Inter({ subsets: ['latin'] });
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-sans',
+  weight: ['400', '500', '600', '700'],
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
   title: 'SaaS Mode - Créez votre marque de A à Z',
@@ -17,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr">
-      <body className={inter.className}>
+      <body className={`${inter.variable} font-sans antialiased`}>
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>

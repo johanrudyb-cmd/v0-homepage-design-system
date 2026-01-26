@@ -68,9 +68,10 @@ model Brand {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  designs   Design[]
-  launchMap LaunchMap?
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  designs     Design[]
+  launchMap   LaunchMap?
+  ugcContents UGCContent[]
 }
 
 model LaunchMap {
@@ -116,6 +117,8 @@ model Factory {
   rating      Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  quotes Quote[]
 }
 
 model Quote {
@@ -128,17 +131,83 @@ model Quote {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  // Relations (à ajouter si nécessaire)
+  factory Factory @relation(fields: [factoryId], references: [id], onDelete: Cascade)
 }
 
 model BrandSpyAnalysis {
   id          String   @id @default(cuid())
   userId      String
   shopifyUrl  String
-  estimatedRevenue Float?
+  storeName   String?  // Nom de la boutique
+  category    String?  // Catégorie
+  launchDate  String?  // Date de lancement
+  country     String?  // Pays principal
+  
+  // Métriques principales
+  estimatedRevenue        Float?  // CA mensuel estimé (compatibilité)
+  estimatedDailyRevenue   Float?  // Ventes quotidiennes estimées
+  estimatedMonthlyRevenue  Float?  // Ventes mensuelles estimées
+  productCount            Int?    // Nombre de produits
+  averageOrdersPerMonth   Int?    // Commandes moyennes par mois
+  
+  // Données de trafic
+  trafficSources          Json?    // Sources de trafic avec pourcentages
+  markets                 Json?    // Marchés exploités avec pourcentages
+  monthlyTraffic          Json?    // Trafic mensuel (historique)
+  monthlyRevenue          Json?    // Revenus mensuels (historique)
+  
+  // Stack technique
   stack       Json?    // Apps installées
-  theme       String?
-  adStrategy  Json?    // Stratégie publicitaire
+  theme       Json?    // Thème (nom, version, polices, couleurs)
+  
+  // Stratégie publicitaire
+  adStrategy  Json?    // Stratégie publicitaire (plateformes, nombre d'ads, etc.)
+  adsEvolution Json?   // Évolution du nombre de publicités
+  adTypes     Json?    // Types de publicités avec pourcentages
+  
+  // Analyse IA
+  aiAnalysis  Json?    // Analyse IA (score, recommandations, badges)
+  
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model UGCContent {
+  id        String   @id @default(cuid())
+  brandId   String
+  type      String   // virtual_tryon, script, video
+  content   String   @db.Text // URL image ou texte script
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+model TrendProduct {
+  id            String   @id @default(cuid())
+  name          String
+  category      String   // Hoodie, T-shirt, Cargo, Accessoires
+  style         String   // Minimaliste, Streetwear, Luxe, Y2K
+  material      String   // Coton GSM élevé, Denim, Synthétique
+  averagePrice  Float
+  trendScore    Float    // Score de tendance (0-100)
+  saturability  Float    // Score de saturabilité (0-100, plus bas = moins saturé)
+  imageUrl      String?
+  description   String?  @db.Text
+  searchVolume  Int?     // Volume de recherche estimé
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  favorites ProductFavorite[]
+}
+
+model ProductFavorite {
+  id        String   @id @default(cuid())
+  userId   String
+  productId String
+  createdAt DateTime @default(now())
+
+  product TrendProduct @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, productId])
 }

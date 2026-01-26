@@ -10,11 +10,12 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/trends') ||
     pathname.startsWith('/spy') ||
     pathname.startsWith('/sourcing') ||
-    pathname.startsWith('/ugc');
+    pathname.startsWith('/ugc') ||
+    pathname.startsWith('/launch-map') ||
+    pathname.startsWith('/design-studio');
 
-  // Vérifier le token de session (sans utiliser Prisma directement)
-  const token = request.cookies.get('next-auth.session-token') || 
-                request.cookies.get('__Secure-next-auth.session-token');
+  // Vérifier le token de session
+  const token = request.cookies.get('auth-token');
 
   const isAuthenticated = !!token;
 
