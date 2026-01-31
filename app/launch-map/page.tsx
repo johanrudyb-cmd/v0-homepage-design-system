@@ -35,26 +35,29 @@ export default async function LaunchMapPage() {
     });
   }
 
+  // Vérifier si l'identité existe
+  const hasIdentity = Boolean(brand.logo && brand.colorPalette);
+
   return (
     <DashboardLayout>
       <div className="p-8 max-w-7xl mx-auto space-y-8">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl gradient-primary flex items-center justify-center shadow-modern">
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
               <Map className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <h1 className="text-4xl font-bold tracking-tight text-foreground">
-                Launch Map
+            <div className="flex-1">
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-1">
+                Créer ma marque
               </h1>
-              <p className="text-muted-foreground font-medium text-lg mt-1">
-                Guidez votre marque <span className="font-bold text-primary">{brand.name}</span> de l'idée à la vente
+              <p className="text-muted-foreground text-sm">
+                Guidez <span className="font-medium text-primary">{brand.name}</span> de l'idée à la vente
               </p>
             </div>
           </div>
         </div>
 
-        <LaunchMapStepper brandId={brand.id} launchMap={brand.launchMap} />
+        <LaunchMapStepper brandId={brand.id} launchMap={brand.launchMap} brand={brand} hasIdentity={hasIdentity} />
       </div>
     </DashboardLayout>
   );

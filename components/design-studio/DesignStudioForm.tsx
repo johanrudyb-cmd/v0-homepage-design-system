@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { DesignResult } from './DesignResult';
 import { DesignGallery } from './DesignGallery';
+import { CollectionsManager } from './CollectionsManager';
+import { DesignTemplates } from './DesignTemplates';
+import { Sparkles } from 'lucide-react';
 
 interface Design {
   id: string;
@@ -16,18 +19,34 @@ interface Design {
   techPack: any;
   prompt: string | null;
   status: string;
+  collectionId?: string | null;
   createdAt: Date;
+}
+
+interface Brand {
+  id: string;
+  name: string;
+  logo?: string | null;
+  colorPalette?: any;
+  autoApplyIdentity?: boolean;
 }
 
 interface DesignStudioFormProps {
   brandId: string;
+  brand?: Brand;
   existingDesigns: Design[];
+  initialData?: {
+    type: string;
+    cut: string;
+    material: string;
+    customPrompt: string;
+  };
 }
 
-export function DesignStudioForm({ brandId, existingDesigns }: DesignStudioFormProps) {
-  const [type, setType] = useState('');
-  const [cut, setCut] = useState('');
-  const [material, setMaterial] = useState('');
+export function DesignStudioForm({ brandId, brand, existingDesigns, initialData }: DesignStudioFormProps) {
+  const [type, setType] = useState(initialData?.type || '');
+  const [cut, setCut] = useState(initialData?.cut || '');
+  const [material, setMaterial] = useState(initialData?.material || '');
   const [details, setDetails] = useState({
     seams: false,
     pockets: false,
@@ -36,10 +55,13 @@ export function DesignStudioForm({ brandId, existingDesigns }: DesignStudioFormP
     hood: false,
     collar: false,
   });
-  const [customPrompt, setCustomPrompt] = useState('');
+  const [customPrompt, setCustomPrompt] = useState(initialData?.customPrompt || '');
+  const [autoApplyIdentity, setAutoApplyIdentity] = useState(brand?.autoApplyIdentity ?? true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentDesign, setCurrentDesign] = useState<Design | null>(null);
   const [error, setError] = useState('');
+  const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
+  const [showTemplates, setShowTemplates] = useState(false);
 
   const handleGenerate = async () => {
     if (!type || !cut || !material) {
@@ -62,6 +84,7 @@ export function DesignStudioForm({ brandId, existingDesigns }: DesignStudioFormP
           material,
           details,
           customPrompt: customPrompt || undefined,
+          autoApplyIdentity: autoApplyIdentity && brand?.logo && brand?.colorPalette,
         }),
       });
 
@@ -79,18 +102,59 @@ export function DesignStudioForm({ brandId, existingDesigns }: DesignStudioFormP
     }
   };
 
+  // Filtrer les designs par collection
+  const filteredDesigns = selectedCollectionId
+    ? existingDesigns.filter((d) => d.collectionId === selectedCollectionId)
+    : existingDesigns;
+
+  const handleSelectTemplate = (template: any) => {
+    setType(template.type);
+    setCut(template.cut || '');
+    setMaterial(template.material || '');
+    setShowTemplates(false);
+    // Scroll vers le formulaire
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Formulaire */}
-      <div className="space-y-6">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      {/* Collections Sidebar */}
+      <div className="lg:col-span-1">
+        <CollectionsManager
+          brandId={brandId}
+          onCollectionSelect={setSelectedCollectionId}
+          selectedCollectionId={selectedCollectionId}
+        />
+      </div>
+
+      {/* Formulaire et Galerie */}
+      <div className="lg:col-span-2 space-y-6">
+        {/* Templates Section */}
+        {showTemplates && (
+          <DesignTemplates brandId={brandId} onSelectTemplate={handleSelectTemplate} />
+        )}
+
         <Card className="border-2">
           <CardHeader>
-            <CardTitle className="text-xl font-bold">
-              Créer un nouveau design
-            </CardTitle>
-            <CardDescription className="font-medium">
-              Remplissez les informations pour générer votre Tech Pack
-            </CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="text-xl font-bold">
+                  Créer un nouveau design
+                </CardTitle>
+                <CardDescription className="font-medium">
+                  Remplissez les informations pour générer votre Tech Pack
+                </CardDescription>
+              </div>
+              <Button
+                variant="outline"
+                onClick={() => setShowTemplates(!showTemplates)}
+                className="border-2"
+                size="sm"
+              >
+                <Sparkles className="w-4 h-4 mr-2" />
+                {showTemplates ? 'Masquer' : 'Voir'} templates
+              </Button>
+            </div>
           </CardHeader>
           <CardContent className="space-y-6">
             {/* Type de vêtement */}
@@ -199,6 +263,59 @@ export function DesignStudioForm({ brandId, existingDesigns }: DesignStudioFormP
               />
             </div>
 
+            {/* Toggle Appliquer identité */}
+            {brand?.logo && brand?.colorPalette && (
+              <div className="flex items-center gap-3 p-4 bg-muted/30 rounded-lg border-2 border-border">
+                <input
+                  type="checkbox"
+                  id="autoApplyIdentity"
+                  checked={autoApplyIdentity}
+                  onChange={(e) => setAutoApplyIdentity(e.target.checked)}
+                  disabled={isGenerating}
+                  className="w-5 h-5 rounded border-2 border-input text-primary focus:ring-primary cursor-pointer"
+                />
+                <label
+                  htmlFor="autoApplyIdentity"
+                  className="text-sm font-semibold text-foreground cursor-pointer flex-1"
+                >
+                  Appliquer l'identité de marque (logo + couleurs)
+                </label>
+                {brand.logo && (
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={brand.logo}
+                      alt="Logo"
+                      className="w-8 h-8 object-contain"
+                    />
+                    <div className="flex gap-1">
+                      {brand.colorPalette && typeof brand.colorPalette === 'object' && (
+                        <>
+                          {brand.colorPalette.primary && (
+                            <div
+                              className="w-4 h-4 rounded border border-border"
+                              style={{ backgroundColor: brand.colorPalette.primary }}
+                            />
+                          )}
+                          {brand.colorPalette.secondary && (
+                            <div
+                              className="w-4 h-4 rounded border border-border"
+                              style={{ backgroundColor: brand.colorPalette.secondary }}
+                            />
+                          )}
+                          {brand.colorPalette.accent && (
+                            <div
+                              className="w-4 h-4 rounded border border-border"
+                              style={{ backgroundColor: brand.colorPalette.accent }}
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             {error && (
               <div className="p-4 text-sm text-error bg-error/10 border-2 border-error/20 rounded-lg font-medium">
                 {error}
@@ -220,11 +337,13 @@ export function DesignStudioForm({ brandId, existingDesigns }: DesignStudioFormP
         {currentDesign && (
           <DesignResult design={currentDesign} />
         )}
-      </div>
 
-      {/* Galerie des designs existants */}
-      <div>
-        <DesignGallery designs={existingDesigns} />
+        {/* Galerie des designs existants */}
+        <DesignGallery 
+          designs={filteredDesigns} 
+          brandId={brandId}
+          selectedCollectionId={selectedCollectionId}
+        />
       </div>
     </div>
   );

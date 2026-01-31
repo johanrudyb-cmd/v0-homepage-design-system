@@ -89,14 +89,21 @@ export default async function BrandsPage() {
   return (
     <DashboardLayout>
       <div className="p-8 max-w-7xl mx-auto space-y-8">
-        {/* Header Moderne */}
-        <div className="space-y-3">
-          <h1 className="text-4xl font-bold tracking-tight text-foreground">
-            Marques Tendances
-          </h1>
-          <p className="text-muted-foreground font-medium text-lg">
-            Découvrez les marques qui performent sur le marché
-          </p>
+        {/* Header Moderne - Design Jeune */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
+              <Filter className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-1">
+                Marques
+              </h1>
+              <p className="text-muted-foreground text-sm">
+                Les marques qui montent et qui performent
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* Filtres Moderne */}

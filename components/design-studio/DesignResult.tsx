@@ -1,7 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { FileText, X } from 'lucide-react';
 
 interface Design {
   id: string;
@@ -12,6 +15,7 @@ interface Design {
   techPack: any;
   prompt: string | null;
   status: string;
+  isTemplate?: boolean;
 }
 
 interface DesignResultProps {
@@ -19,6 +23,9 @@ interface DesignResultProps {
 }
 
 export function DesignResult({ design }: DesignResultProps) {
+  const [showSaveTemplate, setShowSaveTemplate] = useState(false);
+  const [templateName, setTemplateName] = useState('');
+
   const handleExportPDF = async () => {
     try {
       const response = await fetch(`/api/designs/${design.id}/export-pdf`);
@@ -104,19 +111,96 @@ export function DesignResult({ design }: DesignResultProps) {
         )}
 
         {/* Actions */}
-        <div className="flex gap-3">
-          <Button
-            onClick={handleExportPDF}
-            className="bg-stone-900 hover:bg-stone-800 text-white font-light tracking-wide uppercase text-xs py-2 px-4"
-          >
-            Exporter en PDF
-          </Button>
-          <Button
-            variant="outline"
-            className="border-stone-300 text-stone-700 font-light tracking-wide uppercase text-xs py-2 px-4"
-          >
-            Modifier
-          </Button>
+        <div className="space-y-3">
+          <div className="flex gap-3">
+            <Button
+              onClick={handleExportPDF}
+              className="bg-stone-900 hover:bg-stone-800 text-white font-light tracking-wide uppercase text-xs py-2 px-4"
+            >
+              Exporter en PDF
+            </Button>
+            {design.status === 'completed' && !design.isTemplate && (
+              <Button
+                variant="outline"
+                onClick={() => setShowSaveTemplate(true)}
+                className="border-stone-300 text-stone-700 font-light tracking-wide uppercase text-xs py-2 px-4"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Sauvegarder comme template
+              </Button>
+            )}
+          </div>
+
+          {/* Formulaire sauvegarder template */}
+          {showSaveTemplate && (
+            <div className="p-4 bg-stone-50 rounded-lg border border-stone-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium text-stone-900">Sauvegarder comme template</h4>
+                <button
+                  onClick={() => {
+                    setShowSaveTemplate(false);
+                    setTemplateName('');
+                  }}
+                  className="p-1 hover:bg-stone-200 rounded"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <Input
+                type="text"
+                placeholder="Nom du template (ex: T-shirt Classique)"
+                value={templateName}
+                onChange={(e) => setTemplateName(e.target.value)}
+                className="border-stone-300"
+              />
+              <div className="flex gap-2">
+                <Button
+                  onClick={async () => {
+                    if (!templateName.trim()) {
+                      alert('Veuillez donner un nom au template');
+                      return;
+                    }
+
+                    try {
+                      const response = await fetch(`/api/designs/${design.id}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          isTemplate: true,
+                          templateName: templateName.trim(),
+                        }),
+                      });
+
+                      if (response.ok) {
+                        setTemplateName('');
+                        setShowSaveTemplate(false);
+                        alert('Template sauvegardé avec succès !');
+                      } else {
+                        alert('Erreur lors de la sauvegarde');
+                      }
+                    } catch (error) {
+                      console.error('Erreur sauvegarde template:', error);
+                      alert('Erreur lors de la sauvegarde');
+                    }
+                  }}
+                  disabled={!templateName.trim()}
+                  className="bg-stone-900 hover:bg-stone-800 text-white font-light tracking-wide uppercase text-xs py-2 px-4"
+                >
+                  Sauvegarder
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowSaveTemplate(false);
+                    setTemplateName('');
+                  }}
+                  className="border-stone-300 text-stone-700 font-light tracking-wide uppercase text-xs py-2 px-4"
+                >
+                  Annuler
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </CardContent>
     </Card>

@@ -89,7 +89,10 @@ export async function GET(
     doc.fontSize(14).text('Thème Shopify', { underline: true });
     doc.moveDown(0.5);
     if (analysis.theme) {
-      doc.fontSize(10).text(analysis.theme, { indent: 20 });
+      const themeText = typeof analysis.theme === 'string' 
+        ? analysis.theme 
+        : (analysis.theme as any)?.name || 'Thème détecté';
+      doc.fontSize(10).text(themeText, { indent: 20 });
     } else {
       doc.fontSize(10).fillColor('gray').text('Thème non détecté', { indent: 20 }).fillColor('black');
     }

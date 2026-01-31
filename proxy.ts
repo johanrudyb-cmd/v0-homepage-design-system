@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const isAuthPage = pathname.startsWith('/auth');
-  const isProtectedRoute = 
+  const isProtectedRoute =
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/brands') ||
     pathname.startsWith('/trends') ||

@@ -13,6 +13,7 @@ export async function GET(request: Request) {
 
     const { searchParams } = new URL(request.url);
     const brandId = searchParams.get('brandId');
+    const templatesOnly = searchParams.get('templates') === 'true';
 
     if (!brandId) {
       return NextResponse.json({ error: 'brandId requis' }, { status: 400 });
@@ -27,9 +28,14 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Marque non trouvée' }, { status: 404 });
     }
 
+    const where: any = { brandId };
+    if (templatesOnly) {
+      where.isTemplate = true;
+    }
+
     const designs = await prisma.design.findMany({
-      where: { brandId },
-      orderBy: { createdAt: 'desc' },
+      where,
+      orderBy: templatesOnly ? { templateName: 'asc' } : { createdAt: 'desc' },
     });
 
     return NextResponse.json({ designs });

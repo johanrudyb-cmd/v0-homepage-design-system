@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
+import { NotificationHelpers } from '@/lib/notifications';
 
 export const runtime = 'nodejs';
 
@@ -98,6 +99,9 @@ export async function POST(request: Request) {
       },
     });
 
+    // Créer une notification pour le devis envoyé
+    await NotificationHelpers.quoteSent(user.id, factory.name, quote.id);
+
     // Vérifier si au moins 2 devis ont été envoyés pour valider Phase 3
     const quoteCount = await prisma.quote.count({
       where: { brandId, status: 'sent' },
@@ -109,6 +113,8 @@ export async function POST(request: Request) {
         where: { brandId },
         data: { phase3: true },
       });
+      // Notification pour phase complétée
+      await NotificationHelpers.phaseCompleted(user.id, 3, 'Contact avec les usines');
     }
 
     return NextResponse.json({ success: true, quote });

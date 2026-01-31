@@ -18,8 +18,14 @@ import {
   Sparkles,
   Target,
   Users,
-  Activity
+  Activity,
+  FileText
 } from 'lucide-react';
+import { LiveTrackingIndicator } from './LiveTrackingIndicator';
+import { ReverseEngineeringModule } from './ReverseEngineeringModule';
+import { EstimationInfo } from './EstimationInfo';
+import { AdLibrarySection } from './AdLibrarySection';
+import { useRouter } from 'next/navigation';
 import {
   LineChart,
   Line,
@@ -61,6 +67,14 @@ interface Analysis {
   last3MonthsAdsGrowth?: number | null;
   lastMonthAdsGrowth?: number | null;
   aiAnalysis?: any;
+  dataSource?: 'scraped' | 'estimated';
+  scrapedData?: any;
+  advertisingStrategy?: {
+    adData?: {
+      facebook: Array<{ title: string | null; imageUrl: string | null; videoUrl: string | null; text: string | null; link: string | null; date: string | null }>;
+      tiktok: Array<{ title: string | null; imageUrl: string | null; videoUrl: string | null; text: string | null; date: string | null }>;
+    };
+  };
   createdAt: Date;
 }
 
@@ -71,6 +85,8 @@ interface AnalysisResultProps {
 
 export function AnalysisResult({ analysis, onBack }: AnalysisResultProps) {
   const [activeTab, setActiveTab] = useState<'revenue' | 'traffic'>('revenue');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const router = useRouter();
 
   const formatRevenue = (revenue: number | null) => {
     if (!revenue) return 'Non disponible';
@@ -95,8 +111,39 @@ export function AnalysisResult({ analysis, onBack }: AnalysisResultProps) {
   const adStrategy = analysis.adStrategy || {};
   const aiAnalysis = analysis.aiAnalysis || {};
 
+  const isScraped = analysis.dataSource === 'scraped';
+
   return (
     <div className="space-y-8">
+      {/* Badge indicateur de source de données */}
+      {isScraped && (
+        <div className="bg-green-50 dark:bg-green-950 border-2 border-green-200 dark:border-green-800 rounded-lg p-4 flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-green-900 dark:text-green-100">
+              ✅ Données réelles extraites
+            </p>
+            <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+              Thème, couleurs, polices, apps et navigation ont été extraits directement depuis la boutique.
+              Les métriques financières (revenus, trafic) sont estimées car non accessibles publiquement.
+            </p>
+          </div>
+        </div>
+      )}
+      
+      {!isScraped && (
+        <div className="bg-yellow-50 dark:bg-yellow-950 border-2 border-yellow-200 dark:border-yellow-800 rounded-lg p-4 flex items-center gap-3">
+          <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-yellow-900 dark:text-yellow-100">
+              ⚠️ Données estimées
+            </p>
+            <p className="text-xs text-yellow-700 dark:text-yellow-300 mt-1">
+              Le scraping n'a pas pu être effectué. Les données affichées sont des estimations basées sur des moyennes du marché.
+            </p>
+          </div>
+        </div>
+      )}
       {/* Header avec style mode/fashion */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-secondary/5 to-accent/5 rounded-2xl -z-10" />
@@ -138,7 +185,9 @@ export function AnalysisResult({ analysis, onBack }: AnalysisResultProps) {
                     {analysis.launchDate && (
                       <>
                         <span>•</span>
-                        <span className="text-sm font-medium">Lancé en {analysis.launchDate}</span>
+                        <span className="text-sm font-medium" title="Date estimée basée sur le nombre de produits">
+                          Lancé ~{analysis.launchDate}
+                        </span>
                       </>
                     )}
                   </div>
@@ -146,12 +195,68 @@ export function AnalysisResult({ analysis, onBack }: AnalysisResultProps) {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm" className="border-2">
+              <Button 
+                variant="default" 
+                size="sm"
+                onClick={() => {
+                  // Passer les données de l'analyse au Design Studio
+                  const analysisData = {
+                    storeName: analysis.storeName,
+                    theme: analysis.theme,
+                    stack: analysis.stack,
+                    category: analysis.category,
+                  };
+                  sessionStorage.setItem('spyAnalysisData', JSON.stringify(analysisData));
+                  router.push('/design-studio');
+                }}
+                className="border-2"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Générer Tech Pack
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-2"
+                onClick={() => window.open(analysis.shopifyUrl, '_blank')}
+              >
                 <ExternalLink className="w-4 h-4 mr-2" />
                 Site web
               </Button>
-              <Button variant="ghost" size="icon" className="rounded-lg">
-                <RefreshCw className="w-4 h-4" />
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="border-2"
+                onClick={async () => {
+                  setIsRefreshing(true);
+                  try {
+                    const response = await fetch('/api/spy/analyze', {
+                      method: 'PUT',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        analysisId: analysis.id,
+                        url: analysis.shopifyUrl,
+                      }),
+                    });
+
+                    if (!response.ok) {
+                      const data = await response.json();
+                      throw new Error(data.error || 'Erreur lors de l\'actualisation');
+                    }
+
+                    const data = await response.json();
+                    // Recharger la page pour afficher les nouvelles données
+                    window.location.reload();
+                  } catch (error: any) {
+                    alert(error.message || 'Erreur lors de l\'actualisation');
+                  } finally {
+                    setIsRefreshing(false);
+                  }
+                }}
+                disabled={isRefreshing}
+              >
+                <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+                {isRefreshing ? 'Actualisation...' : 'Actualiser'}
               </Button>
             </div>
           </div>
@@ -166,8 +271,11 @@ export function AnalysisResult({ analysis, onBack }: AnalysisResultProps) {
                 </span>
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {formatRevenue(analysis.estimatedDailyRevenue)}
+                {formatRevenue(analysis.estimatedDailyRevenue ?? null)}
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Estimé • Basé sur trafic et conversion
+              </p>
             </div>
 
             <div className="p-4 bg-background/80 backdrop-blur rounded-xl border border-border">
@@ -178,8 +286,11 @@ export function AnalysisResult({ analysis, onBack }: AnalysisResultProps) {
                 </span>
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {formatRevenue(analysis.estimatedMonthlyRevenue)}
+                {formatRevenue(analysis.estimatedMonthlyRevenue ?? null)}
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Estimé • Basé sur trafic et conversion
+              </p>
             </div>
 
             <div className="p-4 bg-background/80 backdrop-blur rounded-xl border border-border">
@@ -190,24 +301,55 @@ export function AnalysisResult({ analysis, onBack }: AnalysisResultProps) {
                 </span>
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {formatNumber(analysis.productCount)}
+                {formatNumber(analysis.productCount ?? null)}
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                {analysis.dataSource === 'scraped' ? 'Extrait depuis la boutique' : 'Estimé'}
+              </p>
             </div>
 
             <div className="p-4 bg-background/80 backdrop-blur rounded-xl border border-border">
               <div className="flex items-center gap-2 mb-2">
                 <ShoppingBag className="w-4 h-4 text-secondary" />
                 <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                  Commandes
+                  Commandes/mois
                 </span>
               </div>
               <div className="text-2xl font-bold text-foreground">
-                {formatNumber(analysis.averageOrdersPerMonth)}
+                {formatNumber(analysis.averageOrdersPerMonth ?? null)}
               </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Estimé • Activer le tracking pour les données réelles
+              </p>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Info sur les estimations */}
+      <EstimationInfo
+        dataSource={analysis.dataSource || 'estimated'}
+        estimatedMonthlyRevenue={analysis.estimatedMonthlyRevenue ?? null}
+        averageOrdersPerMonth={analysis.averageOrdersPerMonth ?? null}
+      />
+
+      {/* Publicités actives */}
+      {analysis.advertisingStrategy?.adData && (
+        <AdLibrarySection adData={analysis.advertisingStrategy.adData} />
+      )}
+
+      {/* Tracking Live */}
+      <LiveTrackingIndicator 
+        shopifyUrl={analysis.shopifyUrl} 
+        storeName={analysis.storeName || 'Boutique'} 
+      />
+
+      {/* Reverse Engineering Financier */}
+      <ReverseEngineeringModule
+        estimatedMonthlyRevenue={analysis.estimatedMonthlyRevenue ?? null}
+        estimatedDailyRevenue={analysis.estimatedDailyRevenue ?? null}
+        productCount={analysis.productCount ?? null}
+      />
 
       {/* Graphiques avec style unique */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -243,14 +385,14 @@ export function AnalysisResult({ analysis, onBack }: AnalysisResultProps) {
               <div className="flex gap-6 mt-4">
                 <div>
                   <span className="text-xs font-semibold text-muted-foreground uppercase">3 mois</span>
-                  <div className={`text-lg font-bold ${analysis.last3MonthsGrowth >= 0 ? 'text-success' : 'text-error'}`}>
-                    {analysis.last3MonthsGrowth >= 0 ? '+' : ''}{analysis.last3MonthsGrowth}%
+                  <div className={`text-lg font-bold ${(analysis.last3MonthsGrowth ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+                    {(analysis.last3MonthsGrowth ?? 0) >= 0 ? '+' : ''}{analysis.last3MonthsGrowth ?? 0}%
                   </div>
                 </div>
                 <div>
                   <span className="text-xs font-semibold text-muted-foreground uppercase">Mois dernier</span>
-                  <div className={`text-lg font-bold ${analysis.lastMonthGrowth >= 0 ? 'text-success' : 'text-error'}`}>
-                    {analysis.lastMonthGrowth >= 0 ? '+' : ''}{analysis.lastMonthGrowth}%
+                  <div className={`text-lg font-bold ${(analysis.lastMonthGrowth ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+                    {(analysis.lastMonthGrowth ?? 0) >= 0 ? '+' : ''}{analysis.lastMonthGrowth ?? 0}%
                   </div>
                 </div>
               </div>
@@ -540,16 +682,16 @@ export function AnalysisResult({ analysis, onBack }: AnalysisResultProps) {
                   {analysis.last3MonthsAdsGrowth !== null && (
                     <div>
                       <span className="text-xs font-semibold text-muted-foreground uppercase">3 mois</span>
-                      <div className={`text-lg font-bold ${analysis.last3MonthsAdsGrowth >= 0 ? 'text-success' : 'text-error'}`}>
-                        {analysis.last3MonthsAdsGrowth >= 0 ? '+' : ''}{analysis.last3MonthsAdsGrowth}%
+                      <div className={`text-lg font-bold ${(analysis.last3MonthsAdsGrowth ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+                        {(analysis.last3MonthsAdsGrowth ?? 0) >= 0 ? '+' : ''}{analysis.last3MonthsAdsGrowth ?? 0}%
                       </div>
                     </div>
                   )}
                   {analysis.lastMonthAdsGrowth !== null && (
                     <div>
                       <span className="text-xs font-semibold text-muted-foreground uppercase">Mois dernier</span>
-                      <div className={`text-lg font-bold ${analysis.lastMonthAdsGrowth >= 0 ? 'text-success' : 'text-error'}`}>
-                        {analysis.lastMonthAdsGrowth >= 0 ? '+' : ''}{analysis.lastMonthAdsGrowth}%
+                      <div className={`text-lg font-bold ${(analysis.lastMonthAdsGrowth ?? 0) >= 0 ? 'text-success' : 'text-error'}`}>
+                        {(analysis.lastMonthAdsGrowth ?? 0) >= 0 ? '+' : ''}{analysis.lastMonthAdsGrowth ?? 0}%
                       </div>
                     </div>
                   )}

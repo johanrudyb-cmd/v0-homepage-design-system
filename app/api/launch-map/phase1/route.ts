@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
+import { NotificationHelpers } from '@/lib/notifications';
 
 export const runtime = 'nodejs';
 
@@ -35,6 +36,9 @@ export async function POST(request: Request) {
         phase1Data: data,
       },
     });
+
+    // Créer une notification pour la phase complétée
+    await NotificationHelpers.phaseCompleted(user.id, 1, 'Calcul de rentabilité');
 
     return NextResponse.json({ success: true, launchMap });
   } catch (error: any) {

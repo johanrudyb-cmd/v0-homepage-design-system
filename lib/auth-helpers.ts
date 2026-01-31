@@ -1,5 +1,6 @@
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
+import { prisma } from './prisma';
 
 const secret = new TextEncoder().encode(
   process.env.NEXTAUTH_SECRET || 'fallback-secret-key-change-in-production'
@@ -16,11 +17,26 @@ export async function getCurrentUser() {
 
     const { payload } = await jwtVerify(token, secret);
 
+    // Récupérer le plan depuis la base de données pour avoir la valeur à jour
+    const user = await prisma.user.findUnique({
+      where: { id: payload.id as string },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        plan: true,
+      },
+    });
+
+    if (!user) {
+      return null;
+    }
+
     return {
-      id: payload.id as string,
-      email: payload.email as string,
-      name: payload.name as string,
-      plan: payload.plan as string,
+      id: user.id,
+      email: user.email,
+      name: user.name || (payload.name as string),
+      plan: user.plan, // Plan depuis la base de données (toujours à jour)
     };
   } catch (error) {
     return null;

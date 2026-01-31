@@ -6,7 +6,8 @@ import Link from 'next/link';
 interface Analysis {
   id: string;
   shopifyUrl: string;
-  estimatedRevenue: number | null;
+  estimatedRevenue?: number | null;
+  estimatedMonthlyRevenue?: number | null;
   createdAt: Date;
 }
 
@@ -56,7 +57,7 @@ export function AnalysisHistory({ analyses }: AnalysisHistoryProps) {
                     </span>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-stone-500 font-light">
-                    <span>CA estimé : {formatRevenue(analysis.estimatedRevenue)}</span>
+                    <span>CA estimé : {formatRevenue(analysis.estimatedMonthlyRevenue ?? analysis.estimatedRevenue ?? null)}</span>
                     <span>•</span>
                     <span>{formatDate(analysis.createdAt)}</span>
                   </div>

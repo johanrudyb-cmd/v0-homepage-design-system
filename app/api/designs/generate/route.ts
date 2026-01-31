@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
+import { rateLimitByUser } from '@/lib/rate-limit';
 import { enhancePrompt, generateTechPack } from '@/lib/api/chatgpt';
 import { generateFlatSketch } from '@/lib/api/higgsfield';
+import { NotificationHelpers } from '@/lib/notifications';
 
 export const runtime = 'nodejs';
 
@@ -13,7 +15,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    const { brandId, type, cut, material, details, customPrompt } = await request.json();
+    const { brandId, type, cut, material, details, customPrompt, autoApplyIdentity } = await request.json();
 
     // Vérifier que la marque appartient à l'utilisateur
     const brand = await prisma.brand.findFirst({
@@ -22,6 +24,30 @@ export async function POST(request: Request) {
 
     if (!brand) {
       return NextResponse.json({ error: 'Marque non trouvée' }, { status: 404 });
+    }
+
+    // Rate limiting : 5 requêtes par minute par utilisateur
+    const rateLimitResult = await rateLimitByUser(user.id, 'designs:generate', {
+      maxRequests: 5,
+      windowMs: 60 * 1000, // 1 minute
+    });
+
+    if (!rateLimitResult.success) {
+      return NextResponse.json(
+        {
+          error: 'Trop de requêtes. Veuillez patienter avant de réessayer.',
+          retryAfter: Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000),
+        },
+        {
+          status: 429,
+          headers: {
+            'Retry-After': Math.ceil((rateLimitResult.resetTime - Date.now()) / 1000).toString(),
+            'X-RateLimit-Limit': '5',
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': new Date(rateLimitResult.resetTime).toISOString(),
+          },
+        }
+      );
     }
 
     // Vérifier les limites selon le plan (Free: 3, Pro: illimité)
@@ -49,7 +75,16 @@ export async function POST(request: Request) {
 
     try {
       // Construire le prompt de base
-      const basePrompt = `${type}, ${cut} cut, ${material}`;
+      let basePrompt = `${type}, ${cut} cut, ${material}`;
+      
+      // Ajouter l'identité de marque si activée
+      if (autoApplyIdentity && brand.logo && brand.colorPalette) {
+        const colorInfo = typeof brand.colorPalette === 'object' 
+          ? Object.entries(brand.colorPalette).map(([key, value]) => `${key}: ${value}`).join(', ')
+          : '';
+        basePrompt += `, marque ${brand.name}, logo ${brand.logo}, couleurs ${colorInfo}`;
+      }
+      
       const detailsList = Object.entries(details)
         .filter(([_, value]) => value)
         .map(([key]) => key)
@@ -86,6 +121,24 @@ export async function POST(request: Request) {
           status: 'completed',
         },
       });
+
+      // Créer une notification
+      await NotificationHelpers.designCompleted(user.id, type, updatedDesign.id);
+
+      // Vérifier si c'est le premier design pour valider Phase 2
+      const designCount = await prisma.design.count({
+        where: { brandId, status: 'completed' },
+      });
+
+      if (designCount === 1) {
+        // Marquer la Phase 2 comme complétée
+        await prisma.launchMap.updateMany({
+          where: { brandId },
+          data: { phase2: true },
+        });
+        // Notification pour phase complétée
+        await NotificationHelpers.phaseCompleted(user.id, 2, 'Création du premier design');
+      }
 
       return NextResponse.json({ design: updatedDesign });
     } catch (error: any) {

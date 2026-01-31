@@ -6,6 +6,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FactoryCard } from './FactoryCard';
 import { QuoteList } from './QuoteList';
+import { FactoryMatching } from './FactoryMatching';
+import { ActivePreferencesBadge } from '@/components/common/ActivePreferencesBadge';
+import { filterFactoriesByProduct } from '@/lib/factory-product-matcher';
 
 interface Factory {
   id: string;
@@ -28,20 +31,41 @@ interface Quote {
   createdAt: Date;
 }
 
+interface UserPreferences {
+  preferredSourcingCountries?: string[];
+  preferredMOQ?: number | null;
+  maxLeadTime?: number | null;
+}
+
 interface SourcingHubProps {
   brandId: string;
   sentQuotes: Quote[];
+  preferences?: UserPreferences | null;
+  trendEmailData?: {
+    subject: string;
+    body: string;
+    productDetails: any;
+  } | null;
+  autoFilterData?: { productType: string | null; material: string | null } | null;
 }
 
-export function SourcingHub({ brandId, sentQuotes }: SourcingHubProps) {
+export function SourcingHub({ brandId, sentQuotes, preferences, trendEmailData, autoFilterData }: SourcingHubProps) {
   const [factories, setFactories] = useState<Factory[]>([]);
   const [filteredFactories, setFilteredFactories] = useState<Factory[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  // Afficher une alerte si on vient d'une tendance
+  useEffect(() => {
+    if (trendEmailData) {
+      // Optionnel : afficher une notification
+      console.log('Email pré-rempli depuis tendance:', trendEmailData);
+    }
+  }, [trendEmailData]);
   const [filters, setFilters] = useState({
-    country: '',
-    moqMax: '',
+    country: preferences?.preferredSourcingCountries?.[0] || '',
+    moqMax: preferences?.preferredMOQ?.toString() || '',
     specialty: '',
-    leadTimeMax: '',
+    leadTimeMax: preferences?.maxLeadTime?.toString() || '',
     search: '',
   });
 
@@ -51,7 +75,7 @@ export function SourcingHub({ brandId, sentQuotes }: SourcingHubProps) {
 
   useEffect(() => {
     applyFilters();
-  }, [filters, factories]);
+  }, [filters, factories, autoFilterData]);
 
   const fetchFactories = async () => {
     try {
@@ -68,6 +92,15 @@ export function SourcingHub({ brandId, sentQuotes }: SourcingHubProps) {
 
   const applyFilters = () => {
     let filtered = [...factories];
+
+    // Filtrage automatique par type de produit (si venant d'une tendance)
+    if (autoFilterData?.productType) {
+      filtered = filterFactoriesByProduct(
+        filtered,
+        autoFilterData.productType,
+        autoFilterData.material
+      );
+    }
 
     if (filters.country) {
       filtered = filtered.filter((f) => f.country === filters.country);
@@ -110,10 +143,16 @@ export function SourcingHub({ brandId, sentQuotes }: SourcingHubProps) {
 
   return (
     <div className="space-y-8">
+      {/* Badge préférences actives */}
+      <ActivePreferencesBadge type="sourcing" />
+      
+      {/* Matching IA */}
+      <FactoryMatching brandId={brandId} sentQuotes={sentQuotes} />
+
       {/* Filtres */}
-      <Card className="border-2">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-bold">
+          <CardTitle className="text-lg font-semibold">
             Filtres de recherche
           </CardTitle>
         </CardHeader>
@@ -142,7 +181,7 @@ export function SourcingHub({ brandId, sentQuotes }: SourcingHubProps) {
                 onChange={(e) =>
                   setFilters({ ...filters, country: e.target.value })
                 }
-                className="w-full px-4 py-2.5 border-2 border-input rounded-lg bg-background text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                className="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               >
                 <option value="">Tous les pays</option>
                 {countries.map((country) => (
@@ -176,7 +215,7 @@ export function SourcingHub({ brandId, sentQuotes }: SourcingHubProps) {
                 onChange={(e) =>
                   setFilters({ ...filters, specialty: e.target.value })
                 }
-                className="w-full px-4 py-2.5 border-2 border-input rounded-lg bg-background text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                className="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
               >
                 <option value="">Toutes les spécialités</option>
                 {allSpecialties.map((specialty) => (
@@ -203,6 +242,36 @@ export function SourcingHub({ brandId, sentQuotes }: SourcingHubProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Alerte si email pré-rempli depuis tendance */}
+      {trendEmailData && (
+        <Card className="border-2 border-blue-500/50 bg-blue-50/50 dark:bg-blue-950/20">
+          <CardContent className="pt-6">
+            <div className="flex items-start gap-3">
+              <div className="flex-1">
+                <div className="font-semibold text-blue-900 dark:text-blue-300 mb-1">
+                  📧 Email Pré-rempli depuis la Tendance
+                </div>
+                <div className="text-sm text-blue-700 dark:text-blue-400">
+                  Un message professionnel a été généré avec les informations essentielles.
+                  Les usines ont été filtrées automatiquement selon le type de produit.
+                </div>
+                <div className="mt-2 text-xs text-blue-600 dark:text-blue-500">
+                  Produit : {trendEmailData.productDetails?.type || 'N/A'}
+                  {trendEmailData.productDetails?.cut && ` • ${trendEmailData.productDetails.cut}`}
+                  {trendEmailData.productDetails?.material && ` • ${trendEmailData.productDetails.material}`}
+                </div>
+                {autoFilterData && (
+                  <div className="mt-2 text-xs text-blue-600 dark:text-blue-500">
+                    ✓ Filtrage automatique activé : {autoFilterData.productType}
+                    {autoFilterData.material && ` • ${autoFilterData.material}`}
+                  </div>
+                )}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Liste des usines */}
       <div>
@@ -232,6 +301,8 @@ export function SourcingHub({ brandId, sentQuotes }: SourcingHubProps) {
                 factory={factory}
                 brandId={brandId}
                 isAlreadyQuoted={sentQuotes.some((q) => q.factoryId === factory.id)}
+                preFilledMessage={trendEmailData?.body}
+                preFilledSubject={trendEmailData?.subject}
               />
             ))}
           </div>

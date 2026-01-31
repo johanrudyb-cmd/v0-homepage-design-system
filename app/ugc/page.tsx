@@ -32,26 +32,44 @@ export default async function UGCPage() {
     take: 10,
   });
 
+  // Récupérer l'identité de marque complète
+  const brandWithIdentity = await prisma.brand.findUnique({
+    where: { id: brand.id },
+    select: {
+      id: true,
+      name: true,
+      logo: true,
+      colorPalette: true,
+      typography: true,
+      styleGuide: true,
+    },
+  });
+
   return (
     <DashboardLayout>
       <div className="p-8 max-w-7xl mx-auto space-y-8">
-        <div className="space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-xl bg-secondary flex items-center justify-center shadow-modern">
+        <div className="space-y-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-lg bg-secondary flex items-center justify-center">
               <Sparkles className="w-6 h-6 text-white" />
             </div>
-            <div>
-              <h1 className="text-4xl font-bold tracking-tight text-foreground">
-                UGC AI Lab
+            <div className="flex-1">
+              <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-1">
+                UGC Lab
               </h1>
-              <p className="text-muted-foreground font-medium text-lg mt-1">
-                Générez votre contenu marketing avec l'IA : Virtual Try-On et scripts UGC
+              <p className="text-muted-foreground text-sm">
+                Créez votre contenu marketing viral avec l'intelligence artificielle
               </p>
             </div>
           </div>
         </div>
 
-        <UGCLab brandId={brand.id} brandName={brand.name} designs={designs} />
+        <UGCLab 
+          brandId={brand.id} 
+          brandName={brand.name} 
+          designs={designs}
+          brand={brandWithIdentity || undefined}
+        />
       </div>
     </DashboardLayout>
   );

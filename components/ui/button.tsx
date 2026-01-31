@@ -26,14 +26,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variants = {
       default:
-        'bg-primary text-primary-foreground hover:bg-primary/90 shadow-modern hover:shadow-modern-lg',
+        'bg-primary text-primary-foreground hover:bg-primary/90',
       secondary:
-        'bg-secondary text-secondary-foreground hover:bg-secondary/90 shadow-modern hover:shadow-modern-lg',
+        'bg-secondary text-secondary-foreground hover:bg-secondary/90',
       outline:
-        'border-2 border-border bg-background hover:bg-muted hover:border-primary/50',
+        'border border-border bg-background hover:bg-muted hover:border-primary/50',
       ghost: 'hover:bg-muted hover:text-foreground',
       destructive:
-        'bg-error text-error-foreground hover:bg-error/90 shadow-modern',
+        'bg-error text-error-foreground hover:bg-error/90',
     };
 
     const sizes = {

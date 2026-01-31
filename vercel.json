@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/track-inventory",
+      "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/scan-trends",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}

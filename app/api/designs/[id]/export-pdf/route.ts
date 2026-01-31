@@ -5,6 +5,19 @@ import PDFDocument from 'pdfkit';
 
 export const runtime = 'nodejs';
 
+// Fonction pour télécharger une image depuis une URL
+async function fetchImageAsBuffer(url: string): Promise<Buffer | null> {
+  try {
+    const response = await fetch(url);
+    if (!response.ok) return null;
+    const arrayBuffer = await response.arrayBuffer();
+    return Buffer.from(arrayBuffer);
+  } catch (error) {
+    console.error('Erreur téléchargement image:', error);
+    return null;
+  }
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -30,73 +43,225 @@ export async function GET(
       return NextResponse.json({ error: 'Accès non autorisé' }, { status: 403 });
     }
 
-    // Créer le PDF
-    const doc = new PDFDocument({ margin: 50 });
-
-    // En-tête
-    doc.fontSize(20).text('Tech Pack', { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(12).text(`Design: ${design.type}`, { align: 'center' });
-    if (design.cut) {
-      doc.text(`Coupe: ${design.cut}`, { align: 'center' });
-    }
-    if (design.material) {
-      doc.text(`Matière: ${design.material}`, { align: 'center' });
-    }
-    doc.moveDown();
-
-    // Informations de contact
-    doc.fontSize(10).text(`Généré le: ${new Date().toLocaleDateString('fr-FR')}`, {
-      align: 'right',
+    // Créer le PDF avec marges
+    const doc = new PDFDocument({ 
+      margin: 50,
+      size: 'A4',
+      info: {
+        Title: `Tech Pack - ${design.type}`,
+        Author: user.name || user.email,
+        Subject: 'Tech Pack Professionnel',
+        Creator: 'SaaS Mode',
+      }
     });
-    if (user.name) {
-      doc.text(`Par: ${user.name}`, { align: 'right' });
-    }
-    doc.text(`Email: ${user.email}`, { align: 'right' });
+
+    // Couleurs
+    const primaryColor = '#000000';
+    const secondaryColor = '#666666';
+    const accentColor = '#000000';
+
+    // En-tête avec ligne décorative
+    doc.rect(50, 50, doc.page.width - 100, 60)
+       .fillColor(primaryColor)
+       .fill();
+    
+    doc.fillColor('#FFFFFF')
+       .fontSize(24)
+       .font('Helvetica-Bold')
+       .text('TECH PACK', 50, 65, { align: 'center', width: doc.page.width - 100 });
+    
+    doc.fontSize(12)
+       .font('Helvetica')
+       .text(design.brand.name || 'Ma Marque', 50, 95, { align: 'center', width: doc.page.width - 100 });
+    
+    doc.fillColor(primaryColor);
     doc.moveDown(2);
 
-    // Flat Sketch
+    // Informations du design
+    doc.fontSize(16)
+       .font('Helvetica-Bold')
+       .text('Informations du Design', { underline: true });
+    doc.moveDown(0.5);
+
+    doc.fontSize(11)
+       .font('Helvetica')
+       .fillColor(secondaryColor)
+       .text('Type:', 50, doc.y, { continued: true })
+       .fillColor(primaryColor)
+       .font('Helvetica-Bold')
+       .text(` ${design.type}`);
+    
+    if (design.cut) {
+      doc.moveDown(0.3);
+      doc.font('Helvetica')
+         .fillColor(secondaryColor)
+         .text('Coupe:', { continued: true })
+         .fillColor(primaryColor)
+         .font('Helvetica-Bold')
+         .text(` ${design.cut}`);
+    }
+    
+    if (design.material) {
+      doc.moveDown(0.3);
+      doc.font('Helvetica')
+         .fillColor(secondaryColor)
+         .text('Matière:', { continued: true })
+         .fillColor(primaryColor)
+         .font('Helvetica-Bold')
+         .text(` ${design.material}`);
+    }
+
+    doc.moveDown(1);
+    doc.fillColor(primaryColor);
+
+    // Flat Sketch avec image
     if (design.flatSketchUrl) {
-      doc.fontSize(14).text('Flat Sketch (Recto/Verso)', { underline: true });
-      doc.moveDown();
-      doc.fontSize(10).fillColor('blue').text(`Image disponible à: ${design.flatSketchUrl}`);
-      doc.fillColor('black');
-      doc.moveDown();
+      doc.fontSize(16)
+         .font('Helvetica-Bold')
+         .text('Flat Sketch (Recto/Verso)', { underline: true });
+      doc.moveDown(0.5);
+
+      // Télécharger et inclure l'image
+      const imageBuffer = await fetchImageAsBuffer(design.flatSketchUrl);
+      
+      if (imageBuffer) {
+        try {
+          // Calculer la taille pour que l'image tienne dans la page
+          const maxWidth = doc.page.width - 100;
+          const maxHeight = 300;
+          
+          doc.image(imageBuffer, {
+            fit: [maxWidth, maxHeight],
+            align: 'center',
+          });
+          doc.moveDown(0.5);
+        } catch (imageError) {
+          console.error('Erreur inclusion image:', imageError);
+          doc.fontSize(10)
+             .fillColor(secondaryColor)
+             .text(`Image disponible à: ${design.flatSketchUrl}`);
+          doc.fillColor(primaryColor);
+        }
+      } else {
+        doc.fontSize(10)
+           .fillColor(secondaryColor)
+           .text(`Image disponible à: ${design.flatSketchUrl}`);
+        doc.fillColor(primaryColor);
+      }
+      
+      doc.moveDown(1);
     }
 
     // Tech Pack - Composants
     if (design.techPack) {
-      doc.fontSize(14).text('Composants du Tech Pack', { underline: true });
+      // Nouvelle page si nécessaire
+      if (doc.y > 600) {
+        doc.addPage();
+      }
+
+      doc.fontSize(16)
+         .font('Helvetica-Bold')
+         .text('Composants du Tech Pack', { underline: true });
       doc.moveDown(0.5);
 
       const techPack = design.techPack as Record<string, any>;
+      const entries = Object.entries(techPack);
 
-      Object.entries(techPack).forEach(([key, value]) => {
+      entries.forEach(([key, value], index) => {
         // Nouvelle page si nécessaire
         if (doc.y > 700) {
           doc.addPage();
         }
 
-        const componentName = key.replace(/([A-Z])/g, ' $1').trim();
-        const componentValue =
-          typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value);
+        const componentName = key
+          .replace(/([A-Z])/g, ' $1')
+          .trim()
+          .split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ');
 
-        doc.fontSize(11).font('Helvetica-Bold').text(`${componentName}:`);
-        doc.font('Helvetica').fontSize(10).text(componentValue, { indent: 20 });
-        doc.moveDown(0.5);
+        const componentValue =
+          typeof value === 'object' 
+            ? JSON.stringify(value, null, 2) 
+            : String(value);
+
+        // Fond alterné pour lisibilité
+        if (index % 2 === 0) {
+          doc.rect(50, doc.y - 5, doc.page.width - 100, 25)
+             .fillColor('#F5F5F5')
+             .fill();
+        }
+
+        doc.fillColor(primaryColor)
+           .fontSize(11)
+           .font('Helvetica-Bold')
+           .text(`${componentName}:`, 55, doc.y);
+        
+        doc.moveDown(0.4);
+        doc.font('Helvetica')
+           .fontSize(10)
+           .fillColor(secondaryColor)
+           .text(componentValue, { 
+             indent: 20, 
+             width: doc.page.width - 120,
+             align: 'left'
+           });
+        
+        doc.moveDown(0.8);
+        doc.fillColor(primaryColor);
       });
     }
 
-    // Footer
-    doc.fontSize(8)
-      .text(
-        `Document généré par SaaS Mode - ${new Date().toLocaleDateString('fr-FR')}`,
-        50,
-        doc.page.height - 50,
-        { align: 'center' }
-      );
+    // Informations de génération
+    doc.addPage();
+    doc.fontSize(12)
+       .font('Helvetica-Bold')
+       .text('Informations', { underline: true });
+    doc.moveDown(0.5);
 
-    // Convertir le stream en buffer (ATTACHER LES LISTENERS AVANT doc.end())
+    const dateStr = new Date().toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+
+    doc.fontSize(10)
+       .font('Helvetica')
+       .fillColor(secondaryColor)
+       .text(`Généré le: ${dateStr}`);
+    
+    if (user.name) {
+      doc.moveDown(0.3);
+      doc.text(`Par: ${user.name}`);
+    }
+    
+    doc.moveDown(0.3);
+    doc.text(`Email: ${user.email}`);
+
+    if (design.brand.name) {
+      doc.moveDown(0.3);
+      doc.text(`Marque: ${design.brand.name}`);
+    }
+
+    // Footer sur chaque page
+    const pageCount = doc.bufferedPageRange().count;
+    const dateFooter = new Date().toLocaleDateString('fr-FR');
+    
+    for (let i = 0; i < pageCount; i++) {
+      doc.switchToPage(i);
+      doc.fontSize(8)
+         .fillColor(secondaryColor)
+         .text(
+           `SaaS Mode - Page ${i + 1} sur ${pageCount} - ${dateFooter}`,
+           50,
+           doc.page.height - 30,
+           { align: 'center', width: doc.page.width - 100 }
+         );
+    }
+
+    // Convertir le stream en buffer
     const chunks: Buffer[] = [];
     doc.on('data', (chunk) => chunks.push(chunk));
 
@@ -106,17 +271,21 @@ export async function GET(
       doc.end();
     });
 
+    // Nom de fichier avec date
+    const dateFile = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
+    const fileName = `tech-pack-${design.type.toLowerCase().replace(/\s+/g, '-')}-${dateFile}.pdf`;
+
     // Retourner le PDF
     return new NextResponse(pdfBuffer as any, {
       headers: {
         'Content-Type': 'application/pdf',
-        'Content-Disposition': `attachment; filename="tech-pack-${id}.pdf"`,
+        'Content-Disposition': `attachment; filename="${fileName}"`,
       },
     });
   } catch (error: any) {
     console.error('Erreur lors de la génération du PDF:', error);
     return NextResponse.json(
-      { error: 'Une erreur est survenue lors de la génération du PDF' },
+      { error: error.message || 'Une erreur est survenue lors de la génération du PDF' },
       { status: 500 }
     );
   }

@@ -6,11 +6,13 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { AnalysisResult } from './AnalysisResult';
 import { AnalysisHistory } from './AnalysisHistory';
+import { BrandComparison } from './BrandComparison';
 
 interface Analysis {
   id: string;
   shopifyUrl: string;
-  estimatedRevenue: number | null;
+  estimatedRevenue?: number | null;
+  estimatedMonthlyRevenue?: number | null;
   stack: any;
   theme: string | null;
   adStrategy: any;
@@ -28,6 +30,7 @@ export function BrandSpy({ userId, analyses }: BrandSpyProps) {
   const [currentAnalysis, setCurrentAnalysis] = useState<Analysis | null>(null);
   const [error, setError] = useState('');
   const [showHistory, setShowHistory] = useState(false);
+  const [showComparison, setShowComparison] = useState(false);
 
   const handleAnalyze = async () => {
     if (!url.trim()) {
@@ -37,11 +40,8 @@ export function BrandSpy({ userId, analyses }: BrandSpyProps) {
 
     // Validation basique de l'URL
     try {
-      const urlObj = new URL(url);
-      if (!urlObj.hostname.includes('myshopify.com') && !urlObj.hostname.includes('shopify')) {
-        setError('Veuillez saisir une URL Shopify valide');
-        return;
-      }
+      new URL(url); // Vérifier que l'URL est valide
+      // La validation Shopify se fera côté serveur
     } catch {
       setError('URL invalide');
       return;
@@ -76,13 +76,13 @@ export function BrandSpy({ userId, analyses }: BrandSpyProps) {
   return (
     <div className="space-y-6">
       {/* Formulaire de recherche */}
-      <Card className="border-2">
+      <Card>
         <CardHeader>
-          <CardTitle className="text-xl font-bold">
+          <CardTitle className="text-xl font-semibold">
             Analyser une marque
           </CardTitle>
-          <CardDescription className="font-medium">
-            Saisissez l'URL d'une boutique Shopify pour obtenir une analyse complète
+          <CardDescription>
+            Saisissez l'URL d'une boutique Shopify pour découvrir leur stratégie
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -99,10 +99,9 @@ export function BrandSpy({ userId, analyses }: BrandSpyProps) {
             <Button
               onClick={handleAnalyze}
               variant="default"
-              className="shadow-modern"
               disabled={isAnalyzing || !url.trim()}
             >
-              {isAnalyzing ? 'Analyse en cours...' : 'Analyser'}
+              {isAnalyzing ? 'Analyse...' : 'Analyser'}
             </Button>
           </div>
 
@@ -113,14 +112,29 @@ export function BrandSpy({ userId, analyses }: BrandSpyProps) {
           )}
 
           {analyses.length > 0 && (
-            <div className="pt-4 border-t-2 border-border">
+            <div className="pt-4 border-t-2 border-border flex gap-2">
               <Button
                 variant="outline"
-                onClick={() => setShowHistory(!showHistory)}
+                onClick={() => {
+                  setShowHistory(!showHistory);
+                  setShowComparison(false);
+                }}
                 className="border-2"
               >
                 {showHistory ? 'Masquer' : 'Afficher'} l'historique ({analyses.length})
               </Button>
+              {analyses.length >= 2 && (
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setShowComparison(!showComparison);
+                    setShowHistory(false);
+                  }}
+                  className="border-2"
+                >
+                  {showComparison ? 'Masquer' : 'Comparer'} les marques
+                </Button>
+              )}
             </div>
           )}
         </CardContent>
@@ -129,6 +143,11 @@ export function BrandSpy({ userId, analyses }: BrandSpyProps) {
       {/* Historique */}
       {showHistory && analyses.length > 0 && (
         <AnalysisHistory analyses={analyses} />
+      )}
+
+      {/* Comparaison */}
+      {showComparison && analyses.length >= 2 && (
+        <BrandComparison userId={userId} />
       )}
 
       {/* Résultat de l'analyse */}

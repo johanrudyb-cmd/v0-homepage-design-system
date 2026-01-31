@@ -3,10 +3,12 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Phase0Identity } from './Phase0Identity';
 import { Phase1Calculator } from './Phase1Calculator';
 import { Phase2Design } from './Phase2Design';
 import { Phase3Sourcing } from './Phase3Sourcing';
 import { Phase4Marketing } from './Phase4Marketing';
+import Link from 'next/link';
 
 interface LaunchMapData {
   id: string;
@@ -17,12 +19,27 @@ interface LaunchMapData {
   phase1Data: any;
 }
 
+interface Brand {
+  id: string;
+  name: string;
+  logo?: string | null;
+  colorPalette?: any;
+}
+
 interface LaunchMapStepperProps {
   brandId: string;
   launchMap: LaunchMapData | null;
+  brand?: Brand;
+  hasIdentity?: boolean;
 }
 
 const phases = [
+  {
+    id: 0,
+    title: 'Identité',
+    subtitle: 'Créez votre identité de marque',
+    description: 'Nom, logo et identité visuelle de votre marque',
+  },
   {
     id: 1,
     title: 'Fondations',
@@ -49,9 +66,10 @@ const phases = [
   },
 ];
 
-export function LaunchMapStepper({ brandId, launchMap }: LaunchMapStepperProps) {
-  const [currentPhase, setCurrentPhase] = useState(1);
+export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = false }: LaunchMapStepperProps) {
+  const [currentPhase, setCurrentPhase] = useState(0);
   const [progress, setProgress] = useState({
+    phase0: hasIdentity, // Phase 0 = identité complétée
     phase1: launchMap?.phase1 || false,
     phase2: launchMap?.phase2 || false,
     phase3: launchMap?.phase3 || false,
@@ -60,7 +78,8 @@ export function LaunchMapStepper({ brandId, launchMap }: LaunchMapStepperProps) 
 
   // Déterminer la phase actuelle (première non complétée)
   useEffect(() => {
-    if (!progress.phase1) setCurrentPhase(1);
+    if (!progress.phase0) setCurrentPhase(0);
+    else if (!progress.phase1) setCurrentPhase(1);
     else if (!progress.phase2) setCurrentPhase(2);
     else if (!progress.phase3) setCurrentPhase(3);
     else if (!progress.phase4) setCurrentPhase(4);
@@ -68,7 +87,7 @@ export function LaunchMapStepper({ brandId, launchMap }: LaunchMapStepperProps) 
   }, [progress]);
 
   const completedPhases = Object.values(progress).filter(Boolean).length;
-  const progressPercentage = (completedPhases / 4) * 100;
+  const progressPercentage = (completedPhases / 5) * 100;
 
   const handlePhaseComplete = (phase: number) => {
     setProgress((prev) => ({
@@ -93,7 +112,7 @@ export function LaunchMapStepper({ brandId, launchMap }: LaunchMapStepperProps) 
                 Progression globale
               </h3>
               <p className="text-sm text-muted-foreground font-medium">
-                {completedPhases} sur 4 phases complétées
+                {completedPhases} sur 5 phases complétées
               </p>
             </div>
             <div className="text-right">
@@ -112,11 +131,11 @@ export function LaunchMapStepper({ brandId, launchMap }: LaunchMapStepperProps) 
       </Card>
 
       {/* Stepper visuel */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-5 gap-4">
         {phases.map((phase, index) => {
           const isCompleted = progress[`phase${phase.id}` as keyof typeof progress];
           const isCurrent = currentPhase === phase.id;
-          const isAccessible = phase.id === 1 || progress[`phase${phase.id - 1}` as keyof typeof progress];
+          const isAccessible = phase.id === 0 || progress[`phase${phase.id - 1}` as keyof typeof progress];
 
           return (
             <button
@@ -171,13 +190,22 @@ export function LaunchMapStepper({ brandId, launchMap }: LaunchMapStepperProps) 
       <Card className="border-2">
         <CardHeader>
           <CardTitle className="text-xl font-bold">
-            Phase {currentPhase} : {phases[currentPhase - 1].title}
+            Phase {currentPhase === 0 ? '0' : currentPhase} : {phases.find(p => p.id === currentPhase)?.title || 'Identité'}
           </CardTitle>
           <CardDescription className="font-medium">
-            {phases[currentPhase - 1].description}
+            {phases.find(p => p.id === currentPhase)?.description || 'Créez l\'identité de votre marque'}
           </CardDescription>
         </CardHeader>
         <CardContent>
+          {currentPhase === 0 && (
+            <Phase0Identity
+              brandId={brandId}
+              onComplete={() => {
+                setProgress((prev) => ({ ...prev, phase0: true }));
+                setCurrentPhase(1);
+              }}
+            />
+          )}
           {currentPhase === 1 && (
             <Phase1Calculator
               brandId={brandId}

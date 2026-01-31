@@ -81,12 +81,19 @@ Ouvrir [http://localhost:3000](http://localhost:3000) dans votre navigateur.
 
 ## 🔑 Variables d'Environnement Requises
 
+Voir `.env.example` pour la liste complète des variables.
+
+**Variables CRITIQUES** :
 - `DATABASE_URL` - URL PostgreSQL
 - `NEXTAUTH_SECRET` - Secret pour NextAuth (générer avec `openssl rand -base64 32`)
 - `NEXTAUTH_URL` - URL de l'application (ex: http://localhost:3000)
-- `CHATGPT_API_KEY` - Clé API ChatGPT (OpenAI)
+- `OPENAI_API_KEY` - Clé API OpenAI (ChatGPT)
 - `HIGGSFIELD_API_KEY` - Clé API Higgsfield
-- `HIGGSFIELD_API_URL` - URL API Higgsfield
+- `CRON_SECRET` - Secret pour les jobs CRON (générer avec `openssl rand -base64 32`)
+
+**Variables Optionnelles** (pour plus de données Brand Spy) :
+- `SIMILARWEB_API_KEY` - API SimilarWeb (199€/mois)
+- `WAPPALYZER_API_KEY` - API Wappalyzer (49€/mois)
 
 ## 📝 Scripts Disponibles
 
@@ -109,7 +116,7 @@ L'authentification est implémentée avec NextAuth.js v5 :
 
 ## 🚧 Status
 
-**MVP en développement**
+**✅ PRODUCTION READY**
 
 - ✅ Setup projet Next.js
 - ✅ Design System
@@ -118,8 +125,13 @@ L'authentification est implémentée avec NextAuth.js v5 :
 - ✅ Prisma schema
 - ✅ Clients API (ChatGPT, Higgsfield)
 - ✅ Authentification (NextAuth v5)
-- ⏳ Implémentation modules
-- ⏳ Intégrations complètes
+- ✅ Tous les modules implémentés
+- ✅ Intégrations complètes
+- ✅ Sécurité renforcée
+- ✅ Rate limiting
+- ✅ Configuration production
+
+**Voir `docs/checklist-production-ready.md` pour le guide complet de déploiement.**
 
 ---
 

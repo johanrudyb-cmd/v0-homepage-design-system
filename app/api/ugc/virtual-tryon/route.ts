@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { generateVirtualTryOn } from '@/lib/api/higgsfield';
 import { prisma } from '@/lib/prisma';
+import { NotificationHelpers } from '@/lib/notifications';
 
 export const runtime = 'nodejs';
 
@@ -46,6 +47,9 @@ export async function POST(request: Request) {
         content: imageUrl,
       },
     });
+
+    // Créer une notification
+    await NotificationHelpers.ugcGenerated(user.id, 'virtual_tryon', brandId);
 
     return NextResponse.json({ imageUrl });
   } catch (error: any) {

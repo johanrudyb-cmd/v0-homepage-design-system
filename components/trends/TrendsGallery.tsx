@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { ProductCard } from './ProductCard';
 import { TrendsFilters } from './TrendsFilters';
+import { ActivePreferencesBadge } from '@/components/common/ActivePreferencesBadge';
 
 interface Product {
   id: string;
@@ -18,17 +19,26 @@ interface Product {
   description: string | null;
 }
 
+interface UserPreferences {
+  preferredCategories?: string[];
+  preferredStyles?: string[];
+  priceRangeMin?: number | null;
+  priceRangeMax?: number | null;
+  preferredCountry?: string | null;
+}
+
 interface TrendsGalleryProps {
   userId: string;
   favoriteIds: string[];
+  preferences?: UserPreferences | null;
 }
 
-export function TrendsGallery({ userId, favoriteIds }: TrendsGalleryProps) {
+export function TrendsGallery({ userId, favoriteIds, preferences }: TrendsGalleryProps) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({
-    category: '',
-    style: '',
+    category: preferences?.preferredCategories?.[0] || '',
+    style: preferences?.preferredStyles?.[0] || '',
     material: '',
     sortBy: 'saturability', // saturability, trendScore, price
   });
@@ -60,6 +70,9 @@ export function TrendsGallery({ userId, favoriteIds }: TrendsGalleryProps) {
 
   return (
     <div className="space-y-6">
+      {/* Badge préférences actives */}
+      <ActivePreferencesBadge type="trends" />
+      
       {/* Filtres */}
       <TrendsFilters filters={filters} onFiltersChange={setFilters} />
 

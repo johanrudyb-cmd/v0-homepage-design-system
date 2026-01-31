@@ -33,7 +33,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    const { name } = await request.json();
+    const body = await request.json();
+    const {
+      name,
+      logo,
+      logoVariations,
+      colorPalette,
+      typography,
+      styleGuide,
+      domain,
+      socialHandles,
+      creationMode,
+      autoApplyIdentity,
+      status,
+    } = body;
 
     if (!name || name.trim().length === 0) {
       return NextResponse.json(
@@ -42,18 +55,32 @@ export async function POST(request: Request) {
       );
     }
 
-    // Créer la marque
+    // Créer la marque avec Launch Map et identité
     const brand = await prisma.brand.create({
       data: {
         userId: user.id,
         name: name.trim(),
+        logo: logo || null,
+        logoVariations: logoVariations || null,
+        colorPalette: colorPalette || null,
+        typography: typography || null,
+        styleGuide: styleGuide || null,
+        domain: domain || null,
+        socialHandles: socialHandles || null,
+        creationMode: creationMode || 'quick',
+        autoApplyIdentity: autoApplyIdentity !== undefined ? autoApplyIdentity : true,
+        status: status || 'draft',
+        launchMap: {
+          create: {
+            phase1: false,
+            phase2: false,
+            phase3: false,
+            phase4: false,
+          },
+        },
       },
-    });
-
-    // Créer le Launch Map associé
-    await prisma.launchMap.create({
-      data: {
-        brandId: brand.id,
+      include: {
+        launchMap: true,
       },
     });
 
@@ -61,7 +88,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('Erreur dans /api/brands POST:', error);
     return NextResponse.json(
-      { error: 'Une erreur est survenue' },
+      { error: error.message || 'Une erreur est survenue' },
       { status: 500 }
     );
   }

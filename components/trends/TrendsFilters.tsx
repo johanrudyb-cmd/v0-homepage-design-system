@@ -1,6 +1,7 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
+import { FASHION_STYLES } from '@/lib/constants/fashion-styles';
 
 interface Filters {
   category: string;
@@ -15,9 +16,9 @@ interface TrendsFiltersProps {
 }
 
 export function TrendsFilters({ filters, onFiltersChange }: TrendsFiltersProps) {
-  const categories = ['', 'Hoodie', 'T-shirt', 'Cargo', 'Accessoires'];
-  const styles = ['', 'Minimaliste', 'Streetwear', 'Luxe', 'Y2K'];
-  const materials = ['', 'Coton GSM élevé', 'Denim', 'Synthétique'];
+  const categories = ['', 'Hoodie', 'T-shirt', 'Cargo', 'Accessoires', 'Pantalon', 'Short', 'Veste', 'Sweat'];
+  const styles = ['', ...FASHION_STYLES];
+  const materials = ['', 'Coton GSM élevé', 'Denim', 'Synthétique', 'Coton', 'Laine', 'Lin', 'Cachemire'];
   const sortOptions = [
     { value: 'saturability', label: 'Moins saturé (meilleur)' },
     { value: 'trendScore', label: 'Plus tendance' },
@@ -29,18 +30,18 @@ export function TrendsFilters({ filters, onFiltersChange }: TrendsFiltersProps) 
   };
 
   return (
-    <Card className="border-stone-200">
+    <Card>
       <CardContent className="pt-6">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           {/* Catégorie */}
           <div>
-            <label className="block text-xs font-medium text-stone-700 mb-2 uppercase tracking-wide">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Catégorie
             </label>
             <select
               value={filters.category}
               onChange={(e) => updateFilter('category', e.target.value)}
-              className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
             >
               {categories.map((cat) => (
                 <option key={cat} value={cat}>
@@ -52,13 +53,13 @@ export function TrendsFilters({ filters, onFiltersChange }: TrendsFiltersProps) 
 
           {/* Style */}
           <div>
-            <label className="block text-xs font-medium text-stone-700 mb-2 uppercase tracking-wide">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Style
             </label>
             <select
               value={filters.style}
               onChange={(e) => updateFilter('style', e.target.value)}
-              className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
             >
               {styles.map((style) => (
                 <option key={style} value={style}>
@@ -70,13 +71,13 @@ export function TrendsFilters({ filters, onFiltersChange }: TrendsFiltersProps) 
 
           {/* Matière */}
           <div>
-            <label className="block text-xs font-medium text-stone-700 mb-2 uppercase tracking-wide">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Matière
             </label>
             <select
               value={filters.material}
               onChange={(e) => updateFilter('material', e.target.value)}
-              className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
             >
               {materials.map((mat) => (
                 <option key={mat} value={mat}>
@@ -88,13 +89,13 @@ export function TrendsFilters({ filters, onFiltersChange }: TrendsFiltersProps) 
 
           {/* Tri */}
           <div>
-            <label className="block text-xs font-medium text-stone-700 mb-2 uppercase tracking-wide">
+            <label className="block text-sm font-medium text-foreground mb-2">
               Trier par
             </label>
             <select
               value={filters.sortBy}
               onChange={(e) => updateFilter('sortBy', e.target.value)}
-              className="w-full px-3 py-2 border border-stone-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              className="w-full px-3 py-2 border border-input rounded-lg bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors"
             >
               {sortOptions.map((option) => (
                 <option key={option.value} value={option.value}>

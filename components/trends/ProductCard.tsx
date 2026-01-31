@@ -46,23 +46,23 @@ export function ProductCard({ product, userId, isFavorite: initialIsFavorite }: 
   };
 
   const getSaturabilityColor = (score: number) => {
-    if (score < 30) return 'text-green-600 bg-green-50';
-    if (score < 60) return 'text-amber-600 bg-amber-50';
-    return 'text-red-600 bg-red-50';
+    if (score < 30) return 'text-success bg-success/10 border-success/20';
+    if (score < 60) return 'text-warning bg-warning/10 border-warning/20';
+    return 'text-error bg-error/10 border-error/20';
   };
 
   const getTrendBadge = (score: number) => {
-    if (score >= 80) return { label: '🔥 Hot', color: 'bg-red-100 text-red-700' };
-    if (score >= 60) return { label: '📈 Trending', color: 'bg-amber-100 text-amber-700' };
-    return { label: '📊 Stable', color: 'bg-stone-100 text-stone-700' };
+    if (score >= 80) return { label: '🔥 Hot', color: 'bg-error/10 text-error border border-error/20' };
+    if (score >= 60) return { label: '📈 Trending', color: 'bg-warning/10 text-warning border border-warning/20' };
+    return { label: '📊 Stable', color: 'bg-muted text-foreground border border-border' };
   };
 
   const trendBadge = getTrendBadge(product.trendScore);
 
   return (
     <Link href={`/trends/${product.id}`}>
-      <Card className="border-stone-200 hover:border-amber-400 transition-all cursor-pointer group">
-        <div className="relative aspect-square bg-stone-100 rounded-t-lg overflow-hidden">
+      <Card className="hover:border-primary/30 transition-colors cursor-pointer group overflow-hidden">
+        <div className="relative aspect-square bg-muted rounded-t-lg overflow-hidden">
           {product.imageUrl ? (
             <Image
               src={product.imageUrl}
@@ -79,10 +79,10 @@ export function ProductCard({ product, userId, isFavorite: initialIsFavorite }: 
           )}
           <button
             onClick={handleToggleFavorite}
-            className={`absolute top-3 right-3 p-2 rounded-full transition-colors ${
+            className={`absolute top-3 right-3 p-2 rounded-lg transition-colors ${
               isFavorite
-                ? 'bg-amber-600 text-white'
-                : 'bg-white/80 text-stone-400 hover:bg-white'
+                ? 'bg-primary text-white'
+                : 'bg-background/80 text-muted-foreground hover:bg-background border border-border'
             }`}
           >
             <svg className="w-5 h-5" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
@@ -97,27 +97,27 @@ export function ProductCard({ product, userId, isFavorite: initialIsFavorite }: 
         </div>
         <CardContent className="p-4 space-y-3">
           <div>
-            <h3 className="font-medium text-stone-900 mb-1">{product.name}</h3>
-            <div className="flex items-center gap-2 text-xs text-stone-500 font-light">
-              <span>{product.category}</span>
+            <h3 className="font-medium text-foreground mb-1 text-base">{product.name}</h3>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="px-2 py-0.5 rounded bg-primary/10 text-primary">{product.category}</span>
               <span>•</span>
               <span>{product.style}</span>
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-2 border-t border-stone-200">
+          <div className="flex items-center justify-between pt-2 border-t border-border">
             <div>
-              <div className="text-sm font-medium text-stone-900">
+              <div className="text-base font-semibold text-foreground">
                 {product.averagePrice.toFixed(0)}€
               </div>
-              <div className="text-xs text-stone-500 font-light">Prix moyen</div>
+              <div className="text-xs text-muted-foreground">Prix moyen</div>
             </div>
             <div className="text-right">
-              <div className={`text-xs px-2 py-1 rounded font-medium ${getSaturabilityColor(product.saturability)}`}>
+              <div className={`text-xs px-2 py-1 rounded font-medium border ${getSaturabilityColor(product.saturability)}`}>
                 {product.saturability.toFixed(0)}% saturé
               </div>
-              <div className="text-xs text-stone-500 font-light mt-1">
-                Score tendance: {product.trendScore.toFixed(0)}
+              <div className="text-xs text-muted-foreground mt-1">
+                Score: {product.trendScore.toFixed(0)}/100
               </div>
             </div>
           </div>

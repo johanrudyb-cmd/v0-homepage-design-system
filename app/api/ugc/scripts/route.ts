@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { generateUGCScripts } from '@/lib/api/chatgpt';
 import { prisma } from '@/lib/prisma';
+import { NotificationHelpers } from '@/lib/notifications';
 
 export const runtime = 'nodejs';
 
@@ -50,11 +51,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    const { brandId, brandName, productDescription, count } = await request.json();
+    const { brandId, brandName, productDescription, count, tone } = await request.json();
 
-    // Vérifier que la marque appartient à l'utilisateur
+    // Vérifier que la marque appartient à l'utilisateur et récupérer l'identité
     const brand = await prisma.brand.findFirst({
       where: { id: brandId, userId: user.id },
+      select: {
+        id: true,
+        name: true,
+        colorPalette: true,
+        typography: true,
+        styleGuide: true,
+      },
     });
 
     if (!brand) {
@@ -74,15 +82,21 @@ export async function POST(request: Request) {
       );
     }
 
-    // Générer les scripts avec ChatGPT
+    // Générer les scripts avec ChatGPT (avec identité de marque)
     const scripts = await generateUGCScripts(
-      brandName,
+      brand.name || brandName,
       productDescription,
-      requestedCount
+      requestedCount,
+      tone || 'décontracté',
+      {
+        colorPalette: brand.colorPalette,
+        typography: brand.typography,
+        styleGuide: brand.styleGuide,
+      }
     );
 
-    // Sauvegarder dans la base de données
-    await Promise.all(
+    // Sauvegarder dans la base de données avec IDs pour permettre l'édition
+    const savedScripts = await Promise.all(
       scripts.map((script) =>
         prisma.uGCContent.create({
           data: {
@@ -93,6 +107,15 @@ export async function POST(request: Request) {
         })
       )
     );
+
+    // Retourner les scripts avec leurs IDs
+    const scriptsWithIds = savedScripts.map((saved) => ({
+      id: saved.id,
+      content: saved.content,
+    }));
+
+    // Créer une notification pour les scripts générés
+    await NotificationHelpers.ugcGenerated(user.id, 'script', brandId);
 
     // Vérifier si au moins 5 scripts ont été générés pour valider Phase 4
     const totalScripts = await prisma.uGCContent.count({
@@ -105,9 +128,11 @@ export async function POST(request: Request) {
         where: { brandId },
         data: { phase4: true },
       });
+      // Notification pour phase complétée
+      await NotificationHelpers.phaseCompleted(user.id, 4, 'Génération de scripts marketing');
     }
 
-    return NextResponse.json({ scripts });
+    return NextResponse.json({ scripts: scriptsWithIds });
   } catch (error: any) {
     console.error('Erreur lors de la génération de scripts:', error);
     return NextResponse.json(
