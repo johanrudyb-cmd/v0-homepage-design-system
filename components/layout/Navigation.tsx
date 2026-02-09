@@ -24,7 +24,7 @@ export function Navigation() {
         {/* Logo */}
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold tracking-tight text-white md:text-2xl">
-            Médias <span className="text-gold">Biangory</span>
+            Média <span className="text-gold">Biangory</span>
           </span>
         </Link>
 
@@ -72,7 +72,7 @@ export function Navigation() {
               <div className="flex flex-col gap-6 pt-8">
                 <div className="flex items-center justify-between">
                   <span className="text-xl font-bold text-white">
-                    Médias <span className="text-gold">Biangory</span>
+                    Média <span className="text-gold">Biangory</span>
                   </span>
                 </div>
                 <div className="flex flex-col gap-4">

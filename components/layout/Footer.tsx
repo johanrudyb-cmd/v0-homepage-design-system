@@ -44,7 +44,7 @@ export function Footer() {
           <div className="lg:col-span-1">
             <Link href="/" className="inline-block">
               <span className="text-xl font-bold">
-                Médias <span className="text-gold">Biangory</span>
+                Média <span className="text-gold">Biangory</span>
               </span>
             </Link>
             <p className="mt-4 text-sm text-white/70 leading-relaxed">
@@ -112,10 +112,10 @@ export function Footer() {
             <div className="mt-6">
               <p className="text-sm text-white/70">Contact</p>
               <a
-                href="mailto:contact@mediasbiangory.com"
+                href="mailto:contact@mediabiangory.com"
                 className="text-sm text-gold hover:text-gold-light transition-colors"
               >
-                contact@mediasbiangory.com
+                contact@mediabiangory.com
               </a>
             </div>
           </div>
@@ -123,7 +123,7 @@ export function Footer() {
 
         <div className="mt-12 border-t border-white/10 pt-8">
           <p className="text-center text-sm text-white/50">
-            © {new Date().getFullYear()} Médias Biangory. Tous droits réservés.
+            © {new Date().getFullYear()} Média Biangory. Tous droits réservés.
           </p>
         </div>
       </div>
