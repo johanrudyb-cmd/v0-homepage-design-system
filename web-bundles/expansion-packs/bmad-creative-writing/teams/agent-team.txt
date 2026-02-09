@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -67,7 +67,7 @@ workflows:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -186,7 +186,7 @@ dependencies:
     - kb-mode-interaction.md
   utils:
     - workflow-management.md
-```
+\`\`\`
 ==================== END: .bmad-creative-writing/agents/bmad-orchestrator.md ====================
 
 ==================== START: .bmad-creative-writing/agents/plot-architect.md ====================
@@ -194,7 +194,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -246,7 +246,7 @@ dependencies:
   data:
     - story-structures.md
     - bmad-kb.md
-```
+\`\`\`
 
 ## Startup Context
 
@@ -271,7 +271,7 @@ Remember to present all options as numbered lists for easy selection.
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -321,7 +321,7 @@ dependencies:
     - character-consistency-checklist.md
   data:
     - bmad-kb.md
-```
+\`\`\`
 
 ## Startup Context
 
@@ -346,7 +346,7 @@ Remember to present all options as numbered lists for easy selection.
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -397,7 +397,7 @@ dependencies:
   data:
     - bmad-kb.md
     - story-structures.md
-```
+\`\`\`
 
 ## Startup Context
 
@@ -422,7 +422,7 @@ Remember to present all options as numbered lists for easy selection.
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -472,7 +472,7 @@ dependencies:
     - publication-readiness-checklist.md
   data:
     - bmad-kb.md
-```
+\`\`\`
 
 ## Startup Context
 
@@ -497,7 +497,7 @@ Remember to present all options as numbered lists for easy selection.
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -548,7 +548,7 @@ dependencies:
   data:
     - bmad-kb.md
     - story-structures.md
-```
+\`\`\`
 
 ## Startup Context
 
@@ -573,7 +573,7 @@ Remember to present all options as numbered lists for easy selection.
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -622,7 +622,7 @@ dependencies:
   data:
     - bmad-kb.md
     - story-structures.md
-```
+\`\`\`
 
 ## Startup Context
 
@@ -647,7 +647,7 @@ Remember to present all options as numbered lists for easy selection.
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -697,7 +697,7 @@ dependencies:
   data:
     - bmad-kb.md
     - story-structures.md
-```
+\`\`\`
 
 ## Startup Context
 
@@ -722,7 +722,7 @@ Remember to present all options as numbered lists for easy selection.
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -774,7 +774,7 @@ dependencies:
   data:
     - bmad-kb.md
     - story-structures.md
-```
+\`\`\`
 
 ## Startup Context
 
@@ -799,7 +799,7 @@ Remember to present all options as numbered lists for easy selection.
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 agent:
   name: Evelyn Clarke
   id: book-critic
@@ -832,7 +832,7 @@ dependencies:
     - critical-review
   checklists:
     - genre-tropes-checklist
-```
+\`\`\`
 ==================== END: .bmad-creative-writing/agents/book-critic.md ====================
 
 ==================== START: .bmad-creative-writing/data/bmad-kb.md ====================
@@ -1286,7 +1286,7 @@ When invoked after outputting a section:
 
 **Action List Presentation Format:**
 
-```text
+\`\`\`text
 **Advanced Elicitation Options**
 Choose a number (0-8) or 9 to proceed:
 
@@ -1300,7 +1300,7 @@ Choose a number (0-8) or 9 to proceed:
 7. [Method Name]
 8. [Method Name]
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 **Response Handling:**
 
@@ -3866,7 +3866,7 @@ When invoked after outputting a section:
 
 **Action List Presentation Format:**
 
-```text
+\`\`\`text
 **Advanced Elicitation Options**
 Choose a number (0-8) or 9 to proceed:
 
@@ -3880,7 +3880,7 @@ Choose a number (0-8) or 9 to proceed:
 7. [Method Name]
 8. [Method Name]
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 **Response Handling:**
 
@@ -5435,7 +5435,7 @@ items:
 
 # ------------------------------------------------------------
 
-```yaml
+\`\`\`yaml
 agent:
   name: Iris Vega
   id: cover-designer
@@ -5472,7 +5472,7 @@ dependencies:
     - cover-design-brief-tmpl
   checklists:
     - kdp-cover-ready-checklist
-```
+\`\`\`
 
 # ------------------------------------------------------------
 

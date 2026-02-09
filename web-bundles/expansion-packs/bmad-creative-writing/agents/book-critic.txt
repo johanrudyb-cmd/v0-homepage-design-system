@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 agent:
   name: Evelyn Clarke
   id: book-critic
@@ -77,5 +77,5 @@ dependencies:
     - critical-review
   checklists:
     - genre-tropes-checklist
-```
+\`\`\`
 ==================== END: .bmad-creative-writing/agents/book-critic.md ====================

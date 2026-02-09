@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -66,7 +66,7 @@ workflows:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -185,7 +185,7 @@ dependencies:
     - kb-mode-interaction.md
   utils:
     - workflow-management.md
-```
+\`\`\`
 ==================== END: .bmad-core/agents/bmad-orchestrator.md ====================
 
 ==================== START: .bmad-core/agents/analyst.md ====================
@@ -193,7 +193,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -249,7 +249,7 @@ dependencies:
     - competitor-analysis-tmpl.yaml
     - market-research-tmpl.yaml
     - project-brief-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-core/agents/analyst.md ====================
 
 ==================== START: .bmad-core/agents/pm.md ====================
@@ -257,7 +257,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -313,7 +313,7 @@ dependencies:
   templates:
     - brownfield-prd-tmpl.yaml
     - prd-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-core/agents/pm.md ====================
 
 ==================== START: .bmad-core/agents/ux-expert.md ====================
@@ -321,7 +321,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -362,7 +362,7 @@ dependencies:
     - generate-ai-frontend-prompt.md
   templates:
     - front-end-spec-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-core/agents/ux-expert.md ====================
 
 ==================== START: .bmad-core/agents/architect.md ====================
@@ -370,7 +370,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -427,7 +427,7 @@ dependencies:
     - brownfield-architecture-tmpl.yaml
     - front-end-architecture-tmpl.yaml
     - fullstack-architecture-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-core/agents/architect.md ====================
 
 ==================== START: .bmad-core/agents/po.md ====================
@@ -435,7 +435,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -486,7 +486,7 @@ dependencies:
     - validate-next-story.md
   templates:
     - story-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-core/agents/po.md ====================
 
 ==================== START: .bmad-core/tasks/advanced-elicitation.md ====================
@@ -571,7 +571,7 @@ When invoked after outputting a section:
 
 **Action List Presentation Format:**
 
-```text
+\`\`\`text
 **Advanced Elicitation Options**
 Choose a number (0-8) or 9 to proceed:
 
@@ -585,7 +585,7 @@ Choose a number (0-8) or 9 to proceed:
 7. [Method Name]
 8. [Method Name]
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 **Response Handling:**
 
@@ -847,14 +847,14 @@ BMad transforms you into a "Vibe CEO" - directing a team of specialized AI agent
 
 ### The Development Loop
 
-```text
+\`\`\`text
 1. SM Agent (New Chat) → Creates next story from sharded docs
 2. You → Review and approve story
 3. Dev Agent (New Chat) → Implements approved story
 4. QA Agent (New Chat) → Reviews and refactors code
 5. You → Verify completion
 6. Repeat until epic complete
-```
+\`\`\`
 
 ### Why This Works
 
@@ -882,10 +882,10 @@ BMad transforms you into a "Vibe CEO" - directing a team of specialized AI agent
 
 **Best for**: Cursor, Claude Code, Windsurf, Trae, Cline, Roo Code, Github Copilot users
 
-```bash
+\`\`\`bash
 # Interactive installation (recommended)
 npx bmad-method install
-```
+\`\`\`
 
 **Installation Steps**:
 
@@ -1019,23 +1019,23 @@ This configuration file acts as a map for BMad agents, telling them exactly wher
 
 **Legacy V3 Project**:
 
-```yaml
+\`\`\`yaml
 prdVersion: v3
 prdSharded: false
 architectureVersion: v3
 architectureSharded: false
-```
+\`\`\`
 
 **V4 Optimized Project**:
 
-```yaml
+\`\`\`yaml
 prdVersion: v4
 prdSharded: true
 prdShardedLocation: docs/prd
 architectureVersion: v4
 architectureSharded: true
 architectureShardedLocation: docs/architecture
-```
+\`\`\`
 
 ## Core Philosophy
 
@@ -1117,13 +1117,13 @@ You are the "Vibe CEO" - thinking like a CEO with unlimited resources and a sing
 
 **In Web UI**:
 
-```text
+\`\`\`text
 /pm create-doc prd
 /architect review system design
 /dev implement story 1.2
 /help - Show available commands
 /switch agent-name - Change active agent (if orchestrator available)
-```
+\`\`\`
 
 ## Team Configurations
 
@@ -1250,17 +1250,17 @@ This architecture enables seamless operation across environments while maintaini
 
 **For PRD Creation**:
 
-```text
+\`\`\`text
 "I want to build a [type] application that [core purpose].
 Help me brainstorm features and create a comprehensive PRD."
-```
+\`\`\`
 
 **For Architecture Design**:
 
-```text
+\`\`\`text
 "Based on this PRD, design a scalable technical architecture
 that can handle [specific requirements]."
-```
+\`\`\`
 
 ### Critical Transition: Web UI to IDE
 
@@ -1447,7 +1447,7 @@ Templates with Level 2 headings (`##`) can be automatically sharded:
 
 **Original PRD**:
 
-```markdown
+\`\`\`markdown
 ## Goals and Background Context
 
 ## Requirements
@@ -1455,7 +1455,7 @@ Templates with Level 2 headings (`##`) can be automatically sharded:
 ## User Interface Design Goals
 
 ## Success Metrics
-```
+\`\`\`
 
 **After Sharding**:
 
@@ -1577,10 +1577,10 @@ Expansion packs extend BMAD-METHOD™ beyond traditional software development in
 2. **Get Inspiration**: See `docs/expansion-packs.md` for detailed examples and ideas
 3. **Install via CLI**:
 
-   ```bash
+   \`\`\`bash
    npx bmad-method install
    # Select "Install expansion pack" option
-   ```
+   \`\`\`
 
 4. **Use in Your Workflow**: Installed packs integrate seamlessly with existing agents
 
@@ -2009,7 +2009,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 
 **Research Prompt Template:**
 
-```markdown
+\`\`\`markdown
 ## Research Objective
 
 [Clear statement of what this research aims to achieve]
@@ -2071,7 +2071,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 ## Timeline and Priority
 
 [If applicable, any time constraints or phasing]
-```
+\`\`\`
 
 ### 5. Review and Refinement
 
@@ -2275,7 +2275,7 @@ etc...
 
 ### Project Structure (Actual)
 
-```text
+\`\`\`text
 project-root/
 ├── src/
 │   ├── controllers/     # HTTP request handlers
@@ -2286,7 +2286,7 @@ project-root/
 ├── tests/               # Jest tests (60% coverage)
 ├── scripts/             # Build and deployment scripts
 └── config/              # Environment configs
-```
+\`\`\`
 
 ### Key Modules and Their Purpose
 
@@ -2368,10 +2368,10 @@ etc...
 
 ### Running Tests
 
-```bash
+\`\`\`bash
 npm test           # Runs unit tests
 npm run test:integration  # Runs integration tests (requires local DB)
-```
+\`\`\`
 
 ## If Enhancement PRD Provided - Impact Analysis
 
@@ -2400,12 +2400,12 @@ Based on the enhancement requirements, these files will be affected:
 
 ### Frequently Used Commands
 
-```bash
+\`\`\`bash
 npm run dev         # Start development server
 npm run build       # Production build
 npm run migrate     # Run database migrations
 npm run seed        # Seed test data
-```
+\`\`\`
 
 ### Debugging and Troubleshooting
 
@@ -4109,13 +4109,13 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
 1. **Install globally**:
 
-   ```bash
+   \`\`\`bash
    npm install -g @kayvan/markdown-tree-parser
-   ```
+   \`\`\`
 
 2. **Use the explode command**:
 
-   ```bash
+   \`\`\`bash
    # For PRD
    md-tree explode docs/prd.md docs/prd
 
@@ -4124,7 +4124,7 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
    # For any document
    md-tree explode [source-document] [destination-folder]
-   ```
+   \`\`\`
 
 3. **What it does**:
    - Automatically splits the document by level 2 sections
@@ -4176,12 +4176,12 @@ For each extracted section:
    - The level 2 heading becomes level 1 (# instead of ##) in the sharded new document
    - All subsection levels decrease by 1:
 
-   ```txt
+   \`\`\`txt
      - ### → ##
      - #### → ###
      - ##### → ####
      - etc.
-   ```
+   \`\`\`
 
 3. **Write content**: Save the adjusted content to the new file
 
@@ -4192,7 +4192,7 @@ Create an `index.md` file in the sharded folder that:
 1. Contains the original level 1 heading and any content before the first level 2 section
 2. Lists all the sharded files with links:
 
-```markdown
+\`\`\`markdown
 # Original Document Title
 
 [Original introduction content if any]
@@ -4203,22 +4203,22 @@ Create an `index.md` file in the sharded folder that:
 - [Section Name 2](./section-name-2.md)
 - [Section Name 3](./section-name-3.md)
   ...
-```
+\`\`\`
 
 ### 5. Preserve Special Content
 
 1. **Code blocks**: Must capture complete blocks including:
 
-   ```language
+   \`\`\`language
    content
-   ```
+   \`\`\`
 
 2. **Mermaid diagrams**: Preserve complete syntax:
 
-   ```mermaid
+   \`\`\`mermaid
    graph TD
    ...
-   ```
+   \`\`\`
 
 3. **Tables**: Maintain proper markdown table formatting
 
@@ -4243,7 +4243,7 @@ After sharding:
 
 Provide a summary:
 
-```text
+\`\`\`text
 Document sharded successfully:
 - Source: [original document path]
 - Destination: docs/[folder-name]/
@@ -4252,7 +4252,7 @@ Document sharded successfully:
   - section-name-1.md: "Section Title 1"
   - section-name-2.md: "Section Title 2"
   ...
-```
+\`\`\`
 
 ## Important Notes
 
@@ -9256,7 +9256,7 @@ workflow:
         Reference: .bmad-core/data/bmad-kb.md#IDE Development Workflow
 
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: Brownfield Enhancement] --> B[analyst: classify enhancement scope]
         B --> C{Enhancement Size?}
@@ -9320,7 +9320,7 @@ workflow:
         style U fill:#F0E68C
         style X fill:#F0E68C
         style AC fill:#F0E68C
-    ```
+    \`\`\`
 
   decision_guidance:
     when_to_use:
@@ -9503,7 +9503,7 @@ workflow:
         Reference: .bmad-core/data/bmad-kb.md#IDE Development Workflow
 
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: Service Enhancement] --> B[analyst: analyze existing service]
         B --> C[pm: prd.md]
@@ -9541,7 +9541,7 @@ workflow:
         style K fill:#F0E68C
         style N fill:#F0E68C
         style S fill:#F0E68C
-    ```
+    \`\`\`
 
   decision_guidance:
     when_to_use:
@@ -9701,7 +9701,7 @@ workflow:
         Reference: .bmad-core/data/bmad-kb.md#IDE Development Workflow
 
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: UI Enhancement] --> B[analyst: analyze existing UI]
         B --> C[pm: prd.md]
@@ -9741,7 +9741,7 @@ workflow:
         style L fill:#F0E68C
         style O fill:#F0E68C
         style T fill:#F0E68C
-    ```
+    \`\`\`
 
   decision_guidance:
     when_to_use:
@@ -9927,7 +9927,7 @@ workflow:
         Reference: .bmad-core/data/bmad-kb.md#IDE Development Workflow
 
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: Greenfield Project] --> B[analyst: project-brief.md]
         B --> C[pm: prd.md]
@@ -9982,7 +9982,7 @@ workflow:
         style N fill:#F0E68C
         style Q fill:#F0E68C
         style V fill:#F0E68C
-    ```
+    \`\`\`
 
   decision_guidance:
     when_to_use:
@@ -10147,7 +10147,7 @@ workflow:
         Reference: .bmad-core/data/bmad-kb.md#IDE Development Workflow
 
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: Service Development] --> B[analyst: project-brief.md]
         B --> C[pm: prd.md]
@@ -10193,7 +10193,7 @@ workflow:
         style M fill:#F0E68C
         style P fill:#F0E68C
         style U fill:#F0E68C
-    ```
+    \`\`\`
 
   decision_guidance:
     when_to_use:
@@ -10376,7 +10376,7 @@ workflow:
         Reference: .bmad-core/data/bmad-kb.md#IDE Development Workflow
 
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: UI Development] --> B[analyst: project-brief.md]
         B --> C[pm: prd.md]
@@ -10431,7 +10431,7 @@ workflow:
         style N fill:#F0E68C
         style Q fill:#F0E68C
         style V fill:#F0E68C
-    ```
+    \`\`\`
 
   decision_guidance:
     when_to_use:

@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -139,7 +139,7 @@ dependencies:
     - apply-qa-fixes.md
   checklists:
     - game-story-dod-checklist.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-developer.md ====================
 
 ==================== START: .bmad-godot-game-dev/tasks/execute-checklist.md ====================
@@ -249,7 +249,7 @@ Implement fixes based on QA results (gate and assessments) for a specific Godot 
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "2.2"
   - qa_root: from `.bmad-godot-game-dev/config.yaml` key `qa.qaLocation` (e.g., `docs/project/qa`)
@@ -259,7 +259,7 @@ required:
 optional:
   - story_title: '{title}' # derive from story H1 if missing
   - story_slug: '{slug}' # derive from title (lowercase, hyphenated) if missing
-```
+\`\`\`
 
 ## QA Sources to Read
 

@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -163,7 +163,7 @@ dependencies:
     - kb-mode-interaction.md
   utils:
     - workflow-management.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/bmad-orchestrator.md ====================
 
 ==================== START: .bmad-godot-game-dev/data/bmad-kb.md ====================
@@ -228,14 +228,14 @@ BMad transforms you into a "Player Experience CEO" - directing a team of special
 
 ### The Game Development Loop
 
-```text
+\`\`\`text
 1. Game SM Agent (New Chat) → Creates next game story from sharded docs
 2. You → Review and approve game story
 3. Game Dev Agent (New Chat) → Implements approved game feature in Godot (TDD-first)
 4. QA Agent (New Chat) → Reviews code, enforces TDD, validates performance
 5. You → Verify game feature completion and 60+ FPS
 6. Repeat until game epic complete
-```
+\`\`\`
 
 ### Why This Works for Games
 
@@ -283,11 +283,11 @@ You are developing games as a "Player Experience CEO" - thinking like a game dir
 
 **Best for**: Godot developers using Cursor, Claude Code, Windsurf, Trae, Cline, Roo Code, Github Copilot
 
-```bash
+\`\`\`bash
 # Interactive installation (recommended)
 npx bmad-method install
 # Select the bmad-godot-game-dev expansion pack when prompted
-```
+\`\`\`
 
 **Installation Steps for Game Development**:
 
@@ -361,7 +361,7 @@ npx bmad-method install
 
 The expansion pack follows the standard BMad configuration patterns. Copy your core-config.yaml file to expansion-packs/bmad-godot-game-dev/ and add Game-specific configurations to your project's `core-config.yaml`:
 
-```yaml
+\`\`\`yaml
 markdownExploder: true
 prd:
   prdFile: docs/prd.md
@@ -399,7 +399,7 @@ devLoadAlwaysFiles:
   - docs/architecture/9-coding-standards.md
   - docs/architecture/3-tech-stack.md
   - docs/architecture/8-godot-project-structure.md
-```
+\`\`\`
 
 ## Complete Game Development Workflow
 
@@ -420,18 +420,18 @@ devLoadAlwaysFiles:
 
 **For Game Design Document Creation**:
 
-```text
+\`\`\`text
 "I want to build a [genre] 2D game in Godot that [core gameplay].
 Help me brainstorm mechanics and create a comprehensive Game Design Document."
-```
+\`\`\`
 
 **For Game Architecture Design**:
 
-```text
+\`\`\`text
 "Based on this Game Design Document, design a scalable Godot architecture
 that can handle [specific game requirements] with 60+ FPS performance.
 Consider both GDScript and C# for appropriate systems."
-```
+\`\`\`
 
 ### Critical Transition: Web UI to Godot IDE
 
@@ -579,7 +579,7 @@ Game templates with Level 2 headings (`##`) can be automatically sharded:
 
 **Original Game Design Document**:
 
-```markdown
+\`\`\`markdown
 ## Core Gameplay Mechanics
 
 ## Player Progression System
@@ -587,7 +587,7 @@ Game templates with Level 2 headings (`##`) can be automatically sharded:
 ## Level Design Framework
 
 ## Technical Requirements
-```
+\`\`\`
 
 **After Sharding**:
 
@@ -641,7 +641,7 @@ Use the `shard-doc` task or `@kayvan/markdown-tree-parser` tool for automatic ga
 
 **Project Structure**:
 
-```text
+\`\`\`text
 GodotProject/
 ├── .godot/              # Godot cache (gitignore)
 ├── scenes/              # Game scenes
@@ -672,7 +672,7 @@ GodotProject/
 │   └── godottest/      # GoDotTest for C#
 ├── export_presets.cfg  # Export configurations
 └── project.godot       # Project settings
-```
+\`\`\`
 
 **Performance Requirements**:
 
@@ -951,10 +951,10 @@ This Godot Game Development expansion pack extends BMad-Method beyond traditiona
 
 1. **Install via CLI**:
 
-   ```bash
+   \`\`\`bash
    npx bmad-method install
    # Select "Install game development expansion pack" option
-   ```
+   \`\`\`
 
 2. **Use in Your Game Workflow**: Installed game agents integrate seamlessly with existing BMad agents
 
@@ -1171,7 +1171,7 @@ This knowledge base provides the foundation for effective game development using
 
 **Present the numbered list (0-9) with this exact format:**
 
-```text
+\`\`\`text
 **Advanced Game Design Elicitation & Brainstorming Actions**
 Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 
@@ -1185,7 +1185,7 @@ Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 7. Explore Alternative Game Design Approaches
 8. Hindsight Postmortem: The 'If Only...' Game Design Reflection
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 ### 2. Processing Guidelines
 

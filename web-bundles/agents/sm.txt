@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -81,7 +81,7 @@ dependencies:
     - execute-checklist.md
   templates:
     - story-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-core/agents/sm.md ====================
 
 ==================== START: .bmad-core/tasks/correct-course.md ====================

@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -133,7 +133,7 @@ dependencies:
     - game-story-tmpl.yaml
   checklists:
     - game-po-checklist.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-po.md ====================
 
 ==================== START: .bmad-godot-game-dev/tasks/game-brownfield-create-story.md ====================
@@ -854,7 +854,7 @@ sections:
         instruction: Define specific Godot node structures and classes with language strategy
         template: |
           **GDScript Implementation (for game logic):**
-          ```gdscript
+          \`\`\`gdscript
           # {{script_name}}.gd
           class_name {{ClassName}}
           extends {{Node2D|Control|Node3D}}
@@ -873,10 +873,10 @@ sections:
           func _physics_process(delta: float) -> void:
               # Must maintain 60+ FPS
               pass
-          ```
+          \`\`\`
 
           **C# Implementation (for performance-critical systems):**
-          ```csharp
+          \`\`\`csharp
           // {{script_name}}.cs
           using Godot;
 
@@ -899,7 +899,7 @@ sections:
                   // Optimize for 60+ FPS, no allocations
               }
           }
-          ```
+          \`\`\`
       - id: integration-points
         title: Integration Points
         instruction: Specify how this feature integrates with existing Godot systems
@@ -1000,12 +1000,12 @@ sections:
       **Primary Language:** {{GDScript|C#}} - {{reason}}
 
       **Node Architecture:**
-      ```
+      \`\`\`
       {{parent_node}}
       └── {{child_node_1}} ({{node_type}})
           ├── {{child_node_2}} ({{node_type}})
           └── {{child_node_3}} ({{node_type}})
-      ```
+      \`\`\`
 
       **Performance Requirements:**
       - Target FPS: 60+ (mandatory)

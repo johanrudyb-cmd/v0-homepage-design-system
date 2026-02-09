@@ -7,18 +7,18 @@
 1. **Ouvrez le chat Cursor** (Ctrl+L ou Cmd+L)
 
 2. **Tapez le nom de l'agent avec @** :
-   ```
+   \`\`\`
    @bmad-orchestrator
-   ```
+   \`\`\`
 
 3. **L'agent s'active automatiquement** et affiche ses commandes
 
 4. **Utilisez les commandes avec * ** :
-   ```
+   \`\`\`
    *help
    *create-prd
    *develop-story
-   ```
+   \`\`\`
 
 ## 🎯 Agents Disponibles
 
@@ -39,32 +39,32 @@
 
 ### Option 1 : Commencer avec l'Orchestrateur (Recommandé)
 
-```
+\`\`\`
 @bmad-orchestrator
 *help
-```
+\`\`\`
 
 L'orchestrateur vous guidera vers le bon agent selon vos besoins.
 
 ### Option 2 : Utiliser un Agent Spécifique
 
 **Pour créer un PRD :**
-```
+\`\`\`
 @pm
 *create-prd
-```
+\`\`\`
 
 **Pour créer une architecture :**
-```
+\`\`\`
 @architect
 *create-full-stack-architecture
-```
+\`\`\`
 
 **Pour développer une story :**
-```
+\`\`\`
 @dev
 *develop-story
-```
+\`\`\`
 
 ## 📖 Commandes Essentielles
 

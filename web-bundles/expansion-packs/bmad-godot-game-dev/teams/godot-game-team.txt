@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -65,7 +65,7 @@ workflows:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -121,7 +121,7 @@ dependencies:
     - competitor-analysis-tmpl.yaml
     - market-research-tmpl.yaml
     - game-brief-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-analyst.md ====================
 
 ==================== START: .bmad-godot-game-dev/agents/bmad-orchestrator.md ====================
@@ -129,7 +129,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -248,7 +248,7 @@ dependencies:
     - kb-mode-interaction.md
   utils:
     - workflow-management.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/bmad-orchestrator.md ====================
 
 ==================== START: .bmad-godot-game-dev/agents/game-designer.md ====================
@@ -256,7 +256,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -308,7 +308,7 @@ dependencies:
     - game-design-checklist.md
   data:
     - bmad-kb.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-designer.md ====================
 
 ==================== START: .bmad-godot-game-dev/agents/game-architect.md ====================
@@ -316,7 +316,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -436,7 +436,7 @@ dependencies:
   data:
     - development-guidelines.md
     - bmad-kb.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-architect.md ====================
 
 ==================== START: .bmad-godot-game-dev/agents/game-developer.md ====================
@@ -444,7 +444,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -539,7 +539,7 @@ dependencies:
     - apply-qa-fixes.md
   checklists:
     - game-story-dod-checklist.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-developer.md ====================
 
 ==================== START: .bmad-godot-game-dev/agents/game-qa.md ====================
@@ -547,7 +547,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -679,7 +679,7 @@ dependencies:
   templates:
     - game-story-tmpl.yaml
     - game-qa-gate-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-qa.md ====================
 
 ==================== START: .bmad-godot-game-dev/agents/game-sm.md ====================
@@ -687,7 +687,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -727,7 +727,7 @@ dependencies:
     - game-story-tmpl.yaml
   checklists:
     - game-change-checklist.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-sm.md ====================
 
 ==================== START: .bmad-godot-game-dev/agents/game-po.md ====================
@@ -735,7 +735,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -824,7 +824,7 @@ dependencies:
     - game-story-tmpl.yaml
   checklists:
     - game-po-checklist.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-po.md ====================
 
 ==================== START: .bmad-godot-game-dev/agents/game-pm.md ====================
@@ -832,7 +832,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -888,7 +888,7 @@ dependencies:
   templates:
     - brownfield-prd-tmpl.yaml
     - game-prd-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-pm.md ====================
 
 ==================== START: .bmad-godot-game-dev/agents/game-ux-expert.md ====================
@@ -896,7 +896,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -945,7 +945,7 @@ dependencies:
     - game-ui-spec-tmpl.yaml
   data:
     - technical-preferences.md
-```
+\`\`\`
 ==================== END: .bmad-godot-game-dev/agents/game-ux-expert.md ====================
 
 ==================== START: .bmad-godot-game-dev/data/bmad-kb.md ====================
@@ -1010,14 +1010,14 @@ BMad transforms you into a "Player Experience CEO" - directing a team of special
 
 ### The Game Development Loop
 
-```text
+\`\`\`text
 1. Game SM Agent (New Chat) → Creates next game story from sharded docs
 2. You → Review and approve game story
 3. Game Dev Agent (New Chat) → Implements approved game feature in Godot (TDD-first)
 4. QA Agent (New Chat) → Reviews code, enforces TDD, validates performance
 5. You → Verify game feature completion and 60+ FPS
 6. Repeat until game epic complete
-```
+\`\`\`
 
 ### Why This Works for Games
 
@@ -1065,11 +1065,11 @@ You are developing games as a "Player Experience CEO" - thinking like a game dir
 
 **Best for**: Godot developers using Cursor, Claude Code, Windsurf, Trae, Cline, Roo Code, Github Copilot
 
-```bash
+\`\`\`bash
 # Interactive installation (recommended)
 npx bmad-method install
 # Select the bmad-godot-game-dev expansion pack when prompted
-```
+\`\`\`
 
 **Installation Steps for Game Development**:
 
@@ -1143,7 +1143,7 @@ npx bmad-method install
 
 The expansion pack follows the standard BMad configuration patterns. Copy your core-config.yaml file to expansion-packs/bmad-godot-game-dev/ and add Game-specific configurations to your project's `core-config.yaml`:
 
-```yaml
+\`\`\`yaml
 markdownExploder: true
 prd:
   prdFile: docs/prd.md
@@ -1181,7 +1181,7 @@ devLoadAlwaysFiles:
   - docs/architecture/9-coding-standards.md
   - docs/architecture/3-tech-stack.md
   - docs/architecture/8-godot-project-structure.md
-```
+\`\`\`
 
 ## Complete Game Development Workflow
 
@@ -1202,18 +1202,18 @@ devLoadAlwaysFiles:
 
 **For Game Design Document Creation**:
 
-```text
+\`\`\`text
 "I want to build a [genre] 2D game in Godot that [core gameplay].
 Help me brainstorm mechanics and create a comprehensive Game Design Document."
-```
+\`\`\`
 
 **For Game Architecture Design**:
 
-```text
+\`\`\`text
 "Based on this Game Design Document, design a scalable Godot architecture
 that can handle [specific game requirements] with 60+ FPS performance.
 Consider both GDScript and C# for appropriate systems."
-```
+\`\`\`
 
 ### Critical Transition: Web UI to Godot IDE
 
@@ -1361,7 +1361,7 @@ Game templates with Level 2 headings (`##`) can be automatically sharded:
 
 **Original Game Design Document**:
 
-```markdown
+\`\`\`markdown
 ## Core Gameplay Mechanics
 
 ## Player Progression System
@@ -1369,7 +1369,7 @@ Game templates with Level 2 headings (`##`) can be automatically sharded:
 ## Level Design Framework
 
 ## Technical Requirements
-```
+\`\`\`
 
 **After Sharding**:
 
@@ -1423,7 +1423,7 @@ Use the `shard-doc` task or `@kayvan/markdown-tree-parser` tool for automatic ga
 
 **Project Structure**:
 
-```text
+\`\`\`text
 GodotProject/
 ├── .godot/              # Godot cache (gitignore)
 ├── scenes/              # Game scenes
@@ -1454,7 +1454,7 @@ GodotProject/
 │   └── godottest/      # GoDotTest for C#
 ├── export_presets.cfg  # Export configurations
 └── project.godot       # Project settings
-```
+\`\`\`
 
 **Performance Requirements**:
 
@@ -1733,10 +1733,10 @@ This Godot Game Development expansion pack extends BMad-Method beyond traditiona
 
 1. **Install via CLI**:
 
-   ```bash
+   \`\`\`bash
    npx bmad-method install
    # Select "Install game development expansion pack" option
-   ```
+   \`\`\`
 
 2. **Use in Your Game Workflow**: Installed game agents integrate seamlessly with existing BMad agents
 
@@ -1833,7 +1833,7 @@ This knowledge base provides the foundation for effective game development using
 
 **Present the numbered list (0-9) with this exact format:**
 
-```text
+\`\`\`text
 **Advanced Game Design Elicitation & Brainstorming Actions**
 Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 
@@ -1847,7 +1847,7 @@ Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 7. Explore Alternative Game Design Approaches
 8. Hindsight Postmortem: The 'If Only...' Game Design Reflection
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 ### 2. Processing Guidelines
 
@@ -2087,7 +2087,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 
 **Research Prompt Template:**
 
-```markdown
+\`\`\`markdown
 ## Research Objective
 
 [Clear statement of what this research aims to achieve]
@@ -2149,7 +2149,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 ## Timeline and Priority
 
 [If applicable, any time constraints or phasing]
-```
+\`\`\`
 
 ### 5. Review and Refinement
 
@@ -2458,7 +2458,7 @@ etc...
 
 ### Project Structure (Actual)
 
-```text
+\`\`\`text
 project-root/
 ├── src/
 │   ├── controllers/     # HTTP request handlers
@@ -2469,7 +2469,7 @@ project-root/
 ├── tests/               # Jest tests (60% coverage)
 ├── scripts/             # Build and deployment scripts
 └── config/              # Environment configs
-```
+\`\`\`
 
 ### Key Modules and Their Purpose
 
@@ -2551,10 +2551,10 @@ etc...
 
 ### Running Tests
 
-```bash
+\`\`\`bash
 npm test           # Runs unit tests
 npm run test:integration  # Runs integration tests (requires local DB)
-```
+\`\`\`
 
 ## If Enhancement PRD Provided - Impact Analysis
 
@@ -2583,12 +2583,12 @@ Based on the enhancement requirements, these files will be affected:
 
 ### Frequently Used Commands
 
-```bash
+\`\`\`bash
 npm run dev         # Start development server
 npm run build       # Production build
 npm run migrate     # Run database migrations
 npm run seed        # Seed test data
-```
+\`\`\`
 
 ### Debugging and Troubleshooting
 
@@ -4475,13 +4475,13 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
 1. **Install globally**:
 
-   ```bash
+   \`\`\`bash
    npm install -g @kayvan/markdown-tree-parser
-   ```
+   \`\`\`
 
 2. **Use the explode command**:
 
-   ```bash
+   \`\`\`bash
    # For PRD
    md-tree explode docs/prd.md docs/prd
 
@@ -4490,7 +4490,7 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
    # For any document
    md-tree explode [source-document] [destination-folder]
-   ```
+   \`\`\`
 
 3. **What it does**:
    - Automatically splits the document by level 2 sections
@@ -4542,12 +4542,12 @@ For each extracted section:
    - The level 2 heading becomes level 1 (# instead of ##) in the sharded new document
    - All subsection levels decrease by 1:
 
-   ```txt
+   \`\`\`txt
      - ### → ##
      - #### → ###
      - ##### → ####
      - etc.
-   ```
+   \`\`\`
 
 3. **Write content**: Save the adjusted content to the new file
 
@@ -4558,7 +4558,7 @@ Create an `index.md` file in the sharded folder that:
 1. Contains the original level 1 heading and any content before the first level 2 section
 2. Lists all the sharded files with links:
 
-```markdown
+\`\`\`markdown
 # Original Document Title
 
 [Original introduction content if any]
@@ -4569,22 +4569,22 @@ Create an `index.md` file in the sharded folder that:
 - [Section Name 2](./section-name-2.md)
 - [Section Name 3](./section-name-3.md)
   ...
-```
+\`\`\`
 
 ### 5. Preserve Special Content
 
 1. **Code blocks**: Must capture complete blocks including:
 
-   ```language
+   \`\`\`language
    content
-   ```
+   \`\`\`
 
 2. **Mermaid diagrams**: Preserve complete syntax:
 
-   ```mermaid
+   \`\`\`mermaid
    graph TD
    ...
-   ```
+   \`\`\`
 
 3. **Tables**: Maintain proper markdown table formatting
 
@@ -4609,7 +4609,7 @@ After sharding:
 
 Provide a summary:
 
-```text
+\`\`\`text
 Document sharded successfully:
 - Source: [original document path]
 - Destination: docs/[folder-name]/
@@ -4618,7 +4618,7 @@ Document sharded successfully:
   - section-name-1.md: "Section Title 1"
   - section-name-2.md: "Section Title 2"
   ...
-```
+\`\`\`
 
 ## Important Notes
 
@@ -5119,13 +5119,13 @@ sections:
 
           **Save Data Structure:**
 
-          ```csharp
+          \`\`\`csharp
           [System.Serializable]
           public class PlayerProgress
           {
               {{progress_fields}}
           }
-          ```
+          \`\`\`
         examples:
           - public int currentLevel, public bool[] unlockedAbilities, public float totalPlayTime
       - id: difficulty-curve
@@ -5333,7 +5333,7 @@ sections:
 
           **Folder Structure:**
 
-          ```
+          \`\`\`
           Assets/
           ├── _Project/
           │   ├── Scripts/
@@ -5341,7 +5341,7 @@ sections:
           │   ├── Scenes/
           │   ├── Scenes/
           │   └── {{additional_folders}}
-          ```
+          \`\`\`
 
           **Naming Conventions:**
 
@@ -5947,7 +5947,7 @@ sections:
           - Resource format: .tres for level data
 
           **Scene Hierarchy:**
-          ```
+          \`\`\`
           Level (Node2D/Spatial)
           ├── TileMap (background)
           ├── TileMap (collision)
@@ -5957,7 +5957,7 @@ sections:
           │   └── Pickups (pooled)
           ├── Triggers (Node2D)
           └── LevelLogic (Node with script)
-          ```
+          \`\`\`
         sections:
           - id: level-resource-data
             title: Level Resource Data (.tres)
@@ -6074,7 +6074,7 @@ sections:
         title: Entity Spawning Patterns
         template: |
           **Object Pooling (Mandatory):**
-          ```gdscript
+          \`\`\`gdscript
           # Enemy pool manager
           var enemy_pool: Array = []
           var max_enemies: int = {{max_count}}
@@ -6085,7 +6085,7 @@ sections:
                   var enemy = enemy_scene.instantiate()
                   enemy.set_process(false)
                   enemy_pool.append(enemy)
-          ```
+          \`\`\`
 
           **Spawn Points:**
           - Use Position2D/3D markers
@@ -8037,7 +8037,7 @@ Following John Carmack's principles:
 
 **Always use static typing for 10-20% performance gain:**
 
-```gdscript
+\`\`\`gdscript
 # GOOD - Static typing
 extends CharacterBody2D
 
@@ -8059,7 +8059,7 @@ func _die() -> void:
 var health = 100  # No type specified
 func take_damage(amount):  # No parameter or return type
     health -= amount
-```
+\`\`\`
 
 ## C# Standards (for Performance-Critical Systems)
 
@@ -8083,7 +8083,7 @@ func take_damage(amount):  # No parameter or return type
 
 ### C# Naming Conventions
 
-```csharp
+\`\`\`csharp
 using Godot;
 
 public partial class PlayerController : CharacterBody2D
@@ -8113,7 +8113,7 @@ public partial class PlayerController : CharacterBody2D
         QueueFree();
     }
 }
-```
+\`\`\`
 
 ## Godot Architecture Patterns
 
@@ -8121,7 +8121,7 @@ public partial class PlayerController : CharacterBody2D
 
 **Scene Composition Over Inheritance:**
 
-```gdscript
+\`\`\`gdscript
 # Player.tscn structure:
 # Player (CharacterBody2D)
 # ├── Sprite2D
@@ -8148,13 +8148,13 @@ func take_damage(amount: int) -> void:
     health_changed.emit(current_health)
     if current_health == 0:
         died.emit()
-```
+\`\`\`
 
 ### Signal-Based Communication
 
 **Decouple Systems with Signals:**
 
-```gdscript
+\`\`\`gdscript
 # GameManager.gd - Singleton/Autoload
 extends Node
 
@@ -8180,13 +8180,13 @@ func _ready() -> void:
 func _on_game_over() -> void:
     set_physics_process(false)  # Stop player movement
     $AnimationPlayer.play("death")
-```
+\`\`\`
 
 ### Resource-Based Data Management
 
 **Use Custom Resources for Game Data:**
 
-```gdscript
+\`\`\`gdscript
 # WeaponData.gd - Custom Resource
 extends Resource
 class_name WeaponData
@@ -8208,13 +8208,13 @@ func _ready() -> void:
 
 func attack() -> int:
     return weapon_data.damage if weapon_data else 0
-```
+\`\`\`
 
 ## Performance Optimization
 
 ### Object Pooling (MANDATORY for Spawned Objects)
 
-```gdscript
+\`\`\`gdscript
 # ObjectPool.gd - Generic pooling system
 extends Node
 class_name ObjectPool
@@ -8252,13 +8252,13 @@ func return_object(obj: Node) -> void:
     obj.set_physics_process(false)
     obj.visible = false
     obj.position = Vector2.ZERO
-```
+\`\`\`
 
 ### Process Optimization
 
 **Use Appropriate Process Methods:**
 
-```gdscript
+\`\`\`gdscript
 extends Node2D
 
 # For physics calculations (fixed timestep)
@@ -8282,13 +8282,13 @@ func _ready() -> void:
 func _check_condition() -> void:
     # Check something once per second instead of 60 times
     pass
-```
+\`\`\`
 
 ### Memory Management
 
 **Prevent Memory Leaks:**
 
-```gdscript
+\`\`\`gdscript
 extends Node
 
 var _connections: Array[Callable] = []
@@ -8308,7 +8308,7 @@ func _exit_tree() -> void:
 # Use queue_free() not free() for nodes
 func remove_enemy(enemy: Node) -> void:
     enemy.queue_free()  # Safe deletion
-```
+\`\`\`
 
 ## Test-Driven Development (MANDATORY)
 
@@ -8316,7 +8316,7 @@ func remove_enemy(enemy: Node) -> void:
 
 **Write Tests FIRST:**
 
-```gdscript
+\`\`\`gdscript
 # test/unit/test_player_health.gd
 extends GutTest
 
@@ -8356,11 +8356,11 @@ func test_died_signal_emitted_at_zero_health() -> void:
 
     # Assert
     assert_signal_emitted(player_health, "died")
-```
+\`\`\`
 
 ### GoDotTest for C#
 
-```csharp
+\`\`\`csharp
 using Godot;
 using GoDotTest;
 
@@ -8404,7 +8404,7 @@ public class PlayerControllerTests : TestClass
         AssertThat(signalEmitted).IsTrue();
     }
 }
-```
+\`\`\`
 
 ## Input Handling
 
@@ -8412,7 +8412,7 @@ public class PlayerControllerTests : TestClass
 
 **Input Map Configuration:**
 
-```gdscript
+\`\`\`gdscript
 # Configure in Project Settings -> Input Map
 # Actions: "move_left", "move_right", "jump", "attack"
 
@@ -8440,13 +8440,13 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
     if event.is_action_pressed("attack"):
         _perform_attack()
-```
+\`\`\`
 
 ## Scene Management
 
 ### Scene Loading and Transitions
 
-```gdscript
+\`\`\`gdscript
 # SceneManager.gd - Autoload singleton
 extends Node
 
@@ -8485,11 +8485,11 @@ func change_scene_with_loading(path: String) -> void:
     # Switch scenes
     loading_screen.queue_free()
     change_scene(path)
-```
+\`\`\`
 
 ## Project Structure
 
-```
+\`\`\`
 res://
 ├── scenes/
 │   ├── main/
@@ -8529,7 +8529,7 @@ res://
 │   └── integration/
 │       └── test_level_loading.gd
 └── project.godot
-```
+\`\`\`
 
 ## Development Workflow
 
@@ -8647,7 +8647,7 @@ res://
 
 ### GDScript Death Sentences
 
-```gdscript
+\`\`\`gdscript
 # CRIME: Dynamic typing
 var health = 100  # Dies. var health: int = 100
 
@@ -8687,11 +8687,11 @@ func _process(delta):
 func spawn_particle():
     var p = Particle.new()  # Dies. Pool everything spawned
     add_child(p)
-```
+\`\`\`
 
 ### The Only Acceptable GDScript Patterns
 
-```gdscript
+\`\`\`gdscript
 # GOOD: Static typing everywhere
 var health: int = 100
 var speed: float = 300.0
@@ -8753,7 +8753,7 @@ func _process_updates() -> void:
 const MAX_ENEMIES: int = 100
 const GRAVITY: float = 980.0
 const DEBUG_MODE: bool = false
-```
+\`\`\`
 
 ### GDScript-Specific Optimization Rules
 
@@ -8803,7 +8803,7 @@ const DEBUG_MODE: bool = false
 
 ### Instant Rejection Patterns
 
-```csharp
+\`\`\`csharp
 // CRIME: LINQ in game code
 units.Where(u => u.IsAlive).ToList()  // Dies. Pre-filtered array.
 
@@ -8833,11 +8833,11 @@ await LoadDataAsync();  // Dies. Preload or synchronous.
 
 // CRIME: GD.Print in production
 GD.Print($"Debug: {value}");  // Dies. Conditional compilation.
-```
+\`\`\`
 
 ### Godot-Specific Crimes
 
-```csharp
+\`\`\`csharp
 // CRIME: GetNode every frame
 GetNode<Label>("UI/Score")  // Dies. Cache in _Ready().
 
@@ -8852,11 +8852,11 @@ public override void _Process(double delta)  // Dies. Use _PhysicsProcess or eve
 
 // CRIME: Autoload abuse
 GetNode<GameManager>("/root/GameManager")  // Dies. Direct reference.
-```
+\`\`\`
 
 ### The Only Acceptable Patterns
 
-```csharp
+\`\`\`csharp
 // GOOD: Pre-allocated buffers
 private readonly Unit[] _units = new Unit[MAX_UNITS];
 private readonly int[] _indices = new int[MAX_UNITS];
@@ -8884,7 +8884,7 @@ public void Update() {
 #if DEBUG
     GD.Print("Debug info");
 #endif
-```
+\`\`\`
 
 These guidelines ensure consistent, high-quality Godot game development that meets performance targets, maintains code quality, and follows TDD practices across all implementation stories.
 ==================== END: .bmad-godot-game-dev/data/development-guidelines.md ====================
@@ -8905,7 +8905,7 @@ Implement fixes based on QA results (gate and assessments) for a specific Godot 
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "2.2"
   - qa_root: from `.bmad-godot-game-dev/config.yaml` key `qa.qaLocation` (e.g., `docs/project/qa`)
@@ -8915,7 +8915,7 @@ required:
 optional:
   - story_title: '{title}' # derive from story H1 if missing
   - story_slug: '{slug}' # derive from title (lowercase, hyphenated) if missing
-```
+\`\`\`
 
 ## QA Sources to Read
 
@@ -9328,13 +9328,13 @@ Perform a comprehensive Godot game story review with quality gate decision, focu
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: '{devStoryLocation}/{epic}.{story}.*.md' # Path from core-config.yaml
   - story_title: '{title}' # If missing, derive from story file H1
   - story_slug: '{slug}' # If missing, derive from title (lowercase, hyphenated)
-```
+\`\`\`
 
 ## Prerequisites
 
@@ -9471,7 +9471,7 @@ required:
 
 After review and any refactoring, append your results to the story file in the QA Results section:
 
-```markdown
+\`\`\`markdown
 ## QA Results
 
 ### Review Date: [Date]
@@ -9542,7 +9542,7 @@ NFR assessment: docs/qa/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md
 
 [✓ Ready for Done] / [✗ Changes Required - See unchecked items above]
 (Story owner decides final status)
-```
+\`\`\`
 
 ## Output 2: Create Quality Gate File
 
@@ -9554,7 +9554,7 @@ NFR assessment: docs/qa/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md
 
 Gate file structure:
 
-```yaml
+\`\`\`yaml
 schema: 1
 story: '{epic}.{story}'
 story_title: '{story title}'
@@ -9604,7 +9604,7 @@ recommendations:
   future: # Can be addressed later
     - action: 'Consider C# for physics system'
       refs: ['scripts/physics_manager.gd']
-```
+\`\`\`
 
 ### Gate Decision Criteria
 
@@ -9640,10 +9640,10 @@ Detailed criteria:
 
 ### Quality Score Calculation
 
-```text
+\`\`\`text
 quality_score = 100 - (20 × number of FAILs) - (10 × number of CONCERNS)
 Bounded between 0 and 100
-```
+\`\`\`
 
 If `technical-preferences.md` defines custom weights, use those instead.
 
@@ -9697,13 +9697,13 @@ Create comprehensive Godot game test scenarios using GUT (GDScript) or GoDotTest
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: '{devStoryLocation}/{epic}.{story}.*.md' # Path from core-config.yaml
   - story_title: '{title}' # If missing, derive from story file H1
   - story_slug: '{slug}' # If missing, derive from title (lowercase, hyphenated)
-```
+\`\`\`
 
 ## Purpose
 
@@ -9711,7 +9711,7 @@ Design a complete Godot game test strategy that identifies what to test, at whic
 
 ## Dependencies
 
-```yaml
+\`\`\`yaml
 data:
   - game-test-levels-framework.md # Unit/Integration/Playtesting decision criteria
   - game-test-priorities-matrix.md # P0/P1/P2/P3 classification for game features
@@ -9721,7 +9721,7 @@ frameworks:
   csharp:
     - GoDotTest # xUnit-based testing for C#
     - GodotTestDriver # UI automation and integration testing
-```
+\`\`\`
 
 ## Godot Testing Frameworks
 
@@ -9783,7 +9783,7 @@ Quick priority assignment for games:
 
 For each identified test need, create:
 
-```yaml
+\`\`\`yaml
 test_scenario:
   id: '{epic}.{story}-{LEVEL}-{SEQ}'
   requirement: 'AC reference'
@@ -9794,7 +9794,7 @@ test_scenario:
   justification: 'Why this level and framework were chosen'
   test_scene: 'res://tests/{TestSceneName}.tscn' # For automated tests
   mitigates_risks: ['PERF-001', 'GAME-002'] # From risk profile
-```
+\`\`\`
 
 ### 5. Validate Coverage
 
@@ -9811,7 +9811,7 @@ Ensure:
 
 **Save to:** `qa.qaLocation/assessments/{epic}.{story}-test-design-{YYYYMMDD}.md`
 
-```markdown
+\`\`\`markdown
 # Test Design: Story {epic}.{story}
 
 Date: {date}
@@ -9851,13 +9851,13 @@ Designer: Quinn (Game Test Architect)
 3. P0 E2E tests
 4. P1 tests in order
 5. P2+ as time permits
-```
+\`\`\`
 
 ### Output 2: Gate YAML Block
 
 Generate for inclusion in quality gate:
 
-```yaml
+\`\`\`yaml
 test_design:
   scenarios_total: X
   by_level:
@@ -9875,16 +9875,16 @@ test_design:
     p2: C
   coverage_gaps: [] # List any ACs without tests
   performance_tests: [] # FPS, memory, load time tests
-```
+\`\`\`
 
 ### Output 3: Trace References
 
 Print for use by trace-requirements task:
 
-```text
+\`\`\`text
 Test design matrix: qa.qaLocation/assessments/{epic}.{story}-test-design-{YYYYMMDD}.md
 P0 tests identified: {count}
-```
+\`\`\`
 
 ## Game Testing Quality Checklist
 
@@ -9919,13 +9919,13 @@ Generate a comprehensive risk assessment matrix for a Godot game story implement
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: 'docs/stories/{epic}.{story}.*.md'
   - story_title: '{title}' # If missing, derive from story file H1
   - story_slug: '{slug}' # If missing, derive from title (lowercase, hyphenated)
-```
+\`\`\`
 
 ## Purpose
 
@@ -9998,7 +9998,7 @@ Identify, assess, and prioritize risks in Godot game feature implementation. Pro
 
 For each category, identify specific risks:
 
-```yaml
+\`\`\`yaml
 risk:
   id: 'PERF-001' # Use prefixes: TECH, PERF, GAME, ART, PLAT, PLAY
   category: performance
@@ -10009,7 +10009,7 @@ risk:
     - 'ParticleManager.gd'
     - 'BossAttackEffects'
   detection_method: 'Profiler showed 80% GPU usage on particles'
-```
+\`\`\`
 
 ### 2. Risk Assessment
 
@@ -10039,7 +10039,7 @@ Evaluate each risk using probability × impact:
 
 Create risk matrix:
 
-```markdown
+\`\`\`markdown
 ## Risk Matrix
 
 | Risk ID  | Description                  | Probability | Impact     | Score | Priority |
@@ -10047,13 +10047,13 @@ Create risk matrix:
 | GAME-001 | Boss fight progression block | High (3)    | High (3)   | 9     | Critical |
 | PERF-001 | Particle FPS drops           | Medium (2)  | Medium (2) | 4     | Medium   |
 | PLAT-001 | Mobile export crashes        | Low (1)     | High (3)   | 3     | Low      |
-```
+\`\`\`
 
 ### 4. Risk Mitigation Strategies
 
 For each identified risk, provide mitigation:
 
-```yaml
+\`\`\`yaml
 mitigation:
   risk_id: 'PERF-001'
   strategy: 'preventive' # preventive|detective|corrective
@@ -10069,7 +10069,7 @@ mitigation:
   residual_risk: 'Low - May still drop to 45 FPS on very low-end devices'
   owner: 'game-dev'
   timeline: 'Before beta release'
-```
+\`\`\`
 
 ## Outputs
 
@@ -10083,7 +10083,7 @@ Generate for pasting into gate file under `risk_summary`:
 - Sort risks by score (desc) when emitting highest and any tabular lists
 - If no risks: totals all zeros, omit highest, keep recommendations arrays empty
 
-```yaml
+\`\`\`yaml
 # risk_summary (paste into gate file):
 risk_summary:
   totals:
@@ -10100,13 +10100,13 @@ risk_summary:
       - 'Fix collision detection in boss arena'
     monitor:
       - 'Track FPS metrics during gameplay'
-```
+\`\`\`
 
 ### Output 2: Markdown Report
 
 **Save to:** `qa.qaLocation/assessments/{epic}.{story}-risk-{YYYYMMDD}.md`
 
-```markdown
+\`\`\`markdown
 # Risk Profile: Story {epic}.{story}
 
 Date: {date}
@@ -10212,13 +10212,13 @@ Review and update risk profile when:
 - Performance issues reported by playtesters
 - Art style or asset pipeline changes
 - Multiplayer features added
-```
+\`\`\`
 
 ## Risk Scoring Algorithm
 
 Calculate overall story risk score:
 
-```text
+\`\`\`text
 Base Score = 100
 For each risk:
   - Critical (9): Deduct 20 points
@@ -10228,7 +10228,7 @@ For each risk:
 
 Minimum score = 0 (extremely risky)
 Maximum score = 100 (minimal risk)
-```
+\`\`\`
 
 ## Risk-Based Recommendations
 
@@ -10267,9 +10267,9 @@ Based on risk profile, recommend:
 
 **Print this line for review task to quote:**
 
-```text
+\`\`\`text
 Risk profile: qa.qaLocation/assessments/{epic}.{story}-risk-{YYYYMMDD}.md
-```
+\`\`\`
 
 ## Key Principles
 
@@ -10390,7 +10390,7 @@ sections:
         instruction: Define specific Godot node structures and classes with language strategy
         template: |
           **GDScript Implementation (for game logic):**
-          ```gdscript
+          \`\`\`gdscript
           # {{script_name}}.gd
           class_name {{ClassName}}
           extends {{Node2D|Control|Node3D}}
@@ -10409,10 +10409,10 @@ sections:
           func _physics_process(delta: float) -> void:
               # Must maintain 60+ FPS
               pass
-          ```
+          \`\`\`
 
           **C# Implementation (for performance-critical systems):**
-          ```csharp
+          \`\`\`csharp
           // {{script_name}}.cs
           using Godot;
 
@@ -10435,7 +10435,7 @@ sections:
                   // Optimize for 60+ FPS, no allocations
               }
           }
-          ```
+          \`\`\`
       - id: integration-points
         title: Integration Points
         instruction: Specify how this feature integrates with existing Godot systems
@@ -10536,12 +10536,12 @@ sections:
       **Primary Language:** {{GDScript|C#}} - {{reason}}
 
       **Node Architecture:**
-      ```
+      \`\`\`
       {{parent_node}}
       └── {{child_node_1}} ({{node_type}})
           ├── {{child_node_2}} ({{node_type}})
           └── {{child_node_3}} ({{node_type}})
-      ```
+      \`\`\`
 
       **Performance Requirements:**
       - Target FPS: 60+ (mandatory)
@@ -13884,14 +13884,14 @@ sections:
               **Purpose:** {{scene_purpose}}
 
               **Control Node Hierarchy:**
-              ```
+              \`\`\`
               Control (root)
               ├── MarginContainer
               │   └── VBoxContainer
               │       ├── {{element_1}}
               │       ├── {{element_2}}
               │       └── {{element_3}}
-              ```
+              \`\`\`
 
               **Anchoring Strategy:** {{anchor_preset}}
 
@@ -14186,7 +14186,7 @@ sections:
         title: UI Scene Organization
         template: |
           **Scene Structure:**
-          ```
+          \`\`\`
           res://
           ├── ui/
           │   ├── scenes/
@@ -14198,7 +14198,7 @@ sections:
           │   │   └── {{component}}.tscn
           │   └── popups/
           │       └── {{popup}}.tscn
-          ```
+          \`\`\`
 
           **Script Organization:**
           - UI Logic: GDScript with static typing
@@ -14302,24 +14302,24 @@ sections:
         title: UI Signal Patterns
         template: |
           **Button Signals:**
-          ```gdscript
+          \`\`\`gdscript
           button.pressed.connect(_on_button_pressed)
           button.button_down.connect(_on_button_down)
           button.toggled.connect(_on_button_toggled)
-          ```
+          \`\`\`
 
           **Input Handling:**
-          ```gdscript
+          \`\`\`gdscript
           func _gui_input(event: InputEvent) -> void:
               if event.is_action_pressed("ui_accept"):
                   # Handle input with 60+ FPS maintained
-          ```
+          \`\`\`
 
           **Custom Signals:**
-          ```gdscript
+          \`\`\`gdscript
           signal value_changed(new_value: float)
           signal item_selected(item_id: int)
-          ```
+          \`\`\`
 
   - id: checklist-results
     title: Checklist Results
@@ -16749,13 +16749,13 @@ sections:
 
           **Save Data Structure:**
 
-          ```csharp
+          \`\`\`csharp
           [System.Serializable]
           public class PlayerProgress
           {
               {{progress_fields}}
           }
-          ```
+          \`\`\`
         examples:
           - public int currentLevel, public bool[] unlockedAbilities, public float totalPlayTime
       - id: difficulty-curve
@@ -16963,7 +16963,7 @@ sections:
 
           **Folder Structure:**
 
-          ```
+          \`\`\`
           Assets/
           ├── _Project/
           │   ├── Scripts/
@@ -16971,7 +16971,7 @@ sections:
           │   ├── Scenes/
           │   ├── Scenes/
           │   └── {{additional_folders}}
-          ```
+          \`\`\`
 
           **Naming Conventions:**
 
@@ -17782,7 +17782,7 @@ sections:
         instruction: Define specific Godot node structures and classes with language strategy
         template: |
           **GDScript Implementation (for game logic):**
-          ```gdscript
+          \`\`\`gdscript
           # {{script_name}}.gd
           class_name {{ClassName}}
           extends {{Node2D|Control|Node3D}}
@@ -17801,10 +17801,10 @@ sections:
           func _physics_process(delta: float) -> void:
               # Must maintain 60+ FPS
               pass
-          ```
+          \`\`\`
 
           **C# Implementation (for performance-critical systems):**
-          ```csharp
+          \`\`\`csharp
           // {{script_name}}.cs
           using Godot;
 
@@ -17827,7 +17827,7 @@ sections:
                   // Optimize for 60+ FPS, no allocations
               }
           }
-          ```
+          \`\`\`
       - id: integration-points
         title: Integration Points
         instruction: Specify how this feature integrates with existing Godot systems
@@ -17928,12 +17928,12 @@ sections:
       **Primary Language:** {{GDScript|C#}} - {{reason}}
 
       **Node Architecture:**
-      ```
+      \`\`\`
       {{parent_node}}
       └── {{child_node_1}} ({{node_type}})
           ├── {{child_node_2}} ({{node_type}})
           └── {{child_node_3}} ({{node_type}})
-      ```
+      \`\`\`
 
       **Performance Requirements:**
       - Target FPS: 60+ (mandatory)
@@ -18250,14 +18250,14 @@ sections:
               **Purpose:** {{scene_purpose}}
 
               **Control Node Hierarchy:**
-              ```
+              \`\`\`
               Control (root)
               ├── MarginContainer
               │   └── VBoxContainer
               │       ├── {{element_1}}
               │       ├── {{element_2}}
               │       └── {{element_3}}
-              ```
+              \`\`\`
 
               **Anchoring Strategy:** {{anchor_preset}}
 
@@ -18552,7 +18552,7 @@ sections:
         title: UI Scene Organization
         template: |
           **Scene Structure:**
-          ```
+          \`\`\`
           res://
           ├── ui/
           │   ├── scenes/
@@ -18564,7 +18564,7 @@ sections:
           │   │   └── {{component}}.tscn
           │   └── popups/
           │       └── {{popup}}.tscn
-          ```
+          \`\`\`
 
           **Script Organization:**
           - UI Logic: GDScript with static typing
@@ -18668,24 +18668,24 @@ sections:
         title: UI Signal Patterns
         template: |
           **Button Signals:**
-          ```gdscript
+          \`\`\`gdscript
           button.pressed.connect(_on_button_pressed)
           button.button_down.connect(_on_button_down)
           button.toggled.connect(_on_button_toggled)
-          ```
+          \`\`\`
 
           **Input Handling:**
-          ```gdscript
+          \`\`\`gdscript
           func _gui_input(event: InputEvent) -> void:
               if event.is_action_pressed("ui_accept"):
                   # Handle input with 60+ FPS maintained
-          ```
+          \`\`\`
 
           **Custom Signals:**
-          ```gdscript
+          \`\`\`gdscript
           signal value_changed(new_value: float)
           signal item_selected(item_id: int)
-          ```
+          \`\`\`
 
   - id: checklist-results
     title: Checklist Results
@@ -18991,7 +18991,7 @@ sections:
           - Resource format: .tres for level data
 
           **Scene Hierarchy:**
-          ```
+          \`\`\`
           Level (Node2D/Spatial)
           ├── TileMap (background)
           ├── TileMap (collision)
@@ -19001,7 +19001,7 @@ sections:
           │   └── Pickups (pooled)
           ├── Triggers (Node2D)
           └── LevelLogic (Node with script)
-          ```
+          \`\`\`
         sections:
           - id: level-resource-data
             title: Level Resource Data (.tres)
@@ -19118,7 +19118,7 @@ sections:
         title: Entity Spawning Patterns
         template: |
           **Object Pooling (Mandatory):**
-          ```gdscript
+          \`\`\`gdscript
           # Enemy pool manager
           var enemy_pool: Array = []
           var max_enemies: int = {{max_count}}
@@ -19129,7 +19129,7 @@ sections:
                   var enemy = enemy_scene.instantiate()
                   enemy.set_process(false)
                   enemy_pool.append(enemy)
-          ```
+          \`\`\`
 
           **Spawn Points:**
           - Use Position2D/3D markers
@@ -19768,7 +19768,7 @@ sections:
 
 **Present the numbered list (0-9) with this exact format:**
 
-```text
+\`\`\`text
 **Advanced Game Design Elicitation & Brainstorming Actions**
 Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 
@@ -19782,7 +19782,7 @@ Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 7. Explore Alternative Game Design Approaches
 8. Hindsight Postmortem: The 'If Only...' Game Design Reflection
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 ### 2. Processing Guidelines
 
@@ -19865,7 +19865,7 @@ Implement fixes based on QA results (gate and assessments) for a specific Godot 
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "2.2"
   - qa_root: from `.bmad-godot-game-dev/config.yaml` key `qa.qaLocation` (e.g., `docs/project/qa`)
@@ -19875,7 +19875,7 @@ required:
 optional:
   - story_title: '{title}' # derive from story H1 if missing
   - story_slug: '{slug}' # derive from title (lowercase, hyphenated) if missing
-```
+\`\`\`
 
 ## QA Sources to Read
 
@@ -20728,7 +20728,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 
 **Research Prompt Template:**
 
-```markdown
+\`\`\`markdown
 ## Research Objective
 
 [Clear statement of what this research aims to achieve]
@@ -20790,7 +20790,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 ## Timeline and Priority
 
 [If applicable, any time constraints or phasing]
-```
+\`\`\`
 
 ### 5. Review and Refinement
 
@@ -21304,7 +21304,7 @@ etc...
 
 ### Project Structure (Actual)
 
-```text
+\`\`\`text
 project-root/
 ├── src/
 │   ├── controllers/     # HTTP request handlers
@@ -21315,7 +21315,7 @@ project-root/
 ├── tests/               # Jest tests (60% coverage)
 ├── scripts/             # Build and deployment scripts
 └── config/              # Environment configs
-```
+\`\`\`
 
 ### Key Modules and Their Purpose
 
@@ -21397,10 +21397,10 @@ etc...
 
 ### Running Tests
 
-```bash
+\`\`\`bash
 npm test           # Runs unit tests
 npm run test:integration  # Runs integration tests (requires local DB)
-```
+\`\`\`
 
 ## If Enhancement PRD Provided - Impact Analysis
 
@@ -21429,12 +21429,12 @@ Based on the enhancement requirements, these files will be affected:
 
 ### Frequently Used Commands
 
-```bash
+\`\`\`bash
 npm run dev         # Start development server
 npm run build       # Production build
 npm run migrate     # Run database migrations
 npm run seed        # Seed test data
-```
+\`\`\`
 
 ### Debugging and Troubleshooting
 
@@ -22338,13 +22338,13 @@ Generate a comprehensive risk assessment matrix for a Godot game story implement
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: 'docs/stories/{epic}.{story}.*.md'
   - story_title: '{title}' # If missing, derive from story file H1
   - story_slug: '{slug}' # If missing, derive from title (lowercase, hyphenated)
-```
+\`\`\`
 
 ## Purpose
 
@@ -22417,7 +22417,7 @@ Identify, assess, and prioritize risks in Godot game feature implementation. Pro
 
 For each category, identify specific risks:
 
-```yaml
+\`\`\`yaml
 risk:
   id: 'PERF-001' # Use prefixes: TECH, PERF, GAME, ART, PLAT, PLAY
   category: performance
@@ -22428,7 +22428,7 @@ risk:
     - 'ParticleManager.gd'
     - 'BossAttackEffects'
   detection_method: 'Profiler showed 80% GPU usage on particles'
-```
+\`\`\`
 
 ### 2. Risk Assessment
 
@@ -22458,7 +22458,7 @@ Evaluate each risk using probability × impact:
 
 Create risk matrix:
 
-```markdown
+\`\`\`markdown
 ## Risk Matrix
 
 | Risk ID  | Description                  | Probability | Impact     | Score | Priority |
@@ -22466,13 +22466,13 @@ Create risk matrix:
 | GAME-001 | Boss fight progression block | High (3)    | High (3)   | 9     | Critical |
 | PERF-001 | Particle FPS drops           | Medium (2)  | Medium (2) | 4     | Medium   |
 | PLAT-001 | Mobile export crashes        | Low (1)     | High (3)   | 3     | Low      |
-```
+\`\`\`
 
 ### 4. Risk Mitigation Strategies
 
 For each identified risk, provide mitigation:
 
-```yaml
+\`\`\`yaml
 mitigation:
   risk_id: 'PERF-001'
   strategy: 'preventive' # preventive|detective|corrective
@@ -22488,7 +22488,7 @@ mitigation:
   residual_risk: 'Low - May still drop to 45 FPS on very low-end devices'
   owner: 'game-dev'
   timeline: 'Before beta release'
-```
+\`\`\`
 
 ## Outputs
 
@@ -22502,7 +22502,7 @@ Generate for pasting into gate file under `risk_summary`:
 - Sort risks by score (desc) when emitting highest and any tabular lists
 - If no risks: totals all zeros, omit highest, keep recommendations arrays empty
 
-```yaml
+\`\`\`yaml
 # risk_summary (paste into gate file):
 risk_summary:
   totals:
@@ -22519,13 +22519,13 @@ risk_summary:
       - 'Fix collision detection in boss arena'
     monitor:
       - 'Track FPS metrics during gameplay'
-```
+\`\`\`
 
 ### Output 2: Markdown Report
 
 **Save to:** `qa.qaLocation/assessments/{epic}.{story}-risk-{YYYYMMDD}.md`
 
-```markdown
+\`\`\`markdown
 # Risk Profile: Story {epic}.{story}
 
 Date: {date}
@@ -22631,13 +22631,13 @@ Review and update risk profile when:
 - Performance issues reported by playtesters
 - Art style or asset pipeline changes
 - Multiplayer features added
-```
+\`\`\`
 
 ## Risk Scoring Algorithm
 
 Calculate overall story risk score:
 
-```text
+\`\`\`text
 Base Score = 100
 For each risk:
   - Critical (9): Deduct 20 points
@@ -22647,7 +22647,7 @@ For each risk:
 
 Minimum score = 0 (extremely risky)
 Maximum score = 100 (minimal risk)
-```
+\`\`\`
 
 ## Risk-Based Recommendations
 
@@ -22686,9 +22686,9 @@ Based on risk profile, recommend:
 
 **Print this line for review task to quote:**
 
-```text
+\`\`\`text
 Risk profile: qa.qaLocation/assessments/{epic}.{story}-risk-{YYYYMMDD}.md
-```
+\`\`\`
 
 ## Key Principles
 
@@ -22709,13 +22709,13 @@ Create comprehensive Godot game test scenarios using GUT (GDScript) or GoDotTest
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: '{devStoryLocation}/{epic}.{story}.*.md' # Path from core-config.yaml
   - story_title: '{title}' # If missing, derive from story file H1
   - story_slug: '{slug}' # If missing, derive from title (lowercase, hyphenated)
-```
+\`\`\`
 
 ## Purpose
 
@@ -22723,7 +22723,7 @@ Design a complete Godot game test strategy that identifies what to test, at whic
 
 ## Dependencies
 
-```yaml
+\`\`\`yaml
 data:
   - game-test-levels-framework.md # Unit/Integration/Playtesting decision criteria
   - game-test-priorities-matrix.md # P0/P1/P2/P3 classification for game features
@@ -22733,7 +22733,7 @@ frameworks:
   csharp:
     - GoDotTest # xUnit-based testing for C#
     - GodotTestDriver # UI automation and integration testing
-```
+\`\`\`
 
 ## Godot Testing Frameworks
 
@@ -22795,7 +22795,7 @@ Quick priority assignment for games:
 
 For each identified test need, create:
 
-```yaml
+\`\`\`yaml
 test_scenario:
   id: '{epic}.{story}-{LEVEL}-{SEQ}'
   requirement: 'AC reference'
@@ -22806,7 +22806,7 @@ test_scenario:
   justification: 'Why this level and framework were chosen'
   test_scene: 'res://tests/{TestSceneName}.tscn' # For automated tests
   mitigates_risks: ['PERF-001', 'GAME-002'] # From risk profile
-```
+\`\`\`
 
 ### 5. Validate Coverage
 
@@ -22823,7 +22823,7 @@ Ensure:
 
 **Save to:** `qa.qaLocation/assessments/{epic}.{story}-test-design-{YYYYMMDD}.md`
 
-```markdown
+\`\`\`markdown
 # Test Design: Story {epic}.{story}
 
 Date: {date}
@@ -22863,13 +22863,13 @@ Designer: Quinn (Game Test Architect)
 3. P0 E2E tests
 4. P1 tests in order
 5. P2+ as time permits
-```
+\`\`\`
 
 ### Output 2: Gate YAML Block
 
 Generate for inclusion in quality gate:
 
-```yaml
+\`\`\`yaml
 test_design:
   scenarios_total: X
   by_level:
@@ -22887,16 +22887,16 @@ test_design:
     p2: C
   coverage_gaps: [] # List any ACs without tests
   performance_tests: [] # FPS, memory, load time tests
-```
+\`\`\`
 
 ### Output 3: Trace References
 
 Print for use by trace-requirements task:
 
-```text
+\`\`\`text
 Test design matrix: qa.qaLocation/assessments/{epic}.{story}-test-design-{YYYYMMDD}.md
 P0 tests identified: {count}
-```
+\`\`\`
 
 ## Game Testing Quality Checklist
 
@@ -23063,13 +23063,13 @@ Perform a comprehensive Godot game story review with quality gate decision, focu
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: '{devStoryLocation}/{epic}.{story}.*.md' # Path from core-config.yaml
   - story_title: '{title}' # If missing, derive from story file H1
   - story_slug: '{slug}' # If missing, derive from title (lowercase, hyphenated)
-```
+\`\`\`
 
 ## Prerequisites
 
@@ -23206,7 +23206,7 @@ required:
 
 After review and any refactoring, append your results to the story file in the QA Results section:
 
-```markdown
+\`\`\`markdown
 ## QA Results
 
 ### Review Date: [Date]
@@ -23277,7 +23277,7 @@ NFR assessment: docs/qa/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md
 
 [✓ Ready for Done] / [✗ Changes Required - See unchecked items above]
 (Story owner decides final status)
-```
+\`\`\`
 
 ## Output 2: Create Quality Gate File
 
@@ -23289,7 +23289,7 @@ NFR assessment: docs/qa/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md
 
 Gate file structure:
 
-```yaml
+\`\`\`yaml
 schema: 1
 story: '{epic}.{story}'
 story_title: '{story title}'
@@ -23339,7 +23339,7 @@ recommendations:
   future: # Can be addressed later
     - action: 'Consider C# for physics system'
       refs: ['scripts/physics_manager.gd']
-```
+\`\`\`
 
 ### Gate Decision Criteria
 
@@ -23375,10 +23375,10 @@ Detailed criteria:
 
 ### Quality Score Calculation
 
-```text
+\`\`\`text
 quality_score = 100 - (20 × number of FAILs) - (10 × number of CONCERNS)
 Bounded between 0 and 100
-```
+\`\`\`
 
 If `technical-preferences.md` defines custom weights, use those instead.
 
@@ -23460,13 +23460,13 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
 1. **Install globally**:
 
-   ```bash
+   \`\`\`bash
    npm install -g @kayvan/markdown-tree-parser
-   ```
+   \`\`\`
 
 2. **Use the explode command**:
 
-   ```bash
+   \`\`\`bash
    # For PRD
    md-tree explode docs/prd.md docs/prd
 
@@ -23475,7 +23475,7 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
    # For any document
    md-tree explode [source-document] [destination-folder]
-   ```
+   \`\`\`
 
 3. **What it does**:
    - Automatically splits the document by level 2 sections
@@ -23527,12 +23527,12 @@ For each extracted section:
    - The level 2 heading becomes level 1 (# instead of ##) in the sharded new document
    - All subsection levels decrease by 1:
 
-   ```txt
+   \`\`\`txt
      - ### → ##
      - #### → ###
      - ##### → ####
      - etc.
-   ```
+   \`\`\`
 
 3. **Write content**: Save the adjusted content to the new file
 
@@ -23543,7 +23543,7 @@ Create an `index.md` file in the sharded folder that:
 1. Contains the original level 1 heading and any content before the first level 2 section
 2. Lists all the sharded files with links:
 
-```markdown
+\`\`\`markdown
 # Original Document Title
 
 [Original introduction content if any]
@@ -23554,22 +23554,22 @@ Create an `index.md` file in the sharded folder that:
 - [Section Name 2](./section-name-2.md)
 - [Section Name 3](./section-name-3.md)
   ...
-```
+\`\`\`
 
 ### 5. Preserve Special Content
 
 1. **Code blocks**: Must capture complete blocks including:
 
-   ```language
+   \`\`\`language
    content
-   ```
+   \`\`\`
 
 2. **Mermaid diagrams**: Preserve complete syntax:
 
-   ```mermaid
+   \`\`\`mermaid
    graph TD
    ...
-   ```
+   \`\`\`
 
 3. **Tables**: Maintain proper markdown table formatting
 
@@ -23594,7 +23594,7 @@ After sharding:
 
 Provide a summary:
 
-```text
+\`\`\`text
 Document sharded successfully:
 - Source: [original document path]
 - Destination: docs/[folder-name]/
@@ -23603,7 +23603,7 @@ Document sharded successfully:
   - section-name-1.md: "Section Title 1"
   - section-name-2.md: "Section Title 2"
   ...
-```
+\`\`\`
 
 ## Important Notes
 
@@ -25520,7 +25520,7 @@ workflow:
         Reference: .bmad-godot-game-dev/data/bmad-kb.md#IDE Development Workflow
 
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: Greenfield Project] --> B[game-designer: project-brief.md]
         B --> C[game-pm: prd.md]
@@ -25568,7 +25568,7 @@ workflow:
         style N fill:#F0E68C
         style Q fill:#F0E68C
         style V fill:#F0E68C
-    ```
+    \`\`\`
 
   decision_guidance:
     when_to_use:
@@ -25654,7 +25654,7 @@ workflow:
     action: jam_submission
     notes: Submit to game jam. Capture lessons learned and consider post-jam development if concept shows promise.
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: Prototype Project] --> B{Development Context?}
         B -->|Standard Prototype| C[game-designer: concept-summary.md]
@@ -25681,7 +25681,7 @@ workflow:
         style H fill:#FFE4B5
         style D fill:#FFB6C1
         style J fill:#FFB6C1
-    ```
+    \`\`\`
   godot_specific_features:
     rapid_prototyping_tools:
       - Tool scripts for in-editor testing without running
@@ -25867,14 +25867,14 @@ BMad transforms you into a "Player Experience CEO" - directing a team of special
 
 ### The Game Development Loop
 
-```text
+\`\`\`text
 1. Game SM Agent (New Chat) → Creates next game story from sharded docs
 2. You → Review and approve game story
 3. Game Dev Agent (New Chat) → Implements approved game feature in Godot (TDD-first)
 4. QA Agent (New Chat) → Reviews code, enforces TDD, validates performance
 5. You → Verify game feature completion and 60+ FPS
 6. Repeat until game epic complete
-```
+\`\`\`
 
 ### Why This Works for Games
 
@@ -25922,11 +25922,11 @@ You are developing games as a "Player Experience CEO" - thinking like a game dir
 
 **Best for**: Godot developers using Cursor, Claude Code, Windsurf, Trae, Cline, Roo Code, Github Copilot
 
-```bash
+\`\`\`bash
 # Interactive installation (recommended)
 npx bmad-method install
 # Select the bmad-godot-game-dev expansion pack when prompted
-```
+\`\`\`
 
 **Installation Steps for Game Development**:
 
@@ -26000,7 +26000,7 @@ npx bmad-method install
 
 The expansion pack follows the standard BMad configuration patterns. Copy your core-config.yaml file to expansion-packs/bmad-godot-game-dev/ and add Game-specific configurations to your project's `core-config.yaml`:
 
-```yaml
+\`\`\`yaml
 markdownExploder: true
 prd:
   prdFile: docs/prd.md
@@ -26038,7 +26038,7 @@ devLoadAlwaysFiles:
   - docs/architecture/9-coding-standards.md
   - docs/architecture/3-tech-stack.md
   - docs/architecture/8-godot-project-structure.md
-```
+\`\`\`
 
 ## Complete Game Development Workflow
 
@@ -26059,18 +26059,18 @@ devLoadAlwaysFiles:
 
 **For Game Design Document Creation**:
 
-```text
+\`\`\`text
 "I want to build a [genre] 2D game in Godot that [core gameplay].
 Help me brainstorm mechanics and create a comprehensive Game Design Document."
-```
+\`\`\`
 
 **For Game Architecture Design**:
 
-```text
+\`\`\`text
 "Based on this Game Design Document, design a scalable Godot architecture
 that can handle [specific game requirements] with 60+ FPS performance.
 Consider both GDScript and C# for appropriate systems."
-```
+\`\`\`
 
 ### Critical Transition: Web UI to Godot IDE
 
@@ -26218,7 +26218,7 @@ Game templates with Level 2 headings (`##`) can be automatically sharded:
 
 **Original Game Design Document**:
 
-```markdown
+\`\`\`markdown
 ## Core Gameplay Mechanics
 
 ## Player Progression System
@@ -26226,7 +26226,7 @@ Game templates with Level 2 headings (`##`) can be automatically sharded:
 ## Level Design Framework
 
 ## Technical Requirements
-```
+\`\`\`
 
 **After Sharding**:
 
@@ -26280,7 +26280,7 @@ Use the `shard-doc` task or `@kayvan/markdown-tree-parser` tool for automatic ga
 
 **Project Structure**:
 
-```text
+\`\`\`text
 GodotProject/
 ├── .godot/              # Godot cache (gitignore)
 ├── scenes/              # Game scenes
@@ -26311,7 +26311,7 @@ GodotProject/
 │   └── godottest/      # GoDotTest for C#
 ├── export_presets.cfg  # Export configurations
 └── project.godot       # Project settings
-```
+\`\`\`
 
 **Performance Requirements**:
 
@@ -26590,10 +26590,10 @@ This Godot Game Development expansion pack extends BMad-Method beyond traditiona
 
 1. **Install via CLI**:
 
-   ```bash
+   \`\`\`bash
    npx bmad-method install
    # Select "Install game development expansion pack" option
-   ```
+   \`\`\`
 
 2. **Use in Your Game Workflow**: Installed game agents integrate seamlessly with existing BMad agents
 
@@ -26702,7 +26702,7 @@ Following John Carmack's principles:
 
 **Always use static typing for 10-20% performance gain:**
 
-```gdscript
+\`\`\`gdscript
 # GOOD - Static typing
 extends CharacterBody2D
 
@@ -26724,7 +26724,7 @@ func _die() -> void:
 var health = 100  # No type specified
 func take_damage(amount):  # No parameter or return type
     health -= amount
-```
+\`\`\`
 
 ## C# Standards (for Performance-Critical Systems)
 
@@ -26748,7 +26748,7 @@ func take_damage(amount):  # No parameter or return type
 
 ### C# Naming Conventions
 
-```csharp
+\`\`\`csharp
 using Godot;
 
 public partial class PlayerController : CharacterBody2D
@@ -26778,7 +26778,7 @@ public partial class PlayerController : CharacterBody2D
         QueueFree();
     }
 }
-```
+\`\`\`
 
 ## Godot Architecture Patterns
 
@@ -26786,7 +26786,7 @@ public partial class PlayerController : CharacterBody2D
 
 **Scene Composition Over Inheritance:**
 
-```gdscript
+\`\`\`gdscript
 # Player.tscn structure:
 # Player (CharacterBody2D)
 # ├── Sprite2D
@@ -26813,13 +26813,13 @@ func take_damage(amount: int) -> void:
     health_changed.emit(current_health)
     if current_health == 0:
         died.emit()
-```
+\`\`\`
 
 ### Signal-Based Communication
 
 **Decouple Systems with Signals:**
 
-```gdscript
+\`\`\`gdscript
 # GameManager.gd - Singleton/Autoload
 extends Node
 
@@ -26845,13 +26845,13 @@ func _ready() -> void:
 func _on_game_over() -> void:
     set_physics_process(false)  # Stop player movement
     $AnimationPlayer.play("death")
-```
+\`\`\`
 
 ### Resource-Based Data Management
 
 **Use Custom Resources for Game Data:**
 
-```gdscript
+\`\`\`gdscript
 # WeaponData.gd - Custom Resource
 extends Resource
 class_name WeaponData
@@ -26873,13 +26873,13 @@ func _ready() -> void:
 
 func attack() -> int:
     return weapon_data.damage if weapon_data else 0
-```
+\`\`\`
 
 ## Performance Optimization
 
 ### Object Pooling (MANDATORY for Spawned Objects)
 
-```gdscript
+\`\`\`gdscript
 # ObjectPool.gd - Generic pooling system
 extends Node
 class_name ObjectPool
@@ -26917,13 +26917,13 @@ func return_object(obj: Node) -> void:
     obj.set_physics_process(false)
     obj.visible = false
     obj.position = Vector2.ZERO
-```
+\`\`\`
 
 ### Process Optimization
 
 **Use Appropriate Process Methods:**
 
-```gdscript
+\`\`\`gdscript
 extends Node2D
 
 # For physics calculations (fixed timestep)
@@ -26947,13 +26947,13 @@ func _ready() -> void:
 func _check_condition() -> void:
     # Check something once per second instead of 60 times
     pass
-```
+\`\`\`
 
 ### Memory Management
 
 **Prevent Memory Leaks:**
 
-```gdscript
+\`\`\`gdscript
 extends Node
 
 var _connections: Array[Callable] = []
@@ -26973,7 +26973,7 @@ func _exit_tree() -> void:
 # Use queue_free() not free() for nodes
 func remove_enemy(enemy: Node) -> void:
     enemy.queue_free()  # Safe deletion
-```
+\`\`\`
 
 ## Test-Driven Development (MANDATORY)
 
@@ -26981,7 +26981,7 @@ func remove_enemy(enemy: Node) -> void:
 
 **Write Tests FIRST:**
 
-```gdscript
+\`\`\`gdscript
 # test/unit/test_player_health.gd
 extends GutTest
 
@@ -27021,11 +27021,11 @@ func test_died_signal_emitted_at_zero_health() -> void:
 
     # Assert
     assert_signal_emitted(player_health, "died")
-```
+\`\`\`
 
 ### GoDotTest for C#
 
-```csharp
+\`\`\`csharp
 using Godot;
 using GoDotTest;
 
@@ -27069,7 +27069,7 @@ public class PlayerControllerTests : TestClass
         AssertThat(signalEmitted).IsTrue();
     }
 }
-```
+\`\`\`
 
 ## Input Handling
 
@@ -27077,7 +27077,7 @@ public class PlayerControllerTests : TestClass
 
 **Input Map Configuration:**
 
-```gdscript
+\`\`\`gdscript
 # Configure in Project Settings -> Input Map
 # Actions: "move_left", "move_right", "jump", "attack"
 
@@ -27105,13 +27105,13 @@ func _physics_process(delta: float) -> void:
 func _unhandled_input(event: InputEvent) -> void:
     if event.is_action_pressed("attack"):
         _perform_attack()
-```
+\`\`\`
 
 ## Scene Management
 
 ### Scene Loading and Transitions
 
-```gdscript
+\`\`\`gdscript
 # SceneManager.gd - Autoload singleton
 extends Node
 
@@ -27150,11 +27150,11 @@ func change_scene_with_loading(path: String) -> void:
     # Switch scenes
     loading_screen.queue_free()
     change_scene(path)
-```
+\`\`\`
 
 ## Project Structure
 
-```
+\`\`\`
 res://
 ├── scenes/
 │   ├── main/
@@ -27194,7 +27194,7 @@ res://
 │   └── integration/
 │       └── test_level_loading.gd
 └── project.godot
-```
+\`\`\`
 
 ## Development Workflow
 
@@ -27312,7 +27312,7 @@ res://
 
 ### GDScript Death Sentences
 
-```gdscript
+\`\`\`gdscript
 # CRIME: Dynamic typing
 var health = 100  # Dies. var health: int = 100
 
@@ -27352,11 +27352,11 @@ func _process(delta):
 func spawn_particle():
     var p = Particle.new()  # Dies. Pool everything spawned
     add_child(p)
-```
+\`\`\`
 
 ### The Only Acceptable GDScript Patterns
 
-```gdscript
+\`\`\`gdscript
 # GOOD: Static typing everywhere
 var health: int = 100
 var speed: float = 300.0
@@ -27418,7 +27418,7 @@ func _process_updates() -> void:
 const MAX_ENEMIES: int = 100
 const GRAVITY: float = 980.0
 const DEBUG_MODE: bool = false
-```
+\`\`\`
 
 ### GDScript-Specific Optimization Rules
 
@@ -27468,7 +27468,7 @@ const DEBUG_MODE: bool = false
 
 ### Instant Rejection Patterns
 
-```csharp
+\`\`\`csharp
 // CRIME: LINQ in game code
 units.Where(u => u.IsAlive).ToList()  // Dies. Pre-filtered array.
 
@@ -27498,11 +27498,11 @@ await LoadDataAsync();  // Dies. Preload or synchronous.
 
 // CRIME: GD.Print in production
 GD.Print($"Debug: {value}");  // Dies. Conditional compilation.
-```
+\`\`\`
 
 ### Godot-Specific Crimes
 
-```csharp
+\`\`\`csharp
 // CRIME: GetNode every frame
 GetNode<Label>("UI/Score")  // Dies. Cache in _Ready().
 
@@ -27517,11 +27517,11 @@ public override void _Process(double delta)  // Dies. Use _PhysicsProcess or eve
 
 // CRIME: Autoload abuse
 GetNode<GameManager>("/root/GameManager")  // Dies. Direct reference.
-```
+\`\`\`
 
 ### The Only Acceptable Patterns
 
-```csharp
+\`\`\`csharp
 // GOOD: Pre-allocated buffers
 private readonly Unit[] _units = new Unit[MAX_UNITS];
 private readonly int[] _indices = new int[MAX_UNITS];
@@ -27549,7 +27549,7 @@ public void Update() {
 #if DEBUG
     GD.Print("Debug info");
 #endif
-```
+\`\`\`
 
 These guidelines ensure consistent, high-quality Godot game development that meets performance targets, maintains code quality, and follows TDD practices across all implementation stories.
 ==================== END: .bmad-godot-game-dev/data/development-guidelines.md ====================

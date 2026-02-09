@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -61,7 +61,7 @@ workflows:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -117,7 +117,7 @@ dependencies:
     - competitor-analysis-tmpl.yaml
     - market-research-tmpl.yaml
     - project-brief-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-2d-phaser-game-dev/agents/analyst.md ====================
 
 ==================== START: .bmad-2d-phaser-game-dev/agents/bmad-orchestrator.md ====================
@@ -125,7 +125,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -244,7 +244,7 @@ dependencies:
     - kb-mode-interaction.md
   utils:
     - workflow-management.md
-```
+\`\`\`
 ==================== END: .bmad-2d-phaser-game-dev/agents/bmad-orchestrator.md ====================
 
 ==================== START: .bmad-2d-phaser-game-dev/agents/game-designer.md ====================
@@ -252,7 +252,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -299,7 +299,7 @@ dependencies:
     - game-brief-tmpl.yaml
   checklists:
     - game-design-checklist.md
-```
+\`\`\`
 ==================== END: .bmad-2d-phaser-game-dev/agents/game-designer.md ====================
 
 ==================== START: .bmad-2d-phaser-game-dev/agents/game-developer.md ====================
@@ -307,7 +307,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -361,7 +361,7 @@ dependencies:
     - game-story-dod-checklist.md
   data:
     - development-guidelines.md
-```
+\`\`\`
 ==================== END: .bmad-2d-phaser-game-dev/agents/game-developer.md ====================
 
 ==================== START: .bmad-2d-phaser-game-dev/agents/game-sm.md ====================
@@ -369,7 +369,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -409,7 +409,7 @@ dependencies:
     - game-story-tmpl.yaml
   checklists:
     - game-story-dod-checklist.md
-```
+\`\`\`
 ==================== END: .bmad-2d-phaser-game-dev/agents/game-sm.md ====================
 
 ==================== START: .bmad-2d-phaser-game-dev/data/bmad-kb.md ====================
@@ -499,7 +499,7 @@ You are developing games as a "Player Experience CEO" - thinking like a game dir
 
 **Project Structure:**
 
-```text
+\`\`\`text
 game-project/
 ├── src/
 │   ├── scenes/          # Game scenes (BootScene, MenuScene, GameScene)
@@ -513,7 +513,7 @@ game-project/
 │   ├── stories/         # Development stories
 │   └── design/          # Game design documents
 └── tests/               # Unit and integration tests
-```
+\`\`\`
 
 **Performance Requirements:**
 
@@ -739,7 +739,7 @@ This knowledge base provides the foundation for effective game development using
 
 **Present the numbered list (0-9) with this exact format:**
 
-```text
+\`\`\`text
 **Advanced Game Design Elicitation & Brainstorming Actions**
 Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 
@@ -753,7 +753,7 @@ Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 7. Explore Alternative Game Design Approaches
 8. Hindsight Postmortem: The 'If Only...' Game Design Reflection
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 ### 2. Processing Guidelines
 
@@ -994,7 +994,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 
 **Research Prompt Template:**
 
-```markdown
+\`\`\`markdown
 ## Research Objective
 
 [Clear statement of what this research aims to achieve]
@@ -1056,7 +1056,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 ## Timeline and Priority
 
 [If applicable, any time constraints or phasing]
-```
+\`\`\`
 
 ### 5. Review and Refinement
 
@@ -1365,7 +1365,7 @@ etc...
 
 ### Project Structure (Actual)
 
-```text
+\`\`\`text
 project-root/
 ├── src/
 │   ├── controllers/     # HTTP request handlers
@@ -1376,7 +1376,7 @@ project-root/
 ├── tests/               # Jest tests (60% coverage)
 ├── scripts/             # Build and deployment scripts
 └── config/              # Environment configs
-```
+\`\`\`
 
 ### Key Modules and Their Purpose
 
@@ -1458,10 +1458,10 @@ etc...
 
 ### Running Tests
 
-```bash
+\`\`\`bash
 npm test           # Runs unit tests
 npm run test:integration  # Runs integration tests (requires local DB)
-```
+\`\`\`
 
 ## If Enhancement PRD Provided - Impact Analysis
 
@@ -1490,12 +1490,12 @@ Based on the enhancement requirements, these files will be affected:
 
 ### Frequently Used Commands
 
-```bash
+\`\`\`bash
 npm run dev         # Start development server
 npm run build       # Production build
 npm run migrate     # Run database migrations
 npm run seed        # Seed test data
-```
+\`\`\`
 
 ### Debugging and Troubleshooting
 
@@ -5533,7 +5533,7 @@ This document establishes coding standards, architectural patterns, and developm
 
 **Required tsconfig.json settings:**
 
-```json
+\`\`\`json
 {
   "compilerOptions": {
     "strict": true,
@@ -5546,13 +5546,13 @@ This document establishes coding standards, architectural patterns, and developm
     "exactOptionalPropertyTypes": true
   }
 }
-```
+\`\`\`
 
 ### Type Definitions
 
 **Game Object Interfaces:**
 
-```typescript
+\`\`\`typescript
 // Core game entity interface
 interface GameEntity {
   readonly id: string;
@@ -5575,11 +5575,11 @@ interface GameSystem {
   update(delta: number): void;
   shutdown(): void;
 }
-```
+\`\`\`
 
 **Scene Data Interfaces:**
 
-```typescript
+\`\`\`typescript
 // Scene transition data
 interface SceneData {
   [key: string]: any;
@@ -5599,7 +5599,7 @@ interface GameSettings {
   difficulty: 'easy' | 'normal' | 'hard';
   controls: ControlScheme;
 }
-```
+\`\`\`
 
 ### Naming Conventions
 
@@ -5631,7 +5631,7 @@ interface GameSettings {
 
 **Scene Lifecycle Management:**
 
-```typescript
+\`\`\`typescript
 class GameScene extends Phaser.Scene {
   private gameManager!: GameManager;
   private inputManager!: InputManager;
@@ -5670,11 +5670,11 @@ class GameScene extends Phaser.Scene {
     this.events.off('*');
   }
 }
-```
+\`\`\`
 
 **Scene Transitions:**
 
-```typescript
+\`\`\`typescript
 // Proper scene transitions with data
 this.scene.start('NextScene', {
   playerScore: this.playerScore,
@@ -5684,13 +5684,13 @@ this.scene.start('NextScene', {
 // Scene overlays for UI
 this.scene.launch('PauseMenuScene');
 this.scene.pause();
-```
+\`\`\`
 
 ### Game Object Patterns
 
 **Component-Based Architecture:**
 
-```typescript
+\`\`\`typescript
 // Base game entity
 abstract class GameEntity extends Phaser.GameObjects.Sprite {
   protected components: Map<string, GameComponent> = new Map();
@@ -5732,13 +5732,13 @@ class Player extends GameEntity {
     this.health = this.addComponent(new HealthComponent(this, 100));
   }
 }
-```
+\`\`\`
 
 ### System Management
 
 **Singleton Managers:**
 
-```typescript
+\`\`\`typescript
 class GameManager {
   private static instance: GameManager;
   private scene: Phaser.Scene;
@@ -5769,7 +5769,7 @@ class GameManager {
     GameManager.instance = null!;
   }
 }
-```
+\`\`\`
 
 ## Performance Optimization
 
@@ -5777,7 +5777,7 @@ class GameManager {
 
 **Required for High-Frequency Objects:**
 
-```typescript
+\`\`\`typescript
 class BulletPool {
   private pool: Bullet[] = [];
   private scene: Phaser.Scene;
@@ -5813,13 +5813,13 @@ class BulletPool {
     bullet.setPosition(0, 0);
   }
 }
-```
+\`\`\`
 
 ### Frame Rate Optimization
 
 **Performance Monitoring:**
 
-```typescript
+\`\`\`typescript
 class PerformanceMonitor {
   private frameCount: number = 0;
   private lastTime: number = 0;
@@ -5844,11 +5844,11 @@ class PerformanceMonitor {
     // Reduce particle counts, disable effects, etc.
   }
 }
-```
+\`\`\`
 
 **Update Loop Optimization:**
 
-```typescript
+\`\`\`typescript
 // Avoid expensive operations in update loops
 class GameScene extends Phaser.Scene {
   private updateTimer: number = 0;
@@ -5868,7 +5868,7 @@ class GameScene extends Phaser.Scene {
     }
   }
 }
-```
+\`\`\`
 
 ## Input Handling
 
@@ -5876,7 +5876,7 @@ class GameScene extends Phaser.Scene {
 
 **Input Abstraction:**
 
-```typescript
+\`\`\`typescript
 interface InputState {
   moveLeft: boolean;
   moveRight: boolean;
@@ -5923,7 +5923,7 @@ class InputManager {
     return { ...this.inputState };
   }
 }
-```
+\`\`\`
 
 ## Error Handling
 
@@ -5931,7 +5931,7 @@ class InputManager {
 
 **Asset Loading Error Handling:**
 
-```typescript
+\`\`\`typescript
 class AssetManager {
   loadAssets(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -5961,13 +5961,13 @@ class AssetManager {
     }
   }
 }
-```
+\`\`\`
 
 ### Runtime Error Recovery
 
 **System Error Handling:**
 
-```typescript
+\`\`\`typescript
 class GameSystem {
   protected handleError(error: Error, context: string): void {
     console.error(`Error in ${context}:`, error);
@@ -5995,7 +5995,7 @@ class GameSystem {
     }
   }
 }
-```
+\`\`\`
 
 ## Testing Standards
 
@@ -6003,7 +6003,7 @@ class GameSystem {
 
 **Game Logic Testing:**
 
-```typescript
+\`\`\`typescript
 // Example test for game mechanics
 describe('HealthComponent', () => {
   let healthComponent: HealthComponent;
@@ -6030,13 +6030,13 @@ describe('HealthComponent', () => {
     expect(healthComponent.isAlive()).toBe(false);
   });
 });
-```
+\`\`\`
 
 ### Integration Testing
 
 **Scene Testing:**
 
-```typescript
+\`\`\`typescript
 describe('GameScene Integration', () => {
   let scene: GameScene;
   let mockGame: Phaser.Game;
@@ -6054,13 +6054,13 @@ describe('GameScene Integration', () => {
     expect(scene.inputManager).toBeDefined();
   });
 });
-```
+\`\`\`
 
 ## File Organization
 
 ### Project Structure
 
-```
+\`\`\`
 src/
 ├── scenes/
 │   ├── BootScene.ts          # Initial loading and setup
@@ -6101,7 +6101,7 @@ src/
 │   ├── GameBalance.ts        # Game balance parameters
 │   └── AssetConfig.ts        # Asset loading configuration
 └── main.ts                   # Application entry point
-```
+\`\`\`
 
 ## Development Workflow
 
@@ -8749,7 +8749,7 @@ sections:
 
 **Present the numbered list (0-9) with this exact format:**
 
-```text
+\`\`\`text
 **Advanced Game Design Elicitation & Brainstorming Actions**
 Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 
@@ -8763,7 +8763,7 @@ Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 7. Explore Alternative Game Design Approaches
 8. Hindsight Postmortem: The 'If Only...' Game Design Reflection
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 ### 2. Processing Guidelines
 
@@ -9793,7 +9793,7 @@ workflow:
     action: move_to_rapid_implementation
     notes: Prototype defined. Begin immediate implementation with Game Developer. Focus on core mechanics first, then iterate based on playtesting.
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: Game Development Project] --> B{Project Scope?}
         B -->|Full Game/Production| C[game-designer: game-brief.md]
@@ -9827,7 +9827,7 @@ workflow:
         style G fill:#FFE4B5
         style D fill:#FFB6C1
         style M fill:#FFB6C1
-    ```
+    \`\`\`
   decision_guidance:
     use_full_sequence_when:
       - Building commercial or production games
@@ -9965,7 +9965,7 @@ workflow:
     action: jam_submission
     notes: Submit to game jam. Capture lessons learned and consider post-jam development if concept shows promise.
   flow_diagram: |
-    ```mermaid
+    \`\`\`mermaid
     graph TD
         A[Start: Prototype Project] --> B{Development Context?}
         B -->|Standard Prototype| C[game-designer: concept-summary.md]
@@ -9992,7 +9992,7 @@ workflow:
         style H fill:#FFE4B5
         style D fill:#FFB6C1
         style J fill:#FFB6C1
-    ```
+    \`\`\`
   decision_guidance:
     use_prototype_sequence_when:
       - Learning new game development concepts
@@ -10166,7 +10166,7 @@ You are developing games as a "Player Experience CEO" - thinking like a game dir
 
 **Project Structure:**
 
-```text
+\`\`\`text
 game-project/
 ├── src/
 │   ├── scenes/          # Game scenes (BootScene, MenuScene, GameScene)
@@ -10180,7 +10180,7 @@ game-project/
 │   ├── stories/         # Development stories
 │   └── design/          # Game design documents
 └── tests/               # Unit and integration tests
-```
+\`\`\`
 
 **Performance Requirements:**
 
@@ -10347,7 +10347,7 @@ This document establishes coding standards, architectural patterns, and developm
 
 **Required tsconfig.json settings:**
 
-```json
+\`\`\`json
 {
   "compilerOptions": {
     "strict": true,
@@ -10360,13 +10360,13 @@ This document establishes coding standards, architectural patterns, and developm
     "exactOptionalPropertyTypes": true
   }
 }
-```
+\`\`\`
 
 ### Type Definitions
 
 **Game Object Interfaces:**
 
-```typescript
+\`\`\`typescript
 // Core game entity interface
 interface GameEntity {
   readonly id: string;
@@ -10389,11 +10389,11 @@ interface GameSystem {
   update(delta: number): void;
   shutdown(): void;
 }
-```
+\`\`\`
 
 **Scene Data Interfaces:**
 
-```typescript
+\`\`\`typescript
 // Scene transition data
 interface SceneData {
   [key: string]: any;
@@ -10413,7 +10413,7 @@ interface GameSettings {
   difficulty: 'easy' | 'normal' | 'hard';
   controls: ControlScheme;
 }
-```
+\`\`\`
 
 ### Naming Conventions
 
@@ -10445,7 +10445,7 @@ interface GameSettings {
 
 **Scene Lifecycle Management:**
 
-```typescript
+\`\`\`typescript
 class GameScene extends Phaser.Scene {
   private gameManager!: GameManager;
   private inputManager!: InputManager;
@@ -10484,11 +10484,11 @@ class GameScene extends Phaser.Scene {
     this.events.off('*');
   }
 }
-```
+\`\`\`
 
 **Scene Transitions:**
 
-```typescript
+\`\`\`typescript
 // Proper scene transitions with data
 this.scene.start('NextScene', {
   playerScore: this.playerScore,
@@ -10498,13 +10498,13 @@ this.scene.start('NextScene', {
 // Scene overlays for UI
 this.scene.launch('PauseMenuScene');
 this.scene.pause();
-```
+\`\`\`
 
 ### Game Object Patterns
 
 **Component-Based Architecture:**
 
-```typescript
+\`\`\`typescript
 // Base game entity
 abstract class GameEntity extends Phaser.GameObjects.Sprite {
   protected components: Map<string, GameComponent> = new Map();
@@ -10546,13 +10546,13 @@ class Player extends GameEntity {
     this.health = this.addComponent(new HealthComponent(this, 100));
   }
 }
-```
+\`\`\`
 
 ### System Management
 
 **Singleton Managers:**
 
-```typescript
+\`\`\`typescript
 class GameManager {
   private static instance: GameManager;
   private scene: Phaser.Scene;
@@ -10583,7 +10583,7 @@ class GameManager {
     GameManager.instance = null!;
   }
 }
-```
+\`\`\`
 
 ## Performance Optimization
 
@@ -10591,7 +10591,7 @@ class GameManager {
 
 **Required for High-Frequency Objects:**
 
-```typescript
+\`\`\`typescript
 class BulletPool {
   private pool: Bullet[] = [];
   private scene: Phaser.Scene;
@@ -10627,13 +10627,13 @@ class BulletPool {
     bullet.setPosition(0, 0);
   }
 }
-```
+\`\`\`
 
 ### Frame Rate Optimization
 
 **Performance Monitoring:**
 
-```typescript
+\`\`\`typescript
 class PerformanceMonitor {
   private frameCount: number = 0;
   private lastTime: number = 0;
@@ -10658,11 +10658,11 @@ class PerformanceMonitor {
     // Reduce particle counts, disable effects, etc.
   }
 }
-```
+\`\`\`
 
 **Update Loop Optimization:**
 
-```typescript
+\`\`\`typescript
 // Avoid expensive operations in update loops
 class GameScene extends Phaser.Scene {
   private updateTimer: number = 0;
@@ -10682,7 +10682,7 @@ class GameScene extends Phaser.Scene {
     }
   }
 }
-```
+\`\`\`
 
 ## Input Handling
 
@@ -10690,7 +10690,7 @@ class GameScene extends Phaser.Scene {
 
 **Input Abstraction:**
 
-```typescript
+\`\`\`typescript
 interface InputState {
   moveLeft: boolean;
   moveRight: boolean;
@@ -10737,7 +10737,7 @@ class InputManager {
     return { ...this.inputState };
   }
 }
-```
+\`\`\`
 
 ## Error Handling
 
@@ -10745,7 +10745,7 @@ class InputManager {
 
 **Asset Loading Error Handling:**
 
-```typescript
+\`\`\`typescript
 class AssetManager {
   loadAssets(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -10775,13 +10775,13 @@ class AssetManager {
     }
   }
 }
-```
+\`\`\`
 
 ### Runtime Error Recovery
 
 **System Error Handling:**
 
-```typescript
+\`\`\`typescript
 class GameSystem {
   protected handleError(error: Error, context: string): void {
     console.error(`Error in ${context}:`, error);
@@ -10809,7 +10809,7 @@ class GameSystem {
     }
   }
 }
-```
+\`\`\`
 
 ## Testing Standards
 
@@ -10817,7 +10817,7 @@ class GameSystem {
 
 **Game Logic Testing:**
 
-```typescript
+\`\`\`typescript
 // Example test for game mechanics
 describe('HealthComponent', () => {
   let healthComponent: HealthComponent;
@@ -10844,13 +10844,13 @@ describe('HealthComponent', () => {
     expect(healthComponent.isAlive()).toBe(false);
   });
 });
-```
+\`\`\`
 
 ### Integration Testing
 
 **Scene Testing:**
 
-```typescript
+\`\`\`typescript
 describe('GameScene Integration', () => {
   let scene: GameScene;
   let mockGame: Phaser.Game;
@@ -10868,13 +10868,13 @@ describe('GameScene Integration', () => {
     expect(scene.inputManager).toBeDefined();
   });
 });
-```
+\`\`\`
 
 ## File Organization
 
 ### Project Structure
 
-```
+\`\`\`
 src/
 ├── scenes/
 │   ├── BootScene.ts          # Initial loading and setup
@@ -10915,7 +10915,7 @@ src/
 │   ├── GameBalance.ts        # Game balance parameters
 │   └── AssetConfig.ts        # Asset loading configuration
 └── main.ts                   # Application entry point
-```
+\`\`\`
 
 ## Development Workflow
 

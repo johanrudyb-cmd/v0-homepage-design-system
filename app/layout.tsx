@@ -1,66 +1,52 @@
-import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
-import './globals.css';
-import { SurplusModalProvider } from '@/components/usage/SurplusModalContext';
+import React from "react"
+import type { Metadata, Viewport } from 'next'
+import { Poppins, Geist_Mono } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import './globals.css'
 
-const inter = Inter({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-sans',
-  display: 'swap',
+const _poppins = Poppins({ 
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-poppins"
 });
-
-const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://outfity.fr';
+const _geistMono = Geist_Mono({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: {
-    default: 'OUTFITY - Créez votre marque avec les données des géants',
-    template: '%s | OUTFITY',
-  },
-  description:
-    'Donnez à votre marque indépendante la puissance des leaders mondiaux. Tendances 15 000+ références, sourcing usines, studio IA et stratégie. Par BIANGORY.',
-  keywords: [
-    'OUTFITY',
-    'marque mode',
-    'tendances mode',
-    'sourcing textile',
-    'tech pack',
-    'création marque vêtements',
-    'BIANGORY',
-  ],
+  title: 'Médias Biangory | Le média business de la mode',
+  description: 'Découvrez le média dédié aux entrepreneurs et passionnés de la mode. Articles, podcasts, vidéos et ressources pour développer votre business dans le secteur de la mode.',
+  keywords: ['mode', 'fashion', 'business', 'entrepreneur', 'média', 'podcast', 'articles'],
+  authors: [{ name: 'Médias Biangory' }],
   openGraph: {
+    title: 'Médias Biangory | Le média business de la mode',
+    description: 'Découvrez le média dédié aux entrepreneurs et passionnés de la mode.',
     type: 'website',
     locale: 'fr_FR',
-    url: siteUrl,
-    siteName: 'OUTFITY',
-    title: 'OUTFITY - Créez votre marque avec les données des géants',
-    description:
-      'Donnez à votre marque indépendante la puissance des leaders mondiaux. Mêmes données. Mêmes usines. Mêmes stratégies.',
-    images: [{ url: '/apple-icon.png', width: 512, height: 512, alt: 'OUTFITY' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OUTFITY - Créez votre marque avec les données des géants',
-    description:
-      'Donnez à votre marque indépendante la puissance des leaders mondiaux. Par BIANGORY.',
+    title: 'Médias Biangory | Le média business de la mode',
+    description: 'Découvrez le média dédié aux entrepreneurs et passionnés de la mode.',
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+    generator: 'v0.app'
+}
+
+export const viewport: Viewport = {
+  themeColor: '#000000',
+  width: 'device-width',
+  initialScale: 1,
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang="fr" className={inter.variable}>
-      <body className="font-sans antialiased">
-        <SurplusModalProvider>{children}</SurplusModalProvider>
+    <html lang="fr">
+      <body className="font-sans antialiased bg-background text-foreground">
+        {children}
+        <Analytics />
       </body>
     </html>
-  );
+  )
 }

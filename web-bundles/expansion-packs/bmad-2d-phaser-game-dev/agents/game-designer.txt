@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -91,7 +91,7 @@ dependencies:
     - game-brief-tmpl.yaml
   checklists:
     - game-design-checklist.md
-```
+\`\`\`
 ==================== END: .bmad-2d-phaser-game-dev/agents/game-designer.md ====================
 
 ==================== START: .bmad-2d-phaser-game-dev/tasks/create-doc.md ====================
@@ -757,7 +757,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 
 **Research Prompt Template:**
 
-```markdown
+\`\`\`markdown
 ## Research Objective
 
 [Clear statement of what this research aims to achieve]
@@ -819,7 +819,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 ## Timeline and Priority
 
 [If applicable, any time constraints or phasing]
-```
+\`\`\`
 
 ### 5. Review and Refinement
 
@@ -898,7 +898,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 
 **Present the numbered list (0-9) with this exact format:**
 
-```text
+\`\`\`text
 **Advanced Game Design Elicitation & Brainstorming Actions**
 Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 
@@ -912,7 +912,7 @@ Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 7. Explore Alternative Game Design Approaches
 8. Hindsight Postmortem: The 'If Only...' Game Design Reflection
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 ### 2. Processing Guidelines
 

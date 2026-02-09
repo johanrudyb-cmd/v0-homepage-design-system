@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -98,7 +98,7 @@ dependencies:
     - game-story-dod-checklist.md
   data:
     - development-guidelines.md
-```
+\`\`\`
 ==================== END: .bmad-2d-phaser-game-dev/agents/game-developer.md ====================
 
 ==================== START: .bmad-2d-phaser-game-dev/tasks/execute-checklist.md ====================
@@ -986,7 +986,7 @@ This document establishes coding standards, architectural patterns, and developm
 
 **Required tsconfig.json settings:**
 
-```json
+\`\`\`json
 {
   "compilerOptions": {
     "strict": true,
@@ -999,13 +999,13 @@ This document establishes coding standards, architectural patterns, and developm
     "exactOptionalPropertyTypes": true
   }
 }
-```
+\`\`\`
 
 ### Type Definitions
 
 **Game Object Interfaces:**
 
-```typescript
+\`\`\`typescript
 // Core game entity interface
 interface GameEntity {
   readonly id: string;
@@ -1028,11 +1028,11 @@ interface GameSystem {
   update(delta: number): void;
   shutdown(): void;
 }
-```
+\`\`\`
 
 **Scene Data Interfaces:**
 
-```typescript
+\`\`\`typescript
 // Scene transition data
 interface SceneData {
   [key: string]: any;
@@ -1052,7 +1052,7 @@ interface GameSettings {
   difficulty: 'easy' | 'normal' | 'hard';
   controls: ControlScheme;
 }
-```
+\`\`\`
 
 ### Naming Conventions
 
@@ -1084,7 +1084,7 @@ interface GameSettings {
 
 **Scene Lifecycle Management:**
 
-```typescript
+\`\`\`typescript
 class GameScene extends Phaser.Scene {
   private gameManager!: GameManager;
   private inputManager!: InputManager;
@@ -1123,11 +1123,11 @@ class GameScene extends Phaser.Scene {
     this.events.off('*');
   }
 }
-```
+\`\`\`
 
 **Scene Transitions:**
 
-```typescript
+\`\`\`typescript
 // Proper scene transitions with data
 this.scene.start('NextScene', {
   playerScore: this.playerScore,
@@ -1137,13 +1137,13 @@ this.scene.start('NextScene', {
 // Scene overlays for UI
 this.scene.launch('PauseMenuScene');
 this.scene.pause();
-```
+\`\`\`
 
 ### Game Object Patterns
 
 **Component-Based Architecture:**
 
-```typescript
+\`\`\`typescript
 // Base game entity
 abstract class GameEntity extends Phaser.GameObjects.Sprite {
   protected components: Map<string, GameComponent> = new Map();
@@ -1185,13 +1185,13 @@ class Player extends GameEntity {
     this.health = this.addComponent(new HealthComponent(this, 100));
   }
 }
-```
+\`\`\`
 
 ### System Management
 
 **Singleton Managers:**
 
-```typescript
+\`\`\`typescript
 class GameManager {
   private static instance: GameManager;
   private scene: Phaser.Scene;
@@ -1222,7 +1222,7 @@ class GameManager {
     GameManager.instance = null!;
   }
 }
-```
+\`\`\`
 
 ## Performance Optimization
 
@@ -1230,7 +1230,7 @@ class GameManager {
 
 **Required for High-Frequency Objects:**
 
-```typescript
+\`\`\`typescript
 class BulletPool {
   private pool: Bullet[] = [];
   private scene: Phaser.Scene;
@@ -1266,13 +1266,13 @@ class BulletPool {
     bullet.setPosition(0, 0);
   }
 }
-```
+\`\`\`
 
 ### Frame Rate Optimization
 
 **Performance Monitoring:**
 
-```typescript
+\`\`\`typescript
 class PerformanceMonitor {
   private frameCount: number = 0;
   private lastTime: number = 0;
@@ -1297,11 +1297,11 @@ class PerformanceMonitor {
     // Reduce particle counts, disable effects, etc.
   }
 }
-```
+\`\`\`
 
 **Update Loop Optimization:**
 
-```typescript
+\`\`\`typescript
 // Avoid expensive operations in update loops
 class GameScene extends Phaser.Scene {
   private updateTimer: number = 0;
@@ -1321,7 +1321,7 @@ class GameScene extends Phaser.Scene {
     }
   }
 }
-```
+\`\`\`
 
 ## Input Handling
 
@@ -1329,7 +1329,7 @@ class GameScene extends Phaser.Scene {
 
 **Input Abstraction:**
 
-```typescript
+\`\`\`typescript
 interface InputState {
   moveLeft: boolean;
   moveRight: boolean;
@@ -1376,7 +1376,7 @@ class InputManager {
     return { ...this.inputState };
   }
 }
-```
+\`\`\`
 
 ## Error Handling
 
@@ -1384,7 +1384,7 @@ class InputManager {
 
 **Asset Loading Error Handling:**
 
-```typescript
+\`\`\`typescript
 class AssetManager {
   loadAssets(): Promise<void> {
     return new Promise((resolve, reject) => {
@@ -1414,13 +1414,13 @@ class AssetManager {
     }
   }
 }
-```
+\`\`\`
 
 ### Runtime Error Recovery
 
 **System Error Handling:**
 
-```typescript
+\`\`\`typescript
 class GameSystem {
   protected handleError(error: Error, context: string): void {
     console.error(`Error in ${context}:`, error);
@@ -1448,7 +1448,7 @@ class GameSystem {
     }
   }
 }
-```
+\`\`\`
 
 ## Testing Standards
 
@@ -1456,7 +1456,7 @@ class GameSystem {
 
 **Game Logic Testing:**
 
-```typescript
+\`\`\`typescript
 // Example test for game mechanics
 describe('HealthComponent', () => {
   let healthComponent: HealthComponent;
@@ -1483,13 +1483,13 @@ describe('HealthComponent', () => {
     expect(healthComponent.isAlive()).toBe(false);
   });
 });
-```
+\`\`\`
 
 ### Integration Testing
 
 **Scene Testing:**
 
-```typescript
+\`\`\`typescript
 describe('GameScene Integration', () => {
   let scene: GameScene;
   let mockGame: Phaser.Game;
@@ -1507,13 +1507,13 @@ describe('GameScene Integration', () => {
     expect(scene.inputManager).toBeDefined();
   });
 });
-```
+\`\`\`
 
 ## File Organization
 
 ### Project Structure
 
-```
+\`\`\`
 src/
 ├── scenes/
 │   ├── BootScene.ts          # Initial loading and setup
@@ -1554,7 +1554,7 @@ src/
 │   ├── GameBalance.ts        # Game balance parameters
 │   └── AssetConfig.ts        # Asset loading configuration
 └── main.ts                   # Application entry point
-```
+\`\`\`
 
 ## Development Workflow
 

@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -94,7 +94,7 @@ dependencies:
     - publication-readiness-checklist.md
   data:
     - bmad-kb.md
-```
+\`\`\`
 
 ## Startup Context
 
@@ -443,7 +443,7 @@ When invoked after outputting a section:
 
 **Action List Presentation Format:**
 
-```text
+\`\`\`text
 **Advanced Elicitation Options**
 Choose a number (0-8) or 9 to proceed:
 
@@ -457,7 +457,7 @@ Choose a number (0-8) or 9 to proceed:
 7. [Method Name]
 8. [Method Name]
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 **Response Handling:**
 

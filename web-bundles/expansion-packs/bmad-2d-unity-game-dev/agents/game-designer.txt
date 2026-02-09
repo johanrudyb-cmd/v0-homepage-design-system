@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -96,7 +96,7 @@ dependencies:
     - game-design-checklist.md
   data:
     - bmad-kb.md
-```
+\`\`\`
 ==================== END: .bmad-2d-unity-game-dev/agents/game-designer.md ====================
 
 ==================== START: .bmad-2d-unity-game-dev/tasks/create-doc.md ====================
@@ -330,13 +330,13 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
 1. **Install globally**:
 
-   ```bash
+   \`\`\`bash
    npm install -g @kayvan/markdown-tree-parser
-   ```
+   \`\`\`
 
 2. **Use the explode command**:
 
-   ```bash
+   \`\`\`bash
    # For PRD
    md-tree explode docs/prd.md docs/prd
 
@@ -345,7 +345,7 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
    # For any document
    md-tree explode [source-document] [destination-folder]
-   ```
+   \`\`\`
 
 3. **What it does**:
    - Automatically splits the document by level 2 sections
@@ -397,12 +397,12 @@ For each extracted section:
    - The level 2 heading becomes level 1 (# instead of ##) in the sharded new document
    - All subsection levels decrease by 1:
 
-   ```txt
+   \`\`\`txt
      - ### → ##
      - #### → ###
      - ##### → ####
      - etc.
-   ```
+   \`\`\`
 
 3. **Write content**: Save the adjusted content to the new file
 
@@ -413,7 +413,7 @@ Create an `index.md` file in the sharded folder that:
 1. Contains the original level 1 heading and any content before the first level 2 section
 2. Lists all the sharded files with links:
 
-```markdown
+\`\`\`markdown
 # Original Document Title
 
 [Original introduction content if any]
@@ -424,22 +424,22 @@ Create an `index.md` file in the sharded folder that:
 - [Section Name 2](./section-name-2.md)
 - [Section Name 3](./section-name-3.md)
   ...
-```
+\`\`\`
 
 ### 5. Preserve Special Content
 
 1. **Code blocks**: Must capture complete blocks including:
 
-   ```language
+   \`\`\`language
    content
-   ```
+   \`\`\`
 
 2. **Mermaid diagrams**: Preserve complete syntax:
 
-   ```mermaid
+   \`\`\`mermaid
    graph TD
    ...
-   ```
+   \`\`\`
 
 3. **Tables**: Maintain proper markdown table formatting
 
@@ -464,7 +464,7 @@ After sharding:
 
 Provide a summary:
 
-```text
+\`\`\`text
 Document sharded successfully:
 - Source: [original document path]
 - Destination: docs/[folder-name]/
@@ -473,7 +473,7 @@ Document sharded successfully:
   - section-name-1.md: "Section Title 1"
   - section-name-2.md: "Section Title 2"
   ...
-```
+\`\`\`
 
 ## Important Notes
 
@@ -951,7 +951,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 
 **Research Prompt Template:**
 
-```markdown
+\`\`\`markdown
 ## Research Objective
 
 [Clear statement of what this research aims to achieve]
@@ -1013,7 +1013,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 ## Timeline and Priority
 
 [If applicable, any time constraints or phasing]
-```
+\`\`\`
 
 ### 5. Review and Refinement
 
@@ -1092,7 +1092,7 @@ CRITICAL: collaborate with the user to develop specific, actionable research que
 
 **Present the numbered list (0-9) with this exact format:**
 
-```text
+\`\`\`text
 **Advanced Game Design Elicitation & Brainstorming Actions**
 Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 
@@ -1106,7 +1106,7 @@ Choose an action (0-9 - 9 to bypass - HELP for explanation of these options):
 7. Explore Alternative Game Design Approaches
 8. Hindsight Postmortem: The 'If Only...' Game Design Reflection
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 ### 2. Processing Guidelines
 
@@ -1359,13 +1359,13 @@ sections:
 
           **Save Data Structure:**
 
-          ```csharp
+          \`\`\`csharp
           [System.Serializable]
           public class PlayerProgress
           {
               {{progress_fields}}
           }
-          ```
+          \`\`\`
         examples:
           - public int currentLevel, public bool[] unlockedAbilities, public float totalPlayTime
       - id: difficulty-curve
@@ -1569,7 +1569,7 @@ sections:
 
           **Folder Structure:**
 
-          ```
+          \`\`\`
           Assets/
           ├── _Project/
           │   ├── Scripts/
@@ -1577,7 +1577,7 @@ sections:
           │   ├── Prefabs/
           │   ├── Scenes/
           │   └── {{additional_folders}}
-          ```
+          \`\`\`
 
           **Naming Conventions:**
 
@@ -2996,14 +2996,14 @@ BMad transforms you into a "Player Experience CEO" - directing a team of special
 
 ### The Game Development Loop
 
-```text
+\`\`\`text
 1. Game SM Agent (New Chat) → Creates next game story from sharded docs
 2. You → Review and approve game story
 3. Game Dev Agent (New Chat) → Implements approved game feature in Unity
 4. QA Agent (New Chat) → Reviews code and tests gameplay
 5. You → Verify game feature completion
 6. Repeat until game epic complete
-```
+\`\`\`
 
 ### Why This Works for Games
 
@@ -3048,11 +3048,11 @@ You are developing games as a "Player Experience CEO" - thinking like a game dir
 
 **Best for**: Unity developers using Cursor, Claude Code, Windsurf, Trae, Cline, Roo Code, Github Copilot
 
-```bash
+\`\`\`bash
 # Interactive installation (recommended)
 npx bmad-method install
 # Select the bmad-2d-unity-game-dev expansion pack when prompted
-```
+\`\`\`
 
 **Installation Steps for Game Development**:
 
@@ -3125,7 +3125,7 @@ npx bmad-method install
 
 The expansion pack follows the standard BMad configuration patterns. Copy your core-config.yaml file to expansion-packs/bmad-2d-unity-game-dev/ and add Game-specific configurations to your project's `core-config.yaml`:
 
-```yaml
+\`\`\`yaml
 markdownExploder: true
 prd:
   prdFile: docs/prd.md
@@ -3163,7 +3163,7 @@ devLoadAlwaysFiles:
   - docs/game-architecture/9-coding-standards.md
   - docs/game-architecture/3-tech-stack.md
   - docs/game-architecture/8-unity-project-structure.md
-```
+\`\`\`
 
 ## Complete Game Development Workflow
 
@@ -3184,17 +3184,17 @@ devLoadAlwaysFiles:
 
 **For Game Design Document Creation**:
 
-```text
+\`\`\`text
 "I want to build a [genre] 2D game that [core gameplay].
 Help me brainstorm mechanics and create a comprehensive Game Design Document."
-```
+\`\`\`
 
 **For Game Architecture Design**:
 
-```text
+\`\`\`text
 "Based on this Game Design Document, design a scalable Unity architecture
 that can handle [specific game requirements] with stable performance."
-```
+\`\`\`
 
 ### Critical Transition: Web UI to Unity IDE
 
@@ -3355,7 +3355,7 @@ Game templates with Level 2 headings (`##`) can be automatically sharded:
 
 **Original Game Design Document**:
 
-```markdown
+\`\`\`markdown
 ## Core Gameplay Mechanics
 
 ## Player Progression System
@@ -3363,7 +3363,7 @@ Game templates with Level 2 headings (`##`) can be automatically sharded:
 ## Level Design Framework
 
 ## Technical Requirements
-```
+\`\`\`
 
 **After Sharding**:
 
@@ -3413,14 +3413,14 @@ Use the `shard-doc` task or `@kayvan/markdown-tree-parser` tool for automatic ga
 
 **In Web UI (after building with unity-2d-game-team)**:
 
-```text
+\`\`\`text
 /bmad2du/game-designer - Access game designer agent
 /bmad2du/game-architect - Access game architect agent
 /bmad2du/game-developer - Access game developer agent
 /bmad2du/game-sm - Access game scrum master agent
 /help - Show available game development commands
 /switch agent-name - Change active agent (if orchestrator available)
-```
+\`\`\`
 
 ## Game-Specific Development Guidelines
 
@@ -3428,7 +3428,7 @@ Use the `shard-doc` task or `@kayvan/markdown-tree-parser` tool for automatic ga
 
 **Project Structure:**
 
-```text
+\`\`\`text
 UnityProject/
 ├── Assets/
 │   └── _Project
@@ -3445,7 +3445,7 @@ UnityProject/
 │           └── PlayMode/
 ├── Packages/            # Package Manager manifest
 └── ProjectSettings/     # Unity project settings
-```
+\`\`\`
 
 **Performance Requirements:**
 
@@ -3679,10 +3679,10 @@ This 2D Unity Game Development expansion pack extends BMad-Method beyond traditi
 
 1. **Install via CLI**:
 
-   ```bash
+   \`\`\`bash
    npx bmad-method install
    # Select "Install game development expansion pack" option
-   ```
+   \`\`\`
 
 2. **Use in Your Game Workflow**: Installed game agents integrate seamlessly with existing BMad agents
 

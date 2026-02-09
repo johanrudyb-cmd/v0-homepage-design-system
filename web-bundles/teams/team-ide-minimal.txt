@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -58,7 +58,7 @@ workflows: null
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -177,7 +177,7 @@ dependencies:
     - kb-mode-interaction.md
   utils:
     - workflow-management.md
-```
+\`\`\`
 ==================== END: .bmad-core/agents/bmad-orchestrator.md ====================
 
 ==================== START: .bmad-core/agents/po.md ====================
@@ -185,7 +185,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -236,7 +236,7 @@ dependencies:
     - validate-next-story.md
   templates:
     - story-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-core/agents/po.md ====================
 
 ==================== START: .bmad-core/agents/sm.md ====================
@@ -244,7 +244,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -281,7 +281,7 @@ dependencies:
     - execute-checklist.md
   templates:
     - story-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-core/agents/sm.md ====================
 
 ==================== START: .bmad-core/agents/dev.md ====================
@@ -289,7 +289,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -334,7 +334,7 @@ dependencies:
     - apply-qa-fixes.md
     - execute-checklist.md
     - validate-next-story.md
-```
+\`\`\`
 ==================== END: .bmad-core/agents/dev.md ====================
 
 ==================== START: .bmad-core/agents/qa.md ====================
@@ -342,7 +342,7 @@ dependencies:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -404,7 +404,7 @@ dependencies:
   templates:
     - qa-gate-tmpl.yaml
     - story-tmpl.yaml
-```
+\`\`\`
 ==================== END: .bmad-core/agents/qa.md ====================
 
 ==================== START: .bmad-core/tasks/advanced-elicitation.md ====================
@@ -489,7 +489,7 @@ When invoked after outputting a section:
 
 **Action List Presentation Format:**
 
-```text
+\`\`\`text
 **Advanced Elicitation Options**
 Choose a number (0-8) or 9 to proceed:
 
@@ -503,7 +503,7 @@ Choose a number (0-8) or 9 to proceed:
 7. [Method Name]
 8. [Method Name]
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 **Response Handling:**
 
@@ -765,14 +765,14 @@ BMad transforms you into a "Vibe CEO" - directing a team of specialized AI agent
 
 ### The Development Loop
 
-```text
+\`\`\`text
 1. SM Agent (New Chat) → Creates next story from sharded docs
 2. You → Review and approve story
 3. Dev Agent (New Chat) → Implements approved story
 4. QA Agent (New Chat) → Reviews and refactors code
 5. You → Verify completion
 6. Repeat until epic complete
-```
+\`\`\`
 
 ### Why This Works
 
@@ -800,10 +800,10 @@ BMad transforms you into a "Vibe CEO" - directing a team of specialized AI agent
 
 **Best for**: Cursor, Claude Code, Windsurf, Trae, Cline, Roo Code, Github Copilot users
 
-```bash
+\`\`\`bash
 # Interactive installation (recommended)
 npx bmad-method install
-```
+\`\`\`
 
 **Installation Steps**:
 
@@ -937,23 +937,23 @@ This configuration file acts as a map for BMad agents, telling them exactly wher
 
 **Legacy V3 Project**:
 
-```yaml
+\`\`\`yaml
 prdVersion: v3
 prdSharded: false
 architectureVersion: v3
 architectureSharded: false
-```
+\`\`\`
 
 **V4 Optimized Project**:
 
-```yaml
+\`\`\`yaml
 prdVersion: v4
 prdSharded: true
 prdShardedLocation: docs/prd
 architectureVersion: v4
 architectureSharded: true
 architectureShardedLocation: docs/architecture
-```
+\`\`\`
 
 ## Core Philosophy
 
@@ -1035,13 +1035,13 @@ You are the "Vibe CEO" - thinking like a CEO with unlimited resources and a sing
 
 **In Web UI**:
 
-```text
+\`\`\`text
 /pm create-doc prd
 /architect review system design
 /dev implement story 1.2
 /help - Show available commands
 /switch agent-name - Change active agent (if orchestrator available)
-```
+\`\`\`
 
 ## Team Configurations
 
@@ -1168,17 +1168,17 @@ This architecture enables seamless operation across environments while maintaini
 
 **For PRD Creation**:
 
-```text
+\`\`\`text
 "I want to build a [type] application that [core purpose].
 Help me brainstorm features and create a comprehensive PRD."
-```
+\`\`\`
 
 **For Architecture Design**:
 
-```text
+\`\`\`text
 "Based on this PRD, design a scalable technical architecture
 that can handle [specific requirements]."
-```
+\`\`\`
 
 ### Critical Transition: Web UI to IDE
 
@@ -1365,7 +1365,7 @@ Templates with Level 2 headings (`##`) can be automatically sharded:
 
 **Original PRD**:
 
-```markdown
+\`\`\`markdown
 ## Goals and Background Context
 
 ## Requirements
@@ -1373,7 +1373,7 @@ Templates with Level 2 headings (`##`) can be automatically sharded:
 ## User Interface Design Goals
 
 ## Success Metrics
-```
+\`\`\`
 
 **After Sharding**:
 
@@ -1495,10 +1495,10 @@ Expansion packs extend BMAD-METHOD™ beyond traditional software development in
 2. **Get Inspiration**: See `docs/expansion-packs.md` for detailed examples and ideas
 3. **Install via CLI**:
 
-   ```bash
+   \`\`\`bash
    npx bmad-method install
    # Select "Install expansion pack" option
-   ```
+   \`\`\`
 
 4. **Use in Your Workflow**: Installed packs integrate seamlessly with existing agents
 
@@ -1953,13 +1953,13 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
 1. **Install globally**:
 
-   ```bash
+   \`\`\`bash
    npm install -g @kayvan/markdown-tree-parser
-   ```
+   \`\`\`
 
 2. **Use the explode command**:
 
-   ```bash
+   \`\`\`bash
    # For PRD
    md-tree explode docs/prd.md docs/prd
 
@@ -1968,7 +1968,7 @@ Then proceed with the manual method below ONLY if markdownExploder is false.]]
 
    # For any document
    md-tree explode [source-document] [destination-folder]
-   ```
+   \`\`\`
 
 3. **What it does**:
    - Automatically splits the document by level 2 sections
@@ -2020,12 +2020,12 @@ For each extracted section:
    - The level 2 heading becomes level 1 (# instead of ##) in the sharded new document
    - All subsection levels decrease by 1:
 
-   ```txt
+   \`\`\`txt
      - ### → ##
      - #### → ###
      - ##### → ####
      - etc.
-   ```
+   \`\`\`
 
 3. **Write content**: Save the adjusted content to the new file
 
@@ -2036,7 +2036,7 @@ Create an `index.md` file in the sharded folder that:
 1. Contains the original level 1 heading and any content before the first level 2 section
 2. Lists all the sharded files with links:
 
-```markdown
+\`\`\`markdown
 # Original Document Title
 
 [Original introduction content if any]
@@ -2047,22 +2047,22 @@ Create an `index.md` file in the sharded folder that:
 - [Section Name 2](./section-name-2.md)
 - [Section Name 3](./section-name-3.md)
   ...
-```
+\`\`\`
 
 ### 5. Preserve Special Content
 
 1. **Code blocks**: Must capture complete blocks including:
 
-   ```language
+   \`\`\`language
    content
-   ```
+   \`\`\`
 
 2. **Mermaid diagrams**: Preserve complete syntax:
 
-   ```mermaid
+   \`\`\`mermaid
    graph TD
    ...
-   ```
+   \`\`\`
 
 3. **Tables**: Maintain proper markdown table formatting
 
@@ -2087,7 +2087,7 @@ After sharding:
 
 Provide a summary:
 
-```text
+\`\`\`text
 Document sharded successfully:
 - Source: [original document path]
 - Destination: docs/[folder-name]/
@@ -2096,7 +2096,7 @@ Document sharded successfully:
   - section-name-1.md: "Section Title 1"
   - section-name-2.md: "Section Title 2"
   ...
-```
+\`\`\`
 
 ## Important Notes
 
@@ -3295,7 +3295,7 @@ Implement fixes based on QA results (gate and assessments) for a specific story.
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "2.2"
   - qa_root: from `.bmad-core/core-config.yaml` key `qa.qaLocation` (e.g., `docs/project/qa`)
@@ -3304,7 +3304,7 @@ required:
 optional:
   - story_title: '{title}' # derive from story H1 if missing
   - story_slug: '{slug}' # derive from title (lowercase, hyphenated) if missing
-```
+\`\`\`
 
 ## QA Sources to Read
 
@@ -3538,7 +3538,7 @@ Quick NFR validation focused on the core four: security, performance, reliabilit
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: `.bmad-core/core-config.yaml` for the `devStoryLocation`
@@ -3547,7 +3547,7 @@ optional:
   - architecture_refs: `.bmad-core/core-config.yaml` for the `architecture.architectureFile`
   - technical_preferences: `.bmad-core/core-config.yaml` for the `technicalPreferences`
   - acceptance_criteria: From story file
-```
+\`\`\`
 
 ## Purpose
 
@@ -3571,7 +3571,7 @@ If story_path or story file can't be found:
 **Interactive mode:** Ask which NFRs to assess
 **Non-interactive mode:** Default to core four (security, performance, reliability, maintainability)
 
-```text
+\`\`\`text
 Which NFRs should I assess? (Enter numbers or press Enter for default)
 [1] Security (default)
 [2] Performance (default)
@@ -3583,7 +3583,7 @@ Which NFRs should I assess? (Enter numbers or press Enter for default)
 [8] Functional Suitability
 
 > [Enter for 1-4]
-```
+\`\`\`
 
 ### 2. Check for Thresholds
 
@@ -3596,13 +3596,13 @@ Look for NFR requirements in:
 **Interactive mode:** Ask for missing thresholds
 **Non-interactive mode:** Mark as CONCERNS with "Target unknown"
 
-```text
+\`\`\`text
 No performance requirements found. What's your target response time?
 > 200ms for API calls
 
 No security requirements found. Required auth method?
 > JWT with refresh tokens
-```
+\`\`\`
 
 **Unknown targets policy:** If a target is missing and not provided, mark status as CONCERNS with notes: "Target unknown"
 
@@ -3620,7 +3620,7 @@ For each selected NFR, check:
 
 Generate ONLY for NFRs actually assessed (no placeholders):
 
-```yaml
+\`\`\`yaml
 # Gate YAML (copy/paste):
 nfr_validation:
   _assessed: [security, performance, reliability, maintainability]
@@ -3636,7 +3636,7 @@ nfr_validation:
   maintainability:
     status: CONCERNS
     notes: 'Test coverage at 65%, target is 80%'
-```
+\`\`\`
 
 ## Deterministic Status Rules
 
@@ -3646,12 +3646,12 @@ nfr_validation:
 
 ## Quality Score Calculation
 
-```
+\`\`\`
 quality_score = 100
 - 20 for each FAIL attribute
 - 10 for each CONCERNS attribute
 Floor at 0, ceiling at 100
-```
+\`\`\`
 
 If `technical-preferences.md` defines custom weights, use those instead.
 
@@ -3659,7 +3659,7 @@ If `technical-preferences.md` defines custom weights, use those instead.
 
 **ALWAYS save to:** `qa.qaLocation/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md`
 
-```markdown
+\`\`\`markdown
 # NFR Assessment: {epic}.{story}
 
 Date: {date}
@@ -3689,23 +3689,23 @@ Reviewer: Quinn
 - Add rate limiting: ~2 hours
 - Increase test coverage: ~4 hours
 - Add performance monitoring: ~1 hour
-```
+\`\`\`
 
 ## Output 3: Story Update Line
 
 **End with this line for the review task to quote:**
 
-```
+\`\`\`
 NFR assessment: qa.qaLocation/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md
-```
+\`\`\`
 
 ## Output 4: Gate Integration Line
 
 **Always print at the end:**
 
-```
+\`\`\`
 Gate NFR block ready → paste into qa.qaLocation/gates/{epic}.{story}-{slug}.yml under nfr_validation
-```
+\`\`\`
 
 ## Assessment Criteria
 
@@ -3794,7 +3794,7 @@ Gate NFR block ready → paste into qa.qaLocation/gates/{epic}.{story}-{slug}.ym
 
 ### What to Check
 
-```yaml
+\`\`\`yaml
 security:
   - Authentication mechanism
   - Authorization checks
@@ -3820,7 +3820,7 @@ maintainability:
   - Code structure
   - Documentation
   - Dependencies
-```
+\`\`\`
 
 ## Key Principles
 
@@ -3857,7 +3857,7 @@ Use these when assessing beyond the core four.
 <details>
 <summary>Example: Deep Performance Analysis (click to expand)</summary>
 
-```yaml
+\`\`\`yaml
 performance_deep_dive:
   response_times:
     p50: 45ms
@@ -3872,7 +3872,7 @@ performance_deep_dive:
   load_test:
     max_rps: 150
     breaking_point: 200 rps
-```
+\`\`\`
 
 </details>
 ==================== END: .bmad-core/tasks/nfr-assess.md ====================
@@ -3906,7 +3906,7 @@ Slug rules:
 
 ## Minimal Required Schema
 
-```yaml
+\`\`\`yaml
 schema: 1
 story: '{epic}.{story}'
 gate: PASS|CONCERNS|FAIL|WAIVED
@@ -3915,11 +3915,11 @@ reviewer: 'Quinn'
 updated: '{ISO-8601 timestamp}'
 top_issues: [] # Empty array if no issues
 waiver: { active: false } # Only set active: true if WAIVED
-```
+\`\`\`
 
 ## Schema with Issues
 
-```yaml
+\`\`\`yaml
 schema: 1
 story: '1.3'
 gate: CONCERNS
@@ -3936,11 +3936,11 @@ top_issues:
     finding: 'No integration tests for auth flow'
     suggested_action: 'Add integration test coverage'
 waiver: { active: false }
-```
+\`\`\`
 
 ## Schema when Waived
 
-```yaml
+\`\`\`yaml
 schema: 1
 story: '1.3'
 gate: WAIVED
@@ -3956,7 +3956,7 @@ waiver:
   active: true
   reason: 'MVP release - performance optimization deferred'
   approved_by: 'Product Owner'
-```
+\`\`\`
 
 ## Gate Decision Criteria
 
@@ -4008,9 +4008,9 @@ waiver:
 1. **ALWAYS** create gate file at: `qa.qaLocation/gates` from `.bmad-core/core-config.yaml`
 2. **ALWAYS** append this exact format to story's QA Results section:
 
-   ```text
+   \`\`\`text
    Gate: {STATUS} → qa.qaLocation/gates/{epic}.{story}-{slug}.yml
-   ```
+   \`\`\`
 
 3. Keep status_reason to 1-2 sentences maximum
 4. Use severity values exactly: `low`, `medium`, or `high`
@@ -4019,7 +4019,7 @@ waiver:
 
 After creating gate file, append to story's QA Results section:
 
-```markdown
+\`\`\`markdown
 ## QA Results
 
 ### Review Date: 2025-01-12
@@ -4031,7 +4031,7 @@ After creating gate file, append to story's QA Results section:
 ### Gate Status
 
 Gate: CONCERNS → qa.qaLocation/gates/{epic}.{story}-{slug}.yml
-```
+\`\`\`
 
 ## Key Principles
 
@@ -4050,13 +4050,13 @@ Perform a comprehensive test architecture review with quality gate decision. Thi
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: '{devStoryLocation}/{epic}.{story}.*.md' # Path from core-config.yaml
   - story_title: '{title}' # If missing, derive from story file H1
   - story_slug: '{slug}' # If missing, derive from title (lowercase, hyphenated)
-```
+\`\`\`
 
 ## Prerequisites
 
@@ -4162,7 +4162,7 @@ required:
 
 After review and any refactoring, append your results to the story file in the QA Results section:
 
-```markdown
+\`\`\`markdown
 ## QA Results
 
 ### Review Date: [Date]
@@ -4223,7 +4223,7 @@ NFR assessment: qa.qaLocation/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md
 
 [✓ Ready for Done] / [✗ Changes Required - See unchecked items above]
 (Story owner decides final status)
-```
+\`\`\`
 
 ## Output 2: Create Quality Gate File
 
@@ -4235,7 +4235,7 @@ NFR assessment: qa.qaLocation/assessments/{epic}.{story}-nfr-{YYYYMMDD}.md
 
 Gate file structure:
 
-```yaml
+\`\`\`yaml
 schema: 1
 story: '{epic}.{story}'
 story_title: '{story title}'
@@ -4279,7 +4279,7 @@ recommendations:
   future: # Can be addressed later
     - action: 'Consider caching'
       refs: ['services/data.ts']
-```
+\`\`\`
 
 ### Gate Decision Criteria
 
@@ -4315,10 +4315,10 @@ Detailed criteria:
 
 ### Quality Score Calculation
 
-```text
+\`\`\`text
 quality_score = 100 - (20 × number of FAILs) - (10 × number of CONCERNS)
 Bounded between 0 and 100
-```
+\`\`\`
 
 If `technical-preferences.md` defines custom weights, use those instead.
 
@@ -4368,13 +4368,13 @@ Generate a comprehensive risk assessment matrix for a story implementation using
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: 'docs/stories/{epic}.{story}.*.md'
   - story_title: '{title}' # If missing, derive from story file H1
   - story_slug: '{slug}' # If missing, derive from title (lowercase, hyphenated)
-```
+\`\`\`
 
 ## Purpose
 
@@ -4441,7 +4441,7 @@ Identify, assess, and prioritize risks in the story implementation. Provide risk
 
 For each category, identify specific risks:
 
-```yaml
+\`\`\`yaml
 risk:
   id: 'SEC-001' # Use prefixes: SEC, PERF, DATA, BUS, OPS, TECH
   category: security
@@ -4451,7 +4451,7 @@ risk:
     - 'UserRegistrationForm'
     - 'ProfileUpdateForm'
   detection_method: 'Code review revealed missing validation'
-```
+\`\`\`
 
 ### 2. Risk Assessment
 
@@ -4481,7 +4481,7 @@ Evaluate each risk using probability × impact:
 
 Create risk matrix:
 
-```markdown
+\`\`\`markdown
 ## Risk Matrix
 
 | Risk ID  | Description             | Probability | Impact     | Score | Priority |
@@ -4489,13 +4489,13 @@ Create risk matrix:
 | SEC-001  | XSS vulnerability       | High (3)    | High (3)   | 9     | Critical |
 | PERF-001 | Slow query on dashboard | Medium (2)  | Medium (2) | 4     | Medium   |
 | DATA-001 | Backup failure          | Low (1)     | High (3)   | 3     | Low      |
-```
+\`\`\`
 
 ### 4. Risk Mitigation Strategies
 
 For each identified risk, provide mitigation:
 
-```yaml
+\`\`\`yaml
 mitigation:
   risk_id: 'SEC-001'
   strategy: 'preventive' # preventive|detective|corrective
@@ -4511,7 +4511,7 @@ mitigation:
   residual_risk: 'Low - Some zero-day vulnerabilities may remain'
   owner: 'dev'
   timeline: 'Before deployment'
-```
+\`\`\`
 
 ## Outputs
 
@@ -4525,7 +4525,7 @@ Generate for pasting into gate file under `risk_summary`:
 - Sort risks by score (desc) when emitting highest and any tabular lists
 - If no risks: totals all zeros, omit highest, keep recommendations arrays empty
 
-```yaml
+\`\`\`yaml
 # risk_summary (paste into gate file):
 risk_summary:
   totals:
@@ -4542,13 +4542,13 @@ risk_summary:
       - 'Add input sanitization & CSP'
     monitor:
       - 'Add security alerts for auth endpoints'
-```
+\`\`\`
 
 ### Output 2: Markdown Report
 
 **Save to:** `qa.qaLocation/assessments/{epic}.{story}-risk-{YYYYMMDD}.md`
 
-```markdown
+\`\`\`markdown
 # Risk Profile: Story {epic}.{story}
 
 Date: {date}
@@ -4648,13 +4648,13 @@ Review and update risk profile when:
 - Security vulnerabilities discovered
 - Performance issues reported
 - Regulatory requirements change
-```
+\`\`\`
 
 ## Risk Scoring Algorithm
 
 Calculate overall story risk score:
 
-```text
+\`\`\`text
 Base Score = 100
 For each risk:
   - Critical (9): Deduct 20 points
@@ -4664,7 +4664,7 @@ For each risk:
 
 Minimum score = 0 (extremely risky)
 Maximum score = 100 (minimal risk)
-```
+\`\`\`
 
 ## Risk-Based Recommendations
 
@@ -4703,9 +4703,9 @@ Based on risk profile, recommend:
 
 **Print this line for review task to quote:**
 
-```text
+\`\`\`text
 Risk profile: qa.qaLocation/assessments/{epic}.{story}-risk-{YYYYMMDD}.md
-```
+\`\`\`
 
 ## Key Principles
 
@@ -4725,13 +4725,13 @@ Create comprehensive test scenarios with appropriate test level recommendations 
 
 ## Inputs
 
-```yaml
+\`\`\`yaml
 required:
   - story_id: '{epic}.{story}' # e.g., "1.3"
   - story_path: '{devStoryLocation}/{epic}.{story}.*.md' # Path from core-config.yaml
   - story_title: '{title}' # If missing, derive from story file H1
   - story_slug: '{slug}' # If missing, derive from title (lowercase, hyphenated)
-```
+\`\`\`
 
 ## Purpose
 
@@ -4739,11 +4739,11 @@ Design a complete test strategy that identifies what to test, at which level (un
 
 ## Dependencies
 
-```yaml
+\`\`\`yaml
 data:
   - test-levels-framework.md # Unit/Integration/E2E decision criteria
   - test-priorities-matrix.md # P0/P1/P2/P3 classification system
-```
+\`\`\`
 
 ## Process
 
@@ -4781,7 +4781,7 @@ Quick priority assignment:
 
 For each identified test need, create:
 
-```yaml
+\`\`\`yaml
 test_scenario:
   id: '{epic}.{story}-{LEVEL}-{SEQ}'
   requirement: 'AC reference'
@@ -4790,7 +4790,7 @@ test_scenario:
   description: 'What is being tested'
   justification: 'Why this level was chosen'
   mitigates_risks: ['RISK-001'] # If risk profile exists
-```
+\`\`\`
 
 ### 5. Validate Coverage
 
@@ -4807,7 +4807,7 @@ Ensure:
 
 **Save to:** `qa.qaLocation/assessments/{epic}.{story}-test-design-{YYYYMMDD}.md`
 
-```markdown
+\`\`\`markdown
 # Test Design: Story {epic}.{story}
 
 Date: {date}
@@ -4846,13 +4846,13 @@ Designer: Quinn (Test Architect)
 3. P0 E2E tests
 4. P1 tests in order
 5. P2+ as time permits
-```
+\`\`\`
 
 ### Output 2: Gate YAML Block
 
 Generate for inclusion in quality gate:
 
-```yaml
+\`\`\`yaml
 test_design:
   scenarios_total: X
   by_level:
@@ -4864,16 +4864,16 @@ test_design:
     p1: B
     p2: C
   coverage_gaps: [] # List any ACs without tests
-```
+\`\`\`
 
 ### Output 3: Trace References
 
 Print for use by trace-requirements task:
 
-```text
+\`\`\`text
 Test design matrix: qa.qaLocation/assessments/{epic}.{story}-test-design-{YYYYMMDD}.md
 P0 tests identified: {count}
-```
+\`\`\`
 
 ## Quality Checklist
 
@@ -4929,7 +4929,7 @@ Identify all testable requirements from:
 
 For each requirement, document which tests validate it. Use Given-When-Then to describe what the test validates (not how it's written):
 
-```yaml
+\`\`\`yaml
 requirement: 'AC1: User can login with valid credentials'
 test_mappings:
   - test_file: 'auth/login.test.ts'
@@ -4946,7 +4946,7 @@ test_mappings:
     when: 'Entering valid credentials and submitting'
     then: 'Dashboard loads with user data'
     coverage: integration
-```
+\`\`\`
 
 ### 3. Coverage Analysis
 
@@ -4964,7 +4964,7 @@ Evaluate coverage for each requirement:
 
 Document any gaps found:
 
-```yaml
+\`\`\`yaml
 coverage_gaps:
   - requirement: 'AC3: Password reset email sent within 60 seconds'
     gap: 'No test for email delivery timing'
@@ -4979,7 +4979,7 @@ coverage_gaps:
     suggested_test:
       type: performance
       description: 'Load test with 1000 concurrent connections'
-```
+\`\`\`
 
 ## Outputs
 
@@ -4987,7 +4987,7 @@ coverage_gaps:
 
 **Generate for pasting into gate file under `trace`:**
 
-```yaml
+\`\`\`yaml
 trace:
   totals:
     requirements: X
@@ -4999,7 +4999,7 @@ trace:
     - ac: 'AC3'
       reason: 'No test found for password reset timing'
   notes: 'See qa.qaLocation/assessments/{epic}.{story}-trace-{YYYYMMDD}.md'
-```
+\`\`\`
 
 ### Output 2: Traceability Report
 
@@ -5007,7 +5007,7 @@ trace:
 
 Create a traceability report with:
 
-```markdown
+\`\`\`markdown
 # Requirements Traceability Matrix
 
 ## Story: {epic}.{story} - {title}
@@ -5069,7 +5069,7 @@ Based on gaps identified, recommend:
 - **High Risk**: Requirements with no coverage
 - **Medium Risk**: Requirements with only partial coverage
 - **Low Risk**: Requirements with full unit + integration coverage
-```
+\`\`\`
 
 ## Traceability Best Practices
 
@@ -5148,9 +5148,9 @@ This traceability feeds into quality gates:
 
 **Print this line for review task to quote:**
 
-```text
+\`\`\`text
 Trace matrix: qa.qaLocation/assessments/{epic}.{story}-trace-{YYYYMMDD}.md
-```
+\`\`\`
 
 - Full coverage → PASS contribution
 

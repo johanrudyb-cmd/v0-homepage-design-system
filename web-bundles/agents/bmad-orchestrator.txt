@@ -19,13 +19,13 @@ When you need to reference a resource mentioned in your instructions:
 
 **Understanding YAML References**: In the agent configuration, resources are referenced in the dependencies section. For example:
 
-```yaml
+\`\`\`yaml
 dependencies:
   utils:
     - template-format
   tasks:
     - create-story
-```
+\`\`\`
 
 These references map directly to bundle sections:
 
@@ -44,7 +44,7 @@ These references map directly to bundle sections:
 
 CRITICAL: Read the full YAML, start activation to alter your state of being, follow startup section instructions, stay in this being until told to exit this mode:
 
-```yaml
+\`\`\`yaml
 activation-instructions:
   - ONLY load dependency files when user selects them for execution via command or request of a task
   - The agent.customization field ALWAYS takes precedence over any conflicting instructions
@@ -163,7 +163,7 @@ dependencies:
     - kb-mode-interaction.md
   utils:
     - workflow-management.md
-```
+\`\`\`
 ==================== END: .bmad-core/agents/bmad-orchestrator.md ====================
 
 ==================== START: .bmad-core/tasks/advanced-elicitation.md ====================
@@ -248,7 +248,7 @@ When invoked after outputting a section:
 
 **Action List Presentation Format:**
 
-```text
+\`\`\`text
 **Advanced Elicitation Options**
 Choose a number (0-8) or 9 to proceed:
 
@@ -262,7 +262,7 @@ Choose a number (0-8) or 9 to proceed:
 7. [Method Name]
 8. [Method Name]
 9. Proceed / No Further Actions
-```
+\`\`\`
 
 **Response Handling:**
 
@@ -524,14 +524,14 @@ BMad transforms you into a "Vibe CEO" - directing a team of specialized AI agent
 
 ### The Development Loop
 
-```text
+\`\`\`text
 1. SM Agent (New Chat) → Creates next story from sharded docs
 2. You → Review and approve story
 3. Dev Agent (New Chat) → Implements approved story
 4. QA Agent (New Chat) → Reviews and refactors code
 5. You → Verify completion
 6. Repeat until epic complete
-```
+\`\`\`
 
 ### Why This Works
 
@@ -559,10 +559,10 @@ BMad transforms you into a "Vibe CEO" - directing a team of specialized AI agent
 
 **Best for**: Cursor, Claude Code, Windsurf, Trae, Cline, Roo Code, Github Copilot users
 
-```bash
+\`\`\`bash
 # Interactive installation (recommended)
 npx bmad-method install
-```
+\`\`\`
 
 **Installation Steps**:
 
@@ -696,23 +696,23 @@ This configuration file acts as a map for BMad agents, telling them exactly wher
 
 **Legacy V3 Project**:
 
-```yaml
+\`\`\`yaml
 prdVersion: v3
 prdSharded: false
 architectureVersion: v3
 architectureSharded: false
-```
+\`\`\`
 
 **V4 Optimized Project**:
 
-```yaml
+\`\`\`yaml
 prdVersion: v4
 prdSharded: true
 prdShardedLocation: docs/prd
 architectureVersion: v4
 architectureSharded: true
 architectureShardedLocation: docs/architecture
-```
+\`\`\`
 
 ## Core Philosophy
 
@@ -794,13 +794,13 @@ You are the "Vibe CEO" - thinking like a CEO with unlimited resources and a sing
 
 **In Web UI**:
 
-```text
+\`\`\`text
 /pm create-doc prd
 /architect review system design
 /dev implement story 1.2
 /help - Show available commands
 /switch agent-name - Change active agent (if orchestrator available)
-```
+\`\`\`
 
 ## Team Configurations
 
@@ -927,17 +927,17 @@ This architecture enables seamless operation across environments while maintaini
 
 **For PRD Creation**:
 
-```text
+\`\`\`text
 "I want to build a [type] application that [core purpose].
 Help me brainstorm features and create a comprehensive PRD."
-```
+\`\`\`
 
 **For Architecture Design**:
 
-```text
+\`\`\`text
 "Based on this PRD, design a scalable technical architecture
 that can handle [specific requirements]."
-```
+\`\`\`
 
 ### Critical Transition: Web UI to IDE
 
@@ -1124,7 +1124,7 @@ Templates with Level 2 headings (`##`) can be automatically sharded:
 
 **Original PRD**:
 
-```markdown
+\`\`\`markdown
 ## Goals and Background Context
 
 ## Requirements
@@ -1132,7 +1132,7 @@ Templates with Level 2 headings (`##`) can be automatically sharded:
 ## User Interface Design Goals
 
 ## Success Metrics
-```
+\`\`\`
 
 **After Sharding**:
 
@@ -1254,10 +1254,10 @@ Expansion packs extend BMAD-METHOD™ beyond traditional software development in
 2. **Get Inspiration**: See `docs/expansion-packs.md` for detailed examples and ideas
 3. **Install via CLI**:
 
-   ```bash
+   \`\`\`bash
    npx bmad-method install
    # Select "Install expansion pack" option
-   ```
+   \`\`\`
 
 4. **Use in Your Workflow**: Installed packs integrate seamlessly with existing agents
 
