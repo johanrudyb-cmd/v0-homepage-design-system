@@ -24,11 +24,11 @@ interface TrendSignal {
   countries?: string[];
   style: string | null;
   imageUrl?: string | null;
-  /** Image générée par Higgsfield après enrichissement */
+  /** Image générée par IA après enrichissement */
   generatedImageUrl?: string | null;
-  /** Conseils GPT sur la tendance (après scrape) */
+  /** Conseils IA sur la tendance (après scrape) */
   aiAdvice?: string | null;
-  /** Note GPT 1-10 (après scrape) */
+  /** Note IA 1-10 (après scrape) */
   aiRating?: number | null;
   /** À privilégier (bonne tendance) ou à éviter (déclin / saturé) */
   recommendation?: 'recommended' | 'avoid';
@@ -299,7 +299,7 @@ export function TrendRadar({ userId }: TrendRadarProps) {
             {isEnriching ? (
               <>Enrichissement IA…</>
             ) : (
-              <>Enrichir les tendances (GPT + Higgsfield)</>
+              <>Enrichir les tendances (IA)</>
             )}
           </Button>
           <Button onClick={handleScan} disabled={isScanning} variant="outline" size="sm" className="gap-2">
@@ -441,7 +441,6 @@ export function TrendRadar({ userId }: TrendRadarProps) {
                     {[trend.productType, trend.cut, trend.material].filter(Boolean).join(' · ') || '—'}
                   </p>
                   <div className="mt-3 flex items-center justify-between text-sm">
-                    <span className="font-medium text-foreground">{trend.averagePrice.toFixed(2)} €</span>
                     <span className="text-muted-foreground">
                       {trend.aiRating != null ? (
                         <span className="font-medium text-primary">Note {trend.aiRating}/10</span>

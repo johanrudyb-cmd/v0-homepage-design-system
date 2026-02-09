@@ -23,22 +23,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Marque non trouvée' }, { status: 404 });
     }
 
-    // Mettre à jour ou créer le LaunchMap
+    // Mettre à jour ou créer le LaunchMap (phase2 = Calculatrice)
     const launchMap = await prisma.launchMap.upsert({
       where: { brandId },
       update: {
-        phase1: true,
+        phase2: true,
         phase1Data: data,
       },
       create: {
         brandId,
-        phase1: true,
+        phase1: false,
+        phase2: true,
+        phase3: false,
+        phase4: false,
+        phase5: false,
         phase1Data: data,
       },
     });
 
     // Créer une notification pour la phase complétée
-    await NotificationHelpers.phaseCompleted(user.id, 1, 'Calcul de rentabilité');
+    await NotificationHelpers.phaseCompleted(user.id, 2, 'Calcul de rentabilité');
 
     return NextResponse.json({ success: true, launchMap });
   } catch (error: any) {

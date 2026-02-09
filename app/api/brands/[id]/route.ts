@@ -102,6 +102,9 @@ export async function PUT(
     if (body.socialHandles !== undefined) {
       updateData.socialHandles = body.socialHandles;
     }
+    if (body.templateBrandSlug !== undefined) {
+      updateData.templateBrandSlug = typeof body.templateBrandSlug === 'string' ? body.templateBrandSlug.trim() || null : null;
+    }
     if (body.creationMode !== undefined) {
       updateData.creationMode = body.creationMode;
     }

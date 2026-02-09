@@ -3,30 +3,22 @@
  * POST /api/trends/hybrid-radar/scan
  *
  * 1. Collecte image + titre + prix (20 produits "New In" par source)
- * 2. Analyse IA GPT-4o (coupe, attributs, score tendance)
+ * 2. Analyse IA (coupe, attributs, score tendance)
  * 3. Stockage TrendProduct avec marketZone
  * 4. Corrélation multi-zones → badge Global Trend Alert
  */
 
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
+import { sanitizeErrorMessage } from '@/lib/utils';
 import { prisma } from '@/lib/prisma';
 import { getAllSources } from '@/lib/hybrid-radar-sources';
 import { scrapeHybridSource } from '@/lib/hybrid-radar-scraper';
-import { analyzeProductImage, isChatGptConfigured } from '@/lib/api/chatgpt';
+import { inferCategory } from '@/lib/infer-trend-category';
+import { analyzeProductImage, isVisualAnalysisConfigured } from '@/lib/api/chatgpt';
 
 export const runtime = 'nodejs';
 export const maxDuration = 300;
-
-function inferCategory(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes('hoodie') || n.includes('sweat')) return 'Hoodie';
-  if (n.includes('t-shirt') || n.includes('tee')) return 'T-shirt';
-  if (n.includes('cargo') || n.includes('pantalon') || n.includes('pant')) return 'Cargo';
-  if (n.includes('veste') || n.includes('jacket') || n.includes('bomber')) return 'Veste';
-  if (n.includes('short')) return 'Short';
-  return 'Autre';
-}
 
 export async function POST() {
   try {
@@ -35,9 +27,9 @@ export async function POST() {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    if (!isChatGptConfigured()) {
+    if (!isVisualAnalysisConfigured()) {
       return NextResponse.json(
-        { error: 'CHATGPT_API_KEY requise pour l’analyse visuelle (GPT-4o).' },
+        { error: 'Clé API requise pour l’analyse visuelle.' },
         { status: 503 }
       );
     }
@@ -146,6 +138,7 @@ export async function POST() {
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Erreur lors du scan';
     console.error('[Hybrid Radar Scan]', e);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: sanitizeErrorMessage(message) }, { status: 500 });
   }
 }
+

@@ -22,25 +22,25 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      'inline-flex items-center justify-center rounded-lg font-semibold transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 active:scale-[0.98]';
+      'inline-flex items-center justify-center rounded-full font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] disabled:pointer-events-none disabled:opacity-50';
 
     const variants = {
       default:
-        'bg-primary text-primary-foreground hover:bg-primary/90',
+        'bg-black text-white hover:opacity-90 active:scale-[0.98]',
       secondary:
-        'bg-secondary text-secondary-foreground hover:bg-secondary/90',
+        'bg-[#007AFF] text-white hover:bg-[#0056CC] active:scale-[0.98]',
       outline:
-        'border border-border bg-background hover:bg-muted hover:border-primary/50',
-      ghost: 'hover:bg-muted hover:text-foreground',
+        'bg-white/80 backdrop-blur-sm text-[#1D1D1F] hover:bg-white shadow-apple active:scale-[0.98]',
+      ghost: 'hover:bg-black/5 text-[#1D1D1F] hover:text-[#007AFF] active:scale-[0.98]',
       destructive:
-        'bg-error text-error-foreground hover:bg-error/90',
+        'bg-[#FF3B30] text-white hover:bg-[#FF2D20] active:scale-[0.98]',
     };
 
     const sizes = {
-      sm: 'h-9 px-4 text-sm',
-      md: 'h-10 px-5 text-sm',
-      lg: 'h-12 px-8 text-base',
-      icon: 'h-10 w-10',
+      sm: 'h-9 px-5 text-sm',
+      md: 'h-11 px-6 text-base',
+      lg: 'h-12 px-8 text-lg',
+      icon: 'h-11 w-11',
     };
 
     return (

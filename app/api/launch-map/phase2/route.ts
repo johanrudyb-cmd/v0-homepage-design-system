@@ -34,15 +34,19 @@ export async function POST(request: Request) {
       );
     }
 
-    // Mettre à jour le LaunchMap
+    // Mettre à jour le LaunchMap (phase3 = Design)
     const launchMap = await prisma.launchMap.upsert({
       where: { brandId },
       update: {
-        phase2: true,
+        phase3: true,
       },
       create: {
         brandId,
-        phase2: true,
+        phase1: false,
+        phase2: false,
+        phase3: true,
+        phase4: false,
+        phase5: false,
       },
     });
 

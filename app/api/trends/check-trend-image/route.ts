@@ -6,8 +6,10 @@
 
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
+import { sanitizeErrorMessage } from '@/lib/utils';
 import { prisma } from '@/lib/prisma';
-import { analyzeProductImage, isChatGptConfigured } from '@/lib/api/chatgpt';
+import { analyzeProductImage, isVisualAnalysisConfigured } from '@/lib/api/chatgpt';
+import { withAIUsageLimit } from '@/lib/ai-usage';
 
 export const runtime = 'nodejs';
 export const maxDuration = 60;
@@ -19,9 +21,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    if (!isChatGptConfigured()) {
+    if (!isVisualAnalysisConfigured()) {
       return NextResponse.json(
-        { error: 'CHATGPT_API_KEY requise pour l’analyse visuelle (GPT-4o).' },
+        { error: 'Clé API requise pour l’analyse visuelle.' },
         { status: 503 }
       );
     }
@@ -53,7 +55,12 @@ export async function POST(request: Request) {
       }
     }
 
-    const analysis = await analyzeProductImage(imageUrl, 'Produit uploadé');
+    const analysis = await withAIUsageLimit(
+      user.id,
+      user.plan,
+      'trends_check_image',
+      () => analyzeProductImage(imageUrl, 'Produit uploadé')
+    );
 
     const orConditions: { productSignature?: string; cut?: string }[] = [];
     if (analysis.productSignature) orConditions.push({ productSignature: analysis.productSignature });
@@ -98,6 +105,7 @@ export async function POST(request: Request) {
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Erreur lors de l’analyse';
     console.error('[Check Trend Image]', e);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: sanitizeErrorMessage(message) }, { status: 500 });
   }
 }
+

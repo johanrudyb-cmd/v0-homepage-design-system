@@ -1,14 +1,15 @@
 /**
- * Génère une image produit via GPT (prompt) + Higgsfield (image), et la stocke pour réutilisation.
+ * Génère une image produit via GPT (prompt) + Ideogram (image), et la stocke pour réutilisation.
  * POST /api/trends/generate-product-image
  * Body: { productName, productType, cut?, material?, color?, style? }
  */
 
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
+import { sanitizeErrorMessage } from '@/lib/utils';
 import { prisma } from '@/lib/prisma';
 import { generateProductImagePrompt, isChatGptConfigured } from '@/lib/api/chatgpt';
-import { generateProductImage, isHiggsfieldConfigured } from '@/lib/api/higgsfield';
+import { generateDesignImage, isIdeogramConfigured } from '@/lib/api/ideogram';
 
 export const runtime = 'nodejs';
 export const maxDuration = 120;
@@ -26,13 +27,13 @@ export async function POST(request: Request) {
 
     if (!isChatGptConfigured()) {
       return NextResponse.json(
-        { error: 'CHATGPT_API_KEY non configurée. Ajoutez-la dans les variables d\'environnement (texte du prompt).' },
+        { error: 'Génération d\'image non configurée.' },
         { status: 503 }
       );
     }
-    if (!isHiggsfieldConfigured()) {
+    if (!isIdeogramConfigured()) {
       return NextResponse.json(
-        { error: 'HIGGSFIELD_API_KEY non configurée. Ajoutez-la dans les variables d\'environnement (génération image).' },
+        { error: 'IDEogram_API_KEY non configurée. Ajoutez-la dans les variables d\'environnement (génération image).' },
         { status: 503 }
       );
     }
@@ -71,7 +72,7 @@ export async function POST(request: Request) {
       style: style ?? null,
     });
 
-    const imageUrl = await generateProductImage(promptText, { aspect_ratio: '1:1' });
+    const imageUrl = await generateDesignImage(promptText, { aspect_ratio: '1:1', transparent: false });
 
     await prisma.generatedProductImage.upsert({
       where: { trendKey },
@@ -88,6 +89,6 @@ export async function POST(request: Request) {
   } catch (error: unknown) {
     const message = error instanceof Error ? error.message : 'Erreur lors de la génération';
     console.error('[generate-product-image]', error);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: sanitizeErrorMessage(message) }, { status: 500 });
   }
 }

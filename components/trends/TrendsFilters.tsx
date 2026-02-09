@@ -22,7 +22,6 @@ export function TrendsFilters({ filters, onFiltersChange }: TrendsFiltersProps) 
   const sortOptions = [
     { value: 'saturability', label: 'Moins saturé (meilleur)' },
     { value: 'trendScore', label: 'Plus tendance' },
-    { value: 'price', label: 'Prix croissant' },
   ];
 
   const updateFilter = (key: keyof Filters, value: string) => {

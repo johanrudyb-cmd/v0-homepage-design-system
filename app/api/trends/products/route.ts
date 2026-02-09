@@ -11,6 +11,8 @@ export async function GET(request: Request) {
     const style = searchParams.get('style') || '';
     const material = searchParams.get('material') || '';
     const sortBy = searchParams.get('sortBy') || 'saturability';
+    const limitParam = searchParams.get('limit');
+    const take = limitParam ? Math.min(parseInt(limitParam, 10) || 50, 120) : 50;
 
     // Récupérer les préférences utilisateur si connecté
     let preferences = null;
@@ -42,6 +44,11 @@ export async function GET(request: Request) {
     }
     
     if (material) where.material = material;
+
+    // Pour moodboard onboarding : uniquement produits avec image
+    if (searchParams.get('hasImage') === 'true') {
+      where.imageUrl = { not: null };
+    }
     
     // Filtrer par prix si préférences définies
     if (preferences?.priceRangeMin || preferences?.priceRangeMax) {
@@ -63,7 +70,7 @@ export async function GET(request: Request) {
     const products = await prisma.trendProduct.findMany({
       where,
       orderBy,
-      take: 50, // Limiter à 50 produits
+      take,
     });
 
     return NextResponse.json({ products });

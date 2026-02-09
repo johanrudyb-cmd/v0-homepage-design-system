@@ -155,9 +155,9 @@ export function CollectionsManager({
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="text-xl font-bold">Collections</CardTitle>
+            <CardTitle className="text-xl font-bold">Fichiers (collections)</CardTitle>
             <CardDescription className="font-medium">
-              Organisez vos designs par collection
+              Organisez vos designs et articles (rentabilité, scripts UGC) par fichier
             </CardDescription>
           </div>
           {!showCreateForm && !editingId && (
@@ -167,7 +167,7 @@ export function CollectionsManager({
               className="shadow-modern"
             >
               <FolderPlus className="w-4 h-4 mr-2" />
-              Nouvelle collection
+              Nouveau fichier
             </Button>
           )}
         </div>
@@ -178,7 +178,7 @@ export function CollectionsManager({
           <div className="p-4 bg-muted/30 rounded-lg border-2 border-border space-y-3">
             <Input
               type="text"
-              placeholder="Nom de la collection"
+              placeholder="Nom du fichier"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
               className="border-2"
@@ -271,7 +271,7 @@ export function CollectionsManager({
 
           {collections.length === 0 && !showCreateForm && (
             <p className="text-sm text-muted-foreground font-medium text-center py-4">
-              Aucune collection. Créez-en une pour organiser vos designs.
+              Aucun fichier. Créez-en un pour regrouper designs, calculs de rentabilité et scripts UGC.
             </p>
           )}
         </div>

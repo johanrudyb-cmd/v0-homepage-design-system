@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Search, X, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { Card, CardContent } from '@/components/ui/card';
 
 interface SearchResult {
   type: 'page' | 'tool' | 'brand';
@@ -14,13 +12,11 @@ interface SearchResult {
 
 const searchableItems: SearchResult[] = [
   { type: 'page', title: 'Tableau de bord', description: 'Vue d\'ensemble de votre progression', href: '/dashboard' },
-  { type: 'tool', title: 'Design Studio', description: 'Générez des tech packs professionnels', href: '/design-studio' },
   { type: 'tool', title: 'Sourcing Hub', description: 'Trouvez des usines qualifiées', href: '/sourcing' },
-  { type: 'tool', title: 'UGC AI Lab', description: 'Créez votre contenu marketing', href: '/ugc' },
-  { type: 'page', title: 'Tendances', description: 'Produits tendance scrapés & analyse photo', href: '/trends' },
-  { type: 'page', title: 'Marques Tendances', description: 'Explorez les marques populaires', href: '/brands' },
-  { type: 'tool', title: 'Analyseur de tendances', description: 'Analyse tendances & prévisions IA', href: '/spy' },
-  { type: 'page', title: 'Créer ma marque', description: 'Guide complet de création', href: '/launch-map' },
+  { type: 'page', title: 'Tendances de la semaine', description: 'Nouveautés chaque semaine — ne vous désabonnez pas', href: '/trends' },
+  { type: 'page', title: 'Marques tendances', description: 'Les marques les plus tendances de la semaine', href: '/brands' },
+  { type: 'tool', title: 'Analyse de marque & tendances', description: 'Analyse IA de marques et analyseur de tendances', href: '/brands/analyze' },
+  { type: 'page', title: 'Gérer ma marque', description: 'Guide complet de lancement', href: '/launch-map' },
   { type: 'page', title: 'Paramètres', description: 'Gérez votre profil et préférences', href: '/settings' },
   { type: 'page', title: 'Notifications', description: 'Voir toutes vos notifications', href: '/notifications' },
 ];
@@ -108,7 +104,6 @@ export function SearchBar() {
   return (
     <div className="flex-1 max-w-lg relative" ref={searchRef}>
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
         <input
           ref={inputRef}
           type="search"
@@ -117,7 +112,7 @@ export function SearchBar() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.trim().length > 0 && setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          className="w-full pl-10 pr-10 py-2.5 text-sm bg-muted/50 border-2 border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium"
+          className="w-full pl-4 pr-10 py-3 text-base bg-white/80 backdrop-blur-sm rounded-3xl shadow-apple focus:outline-none focus:ring-2 focus:ring-[#007AFF] transition-all placeholder:text-[#1D1D1F]/40"
         />
         {query && (
           <button
@@ -126,38 +121,36 @@ export function SearchBar() {
               setIsOpen(false);
               inputRef.current?.focus();
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1D1D1F]/40 hover:text-[#1D1D1F] transition-colors text-lg font-medium"
           >
-            <X className="w-4 h-4" />
+            ×
           </button>
         )}
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute top-full mt-2 w-full bg-background border-2 border-border rounded-xl shadow-modern-lg z-50 max-h-96 overflow-y-auto">
+        <div className="absolute top-full mt-3 w-full bg-white/95 backdrop-blur-xl rounded-3xl shadow-apple-lg z-50 max-h-96 overflow-y-auto">
           {results.map((result, index) => (
             <div
               key={`${result.href}-${index}`}
               onClick={() => handleSelect(result.href)}
-              className={`p-4 cursor-pointer transition-colors ${
+              className={`px-5 py-4 cursor-pointer transition-colors border-b border-black/5 last:border-b-0 first:rounded-t-3xl last:rounded-b-3xl ${
                 index === focusedIndex
-                  ? 'bg-primary/10'
-                  : 'hover:bg-muted/30'
-              } ${index === 0 ? 'rounded-t-xl' : ''} ${
-                index === results.length - 1 ? 'rounded-b-xl' : 'border-b border-border'
+                  ? 'bg-black/5'
+                  : 'hover:bg-black/5'
               }`}
             >
               <div className="flex items-start gap-3">
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xs font-bold text-primary uppercase">
+                  <div className="flex items-center gap-3 mb-1">
+                    <span className="text-xs font-medium text-[#1D1D1F]/50 uppercase tracking-wide">
                       {getTypeLabel(result.type)}
                     </span>
-                    <h4 className="font-semibold text-sm text-foreground truncate">
+                    <h4 className="font-semibold text-base text-[#1D1D1F] truncate">
                       {result.title}
                     </h4>
                   </div>
-                  <p className="text-xs text-muted-foreground font-medium line-clamp-1">
+                  <p className="text-sm text-[#1D1D1F]/60 line-clamp-1">
                     {result.description}
                   </p>
                 </div>
@@ -168,8 +161,8 @@ export function SearchBar() {
       )}
 
       {isOpen && query.trim().length > 0 && results.length === 0 && (
-        <div className="absolute top-full mt-2 w-full bg-background border-2 border-border rounded-xl shadow-modern-lg z-50 p-8 text-center">
-          <p className="text-sm text-muted-foreground font-medium">
+        <div className="absolute top-full mt-3 w-full bg-white/95 backdrop-blur-xl rounded-3xl shadow-apple-lg z-50 p-8 text-center">
+          <p className="text-base text-[#1D1D1F]/60">
             Aucun résultat pour "{query}"
           </p>
         </div>

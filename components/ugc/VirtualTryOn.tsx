@@ -1,10 +1,70 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
+import { GenerationCostBadge } from '@/components/ui/generation-cost-badge';
+import { GenerationLoadingPopup } from '@/components/ui/generation-loading-popup';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Download, Image as ImageIcon, Upload } from 'lucide-react';
-import { UGCContentHistory } from './UGCContentHistory';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Loader2, Sparkles, ChevronRight, ChevronLeft, UserPlus, Image as ImageIcon, Upload, Lock } from 'lucide-react';
+import {
+  DEFAULT_MANNEQUIN_ANSWERS,
+  mapTargetAudienceToGender,
+  mapTargetAudienceToAgeRange,
+  type MannequinQuestionnaireAnswers,
+  type MannequinStrategyContext,
+} from '@/lib/mannequin-questionnaire-types';
+
+const STEPS = [
+  { id: 'identity', title: '1. Identité / Cible' },
+  { id: 'look', title: '2. Caractéristiques physiques' },
+  { id: 'vibe', title: '3. Vibe & expression' },
+  { id: 'method', title: '4. Méthode de création' },
+];
+
+const GENDERS: { value: MannequinQuestionnaireAnswers['gender']; label: string }[] = [
+  { value: 'femme', label: 'Femmes' },
+  { value: 'homme', label: 'Hommes' },
+  { value: 'unisexe', label: 'Unisexe' },
+];
+
+const AGE_RANGES: { value: MannequinQuestionnaireAnswers['ageRange']; label: string }[] = [
+  { value: '18-24', label: '18-24 ans' },
+  { value: '25-34', label: '25-34 ans' },
+  { value: '35-50', label: '35-50 ans' },
+];
+
+const ORIGINS: { value: MannequinQuestionnaireAnswers['origin']; label: string }[] = [
+  { value: 'europeen', label: 'Européen' },
+  { value: 'africain', label: 'Africain' },
+  { value: 'asiatique', label: 'Asiatique' },
+  { value: 'latino', label: 'Latino' },
+  { value: 'metisse', label: 'Métisse' },
+  { value: 'non_specifie', label: 'Non spécifié' },
+];
+
+const BODY_TYPES: { value: MannequinQuestionnaireAnswers['bodyType']; label: string }[] = [
+  { value: 'mince', label: 'Mince' },
+  { value: 'athletique', label: 'Athlétique' },
+  { value: 'plus_size', label: 'Plus-size' },
+  { value: 'muscle', label: 'Musclé' },
+  { value: 'regular', label: 'Regular' },
+  { value: 'svelte', label: 'Svelte' },
+];
+
+const FACIAL_EXPRESSIONS: { value: MannequinQuestionnaireAnswers['facialExpression']; label: string }[] = [
+  { value: 'serieux', label: 'Sérieux / Déterminé (ex. Techwear)' },
+  { value: 'souriant', label: 'Souriant / Accueillant (ex. Casual)' },
+  { value: 'neutre', label: 'Neutre / Hautain (ex. Luxe)' },
+  { value: 'hautain', label: 'Hautain' },
+  { value: 'determine', label: 'Déterminé' },
+];
+
+const STYLE_VIBES = [
+  'Gorpcore', 'Quiet Luxury', 'Streetwear', 'Minimal', 'Luxe', 'Casual', 'Sport', 'Preppy', 'Y2K', 'Techwear', 'Autre',
+];
 
 interface Design {
   id: string;
@@ -18,280 +78,493 @@ interface VirtualTryOnProps {
 }
 
 export function VirtualTryOn({ brandId, designs }: VirtualTryOnProps) {
-  const [selectedDesign, setSelectedDesign] = useState<string>('');
-  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [garmentType, setGarmentType] = useState('');
+  const [stepIndex, setStepIndex] = useState(0);
+  const [strategyContext, setStrategyContext] = useState<MannequinStrategyContext | null>(null);
+  const [strategyLocked, setStrategyLocked] = useState<{ gender?: boolean; ageRange?: boolean }>({});
+  const [answers, setAnswers] = useState<MannequinQuestionnaireAnswers>({ ...DEFAULT_MANNEQUIN_ANSWERS });
   const [isGenerating, setIsGenerating] = useState(false);
-  const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState('');
-  const [showHistory, setShowHistory] = useState(false);
+  const [result, setResult] = useState<string | null>(null);
+  const [showSaveMannequin, setShowSaveMannequin] = useState(false);
+  const [mannequinName, setMannequinName] = useState('');
+  const [savingMannequin, setSavingMannequin] = useState(false);
+  const [saveMannequinError, setSaveMannequinError] = useState('');
+  const [referenceFile, setReferenceFile] = useState<File | null>(null);
+  const [referencePreviewUrl, setReferencePreviewUrl] = useState<string | null>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setUploadedFile(file);
-      setSelectedDesign('');
-    }
+  useEffect(() => {
+    let cancelled = false;
+    fetch(`/api/ugc/mannequin-strategy-context?brandId=${encodeURIComponent(brandId)}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (cancelled) return;
+        setStrategyContext({
+          targetAudience: data.targetAudience ?? null,
+          positioning: data.positioning ?? null,
+        });
+        const gender = mapTargetAudienceToGender(data.targetAudience);
+        const ageRange = mapTargetAudienceToAgeRange(data.targetAudience);
+        setStrategyLocked({
+          gender: !!gender,
+          ageRange: !!ageRange,
+        });
+        if (gender || ageRange) {
+          setAnswers((a) => ({
+            ...a,
+            ...(gender && { gender }),
+            ...(ageRange && { ageRange }),
+          }));
+        }
+      })
+      .catch(() => { if (!cancelled) setStrategyContext({}); });
+    return () => { cancelled = true; };
+  }, [brandId]);
+
+  const update = (partial: Partial<MannequinQuestionnaireAnswers>) => {
+    setAnswers((a) => ({ ...a, ...partial }));
+    setError('');
   };
 
   const handleGenerate = async () => {
-    if (!selectedDesign && !uploadedFile) {
-      setError('Veuillez sélectionner un design ou uploader un fichier');
-      return;
-    }
-
-    if (!garmentType) {
-      setError('Veuillez sélectionner le type de vêtement');
-      return;
-    }
-
     setIsGenerating(true);
     setError('');
     setResult(null);
 
     try {
-      let designUrl = '';
-
-      if (uploadedFile) {
+      if (answers.creationMethod === 'reference_photo' && referenceFile) {
         const formData = new FormData();
-        formData.append('file', uploadedFile);
+        formData.append('file', referenceFile);
         formData.append('brandId', brandId);
-
-        const uploadResponse = await fetch('/api/ugc/upload', {
+        const uploadRes = await fetch('/api/ugc/upload', { method: 'POST', body: formData });
+        if (!uploadRes.ok) {
+          const d = await uploadRes.json();
+          throw new Error(d.error || 'Erreur upload');
+        }
+        const { url } = await uploadRes.json();
+        const res = await fetch('/api/ugc/generate-mannequin', {
           method: 'POST',
-          body: formData,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ brandId, referencePhotoUrl: url }),
         });
-
-        if (!uploadResponse.ok) {
-          throw new Error('Erreur lors de l\'upload');
-        }
-
-        const uploadData = await uploadResponse.json();
-        designUrl = uploadData.url;
-      } else if (selectedDesign) {
-        const design = designs.find((d) => d.id === selectedDesign);
-        if (design?.flatSketchUrl) {
-          designUrl = design.flatSketchUrl;
-        }
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erreur');
+        setResult(data.imageUrl);
+      } else {
+        const res = await fetch('/api/ugc/generate-mannequin', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ brandId, questionnaire: answers }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Erreur génération');
+        setResult(data.imageUrl);
+        window.dispatchEvent(new CustomEvent(USAGE_REFRESH_EVENT));
       }
-
-      if (!designUrl) {
-        throw new Error('Aucune image disponible');
-      }
-
-      const response = await fetch('/api/ugc/virtual-tryon', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brandId,
-          designUrl,
-          garmentType,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erreur lors de la génération');
-      }
-
-      setResult(data.imageUrl);
-      setShowHistory(false);
-    } catch (err: any) {
-      setError(err.message || 'Une erreur est survenue');
+    } catch (e) {
+      setError(e instanceof Error ? e.message : 'Erreur');
     } finally {
       setIsGenerating(false);
     }
   };
 
-  const handleSelectFromHistory = (content: any) => {
-    setResult(content.content);
-    setShowHistory(false);
+  const handleSaveAsMannequin = async () => {
+    if (!result || !mannequinName.trim()) {
+      setSaveMannequinError('Donnez un nom au mannequin');
+      return;
+    }
+    setSavingMannequin(true);
+    setSaveMannequinError('');
+    try {
+      const res = await fetch('/api/ugc/mannequins', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          brandId,
+          name: mannequinName.trim(),
+          imageUrl: result,
+          source: answers.creationMethod === 'reference_photo' ? 'upload' : 'virtual_tryon',
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Erreur');
+      setShowSaveMannequin(false);
+      setMannequinName('');
+    } catch (err: unknown) {
+      setSaveMannequinError(err instanceof Error ? err.message : 'Erreur');
+    } finally {
+      setSavingMannequin(false);
+    }
   };
+
+  const onReferenceFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (referencePreviewUrl) URL.revokeObjectURL(referencePreviewUrl);
+    setReferenceFile(file ?? null);
+    setReferencePreviewUrl(file ? URL.createObjectURL(file) : null);
+  };
+
+  const stepId = STEPS[stepIndex]?.id ?? 'identity';
+  const isLastStep = stepIndex === STEPS.length - 1;
+  const canGenerate = isLastStep && (
+    (answers.creationMethod === 'reference_photo' && referenceFile) ||
+    (answers.creationMethod === 'ai_generate')
+  );
 
   return (
     <div className="space-y-6">
-      {/* Historique */}
-      {showHistory && (
-        <UGCContentHistory
-          brandId={brandId}
-          contentType="virtual_tryon"
-          onSelect={handleSelectFromHistory}
-        />
-      )}
+      <GenerationLoadingPopup open={isGenerating} title="Génération du mannequin en cours…" />
+      <Card className="border-2">
+        <CardHeader>
+          <CardTitle className="text-xl font-bold flex items-center gap-2">
+            <ImageIcon className="w-5 h-5" />
+            Créer votre mannequin (cible)
+          </CardTitle>
+          <CardDescription>
+            Définissez le profil de votre cible pour garder la même cohérence sur tous vos visuels. Les infos issues de votre stratégie sont verrouillées. Vous pouvez soit uploader une photo de référence, soit laisser l&apos;IA générer un visage unique.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {strategyContext && (strategyContext.targetAudience || strategyContext.positioning) && (
+            <div className="rounded-lg border border-primary/30 bg-primary/5 p-3 text-sm">
+              <span className="font-medium flex items-center gap-1.5">
+                <Lock className="w-4 h-4" />
+                Depuis votre stratégie
+              </span>
+              <p className="text-muted-foreground mt-1">
+                {strategyContext.targetAudience && <>Cible : <strong>{strategyContext.targetAudience}</strong></>}
+                {strategyContext.targetAudience && strategyContext.positioning && ' · '}
+                {strategyContext.positioning && <>Positionnement : <strong>{strategyContext.positioning}</strong></>}
+              </p>
+            </div>
+          )}
 
-      {!showHistory && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Formulaire */}
-          <Card className="border-2">
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-xl font-bold">Virtual Try-On</CardTitle>
-                  <CardDescription className="font-medium">
-                    Générez une image de mannequin portant votre design
-                  </CardDescription>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => setShowHistory(true)}
-                  className="border-2"
-                  size="sm"
-                >
-                  <ImageIcon className="w-4 h-4 mr-2" />
-                  Historique
-                </Button>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              {/* Sélection design existant */}
-              {designs.length > 0 && (
-                <div>
-                  <label className="block text-sm font-semibold text-foreground mb-2">
-                    Utiliser un design existant
-                  </label>
-                  <select
-                    value={selectedDesign}
-                    onChange={(e) => {
-                      setSelectedDesign(e.target.value);
-                      setUploadedFile(null);
-                    }}
-                    className="w-full px-4 py-2.5 border-2 border-input rounded-lg bg-background text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                    disabled={isGenerating}
-                  >
-                    <option value="">Sélectionner un design...</option>
-                    {designs.map((design) => (
-                      <option key={design.id} value={design.id}>
-                        {design.type}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              )}
-
-              {/* OU Upload */}
-              <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">
-                  {designs.length > 0 ? 'OU' : ''} Uploader un logo/design
-                </label>
-                <div className="border-2 border-dashed border-input rounded-xl p-8 text-center hover:border-primary/50 transition-all cursor-pointer bg-muted/30">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    id="file-upload"
-                    disabled={isGenerating}
-                  />
-                  <label htmlFor="file-upload" className="cursor-pointer block">
-                    {uploadedFile ? (
-                      <div className="space-y-2">
-                        <Upload className="w-8 h-8 text-primary mx-auto" />
-                        <div className="text-sm font-semibold text-foreground">
-                          {uploadedFile.name}
-                        </div>
-                        <div className="text-xs text-muted-foreground font-medium">
-                          Cliquez pour changer
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="space-y-2">
-                        <Upload className="w-8 h-8 text-muted-foreground mx-auto" />
-                        <div className="text-sm font-semibold text-foreground">
-                          Cliquez pour uploader
-                        </div>
-                        <div className="text-xs text-muted-foreground font-medium">
-                          PNG, JPG jusqu'à 10MB
-                        </div>
-                      </div>
-                    )}
-                  </label>
-                </div>
-              </div>
-
-              {/* Type de vêtement */}
-              <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">
-                  Type de vêtement *
-                </label>
-                <select
-                  value={garmentType}
-                  onChange={(e) => setGarmentType(e.target.value)}
-                  className="w-full px-4 py-2.5 border-2 border-input rounded-lg bg-background text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
-                  disabled={isGenerating}
-                >
-                  <option value="">Sélectionner...</option>
-                  <option value="T-shirt">T-shirt</option>
-                  <option value="Hoodie">Hoodie</option>
-                  <option value="Sweatshirt">Sweatshirt</option>
-                  <option value="Pantalon">Pantalon</option>
-                  <option value="Short">Short</option>
-                  <option value="Veste">Veste</option>
-                </select>
-              </div>
-
-              {error && (
-                <div className="p-4 text-sm text-error bg-error/10 border-2 border-error/20 rounded-lg font-medium">
-                  {error}
-                </div>
-              )}
-
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating || (!selectedDesign && !uploadedFile) || !garmentType}
-                className="w-full shadow-modern-lg"
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {STEPS.map((s, i) => (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => setStepIndex(i)}
+                className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+                  i === stepIndex ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'
+                }`}
               >
+                {s.title}
+              </button>
+            ))}
+          </div>
+
+          {/* 1. Identité / Cible */}
+          {stepId === 'identity' && (
+            <>
+              <div>
+                <Label className="flex items-center gap-1.5">
+                  Sexe du mannequin
+                  {strategyLocked.gender && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
+                </Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {GENDERS.map((g) => (
+                    <Button
+                      key={g.value}
+                      type="button"
+                      variant={answers.gender === g.value ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => !strategyLocked.gender && update({ gender: g.value })}
+                      disabled={strategyLocked.gender}
+                    >
+                      {g.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label className="flex items-center gap-1.5">
+                  Âge apparent (segments)
+                  {strategyLocked.ageRange && <Lock className="w-3.5 h-3.5 text-muted-foreground" />}
+                </Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {AGE_RANGES.map((a) => (
+                    <Button
+                      key={a.value}
+                      type="button"
+                      variant={answers.ageRange === a.value ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => !strategyLocked.ageRange && update({ ageRange: a.value })}
+                      disabled={strategyLocked.ageRange}
+                    >
+                      {a.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label>Origine / ethnie (marketing ciblé)</Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {ORIGINS.map((o) => (
+                    <Button
+                      key={o.value}
+                      type="button"
+                      variant={answers.origin === o.value ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => update({ origin: o.value })}
+                    >
+                      {o.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* 2. Caractéristiques physiques (Look) */}
+          {stepId === 'look' && (
+            <>
+              <div>
+                <Label htmlFor="hair">Couleur et type de cheveux</Label>
+                <Input
+                  id="hair"
+                  value={answers.hairDescription}
+                  onChange={(e) => update({ hairDescription: e.target.value })}
+                  placeholder="ex. Brun court, Blond bouclé, Rasé"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label htmlFor="eyes">Couleur des yeux</Label>
+                <Input
+                  id="eyes"
+                  value={answers.eyeColor}
+                  onChange={(e) => update({ eyeColor: e.target.value })}
+                  placeholder="ex. Marron, Bleu, Vert"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label>Morphologie (body type) — tombé des vêtements</Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {BODY_TYPES.map((b) => (
+                    <Button
+                      key={b.value}
+                      type="button"
+                      variant={answers.bodyType === b.value ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => update({ bodyType: b.value })}
+                    >
+                      {b.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
+
+          {/* 3. Vibe & expression */}
+          {stepId === 'vibe' && (
+            <>
+              <div>
+                <Label>Expression faciale par défaut</Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {FACIAL_EXPRESSIONS.map((f) => (
+                    <Button
+                      key={f.value}
+                      type="button"
+                      variant={answers.facialExpression === f.value ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => update({ facialExpression: f.value })}
+                      className="text-left whitespace-normal h-auto py-2"
+                    >
+                      {f.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <Label htmlFor="skin">Type de peau</Label>
+                <Input
+                  id="skin"
+                  value={answers.skinType}
+                  onChange={(e) => update({ skinType: e.target.value })}
+                  placeholder="ex. Teint mat, taches de rousseur, peau très claire"
+                  className="mt-1"
+                />
+              </div>
+              <div>
+                <Label>Style / vibe (Gorpcore, Quiet Luxury, etc.)</Label>
+                <div className="flex flex-wrap gap-2 mt-1">
+                  {STYLE_VIBES.map((s) => (
+                    <Button
+                      key={s}
+                      type="button"
+                      variant={answers.styleVibe === s ? 'default' : 'outline'}
+                      size="sm"
+                      onClick={() => update({ styleVibe: s })}
+                    >
+                      {s}
+                    </Button>
+                  ))}
+                </div>
+                <Input
+                  value={STYLE_VIBES.includes(answers.styleVibe) ? '' : answers.styleVibe}
+                  onChange={(e) => update({ styleVibe: e.target.value })}
+                  placeholder="Ou précisez"
+                  className="mt-2"
+                />
+              </div>
+            </>
+          )}
+
+          {/* 4. Méthode de création */}
+          {stepId === 'method' && (
+            <>
+              <div>
+                <Label>Comment créer le mannequin ?</Label>
+                <div className="grid gap-3 mt-2">
+                  <label className="flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                    <input
+                      type="radio"
+                      name="creationMethod"
+                      checked={answers.creationMethod === 'reference_photo'}
+                      onChange={() => update({ creationMethod: 'reference_photo' })}
+                      className="mt-1"
+                    />
+                    <div>
+                      <span className="font-medium">Uploader une photo de référence</span>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        Pour copier un visage existant. L&apos;image sera utilisée telle quelle comme mannequin.
+                      </p>
+                      {answers.creationMethod === 'reference_photo' && (
+                        <div className="mt-3">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={onReferenceFileChange}
+                            className="hidden"
+                            id="ref-photo"
+                          />
+                          <label htmlFor="ref-photo" className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm cursor-pointer hover:bg-muted/50">
+                            <Upload className="w-4 h-4" />
+                            {referenceFile ? referenceFile.name : 'Choisir une photo'}
+                          </label>
+                          {referencePreviewUrl && (
+                            <div className="mt-2 w-24 h-24 rounded-lg overflow-hidden border border-border">
+                              <img src={referencePreviewUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </label>
+                  <label className="flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                    <input
+                      type="radio"
+                      name="creationMethod"
+                      checked={answers.creationMethod === 'ai_generate'}
+                      onChange={() => update({ creationMethod: 'ai_generate' })}
+                      className="mt-1"
+                    />
+                    <div>
+                      <span className="font-medium">Générer un visage unique avec l&apos;IA</span>
+                      <p className="text-sm text-muted-foreground mt-0.5">
+                        L&apos;IA génère un mannequin à partir de vos réponses (identité, look, vibe).
+                      </p>
+                    </div>
+                  </label>
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="flex justify-between pt-4">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setStepIndex((i) => Math.max(0, i - 1))}
+              disabled={stepIndex === 0}
+            >
+              <ChevronLeft className="w-4 h-4 mr-1" />
+              Précédent
+            </Button>
+            {!isLastStep ? (
+              <Button type="button" onClick={() => setStepIndex((i) => Math.min(STEPS.length - 1, i + 1))}>
+                Suivant
+                <ChevronRight className="w-4 h-4 ml-1" />
+              </Button>
+            ) : (
+              <Button type="button" onClick={handleGenerate} disabled={isGenerating || !canGenerate}>
                 {isGenerating ? (
                   <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Génération en cours...
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    Génération en cours…
                   </>
                 ) : (
-                  'Générer le Virtual Try-On'
+                  <>
+                    <Sparkles className="w-4 h-4 mr-2" />
+                    {answers.creationMethod === 'reference_photo' ? 'Utiliser cette photo comme mannequin' : 'Générer le mannequin'}
+                    {answers.creationMethod !== 'reference_photo' && <GenerationCostBadge feature="ugc_generate_mannequin" />}
+                  </>
                 )}
               </Button>
-            </CardContent>
-          </Card>
+            )}
+          </div>
+        </CardContent>
+      </Card>
 
-          {/* Résultat */}
-          {result && (
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle className="text-xl font-bold">Résultat</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="border-2 border-border rounded-xl p-4 bg-muted/30">
-                  <img
-                    src={result}
-                    alt="Virtual Try-On"
-                    className="w-full h-auto rounded-lg"
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <Button
-                    onClick={() => {
-                      const link = document.createElement('a');
-                      link.href = result;
-                      link.download = `virtual-tryon-${Date.now()}.jpg`;
-                      link.click();
-                    }}
-                    className="shadow-modern-lg"
-                  >
-                    <Download className="w-4 h-4 mr-2" />
-                    Télécharger
+      {error && (
+        <p className="text-sm text-destructive bg-destructive/10 rounded-lg p-3">{error}</p>
+      )}
+
+      {result && (
+        <Card className="border-2 border-primary/20">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <ImageIcon className="w-5 h-5" />
+              Mannequin généré
+            </CardTitle>
+            <CardDescription>
+              Enregistrez ce mannequin pour l&apos;utiliser dans Shooting photo.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="rounded-lg overflow-hidden bg-muted aspect-[3/4] max-w-sm">
+              <img src={result} alt="Mannequin cible" className="w-full h-full object-cover" />
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                variant="secondary"
+                onClick={() => { setShowSaveMannequin(true); setSaveMannequinError(''); setMannequinName(''); }}
+                className="gap-2"
+              >
+                <UserPlus className="w-4 h-4" />
+                Enregistrer comme mannequin
+              </Button>
+              <Button variant="outline" onClick={handleGenerate} disabled={isGenerating}>
+                {isGenerating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Régénérer
+                {answers.creationMethod !== 'reference_photo' && <GenerationCostBadge feature="ugc_generate_mannequin" />}
+              </Button>
+            </div>
+
+            {showSaveMannequin && (
+              <div className="rounded-xl border border-border bg-muted/30 p-4 space-y-2">
+                <Label htmlFor="mannequin-name">Nom du mannequin</Label>
+                <Input
+                  id="mannequin-name"
+                  value={mannequinName}
+                  onChange={(e) => setMannequinName(e.target.value)}
+                  placeholder="Ex. Emma, Mannequin cible"
+                />
+                {saveMannequinError && <p className="text-sm text-destructive">{saveMannequinError}</p>}
+                <div className="flex gap-2">
+                  <Button onClick={handleSaveAsMannequin} disabled={savingMannequin || !mannequinName.trim()}>
+                    {savingMannequin ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}
                   </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setShowHistory(true)}
-                    className="border-2"
-                  >
-                    Voir l'historique
+                  <Button variant="ghost" onClick={() => { setShowSaveMannequin(false); setSaveMannequinError(''); }} disabled={savingMannequin}>
+                    Annuler
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          )}
-        </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       )}
     </div>
   );

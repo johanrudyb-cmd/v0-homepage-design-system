@@ -1,25 +1,38 @@
 /**
- * Trend Radar Hybride - Liste des tendances par zone et segment
- * Uniquement données réelles (Zalando, ASOS, Zara) et marchés FR / EU.
- * GET /api/trends/hybrid-radar?marketZone=FR|EU&segment=homme|femme&sortBy=...&limit=50
+ * Trend Radar Hybride - Liste des tendances par segment
+ * Tendances scrapées : 10 villes EU (Paris, Berlin, Milan, Copenhague, Stockholm, Anvers, Zurich, Londres, Amsterdam, Varsovie).
+ * GET /api/trends/hybrid-radar?marketZone=EU&segment=homme|femme&sortBy=...&limit=50
  */
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
+import { getProductBrand, brandsMatch } from '@/lib/brand-utils';
+import { isExcludedProduct } from '@/lib/hybrid-radar-scraper';
+import { estimateInternalTrendPercent } from '@/lib/trend-product-kpis';
 
 export const runtime = 'nodejs';
 
-/** Marques qu'on scrape réellement (pas de données fictives / seed). */
-const REAL_SOURCE_BRANDS = ['Zalando', 'ASOS', 'Zara'];
-/** Marchés qu'on fait actuellement (pas US/ASIA). */
-const ACTIVE_MARKET_ZONES = ['FR', 'EU'];
+/** Tranche d'âge : 18-24 = ASOS, 25-34 = Zalando. */
+const AGE_SOURCE_BRANDS: Record<string, string[]> = {
+  '18-24': ['ASOS'],
+  '25-34': ['Zalando'],
+};
+/** Zone affichée : EU. */
+const ACTIVE_MARKET_ZONES = ['EU'];
 /** Segments valides (homme / femme). */
 const VALID_SEGMENTS = ['homme', 'femme'];
-/** Tri : meilleures tendances (score), plus récents, prix. */
-type SortKey = 'trendScoreVisual' | 'createdAt' | 'averagePrice';
+/** Tri : plus tendances en premier (% Zalando puis score), plus récents, prix. */
+type SortKey = 'trendGrowthPercent' | 'trendScoreVisual' | 'createdAt' | 'averagePrice';
 const SORT_OPTIONS: Record<string, { orderBy: Prisma.TrendProductOrderByWithRelationInput[] }> = {
-  best: { orderBy: [{ trendScoreVisual: 'desc' }, { trendScore: 'desc' }, { createdAt: 'desc' }] },
+  best: {
+    orderBy: [
+      { trendGrowthPercent: 'desc' },
+      { trendScoreVisual: 'desc' },
+      { trendScore: 'desc' },
+      { createdAt: 'desc' },
+    ],
+  },
   recent: { orderBy: [{ createdAt: 'desc' }] },
   priceAsc: { orderBy: [{ averagePrice: 'asc' }] },
   priceDesc: { orderBy: [{ averagePrice: 'desc' }] },
@@ -33,6 +46,9 @@ export async function GET(request: Request) {
     const sortBy = searchParams.get('sortBy') || 'best';
     const limit = Math.min(parseInt(searchParams.get('limit') || '50', 10), 100);
     const globalOnly = searchParams.get('globalOnly') === 'true';
+    const brandFilter = searchParams.get('brand')?.trim();
+    const ageRange = searchParams.get('ageRange')?.trim();
+    const sourceBrands = ageRange && AGE_SOURCE_BRANDS[ageRange] ? AGE_SOURCE_BRANDS[ageRange] : AGE_SOURCE_BRANDS['25-34'];
 
     const where: {
       marketZone?: string | { in: string[] };
@@ -41,17 +57,11 @@ export async function GET(request: Request) {
       sourceBrand?: { in: string[] };
       sourceUrl?: { not: null };
     } = {
-      sourceBrand: { in: REAL_SOURCE_BRANDS },
+      sourceBrand: { in: sourceBrands },
       sourceUrl: { not: null },
     };
-    if (marketZone && ACTIVE_MARKET_ZONES.includes(marketZone)) {
-      where.marketZone = marketZone;
-    } else {
-      where.marketZone = { in: ACTIVE_MARKET_ZONES };
-    }
-    if (segment && VALID_SEGMENTS.includes(segment)) {
-      where.segment = segment;
-    }
+    where.marketZone = 'EU';
+    where.segment = segment && VALID_SEGMENTS.includes(segment) ? segment : 'homme';
     if (globalOnly) {
       where.isGlobalTrendAlert = true;
     }
@@ -61,16 +71,59 @@ export async function GET(request: Request) {
     const products = await prisma.trendProduct.findMany({
       where,
       orderBy: sortConfig.orderBy,
-      take: limit,
+      take: limit + 20,
+    });
+
+    // Même logique d'exclusion que le scraper : vêtements uniquement (homme + femme)
+    let filtered = products.filter((p) => !isExcludedProduct(p.name ?? ''));
+
+    // Femme Zalando : ne garder que les refs du Trend Spotter (trendGrowthPercent ou trendLabel)
+    const effectiveSegment = segment && VALID_SEGMENTS.includes(segment) ? segment : 'homme';
+    if (effectiveSegment === 'femme' && sourceBrands.includes('Zalando')) {
+      filtered = filtered.filter(
+        (p) => p.trendGrowthPercent != null || (p.trendLabel != null && p.trendLabel.trim() !== '')
+      );
+    }
+
+    if (brandFilter) {
+      filtered = filtered.filter((p) => brandsMatch(getProductBrand(p.name, p.sourceBrand), brandFilter));
+    }
+
+    // Récurrence par (catégorie, segment) pour le calcul interne du % tendance
+    const recurrenceByKey = new Map<string, number>();
+    for (const p of filtered) {
+      const key = `${p.category ?? ''}|${p.segment ?? ''}`;
+      recurrenceByKey.set(key, (recurrenceByKey.get(key) ?? 0) + 1);
+    }
+
+    const now = Date.now();
+    const trends = filtered.slice(0, limit).map((p) => {
+      const daysInRadar = Math.floor((now - new Date(p.createdAt).getTime()) / 86400000);
+      const recurrenceInCategory = recurrenceByKey.get(`${p.category ?? ''}|${p.segment ?? ''}`) ?? 0;
+      const effectiveTrendGrowthPercent =
+        p.trendGrowthPercent ??
+        estimateInternalTrendPercent({
+          trendGrowthPercent: p.trendGrowthPercent ?? null,
+          trendScoreVisual: p.trendScoreVisual ?? null,
+          isGlobalTrendAlert: p.isGlobalTrendAlert ?? false,
+          daysInRadar,
+          recurrenceInCategory,
+        });
+      return {
+        ...p,
+        name: p.name ?? '',
+        effectiveTrendGrowthPercent,
+        effectiveTrendLabel: p.trendGrowthPercent == null && effectiveTrendGrowthPercent > 0 ? 'Estimé' : p.trendLabel,
+      };
     });
 
     const summary = {
-      total: products.length,
+      total: filtered.length,
       byZone: {} as Record<string, number>,
       bySegment: {} as Record<string, number>,
-      globalAlertCount: products.filter((p) => p.isGlobalTrendAlert).length,
+      globalAlertCount: filtered.filter((p) => p.isGlobalTrendAlert).length,
     };
-    for (const p of products) {
+    for (const p of filtered) {
       if (p.marketZone) {
         summary.byZone[p.marketZone] = (summary.byZone[p.marketZone] || 0) + 1;
       }
@@ -80,7 +133,7 @@ export async function GET(request: Request) {
     }
 
     return NextResponse.json({
-      trends: products,
+      trends,
       summary,
     });
   } catch (e) {

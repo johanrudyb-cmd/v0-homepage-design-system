@@ -237,10 +237,10 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
         <CardContent>
           <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border">
             <div>
-              <p className="font-bold text-lg text-foreground capitalize">{user.plan}</p>
+              <p className="font-bold text-lg text-foreground">{user.plan === 'base' ? 'Créateur' : (user.plan === 'free' ? 'Gratuit' : user.plan)}</p>
               <p className="text-sm text-muted-foreground font-medium mt-1">
                 {user.plan === 'free' && 'Accès aux fonctionnalités de base'}
-                {user.plan === 'pro' && 'Accès à toutes les fonctionnalités'}
+                {(user.plan === 'base' || user.plan === 'pro') && 'Accès à toutes les fonctionnalités'}
                 {user.plan === 'enterprise' && 'Accès complet + support prioritaire'}
               </p>
             </div>

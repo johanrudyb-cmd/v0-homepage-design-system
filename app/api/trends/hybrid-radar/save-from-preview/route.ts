@@ -6,19 +6,13 @@
 
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
+import { computeSaturability, computeTrendScore } from '@/lib/trend-product-kpis';
+import { inferCategory } from '@/lib/infer-trend-category';
+import { cleanProductTitle } from '@/lib/utils';
 import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
-
-function inferCategory(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes('hoodie') || n.includes('sweat')) return 'Hoodie';
-  if (n.includes('t-shirt') || n.includes('tee')) return 'T-shirt';
-  if (n.includes('cargo') || n.includes('pantalon') || n.includes('pant')) return 'Cargo';
-  if (n.includes('veste') || n.includes('jacket') || n.includes('bomber')) return 'Veste';
-  if (n.includes('short')) return 'Short';
-  return 'Autre';
-}
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
@@ -28,35 +22,56 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json().catch(() => ({}));
-    const sourceId = body.sourceId as string | undefined;
-    const brand = body.brand as string | undefined;
-    const marketZone = body.marketZone as string | undefined;
-    const segment = body.segment as string | undefined;
+    const sourceId = (body.sourceId as string)?.trim();
+    const brand = (body.brand as string)?.trim();
+    const marketZone = ((body.marketZone as string)?.trim()) || 'EU';
+    const segment = ((body.segment as string)?.trim()) || 'homme';
     const items = Array.isArray(body.items) ? body.items : [];
+    const defaultTrendPercent =
+      typeof body.defaultTrendPercent === 'number' && body.defaultTrendPercent >= 0 && body.defaultTrendPercent <= 100
+        ? Math.round(body.defaultTrendPercent)
+        : undefined;
 
-    if (!sourceId || !brand || !marketZone) {
+    if (!sourceId || !brand) {
       return NextResponse.json(
-        { error: 'sourceId, brand et marketZone requis' },
+        { error: 'sourceId et brand requis' },
         { status: 400 }
       );
     }
 
-    const isValidProductUrl = (url: string) =>
-      typeof url === 'string' &&
-      url.length > 10 &&
-      (url.includes('/p/') || url.includes('.html')) &&
-      !url.includes('/trend-spotter/trending-items');
+    const isValidProductUrl = (url: string) => {
+      if (typeof url !== 'string' || url.length <= 5) return false;
+      const u = url.trim();
+      if (u.includes('/p/') || u.includes('.html')) return true;
+      if (brand === 'Zalando' && u.includes('/trend-spotter/trending-items')) return true;
+      if (brand === 'ASOS') {
+        if (u.includes('/prd/')) return true;
+        if (u.startsWith('/') && u.includes('/prd/')) return true;
+        if (u.includes('/preview/')) return true; // URL synthétique (liste sans lien produit)
+        if (u.includes('asos.com') || u.includes('asos.')) {
+          const pathSegments = u.replace(/^https?:\/\//i, '').split('/').filter(Boolean);
+          if (pathSegments.length >= 3) return true;
+        }
+      }
+      return false;
+    };
 
     const seenUrls = new Set<string>();
-    let savedCount = 0;
+    const toSave: { url: string; item: (typeof items)[number]; index: number }[] = [];
     let skippedNoUrl = 0;
     let skippedInvalidUrl = 0;
     let skippedDuplicate = 0;
 
-    for (const item of items) {
-      if (!item.name || !item.name.trim()) continue;
-      const rawUrl = item.sourceUrl ?? '';
-      if (!rawUrl || !rawUrl.trim()) {
+    for (let index = 0; index < items.length; index++) {
+      const item = items[index];
+      if (!item.name || !String(item.name).trim()) continue;
+      let rawUrl = (item.sourceUrl ?? '').trim();
+      // ASOS : URL de page catégorie (sans /prd/) = pas d’URL produit → URL synthétique unique par article
+      // ASOS : toujours une URL synthétique unique par article (on ne s'appuie jamais sur l'URL envoyée)
+      if (brand === 'ASOS' && item.name) {
+        rawUrl = `https://www.asos.com/preview/${encodeURIComponent(String(item.name).slice(0, 80))}-${index}`;
+      }
+      if (!rawUrl) {
         skippedNoUrl++;
         continue;
       }
@@ -70,6 +85,37 @@ export async function POST(request: Request) {
         continue;
       }
       seenUrls.add(url);
+      toSave.push({ url, item, index });
+    }
+
+    // ASOS : remplacer les anciens par les nouveaux (supprimer les produits de cette source pour éviter doublons)
+    if (brand === 'ASOS' && toSave.length > 0) {
+      const deleted = await prisma.trendProduct.deleteMany({
+        where: {
+          sourceBrand: 'ASOS',
+          marketZone,
+          segment: segment ?? null,
+        },
+      });
+      if (deleted.count > 0) {
+        console.log(`[Save From Preview] ASOS: ${deleted.count} ancien(s) produit(s) supprimé(s) avant enregistrement`);
+      }
+    }
+
+    const urls = toSave.map((t) => t.url);
+    const existingList = urls.length > 0
+      ? await prisma.trendProduct.findMany({
+          where: { sourceUrl: { in: urls }, marketZone, sourceBrand: brand },
+          select: { id: true, sourceUrl: true },
+        })
+      : [];
+    const existingByUrl = new Map(existingList.map((e) => [e.sourceUrl ?? '', e.id]));
+    let savedCount = 0;
+
+    for (const { url, item, index } of toSave) {
+      const existingId = existingByUrl.get(url);
+      const cleanName = (cleanProductTitle(String(item.name)) || String(item.name)).trim().slice(0, 500);
+      if (!cleanName) continue;
       const category = inferCategory(item.name);
       const material = (item.composition as string) || 'Non spécifié';
       const descParts: string[] = [];
@@ -81,21 +127,29 @@ export async function POST(request: Request) {
       if (item.articleNumber) descParts.push(`Ref: ${item.articleNumber}`);
       const description = descParts.length > 0 ? descParts.join('\n') : null;
       const price = typeof item.price === 'number' ? item.price : parseFloat(String(item.price)) || 0;
-      const trendGrowthPercent = item.trendGrowthPercent ?? null;
-      const trendLabel = item.trendLabel ?? null;
+      let trendGrowthPercent = item.trendGrowthPercent ?? null;
+      let trendLabel = item.trendLabel ?? null;
+      if (trendGrowthPercent == null && defaultTrendPercent != null) {
+        trendGrowthPercent = defaultTrendPercent;
+        trendLabel = trendLabel || 'Tendance';
+      }
+      const productBrand = item.productBrand ?? (brand !== 'Zalando' && brand !== 'ASOS' ? brand : null);
+      const scrapedFields = {
+        color: item.color ?? null,
+        sizes: item.sizes ?? null,
+        countryOfOrigin: item.countryOfOrigin ?? null,
+        articleNumber: item.articleNumber ?? null,
+        careInstructions: item.careInstructions ?? null,
+        markdownPercent: item.markdownPercent ?? null,
+        stockOutRisk: item.stockOutRisk ?? null,
+        productBrand: productBrand ?? null,
+      };
 
-      const existing = await prisma.trendProduct.findFirst({
-        where: {
-          sourceUrl: url,
-          marketZone,
-          sourceBrand: brand,
-        },
-      });
-      if (existing) {
+      if (existingId) {
         await prisma.trendProduct.update({
-          where: { id: existing.id },
+          where: { id: existingId },
           data: {
-            name: String(item.name).slice(0, 500),
+            name: cleanName,
             category,
             material,
             averagePrice: price,
@@ -104,18 +158,21 @@ export async function POST(request: Request) {
             segment: segment ?? null,
             trendGrowthPercent,
             trendLabel,
+            ...scrapedFields,
           },
         });
       } else {
+        const saturability = computeSaturability(trendGrowthPercent, trendLabel, 0);
+        const trendScore = computeTrendScore(trendGrowthPercent, trendLabel);
         await prisma.trendProduct.create({
           data: {
-            name: String(item.name).slice(0, 500),
+            name: cleanName,
             category,
             style: '',
             material,
             averagePrice: price,
-            trendScore: 50,
-            saturability: 50,
+            trendScore,
+            saturability,
             imageUrl: item.imageUrl ?? null,
             description,
             marketZone,
@@ -124,7 +181,8 @@ export async function POST(request: Request) {
             segment: segment ?? null,
             trendGrowthPercent,
             trendLabel,
-            trendScoreVisual: 50,
+            trendScoreVisual: trendScore,
+            ...scrapedFields,
           },
         });
       }
@@ -132,11 +190,16 @@ export async function POST(request: Request) {
     }
 
     const skippedTotal = skippedNoUrl + skippedInvalidUrl + skippedDuplicate;
+    console.log('[Save From Preview] result:', { savedCount, skippedNoUrl, skippedInvalidUrl, skippedDuplicate, toSaveLength: toSave.length });
     const message =
       savedCount > 0
         ? `${savedCount} tendance(s) enregistrée(s) pour ${sourceId}.`
-        : 'Aucune tendance enregistrée.';
-    if (skippedTotal > 0) {
+        : skippedTotal > 0
+          ? `Aucune tendance enregistrée. ${skippedTotal} article(s) ignoré(s) (${skippedNoUrl} sans URL, ${skippedInvalidUrl} URL non valide, ${skippedDuplicate} doublon).`
+          : items.length === 0
+            ? 'Aucun article à enregistrer.'
+            : 'Aucune tendance enregistrée.';
+    if (skippedTotal > 0 || (savedCount === 0 && items.length > 0)) {
       console.log(
         `[Save From Preview] ${sourceId}: saved=${savedCount}, skipped: noUrl=${skippedNoUrl}, invalidUrl=${skippedInvalidUrl}, duplicate=${skippedDuplicate}`
       );

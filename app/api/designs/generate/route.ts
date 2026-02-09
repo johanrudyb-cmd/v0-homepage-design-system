@@ -3,7 +3,7 @@ import { getCurrentUser } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { rateLimitByUser } from '@/lib/rate-limit';
 import { enhancePrompt, generateTechPack } from '@/lib/api/chatgpt';
-import { generateFlatSketch } from '@/lib/api/higgsfield';
+import { generateFlatSketch } from '@/lib/api/ideogram';
 import { NotificationHelpers } from '@/lib/notifications';
 
 export const runtime = 'nodejs';
@@ -131,13 +131,13 @@ export async function POST(request: Request) {
       });
 
       if (designCount === 1) {
-        // Marquer la Phase 2 comme complétée
+        // Marquer la Phase 3 (Design) comme complétée
         await prisma.launchMap.updateMany({
           where: { brandId },
-          data: { phase2: true },
+          data: { phase3: true },
         });
         // Notification pour phase complétée
-        await NotificationHelpers.phaseCompleted(user.id, 2, 'Création du premier design');
+        await NotificationHelpers.phaseCompleted(user.id, 3, 'Création du premier design');
       }
 
       return NextResponse.json({ design: updatedDesign });

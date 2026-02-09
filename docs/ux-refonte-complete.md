@@ -1,4 +1,4 @@
-# Refonte UI/UX Complète - SaaS Mode
+# Refonte UI/UX Complète - OUTFITY
 
 *Document créé via BMAD-Method - UX Expert*
 

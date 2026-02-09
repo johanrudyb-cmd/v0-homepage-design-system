@@ -1,12 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bell, CheckCircle2, Info, AlertCircle, X, CheckCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { formatDistanceToNow } from 'date-fns';
 import { fr } from 'date-fns/locale';
+import { Bell } from 'lucide-react';
 
 interface Notification {
   id: string;
@@ -99,74 +98,60 @@ export function NotificationsDropdown() {
     }
   };
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'success':
-        return <CheckCircle2 className="w-4 h-4 text-success" />;
-      case 'warning':
-        return <AlertCircle className="w-4 h-4 text-warning" />;
-      case 'error':
-        return <X className="w-4 h-4 text-error" />;
-      default:
-        return <Info className="w-4 h-4 text-primary" />;
-    }
-  };
 
   return (
     <div className="relative" ref={dropdownRef}>
       <Button
         variant="ghost"
         size="icon"
-        className="relative h-9 w-9 rounded-lg"
+        className="relative h-11 w-11 rounded-full"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <Bell className="w-4 h-4" />
+        <Bell className="w-5 h-5 text-[#1D1D1F]/60" />
         {unreadCount > 0 && (
-          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-accent rounded-full ring-2 ring-background" />
+          <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#007AFF] rounded-full"></span>
         )}
       </Button>
 
       {isOpen && (
-        <div className="absolute right-0 top-12 w-96 bg-background border-2 border-border rounded-xl shadow-modern-lg z-50">
-          <div className="p-4 border-b border-border">
+        <div className="absolute right-0 top-14 w-96 bg-white/95 backdrop-blur-xl rounded-3xl shadow-apple-lg z-50">
+          <div className="p-6 border-b border-black/5">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-bold text-lg text-foreground">Notifications</h3>
+              <h3 className="text-xl font-semibold tracking-tight text-[#1D1D1F]">Notifications</h3>
               {unreadCount > 0 && (
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={markAllAsRead}
-                  className="h-7 text-xs"
+                  className="text-sm font-medium"
                 >
-                  <CheckCheck className="w-3 h-3 mr-1" />
                   Tout marquer comme lu
                 </Button>
               )}
             </div>
-            <p className="text-xs text-muted-foreground font-medium">
+            <p className="text-sm text-[#1D1D1F]/60">
               {unreadCount} non lue{unreadCount > 1 ? 's' : ''}
             </p>
           </div>
 
           <div className="max-h-96 overflow-y-auto">
             {loading ? (
-              <div className="p-8 text-center">
-                <p className="text-sm text-muted-foreground font-medium">Chargement...</p>
+              <div className="p-12 text-center">
+                <p className="text-base text-[#1D1D1F]/60">Chargement...</p>
               </div>
             ) : notifications.length === 0 ? (
-              <div className="p-8 text-center">
-                <Bell className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                <p className="text-sm text-muted-foreground font-medium">
+              <div className="p-12 text-center">
+                <p className="text-base text-[#1D1D1F]/60">
                   Aucune notification
                 </p>
               </div>
             ) : (
-              <div className="divide-y divide-border">
+              <div className="divide-y divide-black/5">
                 {notifications.map((notification) => (
                   <div
                     key={notification.id}
-                    className={`p-4 hover:bg-muted/30 transition-colors cursor-pointer ${
-                      !notification.read ? 'bg-primary/5' : ''
+                    className={`p-6 transition-colors cursor-pointer hover:bg-black/5 ${
+                      !notification.read ? 'bg-black/2' : ''
                     }`}
                     onClick={() => {
                       if (!notification.read) {
@@ -178,28 +163,25 @@ export function NotificationsDropdown() {
                       setIsOpen(false);
                     }}
                   >
-                    <div className="flex items-start gap-3">
-                      <div className="flex-shrink-0 mt-0.5">
-                        {getIcon(notification.type)}
-                      </div>
+                    <div className="flex items-start gap-4">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2">
                           <div className="flex-1">
                             <p
-                              className={`text-sm font-semibold mb-1 ${
-                                notification.read ? 'text-muted-foreground' : 'text-foreground'
+                              className={`text-base font-semibold mb-2 ${
+                                notification.read ? 'text-[#1D1D1F]/50' : 'text-[#1D1D1F]'
                               }`}
                             >
                               {notification.title}
                             </p>
                             <p
-                              className={`text-xs mb-1 line-clamp-2 ${
-                                notification.read ? 'text-muted-foreground' : 'text-foreground'
-                              } font-medium`}
+                              className={`text-sm mb-2 line-clamp-2 ${
+                                notification.read ? 'text-[#1D1D1F]/50' : 'text-[#1D1D1F]/70'
+                              }`}
                             >
                               {notification.message}
                             </p>
-                            <p className="text-xs text-muted-foreground font-medium">
+                            <p className="text-xs text-[#1D1D1F]/50">
                               {formatDistanceToNow(new Date(notification.createdAt), {
                                 addSuffix: true,
                                 locale: fr,
@@ -207,7 +189,7 @@ export function NotificationsDropdown() {
                             </p>
                           </div>
                           {!notification.read && (
-                            <div className="w-2 h-2 bg-accent rounded-full flex-shrink-0 mt-1" />
+                            <div className="w-2 h-2 bg-[#007AFF] rounded-full flex-shrink-0 mt-1"></div>
                           )}
                         </div>
                       </div>
@@ -218,13 +200,13 @@ export function NotificationsDropdown() {
             )}
           </div>
 
-          <div className="p-3 border-t border-border">
+          <div className="p-6 border-t border-black/5">
             <Link
               href="/notifications"
-              className="block text-center text-sm font-semibold text-primary hover:underline"
+              className="block text-center text-base font-medium text-[#007AFF] hover:text-[#0056CC] transition-colors"
               onClick={() => setIsOpen(false)}
             >
-              Voir toutes les notifications →
+              Voir toutes les notifications
             </Link>
           </div>
         </div>

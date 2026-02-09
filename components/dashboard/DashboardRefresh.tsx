@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export function DashboardRefresh() {
@@ -33,10 +32,9 @@ export function DashboardRefresh() {
       size="sm"
       onClick={handleRefresh}
       disabled={isRefreshing}
-      className="border-2"
+      className="uppercase tracking-widest text-xs font-normal"
     >
-      <RefreshCw className={`w-4 h-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
-      Actualiser
+      {isRefreshing ? 'Actualisation...' : 'Actualiser'}
     </Button>
   );
 }

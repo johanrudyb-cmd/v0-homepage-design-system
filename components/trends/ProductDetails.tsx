@@ -121,14 +121,6 @@ export function ProductDetails({ product, userId, isFavorite: initialIsFavorite 
             <div className="grid grid-cols-2 gap-4">
               <div className="border border-stone-200 rounded-lg p-4">
                 <div className="text-xs text-stone-500 font-light mb-1 uppercase tracking-wide">
-                  Prix moyen
-                </div>
-                <div className="text-2xl font-light text-stone-900">
-                  {product.averagePrice.toFixed(0)}€
-                </div>
-              </div>
-              <div className="border border-stone-200 rounded-lg p-4">
-                <div className="text-xs text-stone-500 font-light mb-1 uppercase tracking-wide">
                   Score tendance
                 </div>
                 <div className="text-2xl font-light text-stone-900">

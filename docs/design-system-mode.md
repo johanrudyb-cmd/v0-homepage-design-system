@@ -1,4 +1,4 @@
-# Design System Mode/Fashion - SaaS Mode
+# Design System Mode/Fashion - OUTFITY
 
 *Document créé via BMAD-Method - UX Expert*
 
@@ -121,7 +121,7 @@ Créer une identité visuelle **mode/fashion** distinctive, élégante et profes
 
 ## Différences avec Copify
 
-| Élément | Copify (Tech) | SaaS Mode (Mode) |
+| Élément | Copify (Tech) | OUTFITY (Mode) |
 |---------|---------------|------------------|
 | **Couleurs** | Bleu tech | Noir/Beige/Doré |
 | **Typographie** | Medium/Bold | Light (300) |

@@ -135,7 +135,7 @@ export function DesignGallery({ designs, brandId, selectedCollectionId }: Design
                       <button
                         onClick={() => setAssigningTo(assigningTo === design.id ? null : design.id)}
                         className="p-1.5 hover:bg-muted rounded transition-colors"
-                        title="Assigner à une collection"
+                        title="Assigner à un fichier (collection)"
                       >
                         <FolderPlus className="w-4 h-4 text-muted-foreground" />
                       </button>
@@ -152,7 +152,7 @@ export function DesignGallery({ designs, brandId, selectedCollectionId }: Design
                               }`}
                             >
                               <Folder className="w-4 h-4 inline mr-2" />
-                              Aucune collection
+                              Aucun fichier
                             </button>
                             {collections.map((collection) => (
                               <button

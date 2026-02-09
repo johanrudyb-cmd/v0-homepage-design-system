@@ -1,64 +1,65 @@
 /**
- * Client API Higgsfield
- * - Génération d'images à partir de texte (modèle soul/standard)
- * - API asynchrone : soumission puis polling du statut jusqu'à completion
+ * Client API Higgsfield — génération d'images (text-to-image).
+ * Utilisé pour la création des mockups (vêtement avec design, pas de mannequin).
  * @see https://docs.higgsfield.ai/
  */
 
-const HIGGSFIELD_BASE_URL =
-  process.env.HIGGSFIELD_API_URL || 'https://platform.higgsfield.ai';
+const HIGGSFIELD_BASE = 'https://platform.higgsfield.ai';
 const HIGGSFIELD_API_KEY = process.env.HIGGSFIELD_API_KEY;
 const HIGGSFIELD_API_SECRET = process.env.HIGGSFIELD_API_SECRET;
 
-function getAuthHeader(): string {
-  if (!HIGGSFIELD_API_KEY) {
-    throw new Error('HIGGSFIELD_API_KEY non configurée');
-  }
-  // Format Higgsfield : "Key api_key:api_secret"
-  // Soit HIGGSFIELD_API_KEY="key:secret", soit HIGGSFIELD_API_KEY + HIGGSFIELD_API_SECRET
-  const authValue = HIGGSFIELD_API_SECRET
-    ? `${HIGGSFIELD_API_KEY}:${HIGGSFIELD_API_SECRET}`
-    : HIGGSFIELD_API_KEY;
-  return `Key ${authValue}`;
-}
+/** Modèle text-to-image recommandé pour mockups produit */
+const DEFAULT_MODEL_ID = 'higgsfield-ai/soul/standard';
+
+/** Modèle image-to-image pour shootings (mannequin + scène) */
+const EDIT_MODEL_ID = 'bytedance/seedream/v4/edit';
 
 export function isHiggsfieldConfigured(): boolean {
-  return !!HIGGSFIELD_API_KEY;
+  return !!(HIGGSFIELD_API_KEY && HIGGSFIELD_API_SECRET);
 }
 
-/** Réponse soumission (queued) */
-interface HiggsfieldQueuedResponse {
-  status: string;
-  request_id: string;
-  status_url: string;
+function getAuthHeader(): string {
+  if (!HIGGSFIELD_API_KEY || !HIGGSFIELD_API_SECRET) {
+    throw new Error('HIGGSFIELD_API_KEY et HIGGSFIELD_API_SECRET doivent être définis');
+  }
+  return `Key ${HIGGSFIELD_API_KEY}:${HIGGSFIELD_API_SECRET}`;
+}
+
+interface SubmitResponse {
+  status?: string;
+  request_id?: string;
+  status_url?: string;
   cancel_url?: string;
 }
 
-/** Réponse statut (completed) */
-interface HiggsfieldStatusResponse {
-  status: string;
+interface StatusResponse {
+  status?: string;
   request_id?: string;
   status_url?: string;
-  images?: Array<{ url: string }>;
-  video?: { url: string };
+  cancel_url?: string;
+  images?: Array<{ url?: string }>;
+  video?: { url?: string };
 }
 
-/**
- * Génère une image produit à partir d'un prompt texte (API Higgsfield asynchrone).
- * Utilise le modèle higgsfield-ai/soul/standard.
- * @param prompt - Prompt en anglais (idéalement généré par GPT)
- * @param options - aspect_ratio (défaut 1:1), resolution (défaut 720p)
- * @returns URL de l'image générée
- */
-export async function generateProductImage(
-  prompt: string,
-  options?: { aspect_ratio?: string; resolution?: string }
-): Promise<string> {
-  const auth = getAuthHeader();
-  const modelId = 'higgsfield-ai/soul/standard';
-  const url = `${HIGGSFIELD_BASE_URL}/${modelId}`;
+const POLL_INTERVAL_MS = 2000;
+const MAX_POLL_ATTEMPTS = 60; // ~2 min
 
-  const body = {
+/**
+ * Soumet une génération puis poll jusqu'à completion.
+ * Retourne l'URL de la première image générée.
+ */
+export async function generateImage(
+  prompt: string,
+  options?: {
+    aspect_ratio?: string;
+    resolution?: string;
+    model_id?: string;
+  }
+): Promise<string> {
+  const modelId = options?.model_id ?? DEFAULT_MODEL_ID;
+  const url = `${HIGGSFIELD_BASE}/${modelId}`;
+
+  const body: Record<string, string> = {
     prompt,
     aspect_ratio: options?.aspect_ratio ?? '1:1',
     resolution: options?.resolution ?? '720p',
@@ -67,7 +68,7 @@ export async function generateProductImage(
   const submitRes = await fetch(url, {
     method: 'POST',
     headers: {
-      Authorization: auth,
+      Authorization: getAuthHeader(),
       'Content-Type': 'application/json',
       Accept: 'application/json',
     },
@@ -76,107 +77,171 @@ export async function generateProductImage(
 
   if (!submitRes.ok) {
     const errText = await submitRes.text();
-    throw new Error(`Higgsfield API (submit): ${submitRes.status} ${errText}`);
+    throw new Error(`Higgsfield submit: ${submitRes.status} — ${errText || submitRes.statusText}`);
   }
 
-  const queued = (await submitRes.json()) as HiggsfieldQueuedResponse;
-  if (queued.status !== 'queued' || !queued.status_url) {
-    throw new Error(`Higgsfield: réponse inattendue ${JSON.stringify(queued)}`);
+  const submitData = (await submitRes.json()) as SubmitResponse;
+  const statusUrl = submitData.status_url;
+  const requestId = submitData.request_id;
+
+  if (!statusUrl || !requestId) {
+    throw new Error('Higgsfield: réponse invalide (status_url ou request_id manquant)');
   }
 
-  const statusUrl = queued.status_url.startsWith('http')
-    ? queued.status_url
-    : `${HIGGSFIELD_BASE_URL}${queued.status_url.startsWith('/') ? '' : '/'}${queued.status_url}`;
-
-  const maxAttempts = 60;
-  const pollIntervalMs = 3000;
-
-  for (let i = 0; i < maxAttempts; i++) {
-    await new Promise((r) => setTimeout(r, pollIntervalMs));
+  for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
+    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
 
     const statusRes = await fetch(statusUrl, {
-      headers: { Authorization: auth, Accept: 'application/json' },
+      headers: {
+        Authorization: getAuthHeader(),
+        Accept: 'application/json',
+      },
     });
+
     if (!statusRes.ok) {
-      throw new Error(`Higgsfield API (status): ${statusRes.status}`);
+      throw new Error(`Higgsfield status: ${statusRes.status}`);
     }
 
-    const statusData = (await statusRes.json()) as HiggsfieldStatusResponse;
+    const statusData = (await statusRes.json()) as StatusResponse;
 
     if (statusData.status === 'completed') {
       const imageUrl = statusData.images?.[0]?.url;
-      if (!imageUrl) throw new Error('Higgsfield: aucune image dans la réponse');
-      return imageUrl;
+      if (imageUrl) return imageUrl;
+      throw new Error('Higgsfield: aucune image dans la réponse complétée');
     }
 
     if (statusData.status === 'failed' || statusData.status === 'nsfw') {
-      throw new Error(`Higgsfield: génération ${statusData.status}`);
+      const errMsg = (statusData as { error?: string }).error || statusData.status || 'Échec';
+      throw new Error(`Higgsfield: ${errMsg}`);
     }
+
+    // queued ou in_progress → continuer à poller
   }
 
   throw new Error('Higgsfield: timeout (génération trop longue)');
 }
 
-export async function generateFlatSketch(prompt: string): Promise<string> {
-  const fullPrompt = `Technical fashion flat sketch, ${prompt}, black and white, front and back view, professional, detailed`;
-  return generateProductImage(fullPrompt, { aspect_ratio: '1:1' });
+/** Alias pour compatibilité avec les imports existants */
+export const generateProductImage = generateImage;
+
+/** Options complètes pour le shooting photo (infos de la page Shooting Photo). */
+export interface ShootingPhotoOptions {
+  /** URL de l'image du vêtement/design (référence visuelle). */
+  designUrl: string;
+  /** Type de vêtement (ex. T-shirt, Hoodie). */
+  garmentType: string;
+  /** Nom du design/vêtement (ex. "T-shirt logo bande"). */
+  garmentLabel?: string;
+  /** Format / ratio d'aspect (ex. 3:4, 1:1, 9:16). */
+  aspectRatio?: string;
+  /** Prompt scène construit (lieu, éclairage, fond, cadrage, ambiance, pose). */
+  scenePrompt: string;
+  /** Instruction libre utilisateur (pose, expression, action). */
+  mannequinInstruction?: string;
+  /** Option de pose (sélection pré-définie). */
+  mannequinPoseOptional?: string;
+  /** Options brutes (location, outdoorType, lighting, background, framing, mood). */
+  sceneOptions?: Record<string, string>;
 }
 
-export async function generateVirtualTryOn(
-  designUrl: string,
-  garmentType: string,
-  style?: string
+/**
+ * Génère une photo de shooting à partir du mannequin (généré par Higgsfield virtual try-on)
+ * et du vêtement sélectionné.
+ * Utilise l'API image-to-image (Seedream edit) :
+ * - image 1 : mannequin (virtual try-on)
+ * - image 2 : vêtement/design (référence visuelle)
+ * Prompt enrichi avec toutes les infos de la page Shooting Photo.
+ */
+export async function generateShootingPhoto(
+  mannequinImageUrl: string,
+  options: ShootingPhotoOptions
 ): Promise<string> {
-  const auth = getAuthHeader();
-  const url = `${HIGGSFIELD_BASE_URL}/v1/images/virtual-tryon`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: auth,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      designUrl,
-      garmentType,
-      style: style || 'realistic',
-    }),
-  });
+  const opts = options;
 
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: response.statusText }));
-    throw new Error(`Higgsfield API error: ${(error as { message?: string }).message || response.statusText}`);
+  const modelId = EDIT_MODEL_ID;
+  const url = `${HIGGSFIELD_BASE}/${modelId}`;
+
+  const garmentDesc = opts.garmentLabel
+    ? `${opts.garmentType} (${opts.garmentLabel})`
+    : opts.garmentType;
+
+  const promptParts: string[] = [
+    'Professional fashion photography',
+    `model wearing ${garmentDesc}`,
+    opts.scenePrompt,
+    'keep the model exactly as shown in the first image',
+    'the garment must match the design shown in the second image',
+    'high quality',
+    'editorial style',
+  ];
+  if (opts.mannequinInstruction?.trim()) {
+    promptParts.splice(3, 0, opts.mannequinInstruction.trim());
   }
 
-  const data = (await response.json()) as { imageUrl?: string; url?: string };
-  return data.imageUrl || data.url || '';
-}
+  const prompt = promptParts.join(', ');
 
-export async function generateVideo(
-  script: string,
-  avatarId?: string,
-  designUrl?: string
-): Promise<string> {
-  const auth = getAuthHeader();
-  const url = `${HIGGSFIELD_BASE_URL}/v1/videos/generate`;
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      Authorization: auth,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      script,
-      avatarId: avatarId || 'default-fashion-avatar',
-      designUrl,
-      duration: 15,
-    }),
-  });
-
-  if (!response.ok) {
-    const error = await response.json().catch(() => ({ message: response.statusText }));
-    throw new Error(`Higgsfield API error: ${(error as { message?: string }).message || response.statusText}`);
+  const imageUrls = [mannequinImageUrl];
+  if (opts.designUrl?.trim()) {
+    imageUrls.push(opts.designUrl.trim());
   }
 
-  const data = (await response.json()) as { videoUrl?: string; url?: string };
-  return data.videoUrl || data.url || '';
+  const body: Record<string, unknown> = {
+    prompt,
+    image_urls: imageUrls,
+    aspect_ratio: opts.aspectRatio || '3:4',
+    resolution: '2K',
+  };
+
+  const submitRes = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: getAuthHeader(),
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!submitRes.ok) {
+    const errText = await submitRes.text();
+    throw new Error(`Higgsfield shooting (image-to-image): ${submitRes.status} — ${errText || submitRes.statusText}`);
+  }
+
+  const submitData = (await submitRes.json()) as SubmitResponse;
+  const statusUrl = submitData.status_url;
+  const requestId = submitData.request_id;
+
+  if (!statusUrl || !requestId) {
+    throw new Error('Higgsfield: réponse invalide (status_url ou request_id manquant)');
+  }
+
+  for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
+    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+
+    const statusRes = await fetch(statusUrl, {
+      headers: {
+        Authorization: getAuthHeader(),
+        Accept: 'application/json',
+      },
+    });
+
+    if (!statusRes.ok) {
+      throw new Error(`Higgsfield status: ${statusRes.status}`);
+    }
+
+    const statusData = (await statusRes.json()) as StatusResponse;
+
+    if (statusData.status === 'completed') {
+      const imageUrl = statusData.images?.[0]?.url;
+      if (imageUrl) return imageUrl;
+      throw new Error('Higgsfield: aucune image dans la réponse complétée');
+    }
+
+    if (statusData.status === 'failed' || statusData.status === 'nsfw') {
+      const errMsg = (statusData as { error?: string }).error || statusData.status || 'Échec';
+      throw new Error(`Higgsfield: ${errMsg}`);
+    }
+  }
+
+  throw new Error('Higgsfield: timeout (génération trop longue)');
 }

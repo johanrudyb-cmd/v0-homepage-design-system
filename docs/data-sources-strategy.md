@@ -1,4 +1,4 @@
-# Stratégie d'Acquisition de Données - Application SaaS Mode
+# Stratégie d'Acquisition de Données - Application OUTFITY
 
 *Document créé via BMAD-Method - Analyst*
 

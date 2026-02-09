@@ -83,8 +83,8 @@ export const NotificationHelpers = {
   /**
    * Notification quand un contenu UGC est généré
    */
-  async ugcGenerated(userId: string, contentType: 'virtual_tryon' | 'script', brandId: string) {
-    const contentLabel = contentType === 'virtual_tryon' ? 'Virtual Try-On' : 'script UGC';
+  async ugcGenerated(userId: string, contentType: 'virtual_tryon' | 'script' | 'shooting_photo', brandId: string) {
+    const contentLabel = contentType === 'virtual_tryon' ? 'Virtual Try-On' : contentType === 'shooting_photo' ? 'Shooting photo' : 'script UGC';
     return createNotification({
       userId,
       title: `Contenu ${contentLabel} généré ! ✨`,

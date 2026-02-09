@@ -3,14 +3,18 @@
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { VirtualTryOn } from './VirtualTryOn';
-import { ScriptGenerator } from './ScriptGenerator';
-import { Sparkles, Image as ImageIcon } from 'lucide-react';
+import { StructuredPostCreator } from './StructuredPostCreator';
+import { ShootingPhoto } from './ShootingPhoto';
+import { LayoutList, Image as ImageIcon, Camera } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
+/** Design pour UGC (Virtual Try-On, Shooting). Compatible avec les designs renvoyés par /api/designs. */
 interface Design {
   id: string;
   type: string;
   flatSketchUrl: string | null;
+  productImageUrl?: string | null;
+  templateName?: string | null;
 }
 
 interface Brand {
@@ -23,12 +27,13 @@ interface Brand {
 interface UGCLabProps {
   brandId: string;
   brandName: string;
-  designs: Design[];
+  /** Designs de la marque (optionnel : Shooting photo charge la collection via l’API). */
+  designs?: Design[];
   brand?: Brand;
 }
 
-export function UGCLab({ brandId, brandName, designs, brand }: UGCLabProps) {
-  const [activeTab, setActiveTab] = useState<'tryon' | 'scripts'>('tryon');
+export function UGCLab({ brandId, brandName, designs = [], brand }: UGCLabProps) {
+  const [activeTab, setActiveTab] = useState<'tryon' | 'shooting' | 'scripts'>('tryon');
 
   return (
     <div className="space-y-6">
@@ -50,6 +55,19 @@ export function UGCLab({ brandId, brandName, designs, brand }: UGCLabProps) {
               Virtual Try-On
             </button>
             <button
+              onClick={() => setActiveTab('shooting')}
+              className={cn(
+                'flex-1 px-6 py-3 text-sm font-semibold rounded-lg transition-all relative',
+                'flex items-center justify-center gap-2',
+                activeTab === 'shooting'
+                  ? 'bg-background text-foreground shadow-modern'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <Camera className="w-4 h-4" />
+              Shooting photo
+            </button>
+            <button
               onClick={() => setActiveTab('scripts')}
               className={cn(
                 'flex-1 px-6 py-3 text-sm font-semibold rounded-lg transition-all relative',
@@ -59,8 +77,8 @@ export function UGCLab({ brandId, brandName, designs, brand }: UGCLabProps) {
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <Sparkles className="w-4 h-4" />
-              Script Generator
+              <LayoutList className="w-4 h-4" />
+              Post structuré
             </button>
           </div>
         </CardContent>
@@ -71,8 +89,16 @@ export function UGCLab({ brandId, brandName, designs, brand }: UGCLabProps) {
         <VirtualTryOn brandId={brandId} designs={designs} />
       )}
 
+      {activeTab === 'shooting' && (
+        <ShootingPhoto
+          brandId={brandId}
+          designs={designs}
+          onSwitchToTryOn={() => setActiveTab('tryon')}
+        />
+      )}
+
       {activeTab === 'scripts' && (
-        <ScriptGenerator brandId={brandId} brandName={brandName} />
+        <StructuredPostCreator brandId={brandId} brandName={brandName} />
       )}
     </div>
   );

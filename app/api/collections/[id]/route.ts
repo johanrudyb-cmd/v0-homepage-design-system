@@ -28,9 +28,12 @@ export async function GET(
         designs: {
           orderBy: { createdAt: 'desc' },
         },
+        articles: {
+          orderBy: [{ sortOrder: 'asc' }, { createdAt: 'asc' }],
+        },
         brand: true,
         _count: {
-          select: { designs: true },
+          select: { designs: true, articles: true },
         },
       },
     });

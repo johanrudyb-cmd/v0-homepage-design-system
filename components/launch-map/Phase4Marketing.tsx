@@ -1,80 +1,96 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import { UGCLab } from '@/components/ugc/UGCLab';
 
 interface Phase4MarketingProps {
   brandId: string;
+  brandName: string;
+  brand?: { id: string; name: string; logo?: string | null; colorPalette?: unknown; typography?: unknown; styleGuide?: unknown } | null;
   onComplete: () => void;
   isCompleted: boolean;
 }
 
-export function Phase4Marketing({ brandId, onComplete, isCompleted }: Phase4MarketingProps) {
+interface DesignItem {
+  id: string;
+  type: string;
+  flatSketchUrl: string | null;
+}
+
+export function Phase4Marketing({ brandId, brandName, brand, onComplete, isCompleted }: Phase4MarketingProps) {
+  const [designs, setDesigns] = useState<DesignItem[]>([]);
   const [scriptsCount, setScriptsCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // Phase 5 validée quand au moins un post structuré est planifié dans le calendrier
   useEffect(() => {
-    const checkScripts = async () => {
-      setLoading(true);
+    const checkStructuredPosts = async () => {
       try {
-        const response = await fetch(`/api/ugc/scripts?brandId=${brandId}`);
+        const response = await fetch(`/api/launch-map/calendar?brandId=${encodeURIComponent(brandId)}`);
         if (response.ok) {
           const data = await response.json();
-          const count = data.count || 0;
-          setScriptsCount(count);
-          if (count >= 5 && !isCompleted) {
-            onComplete(); // Marquer la phase comme complétée si 5 scripts existent
+          const events = Array.isArray(data.events) ? data.events : [];
+          const structuredCount = events.filter(
+            (ev: { type?: string; structuredContent?: unknown }) =>
+              ev.type === 'content' && ev.structuredContent && typeof ev.structuredContent === 'object'
+          ).length;
+          setScriptsCount(structuredCount);
+          if (structuredCount >= 1 && !isCompleted) {
+            onComplete();
           }
         }
       } catch (error) {
-        console.error('Error checking scripts:', error);
-      } finally {
-        setLoading(false);
+        console.error('Error checking calendar structured posts:', error);
       }
     };
 
-    checkScripts();
+    checkStructuredPosts();
+    const interval = setInterval(checkStructuredPosts, 10000);
+    return () => clearInterval(interval);
   }, [brandId, onComplete, isCompleted]);
 
-  if (loading) {
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    fetch(`/api/designs?brandId=${encodeURIComponent(brandId)}`)
+      .then((res) => (res.ok ? res.json() : { designs: [] }))
+      .then((data) => {
+        if (cancelled) return;
+        const list = (data.designs || []).slice(0, 10).map((d: { id: string; type: string; flatSketchUrl?: string | null }) => ({
+          id: d.id,
+          type: d.type,
+          flatSketchUrl: d.flatSketchUrl ?? null,
+        }));
+        setDesigns(list);
+      })
+      .catch(() => {
+        if (!cancelled) setDesigns([]);
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [brandId]);
+
+  if (loading && designs.length === 0) {
     return (
-      <div className="text-stone-700 font-light">Chargement de l'état des scripts...</div>
+      <div className="text-stone-700 font-light">Chargement...</div>
     );
   }
 
   return (
     <div className="space-y-6">
-      <div className="text-stone-700 font-light">
-        <p className="mb-4">
-          Pour valider cette phase, vous devez générer 5 scripts de clips UGC avec l'IA.
-        </p>
-        <p className="text-sm text-stone-600">
-          Vous avez actuellement généré {scriptsCount} script(s).
-        </p>
-        <p className="text-sm text-stone-600 mt-2">
-          Les scripts UGC incluent :
-        </p>
-        <ul className="list-disc list-inside text-sm text-stone-600 mt-2 space-y-1">
-          <li>Structure : Problème → Solution → Preuve → CTA</li>
-          <li>Format optimisé pour TikTok et Instagram (15 secondes)</li>
-          <li>Hooks viraux du moment</li>
-        </ul>
-      </div>
-
-      {scriptsCount >= 5 ? (
-        <div className="p-4 bg-green-50 border border-green-200 text-green-700 rounded-lg">
-          ✅ {scriptsCount} scripts générés ! Cette phase est validée.
-        </div>
-      ) : (
-        <div className="flex gap-4">
-          <Link href="/ugc">
-            <Button className="bg-stone-900 hover:bg-stone-800 text-white font-light tracking-wide uppercase text-xs py-3 px-6">
-              Accéder au UGC AI Lab
-            </Button>
-          </Link>
+      {scriptsCount >= 1 && !isCompleted && (
+        <div className="p-4 bg-green-50 dark:bg-green-950/30 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 rounded-lg text-sm font-medium">
+          ✅ Post structuré planifié dans le calendrier — cette phase est validée.
         </div>
       )}
+      <UGCLab
+        brandId={brandId}
+        brandName={brandName}
+        designs={designs}
+        brand={brand || undefined}
+      />
     </div>
   );
 }

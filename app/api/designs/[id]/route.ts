@@ -101,3 +101,46 @@ export async function PUT(
     );
   }
 }
+
+// DELETE - Supprimer un design
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    }
+
+    const { id } = await params;
+
+    const design = await prisma.design.findFirst({
+      where: {
+        id,
+        brand: {
+          userId: user.id,
+        },
+      },
+    });
+
+    if (!design) {
+      return NextResponse.json(
+        { error: 'Design non trouvé' },
+        { status: 404 }
+      );
+    }
+
+    await prisma.design.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Erreur dans /api/designs/[id] DELETE:', error);
+    return NextResponse.json(
+      { error: 'Une erreur est survenue' },
+      { status: 500 }
+    );
+  }
+}

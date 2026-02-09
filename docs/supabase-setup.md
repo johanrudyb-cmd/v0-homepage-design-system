@@ -10,7 +10,7 @@
 
 1. Cliquez sur **"New Project"**
 2. Remplissez les informations :
-   - **Name** : `saas-mode` (ou votre nom)
+   - **Name** : `outfity` (ou votre nom)
    - **Database Password** : Choisissez un mot de passe fort (⚠️ **SAVEZ-LE !**)
    - **Region** : Choisissez la région la plus proche (ex: `West Europe` pour la France)
    - **Pricing Plan** : Sélectionnez **Free** (gratuit)

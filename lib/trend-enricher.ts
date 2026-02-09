@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma';
 import { getTrendsWithRecommendation } from '@/lib/trend-detector';
 import type { TrendWithRecommendation } from '@/lib/trend-detector';
 import { generateTrendAdviceAndImagePrompt } from '@/lib/api/chatgpt';
-import { generateProductImage, isHiggsfieldConfigured } from '@/lib/api/higgsfield';
+import { generateDesignImage, isIdeogramConfigured } from '@/lib/api/ideogram';
 import { isChatGptConfigured } from '@/lib/api/chatgpt';
 
 export function buildTrendKey(
@@ -34,8 +34,8 @@ export async function enrichTrends(limit: number = 10): Promise<{
   if (!isChatGptConfigured()) {
     return { enriched: 0, errors: ['CHATGPT_API_KEY non configurée'] };
   }
-  if (!isHiggsfieldConfigured()) {
-    return { enriched: 0, errors: ['HIGGSFIELD_API_KEY non configurée'] };
+  if (!isIdeogramConfigured()) {
+    return { enriched: 0, errors: ['IDEogram_API_KEY non configurée'] };
   }
 
   const trends = await getTrendsWithRecommendation(Math.min(limit * 3, 60), {});
@@ -71,7 +71,7 @@ export async function enrichTrends(limit: number = 10): Promise<{
         country: trend.country,
       });
 
-      const imageUrl = await generateProductImage(imagePrompt, { aspect_ratio: '1:1' });
+      const imageUrl = await generateDesignImage(imagePrompt, { aspect_ratio: '1:1', transparent: false });
 
       await prisma.generatedProductImage.upsert({
         where: { trendKey: key },

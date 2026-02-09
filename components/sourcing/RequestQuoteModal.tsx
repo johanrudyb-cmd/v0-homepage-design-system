@@ -1,14 +1,24 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Copy, Mail, Eye } from 'lucide-react';
+import { Copy, Mail } from 'lucide-react';
+import { buildQuoteEmail, isForeignSupplier } from '@/lib/quote-email-template';
+
+interface Design {
+  id: string;
+  type: string;
+  cut?: string | null;
+  material?: string | null;
+  collection?: { id: string; name: string } | null;
+  brand?: { name: string | null } | null;
+}
 
 interface Factory {
   id: string;
   name: string;
+  country: string;
   contactEmail?: string | null;
   contactPhone?: string | null;
 }
@@ -30,62 +40,109 @@ export function RequestQuoteModal({
   preFilledMessage,
   preFilledSubject,
 }: RequestQuoteModalProps) {
+  const [designs, setDesigns] = useState<Design[]>([]);
+  const [selectedDesignId, setSelectedDesignId] = useState<string>('');
+  const [subject, setSubject] = useState(preFilledSubject || '');
   const [message, setMessage] = useState(preFilledMessage || '');
-  const [designId, setDesignId] = useState('');
-  const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState('');
-  const [showEmailPreview, setShowEmailPreview] = useState(false);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSending(true);
-    setError('');
-
-    try {
-      // Si un designId est fourni, récupérer l'URL du tech pack
-      let techPackUrl = undefined;
-      if (designId) {
-        try {
-          const designResponse = await fetch(`/api/designs/${designId}`);
-          if (designResponse.ok) {
-            const designData = await designResponse.json();
-            // Le tech pack peut être dans designData.techPack ou designData.flatSketchUrl
-            techPackUrl = designData.design?.techPack?.url || designData.design?.flatSketchUrl;
-          }
-        } catch (err) {
-          console.warn('Impossible de récupérer le tech pack:', err);
+  useEffect(() => {
+    fetch(`/api/designs/tech-packs?brandId=${encodeURIComponent(brandId)}`, { credentials: 'include' })
+      .then((r) => r.ok ? r.json() : Promise.resolve({ designs: [] }))
+      .then((data) => {
+        const list = data.designs ?? [];
+        setDesigns(list);
+        if (list.length > 0 && !selectedDesignId) {
+          setSelectedDesignId(list[0].id);
         }
-      }
+      })
+      .catch(() => setDesigns([]));
+  }, [brandId]);
 
-      const response = await fetch('/api/quotes', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          brandId,
-          factoryId: factory.id,
-          designId: designId || undefined,
-          message: message || undefined,
-          techPackUrl: techPackUrl || undefined,
-        }),
-      });
+  useEffect(() => {
+    if (preFilledMessage) setMessage(preFilledMessage);
+    if (preFilledSubject) setSubject(preFilledSubject);
+  }, [preFilledMessage, preFilledSubject]);
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Erreur lors de l\'envoi');
-      }
-
-      onSuccess();
-    } catch (err: any) {
-      setError(err.message || 'Une erreur est survenue');
-    } finally {
-      setIsSending(false);
+  const handlePrepare = () => {
+    if (!selectedDesignId) {
+      setError('Veuillez sélectionner un tech pack.');
+      return;
     }
+    setError('');
+    const design = designs.find((d) => d.id === selectedDesignId);
+    if (!design) return;
+    const useEnglish = isForeignSupplier(factory.country);
+    const { subject: subj, body } = buildQuoteEmail({
+      type: design.type,
+      cut: design.cut,
+      material: design.material,
+      factoryName: factory.name,
+      brandName: design.brand?.name ?? undefined,
+      useEnglish,
+    });
+    setSubject(subj);
+    setMessage(body);
+  };
+
+  const handleValidate = async () => {
+    if (!factory.contactEmail) {
+      setError('Aucune adresse email pour ce fournisseur.');
+      return;
+    }
+    const subj = subject || 'Demande de devis';
+    const body = message || '';
+
+    if (selectedDesignId) {
+      try {
+        const res = await fetch('/api/quotes/send-with-attachment', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            designId: selectedDesignId,
+            factoryId: factory.id,
+            brandId,
+            subject: subj,
+            body,
+          }),
+          credentials: 'include',
+        });
+        const data = await res.json();
+
+        if (res.ok) {
+          onSuccess();
+          return;
+        }
+
+        if (res.status === 503 && data.error?.includes('SMTP')) {
+          // Fallback mailto + téléchargement PDF
+          window.open(`/api/designs/${selectedDesignId}/export-pdf`, '_blank');
+          const url = `mailto:${factory.contactEmail}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body + '\n\n---\nPJ : tech-pack (fichier téléchargé — à joindre manuellement)')}`;
+          window.open(url);
+          onSuccess();
+          return;
+        }
+
+        throw new Error(data.error || 'Erreur lors de l\'envoi');
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Erreur lors de l\'envoi');
+        return;
+      }
+    }
+
+    const url = `mailto:${factory.contactEmail}?subject=${encodeURIComponent(subj)}&body=${encodeURIComponent(body)}`;
+    window.open(url);
+    onSuccess();
+  };
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(message);
+    alert('Message copié dans le presse-papier !');
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <Card className="w-full max-w-md border-stone-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4">
+      <Card className="w-full max-w-md border-stone-200 bg-background shadow-xl">
         <CardHeader>
           <CardTitle className="text-xl font-light tracking-wide">
             Demander un devis
@@ -95,101 +152,50 @@ export function RequestQuoteModal({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {preFilledSubject && (
-              <div className="p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                <div className="text-sm font-medium text-blue-900 dark:text-blue-300 mb-1">
-                  Sujet de l'email :
-                </div>
-                <div className="text-sm text-blue-700 dark:text-blue-400">
-                  {preFilledSubject}
-                </div>
-              </div>
-            )}
-            
+          <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-stone-700 mb-2">
-                Design associé (optionnel)
+                Tech pack
               </label>
-              <Input
+              <select
+                value={selectedDesignId}
+                onChange={(e) => setSelectedDesignId(e.target.value)}
+                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+              >
+                <option value="">— Choisir un tech pack —</option>
+                {designs.map((d) => (
+                  <option key={d.id} value={d.id}>
+                    {d.type}
+                    {d.cut ? ` - ${d.cut}` : ''}
+                    {d.collection?.name ? ` (${d.collection.name})` : ''}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-stone-700 mb-2">
+                Sujet
+              </label>
+              <input
                 type="text"
-                value={designId}
-                onChange={(e) => setDesignId(e.target.value)}
-                placeholder="ID du design (pour inclure le tech pack)"
-                className="mb-4"
+                value={subject}
+                onChange={(e) => setSubject(e.target.value)}
+                placeholder="Sujet de l'email"
+                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
               />
             </div>
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-medium text-stone-700">
-                  Message pour le fournisseur
-                </label>
-                {preFilledMessage && (
-                  <div className="flex gap-2">
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => setShowEmailPreview(!showEmailPreview)}
-                      className="gap-1 text-xs"
-                    >
-                      <Eye className="w-3 h-3" />
-                      {showEmailPreview ? 'Masquer' : 'Aperçu'}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        navigator.clipboard.writeText(message);
-                        alert('Message copié dans le presse-papier !');
-                      }}
-                      className="gap-1 text-xs"
-                    >
-                      <Copy className="w-3 h-3" />
-                      Copier
-                    </Button>
-                    {factory.contactEmail && (
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          const subject = preFilledSubject || 'Demande de devis';
-                          const body = encodeURIComponent(message);
-                          window.open(`mailto:${factory.contactEmail}?subject=${encodeURIComponent(subject)}&body=${body}`);
-                        }}
-                        className="gap-1 text-xs"
-                      >
-                        <Mail className="w-3 h-3" />
-                        Ouvrir Email
-                      </Button>
-                    )}
-                  </div>
-                )}
-              </div>
-              {showEmailPreview && preFilledMessage && (
-                <div className="mb-3 p-3 bg-gray-50 dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-lg">
-                  <div className="text-xs font-medium text-gray-600 dark:text-gray-400 mb-2">
-                    Aperçu de l'email :
-                  </div>
-                  <div className="text-sm text-gray-700 dark:text-gray-300 whitespace-pre-wrap font-mono">
-                    {message}
-                  </div>
-                </div>
-              )}
+              <label className="block text-sm font-medium text-stone-700 mb-2">
+                Message pour le fournisseur
+              </label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Décrivez votre projet, quantité souhaitée, etc."
-                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 min-h-[150px]"
+                placeholder="Sélectionnez un tech pack, cliquez sur Préparer le mail, puis Valider pour ouvrir votre messagerie."
+                className="w-full px-4 py-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-amber-500 min-h-[180px]"
               />
-              {preFilledMessage && (
-                <div className="mt-1 text-xs text-muted-foreground">
-                  💡 Message pré-rempli depuis la tendance détectée. Vous pouvez le modifier.
-                </div>
-              )}
             </div>
 
             {error && (
@@ -198,25 +204,48 @@ export function RequestQuoteModal({
               </div>
             )}
 
-            <div className="flex gap-3">
+            <div className="flex flex-wrap gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handlePrepare}
+                disabled={!selectedDesignId}
+              >
+                Préparer le mail
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleCopy}
+                disabled={!message}
+                className="gap-1"
+              >
+                <Copy className="w-4 h-4" />
+                Copier
+              </Button>
+            </div>
+
+            <div className="flex gap-3 pt-2">
               <Button
                 type="button"
                 variant="outline"
                 onClick={onClose}
                 className="flex-1 border-stone-300 text-stone-700 font-light tracking-wide uppercase text-xs py-2"
-                disabled={isSending}
               >
                 Annuler
               </Button>
               <Button
-                type="submit"
-                disabled={isSending}
-                className="flex-1 bg-stone-900 hover:bg-stone-800 text-white font-light tracking-wide uppercase text-xs py-2"
+                type="button"
+                onClick={handleValidate}
+                disabled={!factory.contactEmail || !message}
+                className="flex-1 bg-stone-900 hover:bg-stone-800 text-white font-light tracking-wide uppercase text-xs py-2 gap-2"
               >
-                {isSending ? 'Envoi...' : 'Envoyer la demande'}
+                <Mail className="w-4 h-4" />
+                Valider
               </Button>
             </div>
-          </form>
+          </div>
         </CardContent>
       </Card>
     </div>

@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
+import { sanitizeErrorMessage } from '@/lib/utils';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { generateUGCScripts } from '@/lib/api/chatgpt';
 import { prisma } from '@/lib/prisma';
 import { NotificationHelpers } from '@/lib/notifications';
+import { withAIUsageLimit } from '@/lib/ai-usage';
 
 export const runtime = 'nodejs';
 
@@ -69,30 +71,26 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Marque non trouvée' }, { status: 404 });
     }
 
-    // Vérifier les limites selon le plan (Free: 10 scripts, Pro: illimité)
-    const scriptCount = await prisma.uGCContent.count({
-      where: { brandId, type: 'script' },
-    });
-
     const requestedCount = Math.min(count || 5, 10);
-    if (user.plan === 'free' && scriptCount + requestedCount > 10) {
-      return NextResponse.json(
-        { error: 'Limite atteinte. Passez au plan Pro pour générer plus de scripts.' },
-        { status: 403 }
-      );
-    }
 
-    // Générer les scripts avec ChatGPT (avec identité de marque)
-    const scripts = await generateUGCScripts(
-      brand.name || brandName,
-      productDescription,
-      requestedCount,
-      tone || 'décontracté',
-      {
-        colorPalette: brand.colorPalette,
-        typography: brand.typography,
-        styleGuide: brand.styleGuide,
-      }
+    // Générer les scripts avec ChatGPT (avec identité de marque) — vérification quota IA / jetons
+    const scripts = await withAIUsageLimit(
+      user.id,
+      user.plan,
+      'ugc_scripts',
+      () =>
+        generateUGCScripts(
+          brand.name || brandName,
+          productDescription,
+          requestedCount,
+          tone || 'décontracté',
+          {
+            colorPalette: brand.colorPalette,
+            typography: brand.typography,
+            styleGuide: brand.styleGuide,
+          }
+        ),
+      { brandId }
     );
 
     // Sauvegarder dans la base de données avec IDs pour permettre l'édition
@@ -123,21 +121,23 @@ export async function POST(request: Request) {
     });
 
     if (totalScripts >= 5) {
-      // Marquer la Phase 4 comme complétée
+      // Marquer la Phase 5 (Go-to-Market) comme complétée
       await prisma.launchMap.updateMany({
         where: { brandId },
-        data: { phase4: true },
+        data: { phase5: true },
       });
       // Notification pour phase complétée
-      await NotificationHelpers.phaseCompleted(user.id, 4, 'Génération de scripts marketing');
+      await NotificationHelpers.phaseCompleted(user.id, 5, 'Génération de scripts marketing');
     }
 
     return NextResponse.json({ scripts: scriptsWithIds });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : 'Une erreur est survenue lors de la génération';
     console.error('Erreur lors de la génération de scripts:', error);
+    const isQuota = typeof message === 'string' && (message.includes('limité') || message.includes('Quota') || message.includes('épuisé'));
     return NextResponse.json(
-      { error: error.message || 'Une erreur est survenue lors de la génération' },
-      { status: 500 }
+      { error: sanitizeErrorMessage(message) },
+      { status: isQuota ? 403 : 500 }
     );
   }
 }

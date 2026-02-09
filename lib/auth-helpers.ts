@@ -25,6 +25,8 @@ export async function getCurrentUser() {
         email: true,
         name: true,
         plan: true,
+        subscribedAt: true,
+        createdAt: true,
       },
     });
 
@@ -37,6 +39,8 @@ export async function getCurrentUser() {
       email: user.email,
       name: user.name || (payload.name as string),
       plan: user.plan, // Plan depuis la base de données (toujours à jour)
+      subscribedAt: user.subscribedAt ?? null,
+      createdAt: user.createdAt,
     };
   } catch (error) {
     return null;

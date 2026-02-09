@@ -106,13 +106,7 @@ export function ProductCard({ product, userId, isFavorite: initialIsFavorite }: 
           </div>
 
           <div className="flex items-center justify-between pt-2 border-t border-border">
-            <div>
-              <div className="text-base font-semibold text-foreground">
-                {product.averagePrice.toFixed(0)}€
-              </div>
-              <div className="text-xs text-muted-foreground">Prix moyen</div>
-            </div>
-            <div className="text-right">
+            <div className="text-right flex-1">
               <div className={`text-xs px-2 py-1 rounded font-medium border ${getSaturabilityColor(product.saturability)}`}>
                 {product.saturability.toFixed(0)}% saturé
               </div>

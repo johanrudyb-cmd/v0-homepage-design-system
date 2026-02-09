@@ -14,19 +14,10 @@
 import 'dotenv/config';
 import { getAllSources } from '../lib/hybrid-radar-sources';
 import { scrapeHybridSource } from '../lib/hybrid-radar-scraper';
+import { inferCategory } from '../lib/infer-trend-category';
 import { prisma } from '../lib/prisma';
 
 const QUICK_SOURCE_ID = 'zalando-trend-homme-paris';
-
-function inferCategory(name: string): string {
-  const n = name.toLowerCase();
-  if (n.includes('hoodie') || n.includes('sweat')) return 'Hoodie';
-  if (n.includes('t-shirt') || n.includes('tee')) return 'T-shirt';
-  if (n.includes('cargo') || n.includes('pantalon') || n.includes('pant')) return 'Cargo';
-  if (n.includes('veste') || n.includes('jacket') || n.includes('bomber')) return 'Veste';
-  if (n.includes('short')) return 'Short';
-  return 'Autre';
-}
 
 async function main(): Promise<void> {
   const args = process.argv.slice(2);

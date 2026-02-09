@@ -3,8 +3,13 @@ import { getCurrentUser } from '@/lib/auth-helpers';
 import { writeFile, mkdir } from 'fs/promises';
 import { join } from 'path';
 import { existsSync } from 'fs';
+import sharp from 'sharp';
 
 export const runtime = 'nodejs';
+
+/** Taille requise pour le logo (carré, adapté partout). */
+export const LOGO_WIDTH = 256;
+export const LOGO_HEIGHT = 256;
 
 export async function POST(request: Request) {
   try {
@@ -16,6 +21,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const brandId = formData.get('brandId') as string;
+    const isLogo = formData.get('isLogo') === 'true';
 
     if (!file) {
       return NextResponse.json({ error: 'Aucun fichier fourni' }, { status: 400 });
@@ -37,6 +43,22 @@ export async function POST(request: Request) {
       );
     }
 
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // Pour le logo : vérifier les dimensions (256x256)
+    if (isLogo) {
+      const meta = await sharp(buffer).metadata();
+      const w = meta.width ?? 0;
+      const h = meta.height ?? 0;
+      if (w !== LOGO_WIDTH || h !== LOGO_HEIGHT) {
+        return NextResponse.json(
+          { error: `Le logo doit faire exactement ${LOGO_WIDTH}×${LOGO_HEIGHT} pixels. Votre image fait ${w}×${h} px. Redimensionnez-la puis réessayez.` },
+          { status: 400 }
+        );
+      }
+    }
+
     // Créer le dossier uploads s'il n'existe pas
     const uploadsDir = join(process.cwd(), 'public', 'uploads', brandId);
     if (!existsSync(uploadsDir)) {
@@ -48,9 +70,6 @@ export async function POST(request: Request) {
     const filename = `${timestamp}-${file.name}`;
     const filepath = join(uploadsDir, filename);
 
-    // Sauvegarder le fichier
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
     await writeFile(filepath, buffer);
 
     // Retourner l'URL publique

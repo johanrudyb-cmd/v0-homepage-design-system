@@ -108,13 +108,13 @@ export async function POST(request: Request) {
     });
 
     if (quoteCount >= 2) {
-      // Marquer la Phase 3 comme complétée
+      // Marquer la Phase 4 (Sourcing) comme complétée
       await prisma.launchMap.updateMany({
         where: { brandId },
-        data: { phase3: true },
+        data: { phase4: true },
       });
       // Notification pour phase complétée
-      await NotificationHelpers.phaseCompleted(user.id, 3, 'Contact avec les usines');
+      await NotificationHelpers.phaseCompleted(user.id, 4, 'Contact avec les usines');
     }
 
     return NextResponse.json({ success: true, quote });

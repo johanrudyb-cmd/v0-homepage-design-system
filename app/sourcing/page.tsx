@@ -34,9 +34,10 @@ export default async function SourcingPage({
     };
   }
 
-  // Récupérer ou créer une marque par défaut
+  // Récupérer la marque la plus récente
   let brand = await prisma.brand.findFirst({
     where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
   });
 
   if (!brand) {
@@ -53,6 +54,18 @@ export default async function SourcingPage({
     where: { brandId: brand.id },
     include: { factory: true },
   });
+
+  // Fournisseurs favoris (après prisma generate + db push)
+  let favoriteFactoryIds: string[] = [];
+  try {
+    const favoriteFactories = await prisma.brandFavoriteFactory.findMany({
+      where: { brandId: brand.id },
+      select: { factoryId: true },
+    });
+    favoriteFactoryIds = favoriteFactories.map((f) => f.factoryId);
+  } catch (e) {
+    console.warn('Favorite factories not available (run: npx prisma generate && npx prisma db push):', e);
+  }
 
   // Récupérer les préférences utilisateur
   let preferences = null;
@@ -86,6 +99,7 @@ export default async function SourcingPage({
         <SourcingHub 
           brandId={brand.id} 
           sentQuotes={quotes} 
+          favoriteFactoryIds={favoriteFactoryIds}
           preferences={preferences}
           trendEmailData={trendData}
           autoFilterData={autoFilterData}

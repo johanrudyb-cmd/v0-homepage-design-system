@@ -9,6 +9,8 @@ import { DesignGallery } from './DesignGallery';
 import { CollectionsManager } from './CollectionsManager';
 import { DesignTemplates } from './DesignTemplates';
 import { Sparkles } from 'lucide-react';
+import { GenerationCostBadge } from '@/components/ui/generation-cost-badge';
+import { GenerationLoadingPopup } from '@/components/ui/generation-loading-popup';
 
 interface Design {
   id: string;
@@ -118,6 +120,7 @@ export function DesignStudioForm({ brandId, brand, existingDesigns, initialData 
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <GenerationLoadingPopup open={isGenerating} title="Génération du tech pack…" />
       {/* Collections Sidebar */}
       <div className="lg:col-span-1">
         <CollectionsManager
@@ -329,6 +332,7 @@ export function DesignStudioForm({ brandId, brand, existingDesigns, initialData 
               variant="default"
             >
               {isGenerating ? 'Génération en cours...' : 'Générer le Tech Pack'}
+            <GenerationCostBadge feature="design_tech_pack" />
             </Button>
           </CardContent>
         </Card>

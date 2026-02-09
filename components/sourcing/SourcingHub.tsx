@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { FactoryCard } from './FactoryCard';
+import { FactoryDetailModal } from './FactoryDetailModal';
 import { QuoteList } from './QuoteList';
-import { FactoryMatching } from './FactoryMatching';
 import { ActivePreferencesBadge } from '@/components/common/ActivePreferencesBadge';
 import { filterFactoriesByProduct } from '@/lib/factory-product-matcher';
+import { Truck } from 'lucide-react';
 
 interface Factory {
   id: string;
@@ -20,6 +21,7 @@ interface Factory {
   certifications: string[];
   contactEmail: string | null;
   contactPhone: string | null;
+  website?: string | null;
   rating: number | null;
 }
 
@@ -40,6 +42,7 @@ interface UserPreferences {
 interface SourcingHubProps {
   brandId: string;
   sentQuotes: Quote[];
+  favoriteFactoryIds?: string[];
   preferences?: UserPreferences | null;
   trendEmailData?: {
     subject: string;
@@ -49,10 +52,64 @@ interface SourcingHubProps {
   autoFilterData?: { productType: string | null; material: string | null } | null;
 }
 
-export function SourcingHub({ brandId, sentQuotes, preferences, trendEmailData, autoFilterData }: SourcingHubProps) {
+export function SourcingHub({ brandId, sentQuotes, favoriteFactoryIds = [], preferences, trendEmailData, autoFilterData }: SourcingHubProps) {
   const [factories, setFactories] = useState<Factory[]>([]);
   const [filteredFactories, setFilteredFactories] = useState<Factory[]>([]);
   const [loading, setLoading] = useState(true);
+  const [favoriteIds, setFavoriteIds] = useState<string[]>(favoriteFactoryIds);
+  const [favoriteFactories, setFavoriteFactories] = useState<Factory[]>([]);
+  const [detailFactory, setDetailFactory] = useState<Factory | null>(null);
+
+  useEffect(() => {
+    setFavoriteIds(favoriteFactoryIds);
+  }, [favoriteFactoryIds]);
+
+  // Charger les détails des fournisseurs favoris
+  useEffect(() => {
+    const loadFavoriteFactories = async () => {
+      if (favoriteIds.length === 0) {
+        setFavoriteFactories([]);
+        return;
+      }
+      try {
+        const res = await fetch(`/api/brands/${brandId}/favorite-factories`);
+        if (res.ok) {
+          const data = await res.json();
+          setFavoriteFactories(data.factories || []);
+        }
+      } catch (err) {
+        console.error('Erreur chargement favoris:', err);
+      }
+    };
+    loadFavoriteFactories();
+  }, [brandId, favoriteIds]);
+
+  const toggleFavorite = async (factoryId: string) => {
+    const isFav = favoriteIds.includes(factoryId);
+    const nextIds = isFav ? favoriteIds.filter((id) => id !== factoryId) : [...favoriteIds, factoryId];
+    setFavoriteIds(nextIds);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/favorite-factories`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ factoryId, favorite: !isFav }),
+      });
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}));
+        throw new Error(data.error || `Erreur ${res.status}`);
+      }
+      // Recharger les favoris après modification
+      const favRes = await fetch(`/api/brands/${brandId}/favorite-factories`);
+      if (favRes.ok) {
+        const favData = await favRes.json();
+        setFavoriteFactories(favData.factories || []);
+      }
+    } catch (err) {
+      setFavoriteIds(favoriteIds);
+      const msg = err instanceof Error ? err.message : 'Impossible d\'enregistrer le fournisseur en favori.';
+      window.alert(msg);
+    }
+  };
   
   // Afficher une alerte si on vient d'une tendance
   useEffect(() => {
@@ -145,9 +202,6 @@ export function SourcingHub({ brandId, sentQuotes, preferences, trendEmailData, 
     <div className="space-y-8">
       {/* Badge préférences actives */}
       <ActivePreferencesBadge type="sourcing" />
-      
-      {/* Matching IA */}
-      <FactoryMatching brandId={brandId} sentQuotes={sentQuotes} />
 
       {/* Filtres */}
       <Card>
@@ -243,6 +297,34 @@ export function SourcingHub({ brandId, sentQuotes, preferences, trendEmailData, 
         </CardContent>
       </Card>
 
+      {/* Fournisseurs avec qui vous travaillez */}
+      {favoriteFactories.length > 0 && (
+        <Card className="border-2 border-primary/20 bg-primary/5">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold flex items-center gap-2">
+              <Truck className="w-5 h-5 text-primary" />
+              Fournisseurs avec qui vous travaillez
+            </CardTitle>
+            <CardDescription>
+              Vos fournisseurs favoris (mis en étoile) — {favoriteFactories.length} fournisseur{favoriteFactories.length > 1 ? 's' : ''}
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {favoriteFactories.map((factory) => (
+                <FactoryCard
+                  key={factory.id}
+                  factory={factory}
+                  isFavorite={true}
+                  onToggleFavorite={() => toggleFavorite(factory.id)}
+                  onViewDetail={() => setDetailFactory(factory)}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Alerte si email pré-rempli depuis tendance */}
       {trendEmailData && (
         <Card className="border-2 border-blue-500/50 bg-blue-50/50 dark:bg-blue-950/20">
@@ -299,10 +381,9 @@ export function SourcingHub({ brandId, sentQuotes, preferences, trendEmailData, 
               <FactoryCard
                 key={factory.id}
                 factory={factory}
-                brandId={brandId}
-                isAlreadyQuoted={sentQuotes.some((q) => q.factoryId === factory.id)}
-                preFilledMessage={trendEmailData?.body}
-                preFilledSubject={trendEmailData?.subject}
+                isFavorite={favoriteIds.includes(factory.id)}
+                onToggleFavorite={() => toggleFavorite(factory.id)}
+                onViewDetail={() => setDetailFactory(factory)}
               />
             ))}
           </div>
@@ -312,6 +393,16 @@ export function SourcingHub({ brandId, sentQuotes, preferences, trendEmailData, 
       {/* Devis envoyés */}
       {sentQuotes.length > 0 && (
         <QuoteList quotes={sentQuotes} />
+      )}
+
+      {/* Modal détail fournisseur */}
+      {detailFactory && (
+        <FactoryDetailModal
+          factory={detailFactory}
+          isFavorite={favoriteIds.includes(detailFactory.id)}
+          onToggleFavorite={() => toggleFavorite(detailFactory.id)}
+          onClose={() => setDetailFactory(null)}
+        />
       )}
     </div>
   );

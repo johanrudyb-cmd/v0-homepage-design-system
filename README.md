@@ -1,4 +1,4 @@
-# SaaS Mode - Application
+# OUTFITY - Application
 
 Plateforme SaaS complète pour créer et lancer une marque de vêtements de A à Z avec IA.
 

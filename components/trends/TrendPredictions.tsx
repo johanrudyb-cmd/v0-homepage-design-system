@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Sparkles, TrendingUp, AlertCircle, Clock, Globe, DollarSign, Palette, Mail } from 'lucide-react';
+import { Sparkles, TrendingUp, AlertCircle, Clock, Globe, Palette, Mail } from 'lucide-react';
 import { TrendsSubNav } from './TrendsSubNav';
 
 interface TrendPrediction {
@@ -238,13 +238,6 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
                     </div>
                     <div className="text-lg font-semibold">{prediction.emergenceScore}</div>
                   </div>
-                  <div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                      <DollarSign className="w-4 h-4" />
-                      Stabilité Prix
-                    </div>
-                    <div className="text-lg font-semibold">{prediction.priceStabilityScore}</div>
-                  </div>
                 </div>
 
                 {/* Informations */}
@@ -256,14 +249,6 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
                   <div>
                     <div className="text-muted-foreground mb-1">Pays</div>
                     <div className="font-medium">{prediction.countries.join(', ') || 'Non spécifié'}</div>
-                  </div>
-                  <div>
-                    <div className="text-muted-foreground mb-1">Prix moyen</div>
-                    <div className="font-medium">
-                      {prediction.averagePrice.toFixed(2)}€ 
-                      {prediction.priceRange.min !== prediction.priceRange.max && 
-                        ` (${prediction.priceRange.min.toFixed(2)}€ - ${prediction.priceRange.max.toFixed(2)}€)`}
-                    </div>
                   </div>
                   <div>
                     <div className="text-muted-foreground mb-1">Apparitions</div>

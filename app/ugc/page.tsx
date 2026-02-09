@@ -11,9 +11,10 @@ export default async function UGCPage() {
     redirect('/auth/signin');
   }
 
-  // Récupérer ou créer une marque par défaut
+  // Récupérer la marque la plus récente
   let brand = await prisma.brand.findFirst({
     where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
   });
 
   if (!brand) {

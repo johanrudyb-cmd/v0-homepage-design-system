@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,28 +26,6 @@ interface DesignResultProps {
 export function DesignResult({ design }: DesignResultProps) {
   const [showSaveTemplate, setShowSaveTemplate] = useState(false);
   const [templateName, setTemplateName] = useState('');
-
-  const handleExportPDF = async () => {
-    try {
-      const response = await fetch(`/api/designs/${design.id}/export-pdf`);
-      if (!response.ok) {
-        throw new Error('Erreur lors de la génération du PDF');
-      }
-
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `tech-pack-${design.id}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-    } catch (error) {
-      console.error('Erreur export PDF:', error);
-      alert('Erreur lors de l\'export du PDF');
-    }
-  };
 
   return (
     <Card className="border-stone-200">
@@ -113,12 +92,12 @@ export function DesignResult({ design }: DesignResultProps) {
         {/* Actions */}
         <div className="space-y-3">
           <div className="flex gap-3">
-            <Button
-              onClick={handleExportPDF}
-              className="bg-stone-900 hover:bg-stone-800 text-white font-light tracking-wide uppercase text-xs py-2 px-4"
+            <Link
+              href={`/designs/${design.id}/tech-pack`}
+              className="inline-flex items-center justify-center bg-stone-900 hover:bg-stone-800 text-white font-light tracking-wide uppercase text-xs py-2 px-4 rounded-md transition-colors"
             >
-              Exporter en PDF
-            </Button>
+              Voir le tech pack
+            </Link>
             {design.status === 'completed' && !design.isTemplate && (
               <Button
                 variant="outline"

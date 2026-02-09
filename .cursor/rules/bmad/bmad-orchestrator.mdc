@@ -1,5 +1,5 @@
 ---
-description: 
+description: Coordinateur BMAD - orchestre les agents et workflows. Tapez @bmad-orchestrator pour l'activer.
 globs: []
 alwaysApply: false
 ---

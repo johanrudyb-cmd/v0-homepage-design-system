@@ -20,11 +20,11 @@ const config: Config = {
           foreground: 'hsl(var(--primary-foreground))',
         },
         secondary: {
-          DEFAULT: 'hsl(var(--secondary))',
+          DEFAULT: '#007AFF', // Bleu Apple pour éléments cliquables
           foreground: 'hsl(var(--secondary-foreground))',
         },
         accent: {
-          DEFAULT: 'hsl(var(--accent))',
+          DEFAULT: '#007AFF', // Bleu Apple
           foreground: 'hsl(var(--accent-foreground))',
         },
         muted: {
@@ -44,7 +44,7 @@ const config: Config = {
           foreground: 'hsl(var(--foreground))',
         },
         info: {
-          DEFAULT: 'hsl(var(--info))',
+          DEFAULT: '#007AFF', // Bleu Apple
           foreground: 'hsl(var(--foreground))',
         },
         sidebar: {
@@ -53,14 +53,23 @@ const config: Config = {
           border: 'hsl(var(--sidebar-border))',
           accent: 'hsl(var(--sidebar-accent))',
         },
+        card: {
+          DEFAULT: 'hsl(var(--card))',
+          foreground: 'hsl(var(--card-foreground))',
+        },
+        apple: {
+          blue: '#007AFF',
+          'blue-dark': '#0056CC',
+        },
       },
       borderRadius: {
-        lg: 'var(--radius)',
-        md: 'calc(var(--radius) - 2px)',
-        sm: 'calc(var(--radius) - 4px)',
+        lg: '1.5rem', /* rounded-3xl - Squircle Apple */
+        md: '1.5rem',
+        sm: '1rem', /* rounded-2xl */
+        none: '0',
       },
       fontFamily: {
-        sans: ['var(--font-sans)', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        sans: ['var(--font-sans)'],
       },
       spacing: {
         '18': '4.5rem',

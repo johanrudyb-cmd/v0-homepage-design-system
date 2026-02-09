@@ -46,7 +46,7 @@ export default function SignUpPage() {
         return;
       }
 
-      router.push('/auth/signin?registered=true');
+      router.push('/auth/signin?registered=true&redirect=/auth/choose-plan');
     } catch (err) {
       setError('Une erreur est survenue');
     } finally {

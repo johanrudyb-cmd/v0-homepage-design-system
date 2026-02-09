@@ -1,8 +1,10 @@
 import { NextResponse } from 'next/server';
+import { sanitizeErrorMessage } from '@/lib/utils';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { generateVirtualTryOn } from '@/lib/api/higgsfield';
 import { prisma } from '@/lib/prisma';
 import { NotificationHelpers } from '@/lib/notifications';
+import { withAIUsageLimit } from '@/lib/ai-usage';
 
 export const runtime = 'nodejs';
 
@@ -24,20 +26,23 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Marque non trouvée' }, { status: 404 });
     }
 
-    // Vérifier les limites selon le plan (Free: 5, Pro: illimité)
-    const ugcCount = await prisma.uGCContent.count({
-      where: { brandId, type: 'virtual_tryon' },
-    });
-
-    if (user.plan === 'free' && ugcCount >= 5) {
-      return NextResponse.json(
-        { error: 'Limite atteinte. Passez au plan Pro pour générer plus de Virtual Try-On.' },
-        { status: 403 }
+    // Générer le Virtual Try-On avec Higgsfield (limite 1/mois plan base + budget)
+    let imageUrl: string;
+    try {
+      imageUrl = await withAIUsageLimit(
+        user.id,
+        user.plan ?? 'free',
+        'ugc_virtual_tryon',
+        () => generateVirtualTryOn(designUrl, garmentType),
+        { brandId }
       );
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : 'Quota dépassé';
+      if (msg.includes('Virtual try-on') || msg.includes('Quota') || msg.includes('épuisé')) {
+        return NextResponse.json({ error: msg }, { status: 403 });
+      }
+      throw err;
     }
-
-    // Générer le Virtual Try-On avec Higgsfield
-    const imageUrl = await generateVirtualTryOn(designUrl, garmentType);
 
     // Sauvegarder dans la base de données
     await prisma.uGCContent.create({
@@ -55,7 +60,7 @@ export async function POST(request: Request) {
   } catch (error: any) {
     console.error('Erreur lors de la génération Virtual Try-On:', error);
     return NextResponse.json(
-      { error: error.message || 'Une erreur est survenue lors de la génération' },
+      { error: sanitizeErrorMessage(error.message || 'Une erreur est survenue lors de la génération') },
       { status: 500 }
     );
   }

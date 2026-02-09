@@ -1,4 +1,4 @@
-# Architecture Technique - Application SaaS Mode
+# Architecture Technique - Application OUTFITY
 
 *Document créé via BMAD-Method - Architect (Alex)*
 

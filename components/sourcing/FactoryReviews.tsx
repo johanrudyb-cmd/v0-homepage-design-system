@@ -2,9 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Star, StarHalf, MessageSquare, Image as ImageIcon, X } from 'lucide-react';
+import { Star, StarHalf } from 'lucide-react';
 
 interface Review {
   id: string;
@@ -32,13 +30,6 @@ export function FactoryReviews({ factoryId, factoryName, currentRating }: Factor
   const [averageRating, setAverageRating] = useState<number | null>(currentRating || null);
   const [totalReviews, setTotalReviews] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [showForm, setShowForm] = useState(false);
-  const [formData, setFormData] = useState({
-    rating: 0,
-    comment: '',
-    photos: [] as string[],
-  });
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     fetchReviews();
@@ -57,40 +48,6 @@ export function FactoryReviews({ factoryId, factoryName, currentRating }: Factor
       console.error('Erreur chargement reviews:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleSubmit = async () => {
-    if (formData.rating === 0) {
-      alert('Veuillez sélectionner une note');
-      return;
-    }
-
-    setSubmitting(true);
-    try {
-      const response = await fetch(`/api/factories/${factoryId}/reviews`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          rating: formData.rating,
-          comment: formData.comment.trim() || null,
-          photos: formData.photos,
-        }),
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        setFormData({ rating: 0, comment: '', photos: [] });
-        setShowForm(false);
-        fetchReviews(); // Recharger les reviews
-      } else {
-        alert(data.error || 'Erreur lors de l\'envoi de l\'avis');
-      }
-    } catch (error) {
-      console.error('Erreur envoi review:', error);
-      alert('Erreur lors de l\'envoi de l\'avis');
-    } finally {
-      setSubmitting(false);
     }
   };
 
@@ -147,90 +104,9 @@ export function FactoryReviews({ factoryId, factoryName, currentRating }: Factor
               )}
             </CardDescription>
           </div>
-          {!showForm && (
-            <Button onClick={() => setShowForm(true)} size="sm" className="shadow-modern">
-              <MessageSquare className="w-4 h-4 mr-2" />
-              Laisser un avis
-            </Button>
-          )}
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Formulaire d'avis */}
-        {showForm && (
-          <div className="p-4 bg-muted/30 rounded-lg border-2 border-border space-y-4">
-            <div className="flex items-center justify-between">
-              <h4 className="font-semibold text-foreground">Votre avis</h4>
-              <button
-                onClick={() => {
-                  setShowForm(false);
-                  setFormData({ rating: 0, comment: '', photos: [] });
-                }}
-                className="p-1 hover:bg-muted rounded transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            {/* Note */}
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
-                Note (1-5 étoiles)
-              </label>
-              <div className="flex gap-1">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button
-                    key={star}
-                    onClick={() => setFormData({ ...formData, rating: star })}
-                    className="transition-transform hover:scale-110"
-                  >
-                    <Star
-                      className={`w-8 h-8 ${
-                        star <= formData.rating
-                          ? 'fill-primary text-primary'
-                          : 'text-muted-foreground'
-                      }`}
-                    />
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            {/* Commentaire */}
-            <div>
-              <label className="block text-sm font-semibold text-foreground mb-2">
-                Commentaire (optionnel)
-              </label>
-              <textarea
-                value={formData.comment}
-                onChange={(e) => setFormData({ ...formData, comment: e.target.value })}
-                placeholder="Partagez votre expérience avec cette usine..."
-                className="w-full px-4 py-3 border-2 border-input rounded-lg bg-background text-foreground font-medium focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all min-h-[100px] placeholder:text-muted-foreground/60"
-              />
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                onClick={handleSubmit}
-                disabled={submitting || formData.rating === 0}
-                className="shadow-modern"
-              >
-                {submitting ? 'Envoi...' : 'Publier l\'avis'}
-              </Button>
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setShowForm(false);
-                  setFormData({ rating: 0, comment: '', photos: [] });
-                }}
-                className="border-2"
-              >
-                Annuler
-              </Button>
-            </div>
-          </div>
-        )}
-
         {/* Liste des avis */}
         {reviews.length > 0 ? (
           <div className="space-y-4">
@@ -282,11 +158,9 @@ export function FactoryReviews({ factoryId, factoryName, currentRating }: Factor
             ))}
           </div>
         ) : (
-          !showForm && (
-            <p className="text-sm text-muted-foreground font-medium text-center py-4">
-              Soyez le premier à laisser un avis sur cette usine !
-            </p>
-          )
+          <p className="text-sm text-muted-foreground font-medium text-center py-4">
+            Aucun avis pour le moment.
+          </p>
         )}
       </CardContent>
     </Card>

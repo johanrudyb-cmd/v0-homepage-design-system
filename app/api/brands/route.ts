@@ -43,6 +43,7 @@ export async function POST(request: Request) {
       styleGuide,
       domain,
       socialHandles,
+      templateBrandSlug,
       creationMode,
       autoApplyIdentity,
       status,
@@ -67,6 +68,7 @@ export async function POST(request: Request) {
         styleGuide: styleGuide || null,
         domain: domain || null,
         socialHandles: socialHandles || null,
+        templateBrandSlug: typeof templateBrandSlug === 'string' ? templateBrandSlug.trim() || null : null,
         creationMode: creationMode || 'quick',
         autoApplyIdentity: autoApplyIdentity !== undefined ? autoApplyIdentity : true,
         status: status || 'draft',
@@ -76,6 +78,7 @@ export async function POST(request: Request) {
             phase2: false,
             phase3: false,
             phase4: false,
+            // phase5: false — défini par @default(false) dans le schéma Prisma
           },
         },
       },

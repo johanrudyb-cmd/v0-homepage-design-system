@@ -2,7 +2,7 @@
 
 ## Vue d'ensemble
 
-Ce document décrit les tests fonctionnels end-to-end pour valider tous les modules de l'application SaaS Mode.
+Ce document décrit les tests fonctionnels end-to-end pour valider tous les modules de l'application OUTFITY.
 
 ## Prérequis
 

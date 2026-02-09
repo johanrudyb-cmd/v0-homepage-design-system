@@ -131,7 +131,7 @@ export async function GET(
     // Footer
     doc.fontSize(8)
       .text(
-        `Document généré par SaaS Mode - ${new Date().toLocaleDateString('fr-FR')}`,
+        `Document généré par OUTFITY - ${new Date().toLocaleDateString('fr-FR')}`,
         50,
         doc.page.height - 50,
         { align: 'center' }

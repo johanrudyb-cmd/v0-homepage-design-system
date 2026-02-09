@@ -1,4 +1,4 @@
-# Analyse Complète du Projet - SaaS Mode
+# Analyse Complète du Projet - OUTFITY
 
 *Document créé par Analyst BMAD - Date : 2025-01-23*
 

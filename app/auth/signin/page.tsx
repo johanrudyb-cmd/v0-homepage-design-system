@@ -1,14 +1,15 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, Suspense } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
-export default function SignInPage() {
+function SignInContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -36,8 +37,9 @@ export default function SignInPage() {
         return;
       }
 
-      // Connexion réussie, redirection
-      window.location.href = '/dashboard';
+      // Connexion réussie : redirection vers onboarding si demandé, sinon dashboard
+      const redirectTo = searchParams.get('redirect') || '/dashboard';
+      window.location.href = redirectTo.startsWith('/') ? redirectTo : '/dashboard';
     } catch (err: any) {
       console.error('Erreur lors de la connexion:', err);
       setError('Une erreur est survenue. Vérifiez votre connexion.');
@@ -54,7 +56,7 @@ export default function SignInPage() {
             <div className="w-12 h-1 bg-gradient-to-r from-primary via-secondary to-accent mx-auto mt-3 rounded-full"></div>
           </div>
           <CardDescription className="text-base font-medium">
-            Accédez à votre compte SaaS Mode
+            Accédez à votre compte OUTFITY
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -105,5 +107,13 @@ export default function SignInPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-muted/20">Chargement…</div>}>
+      <SignInContent />
+    </Suspense>
   );
 }

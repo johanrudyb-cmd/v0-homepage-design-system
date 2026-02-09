@@ -1,4 +1,4 @@
-# Analyse de l'État Actuel du Projet - SaaS Mode
+# Analyse de l'État Actuel du Projet - OUTFITY
 
 *Document créé par Analyst - Date : 2025-01-23*
 

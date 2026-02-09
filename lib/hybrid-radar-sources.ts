@@ -2,6 +2,9 @@
  * Trend Radar Hybride (Mondial) - Sources par zone
  * Les marques sont ajoutées une par une (marché français en premier).
  * Pour chaque marque : indiquer homme ou femme (segment).
+ *
+ * Toutes les références qu'on ajoute pour l'Europe doivent avoir marketZone: 'EU'
+ * afin d'être affichées dans la zone EU (Europe) sur la page Tendances.
  */
 
 export type MarketZone = 'FR' | 'EU' | 'US' | 'ASIA';
@@ -44,7 +47,7 @@ const ASOS_SELECTORS = {
   products: 'li[class*="productTile"], article[data-auto-id="productTile"], [data-auto-id="productTile"], [class*="productTile"]',
   name: 'p[class*="productDescription"], h3[data-auto-id="productTileTitle"], [data-auto-id="productTileTitle"], [class*="productTileTitle"], a[class*="productLink"]',
   price: 'span[class*="price_"], span[class*="price"], p[aria-label*="prix"] span, [class*="originalPrice"] span, span[data-auto-id="productTilePrice"], [data-auto-id="productTilePrice"], [class*="productTilePrice"]',
-  image: 'img[src*="asos-media"], img[data-auto-id="productTileImage"], [data-auto-id="productTileImage"] img, [class*="productTileImage"] img',
+  image: 'img[src*="asos-media"], img[srcset*="asos"], img[data-src*="asos"], img[data-auto-id="productTileImage"], [data-auto-id="productTileImage"] img, [class*="productTileImage"] img, img',
 };
 
 const ZARA_SELECTORS = {
@@ -85,6 +88,30 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
     section: 'new_in',
     selectors: ASOS_SELECTORS,
     limit: 100,
+  },
+  // EU — ASOS 18-24 ans Homme (une page, pas de ville)
+  {
+    id: 'asos-18-24-homme',
+    brand: 'ASOS',
+    marketZone: 'EU',
+    segment: 'homme',
+    baseUrl: 'https://www.asos.com',
+    newInPath: '/fr/homme/ctas/mode-americaine-en-ligne-14/cat/?cid=16691',
+    section: 'new_in',
+    selectors: ASOS_SELECTORS,
+    limit: 80,
+  },
+  // EU — ASOS Femme (mode en ligne États-Unis)
+  {
+    id: 'asos-18-24-femme',
+    brand: 'ASOS',
+    marketZone: 'EU',
+    segment: 'femme',
+    baseUrl: 'https://www.asos.com',
+    newInPath: '/fr/femme/ctas/mode-en-ligne-etats-unis-13/cat/?cid=16661',
+    section: 'new_in',
+    selectors: ASOS_SELECTORS,
+    limit: 80,
   },
   // FR — Zara Homme (lazy-load : pre-scroll pour charger plus que les 8 premiers)
   {
@@ -128,9 +155,9 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
     initialWaitMs: 9000,
     preScrollSteps: 25,
   },
-  // EU — Zalando Trend Spotter (Trend Alert) : femme + homme, toutes les villes. Enrich "Voir l'article" pour Paris + Berlin.
+  // EU — Zalando Trend Spotter (Trend Alert) : femme + homme, 10 villes actives. Enrich "Voir l'article" pour toutes.
   ...(['paris', 'berlin', 'milan', 'copenhagen', 'stockholm', 'antwerp', 'zurich', 'london', 'amsterdam', 'warsaw'] as const).flatMap((city) => {
-    const withEnrich = city === 'paris' || city === 'berlin';
+    const withEnrich = true;
     return [
       {
         id: `zalando-trend-femme-${city}`,
@@ -141,8 +168,8 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
         newInPath: `/trend-spotter/${city}?gender=WOMEN`,
         section: 'new_in' as const,
         selectors: ZALANDO_SELECTORS,
-        limit: 80,
-        initialWaitMs: 8000,
+        limit: city === 'paris' ? 8 : 80,
+        initialWaitMs: 14000,
         preScrollSteps: 25,
         zalandoMainPageOnly: true,
         ...(withEnrich ? { zalandoTrendingItemsEnrich: true as const } : {}),
@@ -156,8 +183,8 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
         newInPath: `/trend-spotter/${city}?gender=MEN`,
         section: 'new_in' as const,
         selectors: ZALANDO_SELECTORS,
-        limit: 80,
-        initialWaitMs: 8000,
+        limit: city === 'paris' ? 8 : 80,
+        initialWaitMs: 14000,
         preScrollSteps: 25,
         zalandoMainPageOnly: true,
         ...(withEnrich ? { zalandoTrendingItemsEnrich: true as const } : {}),
@@ -182,32 +209,53 @@ const ZALANDO_SELECTORS_FOR_SOURCE = {
 };
 
 /**
- * Crée une source Zalando à partir d'une URL (ex. page trend-spotter).
+ * Crée une source à partir d'une URL (Zalando ou ASOS).
  * Utilisé quand l'utilisateur colle directement le lien de la page à scraper.
  */
 export function createSourceFromUrl(customUrl: string): HybridRadarSource | null {
   try {
     const u = new URL(customUrl.trim());
-    if (!u.hostname.includes('zalando')) return null;
     const pathAndSearch = u.pathname + u.search;
-    const isTrendSpotter = pathAndSearch.includes('trend-spotter');
-    const segment: Segment = u.searchParams.get('gender') === 'WOMEN' ? 'femme' : 'homme';
-    const id = 'zalando-custom-' + (isTrendSpotter ? pathAndSearch.replace(/\?.*/, '').replace(/\//g, '-') : 'url');
-    return {
-      id,
-      brand: 'Zalando',
-      marketZone: 'EU',
-      segment,
-      baseUrl: u.origin,
-      newInPath: pathAndSearch || '/',
-      section: 'new_in',
-      selectors: ZALANDO_SELECTORS_FOR_SOURCE,
-      limit: 80,
-      initialWaitMs: 12000,
-      preScrollSteps: 25,
-      zalandoMainPageOnly: true,
-      zalandoTrendingItemsEnrich: true,
-    };
+
+    if (u.hostname.includes('asos')) {
+      const segment: Segment = pathAndSearch.includes('/femme/') ? 'femme' : 'homme';
+      const slug = pathAndSearch.replace(/\?.*/, '').replace(/^\/+|\/+$/g, '').replace(/\//g, '-') || 'url';
+      const id = 'asos-custom-' + slug.slice(0, 40);
+      return {
+        id,
+        brand: 'ASOS',
+        marketZone: 'EU',
+        segment,
+        baseUrl: u.origin,
+        newInPath: pathAndSearch || '/',
+        section: 'new_in',
+        selectors: ASOS_SELECTORS,
+        limit: 80,
+      };
+    }
+
+    if (u.hostname.includes('zalando')) {
+      const isTrendSpotter = pathAndSearch.includes('trend-spotter');
+      const segment: Segment = u.searchParams.get('gender') === 'WOMEN' ? 'femme' : 'homme';
+      const id = 'zalando-custom-' + (isTrendSpotter ? pathAndSearch.replace(/\?.*/, '').replace(/\//g, '-') : 'url');
+      return {
+        id,
+        brand: 'Zalando',
+        marketZone: 'EU',
+        segment,
+        baseUrl: u.origin,
+        newInPath: pathAndSearch || '/',
+        section: 'new_in',
+        selectors: ZALANDO_SELECTORS_FOR_SOURCE,
+        limit: 80,
+        initialWaitMs: 12000,
+        preScrollSteps: 25,
+        zalandoMainPageOnly: true,
+        zalandoTrendingItemsEnrich: true,
+      };
+    }
+
+    return null;
   } catch {
     return null;
   }

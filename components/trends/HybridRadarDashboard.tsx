@@ -3,7 +3,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Globe, Zap, Upload, Loader2, AlertTriangle, Sparkles, Eye, ChevronDown, ChevronUp, Copy, Check } from 'lucide-react';
+import { Globe, Zap, Upload, Loader2, AlertTriangle, Sparkles, Eye, ChevronDown, ChevronUp } from 'lucide-react';
+import { GenerationCostBadge } from '@/components/ui/generation-cost-badge';
+import { GenerationLoadingPopup } from '@/components/ui/generation-loading-popup';
+import { getProductBrand } from '@/lib/brand-utils';
+import { safeDisplayBrand } from '@/lib/constants/retailer-exclusion';
 
 interface HybridTrend {
   id: string;
@@ -55,7 +59,6 @@ export function HybridRadarDashboard() {
       }>;
     }>;
   } | null>(null);
-  const [copiedTechPackId, setCopiedTechPackId] = useState<string | null>(null);
   const [scrapeOnlyExpanded, setScrapeOnlyExpanded] = useState<string | null>(null);
 
   const loadTrends = useCallback(async () => {
@@ -171,13 +174,17 @@ export function HybridRadarDashboard() {
 
   return (
     <div className="space-y-8">
+      <GenerationLoadingPopup open={uploading} title="Analyse de l'image en cours…" />
+      <GenerationLoadingPopup open={!!generatingAnalysis} title="Génération de l'analyse business…" />
+      <GenerationLoadingPopup open={scanning} title="Scan des tendances en cours…" />
+      <GenerationLoadingPopup open={scrapingOnly} title="Récupération des données…" />
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Globe className="w-7 h-7" />
           Trend Radar Hybride (Mondial)
         </h1>
         <p className="text-muted-foreground mt-1 text-sm max-w-2xl">
-          Scraping (donnée réelle) + IA Vision (analyse). Tendances par zone (France, Europe, USA, Asie). Badge Global Trend Alert si tendance présente dans 2+ zones.
+          Données réelles + IA Vision (analyse). Tendances par zone (France, Europe, USA, Asie). Badge Global Trend Alert si tendance présente dans 2+ zones.
         </p>
       </div>
 
@@ -190,17 +197,17 @@ export function HybridRadarDashboard() {
             variant="outline"
             size="sm"
             className="gap-2"
-            title="Scraper sans IA ni enregistrement — voir les données brutes"
+            title="Voir les données récupérées (sans IA ni enregistrement)"
           >
             {scrapingOnly ? (
               <>
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Scrape en cours…
+                Récupération en cours…
               </>
             ) : (
               <>
                 <Eye className="w-4 h-4" />
-                Voir ce que le scraper récupère (Zalando uniquement)
+                Récupérer les données
               </>
             )}
           </Button>
@@ -254,7 +261,7 @@ export function HybridRadarDashboard() {
           <CardHeader className="pb-2">
             <CardTitle className="text-lg flex items-center gap-2">
               <Eye className="w-5 h-5" />
-              Données brutes scrapées ({scrapeOnlyResult.totalItems} produits, sans IA)
+              Données récupérées ({scrapeOnlyResult.totalItems} produits, sans IA)
             </CardTitle>
             <p className="text-sm text-muted-foreground">
               Cliquez sur une source pour afficher les produits récupérés.
@@ -271,42 +278,15 @@ export function HybridRadarDashboard() {
                     className="w-full flex items-center justify-between px-4 py-3 bg-muted/50 hover:bg-muted text-left text-sm font-medium"
                   >
                     <span>
-                      {source.brand} ({source.marketZone}) — {source.itemCount} produit{source.itemCount !== 1 ? 's' : ''}
+                      {source.marketZone} — {source.itemCount} produit{source.itemCount !== 1 ? 's' : ''}
                     </span>
                     {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
                   {isExpanded && (
                     <div className="p-4 border-t bg-background">
-                      <p className="text-xs text-muted-foreground mb-3 truncate" title={source.url}>
-                        {source.url}
-                      </p>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {source.items.map((item, idx) => {
-                          const itemId = `${source.sourceId}-${idx}`;
                           const hasTechPack = item.composition || item.careInstructions || item.color || item.sizes || item.countryOfOrigin || item.articleNumber;
-                          const buildTechPackText = () => {
-                            const lines: string[] = [
-                              `--- TECH PACK / FOURNISSEUR ---`,
-                              `Nom: ${item.name || '—'}`,
-                              `Prix: ${Number(item.price) > 0 ? `${Number(item.price).toFixed(2)} €` : '—'}`,
-                              `Référence / Article: ${item.articleNumber || '—'}`,
-                              `Couleur: ${item.color || '—'}`,
-                              `Composition: ${item.composition || '—'}`,
-                              `Entretien: ${item.careInstructions || '—'}`,
-                              `Tailles: ${item.sizes || '—'}`,
-                              `Pays d'origine: ${item.countryOfOrigin || '—'}`,
-                              `Lien: ${item.sourceUrl || ''}`,
-                              `---`,
-                            ];
-                            return lines.join('\n');
-                          };
-                          const handleCopyTechPack = async () => {
-                            try {
-                              await navigator.clipboard.writeText(buildTechPackText());
-                              setCopiedTechPackId(itemId);
-                              setTimeout(() => setCopiedTechPackId(null), 2000);
-                            } catch (_) {}
-                          };
                           return (
                             <div
                               key={idx}
@@ -327,12 +307,6 @@ export function HybridRadarDashboard() {
                               </div>
                               <div className="p-2 text-xs flex-1 flex flex-col min-w-0">
                                 <p className="font-medium line-clamp-2 leading-tight">{item.name || '—'}</p>
-                                <p className="text-primary mt-0.5" title={typeof item.price !== 'undefined' ? String(item.price) : ''}>
-                                  {(() => {
-                                    const p = Number(item.price);
-                                    return p > 0 ? `${p.toFixed(2)} €` : 'Prix non détecté';
-                                  })()}
-                                </p>
                                 {hasTechPack && (
                                   <>
                                     {item.articleNumber && <p className="mt-1 text-muted-foreground line-clamp-1">Ref: {item.articleNumber}</p>}
@@ -343,17 +317,6 @@ export function HybridRadarDashboard() {
                                     {item.countryOfOrigin && <p className="text-muted-foreground line-clamp-1">Origine: {item.countryOfOrigin}</p>}
                                   </>
                                 )}
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  className="mt-2 w-full gap-1 text-xs"
-                                  onClick={handleCopyTechPack}
-                                  title="Copier nom, prix, composition, entretien, couleur, tailles, origine et lien pour fournisseur / tech pack"
-                                >
-                                  {copiedTechPackId === itemId ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
-                                  {copiedTechPackId === itemId ? 'Copié' : 'Copier tech pack'}
-                                </Button>
                               </div>
                             </div>
                           );
@@ -463,7 +426,7 @@ export function HybridRadarDashboard() {
                 <CardContent className="p-4 flex-1 flex flex-col">
                   <h3 className="font-semibold line-clamp-2 leading-tight">{t.name}</h3>
                   <p className="text-sm text-muted-foreground mt-1">
-                    {t.category} · {t.cut || '—'} · {t.sourceBrand || '—'}
+                    {t.category} · {t.cut || '—'} · {safeDisplayBrand((t as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand))}
                   </p>
                   <p className="text-sm font-medium mt-1">
                     Score tendance : {t.trendScoreVisual ?? '—'}/100
@@ -486,6 +449,7 @@ export function HybridRadarDashboard() {
                         <Sparkles className="w-3 h-3" />
                       )}
                       Générer analyse business
+                      <GenerationCostBadge feature="trends_analyse" />
                     </Button>
                   )}
                 </CardContent>

@@ -12,7 +12,7 @@ export const runtime = 'nodejs';
 export async function GET() {
   const result = await testGptConnection();
   if (result.ok) {
-    return NextResponse.json({ ok: true, message: 'API GPT opérationnelle' });
+    return NextResponse.json({ ok: true, message: 'API IA opérationnelle' });
   }
   return NextResponse.json({ ok: false, error: result.error }, { status: 500 });
 }

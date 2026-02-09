@@ -1,12 +1,15 @@
 import OpenAI from 'openai';
 
-if (!process.env.CHATGPT_API_KEY) {
-  console.warn('CHATGPT_API_KEY not configured. ChatGPT features will be disabled.');
+/** OpenAI / GPT : CHATGPT_API_KEY prioritaire, sinon fallback sur OPENAI_API_KEY */
+const openaiApiKey = process.env.CHATGPT_API_KEY || process.env.OPENAI_API_KEY;
+
+if (!openaiApiKey) {
+  console.warn('CHATGPT_API_KEY ou OPENAI_API_KEY non configurée. ChatGPT features will be disabled.');
 }
 
-const openai = process.env.CHATGPT_API_KEY
+const openai = openaiApiKey
   ? new OpenAI({
-      apiKey: process.env.CHATGPT_API_KEY,
+      apiKey: openaiApiKey,
     })
   : null;
 
@@ -21,6 +24,10 @@ export async function generateUGCScripts(
     styleGuide?: any;
   }
 ): Promise<string[]> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateUGCScripts: claudeUGC } = await import('./claude');
+    return claudeUGC(brandName, productDescription, count, tone, brandIdentity);
+  }
   if (!openai) {
     throw new Error('ChatGPT API key not configured');
   }
@@ -90,6 +97,10 @@ export async function generateTechPack(designData: {
   details: object;
   material: string;
 }): Promise<object> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateTechPack: claudeTech } = await import('./claude');
+    return claudeTech(designData);
+  }
   if (!openai) {
     throw new Error('ChatGPT API key not configured');
   }
@@ -125,10 +136,77 @@ export async function generateTechPack(designData: {
   return JSON.parse(content);
 }
 
+/** Tech pack ultra détaillé (structure visuelle pour fournisseurs) */
+export async function generateTechPackVisual(input: {
+  type: string;
+  cut: string;
+  material: string;
+  mockupSpec?: Record<string, unknown> | null;
+}): Promise<{
+  materials: { name: string; composition?: string; weight?: string; ref?: string }[];
+  measurementsTable?: { size: string; measurements: Record<string, number> }[];
+  trims?: { name: string; ref?: string; placement?: string }[];
+  constructionNotes?: string;
+  printSpec?: { placement: string; width: number; height: number; technique: string; colors: string[] };
+  labeling?: string;
+  packaging?: string;
+  compliance?: string;
+}> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateTechPackVisual: claudeTechPackVisual } = await import('./claude');
+    return claudeTechPackVisual(input);
+  }
+  if (!openai) {
+    throw new Error('ChatGPT API key not configured');
+  }
+
+  const questionnaire = input.mockupSpec || {};
+  const context = [
+    `Type: ${input.type}`,
+    `Coupe: ${input.cut}`,
+    `Matière: ${input.material}`,
+    questionnaire ? `Détails questionnaire: ${JSON.stringify(questionnaire)}` : '',
+  ].filter(Boolean).join('\n');
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      {
+        role: 'system',
+        content: `Tu es un expert en tech packs mode. Génère un tech pack ULTRA DÉTAILLÉ au format JSON pour un fournisseur.
+Réponds UNIQUEMENT par un objet JSON valide avec exactement ces clés (en anglais dans le JSON) :
+- materials: array de { name, composition?, weight?, ref? } (tissu principal, bord côte, doublure si pertinent)
+- measurementsTable: array de { size: "S"|"M"|"L"|"XL", measurements: { longueurTotale, tourPoitrine, tourTaille, tourBassin, longueurManche, etc. } } en cm
+- trims: array de { name, ref?, placement? } (boutons, fermeture, étiquettes)
+- constructionNotes: string détaillant coutures, ourlets, finitions
+- printSpec: { placement, width, height, technique, colors } si visuel/impression
+- labeling: string (position et type d'étiquettes)
+- packaging: string (pliage, sachet, carton)
+- compliance: string (normes OEKO-TEX, pays production, etc.)`,
+      },
+      {
+        role: 'user',
+        content: `Génère le tech pack ultra détaillé pour:\n${context}`,
+      },
+    ],
+    temperature: 0.3,
+    max_tokens: 1200,
+    response_format: { type: 'json_object' },
+  });
+
+  const content = completion.choices[0]?.message?.content;
+  if (!content) throw new Error('Tech pack non généré');
+  return JSON.parse(content);
+}
+
 export async function enhancePrompt(
   userInput: string,
   context: { type: string; style: string }
 ): Promise<string> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { enhancePrompt: claudeEnhance } = await import('./claude');
+    return claudeEnhance(userInput, context);
+  }
   if (!openai) {
     throw new Error('ChatGPT API key not configured');
   }
@@ -166,6 +244,10 @@ export interface TrendsAnalysisInput {
 
 /** Génère une analyse IA des tendances : prévisions pour la France, tendances à venir, recommandations. */
 export async function generateTrendsAnalysis(data: TrendsAnalysisInput): Promise<string> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateTrendsAnalysis: claudeTrends } = await import('./claude');
+    return claudeTrends(data);
+  }
   if (!openai) {
     throw new Error('ChatGPT API key not configured');
   }
@@ -220,6 +302,10 @@ export interface ProductTrendInput {
 
 /** Génère une analyse IA pour un seul produit : potentiel en France, positionnement, recommandations. */
 export async function generateProductTrendAnalysis(product: ProductTrendInput): Promise<string> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateProductTrendAnalysis: claudeProduct } = await import('./claude');
+    return claudeProduct(product);
+  }
   if (!openai) {
     throw new Error('ChatGPT API key not configured');
   }
@@ -269,6 +355,10 @@ export async function generateProductImagePrompt(product: {
   color?: string | null;
   style?: string | null;
 }): Promise<string> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateProductImagePrompt: claudePrompt } = await import('./claude');
+    return claudePrompt(product);
+  }
   if (!openai) {
     throw new Error('ChatGPT API key not configured');
   }
@@ -337,6 +427,10 @@ export interface TrendEnrichmentResult {
 export async function generateTrendAdviceAndImagePrompt(
   product: TrendEnrichmentInput
 ): Promise<TrendEnrichmentResult> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateTrendAdviceAndImagePrompt: claudeAdvice } = await import('./claude');
+    return claudeAdvice(product);
+  }
   if (!openai) {
     throw new Error('ChatGPT API key not configured');
   }
@@ -422,8 +516,12 @@ export async function analyzeProductImage(
   imageUrl: string,
   title: string
 ): Promise<VisualTaggingResult> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { analyzeProductImage: claudeAnalyze } = await import('./claude');
+    return claudeAnalyze(imageUrl, title);
+  }
   if (!openai) {
-    throw new Error('ChatGPT API key not configured');
+    throw new Error('CHATGPT_API_KEY ou ANTHROPIC_API_KEY requise pour l\'analyse visuelle.');
   }
 
   const completion = await openai.chat.completions.create({
@@ -499,6 +597,10 @@ export async function generateBusinessAnalysisForZones(
   zones: string[],
   trendScoresByZone: Record<string, number>
 ): Promise<string> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateBusinessAnalysisForZones: claudeBiz } = await import('./claude');
+    return claudeBiz(productName, zones, trendScoresByZone);
+  }
   if (!openai) {
     throw new Error('ChatGPT API key not configured');
   }
@@ -527,8 +629,300 @@ export async function generateBusinessAnalysisForZones(
   return completion.choices[0]?.message?.content?.trim() || 'Aucune analyse.';
 }
 
+/** Champs enrichis par IA pour un produit tendance (hors segment et marketZone). */
+export interface EnrichedProductFields {
+  category?: string;
+  style?: string;
+  material?: string;
+  color?: string;
+  careInstructions?: string;
+  description?: string;
+  cut?: string;
+  productBrand?: string;
+  estimatedCogsPercent?: number;
+  complexityScore?: string;
+  sustainabilityScore?: number;
+  visualAttractivenessScore?: number;
+  dominantAttribute?: string;
+}
+
+/**
+ * Enrichit les champs manquants d'un produit tendance via IA.
+ * Ne modifie pas segment ni marketZone.
+ * Utilise l'image si disponible (GPT-4o vision) pour visuels/design.
+ */
+function normalizeEnrichedFields(parsed: Record<string, unknown>): EnrichedProductFields {
+  const out: EnrichedProductFields = {};
+  if (typeof parsed.category === 'string' && parsed.category.trim()) {
+    const cat = parsed.category.trim().slice(0, 50);
+    if (cat !== 'Autre' && cat !== 'autres') out.category = cat;
+  }
+  if (typeof parsed.style === 'string' && parsed.style.trim()) out.style = parsed.style.trim().slice(0, 100);
+  if (typeof parsed.material === 'string' && parsed.material.trim()) out.material = parsed.material.trim().slice(0, 200);
+  if (typeof parsed.color === 'string' && parsed.color.trim()) out.color = parsed.color.trim().slice(0, 80);
+  if (typeof parsed.careInstructions === 'string' && parsed.careInstructions.trim()) out.careInstructions = parsed.careInstructions.trim().slice(0, 500);
+  if (typeof parsed.description === 'string' && parsed.description.trim()) out.description = parsed.description.trim().slice(0, 2000);
+  if (typeof parsed.cut === 'string' && parsed.cut.trim()) out.cut = parsed.cut.trim().slice(0, 60);
+  if (typeof parsed.productBrand === 'string' && parsed.productBrand.trim()) {
+    const brand = parsed.productBrand.trim().replace(/^\._\.\s*/i, '').slice(0, 80);
+    if (brand.length >= 2 && !/^[._\-\s]+$/.test(brand)) out.productBrand = brand;
+  }
+  if (typeof parsed.estimatedCogsPercent === 'number') out.estimatedCogsPercent = Math.min(50, Math.max(15, Math.round(parsed.estimatedCogsPercent)));
+  if (typeof parsed.complexityScore === 'string' && ['Facile', 'Moyen', 'Complexe', 'Différent'].includes(parsed.complexityScore)) out.complexityScore = parsed.complexityScore === 'Différent' ? 'Complexe' : parsed.complexityScore;
+  if (typeof parsed.sustainabilityScore === 'number') out.sustainabilityScore = Math.min(100, Math.max(0, Math.round(parsed.sustainabilityScore)));
+  if (typeof parsed.visualAttractivenessScore === 'number') out.visualAttractivenessScore = Math.min(100, Math.max(0, Math.round(parsed.visualAttractivenessScore)));
+  if (typeof parsed.dominantAttribute === 'string' && parsed.dominantAttribute.trim()) out.dominantAttribute = parsed.dominantAttribute.trim().slice(0, 300);
+  return out;
+}
+
+export async function enrichProductDetails(
+  product: {
+    name: string;
+    category: string;
+    productBrand?: string | null;
+    material?: string | null;
+    style?: string | null;
+    color?: string | null;
+    careInstructions?: string | null;
+    description?: string | null;
+    cut?: string | null;
+    averagePrice: number;
+    imageUrl?: string | null;
+    estimatedCogsPercent?: number | null;
+    complexityScore?: string | null;
+    sustainabilityScore?: number | null;
+    visualAttractivenessScore?: number | null;
+    dominantAttribute?: string | null;
+  }
+): Promise<EnrichedProductFields> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { enrichProductDetails: claudeEnrich } = await import('./claude');
+    const raw = await claudeEnrich(product);
+    return normalizeEnrichedFields(raw as Record<string, unknown>);
+  }
+  if (!openai) {
+    throw new Error('ChatGPT API key not configured');
+  }
+
+  const existing = [
+    product.material ? `Matière: ${product.material}` : null,
+    product.style ? `Style: ${product.style}` : null,
+    product.color ? `Couleur: ${product.color}` : null,
+    product.careInstructions ? `Entretien: ${product.careInstructions}` : null,
+    product.cut ? `Coupe: ${product.cut}` : null,
+    product.description ? `Description: ${product.description.slice(0, 300)}` : null,
+  ].filter(Boolean).join('; ');
+
+  const systemPrompt = `Tu es un expert mode et retail. Complète les informations manquantes pour ce produit (vêtement e-commerce).
+
+Règles:
+- Réponds UNIQUEMENT en JSON avec les champs demandés.
+- Pour complexityScore: "Facile" | "Moyen" | "Complexe" (fabrication simple, moyenne ou complexe).
+- Pour sustainabilityScore, visualAttractivenessScore: nombre entre 0 et 100.
+- Pour estimatedCogsPercent: nombre entre 15 et 50 (coût production en % du prix de vente).
+- Pour dominantAttribute: une phrase courte (ex: "Coupe Boxy : 80% responsable de la performance").
+- N'inclus que les champs à compléter s'ils sont vides ou "Non spécifié".`;
+
+  const userContent = [
+    `Produit: ${product.name}`,
+    `Catégorie: ${product.category}`,
+    `Prix: ${product.averagePrice}€`,
+    existing ? `Données existantes: ${existing}` : '',
+    '',
+    'Retourne un objet JSON avec les champs manquants à compléter: category (type de vêtement: T-shirt, Hoodie, Pantalon, Jean, Veste, Blouson, Pull, Polo, Short, Robe, Cargo, Jogging, Legging — jamais "Autre"), style, material, color, careInstructions, description, cut, productBrand (marque du vêtement, ex. Nike, Zara, Les Deux — jamais Zalando/ASOS), estimatedCogsPercent, complexityScore, sustainabilityScore, visualAttractivenessScore, dominantAttribute. Exclure les champs déjà remplis. Réponds UNIQUEMENT par JSON valide.',
+  ].filter(Boolean).join('\n');
+
+  const messages: OpenAI.ChatCompletionMessageParam[] = [
+    { role: 'system', content: systemPrompt },
+    { role: 'user', content: userContent },
+  ];
+
+  if (product.imageUrl && product.imageUrl.startsWith('http')) {
+    messages[1] = {
+      role: 'user',
+      content: [
+        { type: 'text', text: userContent + '\n\nAnalyse aussi cette image produit pour compléter cut, color, productBrand, visualAttractivenessScore, dominantAttribute.' },
+        { type: 'image_url', image_url: { url: product.imageUrl } },
+      ],
+    } as OpenAI.ChatCompletionMessageParam;
+  }
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages,
+    max_tokens: 500,
+    temperature: 0.3,
+    response_format: { type: 'json_object' },
+  });
+
+  const raw = completion.choices[0]?.message?.content?.trim();
+  if (!raw) return {};
+
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    return normalizeEnrichedFields(parsed);
+  } catch {
+    return {};
+  }
+}
+
+/** Contexte optionnel depuis les données curatées (Marques tendances). */
+export interface BrandAnalysisContext {
+  signaturePiece?: string;
+  dominantStyle?: string;
+  cyclePhase?: string;
+  launchPotential?: string;
+  indicativePrice?: string;
+  rank?: number;
+  score?: string;
+}
+
+/**
+ * Génère une analyse complète de marque pour un créateur qui veut lancer sa marque.
+ * Couvre : positionnement, cible, marketing, forces/opportunités, recommandations.
+ */
+export async function generateBrandAnalysis(
+  brandName: string,
+  context?: BrandAnalysisContext
+): Promise<string> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateBrandAnalysis: claudeBrand } = await import('./claude');
+    return claudeBrand(brandName, context);
+  }
+  if (!openai) {
+    throw new Error('ChatGPT API key not configured');
+  }
+
+  let contextStr = '';
+  if (context) {
+    const parts: string[] = [];
+    if (context.signaturePiece) parts.push(`Pièce maîtresse tendance : ${context.signaturePiece}`);
+    if (context.dominantStyle) parts.push(`Style dominant : ${context.dominantStyle}`);
+    if (context.cyclePhase) parts.push(`Phase du cycle : ${context.cyclePhase}`);
+    if (context.launchPotential) parts.push(`Potentiel de lancement : ${context.launchPotential}`);
+    if (context.indicativePrice) parts.push(`Prix indicatif : ${context.indicativePrice}`);
+    if (context.rank) parts.push(`Rang tendance EU : #${context.rank}`);
+    if (context.score) parts.push(`Score tendance : ${context.score}`);
+    if (parts.length > 0) {
+      contextStr = `\n\nContexte tendances EU :\n${parts.join('\n')}`;
+    }
+  }
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      {
+        role: 'system',
+        content: `Tu es un expert en stratégie mode et retail, spécialisé dans l'accompagnement des créateurs de marques de vêtements.
+
+Tu rédiges des analyses de marque COMPLÈTES et ACTIONNABLES, avec la même structure que la stratégie marketing dans "gérer ma marque".
+Structure ton analyse en sections claires avec des titres ##. Réponds UNIQUEMENT en français.
+Interdit le gras markdown (**). Interdit les hashtags bruts (#xxx) : reformule en "thèmes : …" ou en mots simples.
+Sois concret, factuel et orienté action.`,
+      },
+      {
+        role: 'user',
+        content: `Analyse la marque "${brandName}" et rédige une analyse complète pour un créateur qui veut lancer sa marque de vêtements (ou accessoires).${contextStr}
+
+Structure obligatoire (identique à la stratégie marketing dans "gérer ma marque") — les 7 sections ci-dessous :
+
+## 1. Vision et positionnement
+Positionnement de la marque sur le marché, identité, codes, promesse. Comment se différencie-t-elle ? Comment un créateur peut s'en inspirer.
+
+## 2. Cible et client idéal
+Qui sont les clients de cette marque ? Profil socio-démo, aspirations, habitudes d'achat. Où les trouver (canaux, communautés) ?
+
+## 3. Offre et pricing
+Fourchettes de prix, structure de gamme, promotions. Recommandations pour un créateur (prix d'entrée, positionnement prix).
+
+## 4. Canaux et marketing
+Comment la marque communique ? Canaux (réseaux, influence, retail, événements), tonalité, type de contenu. Ce qui fonctionne pour eux et comment le transposer.
+
+## 5. Messages clés et storytelling
+Thèmes récurrents, angles de communication, codes. Formulations à adapter pour une nouvelle marque.
+
+## 6. Stratégie de contenu
+Types de contenu (posts, stories, vidéos, lookbooks), calendrier éditorial, thèmes par canal, fréquence de publication, formats (UGC, behind-the-scenes). Ce qui fonctionne pour cette marque.
+
+## 7. Site internet
+Ce qui fonctionne sur le site e-commerce de cette marque (structure, UX, confiance, visuels, conversion). Recommandations pour un créateur qui lance son site.`,
+      },
+    ],
+    temperature: 0.7,
+    max_tokens: 2500,
+  });
+
+  return completion.choices[0]?.message?.content?.trim() || 'Aucune analyse générée.';
+}
+
+/** Contexte pour générer la description produit (marque + stratégie + identité). */
+export interface ProductDescriptionContext {
+  brandName: string;
+  styleGuide?: { preferredStyle?: string; positioning?: string; targetAudience?: string; productType?: string; tagline?: string; description?: string; story?: string } | null;
+  phase1Data?: { productType?: string; weight?: string } | null;
+  phaseSummaries?: Record<string, string> | null;
+  designType: string;
+  designCut?: string | null;
+  designMaterial?: string | null;
+  techPackSummary?: string | null;
+}
+
+/**
+ * Génère une description produit e-commerce à partir de la marque, stratégie (phase 1) et identité.
+ * Utilisée après validation du tech pack dans Design et Tech Pack.
+ */
+export async function generateProductDescriptionFromBrand(context: ProductDescriptionContext): Promise<string> {
+  if (process.env.ANTHROPIC_API_KEY) {
+    const { generateProductDescriptionFromBrand: claudeGen } = await import('./claude');
+    return claudeGen(context);
+  }
+  if (!openai) {
+    throw new Error('ChatGPT API key not configured');
+  }
+
+  const parts: string[] = [
+    `Marque : ${context.brandName}.`,
+    context.styleGuide?.story ? `Histoire / raison d'être de la marque (donner du sens, âme) : ${context.styleGuide.story}.` : '',
+    context.styleGuide?.preferredStyle ? `Style / positionnement : ${context.styleGuide.preferredStyle}.` : '',
+    context.styleGuide?.positioning ? `Positionnement : ${context.styleGuide.positioning}.` : '',
+    context.styleGuide?.targetAudience ? `Cible : ${context.styleGuide.targetAudience}.` : '',
+    context.styleGuide?.tagline ? `Slogan : ${context.styleGuide.tagline}.` : '',
+    context.phase1Data?.productType ? `Type produit stratégie : ${context.phase1Data.productType}.` : '',
+    context.phase1Data?.weight ? `Grammage : ${context.phase1Data.weight}.` : '',
+    context.phaseSummaries && Object.keys(context.phaseSummaries).length > 0
+      ? `Résumés phases : ${JSON.stringify(context.phaseSummaries)}.`
+      : '',
+    `Design : ${context.designType}${context.designCut ? `, coupe ${context.designCut}` : ''}${context.designMaterial ? `, ${context.designMaterial}` : ''}.`,
+    context.techPackSummary ? `Tech pack (résumé) : ${context.techPackSummary}.` : '',
+  ].filter(Boolean);
+
+  const userContent = `Contexte marque et produit :\n${parts.join('\n')}\n\nRédige une description produit e-commerce en français (2 à 4 phrases), vendeuse et alignée avec l'identité de la marque. Si une histoire ou raison d'être de la marque est fournie, donne du sens et de l'âme à la description pour que les gens s'y retrouvent. Mets en valeur le produit (${context.designType}), les matières/coupe si connus, et le positionnement. Pas de titre, uniquement le paragraphe de description.`;
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4',
+    messages: [
+      {
+        role: 'system',
+        content: 'Tu es un rédacteur e-commerce mode. Tu rédiges des descriptions produit courtes, engageantes et alignées avec l\'identité de la marque. Ton français est fluide et sans faute. Réponds UNIQUEMENT par le texte de la description, sans préambule.',
+      },
+      { role: 'user', content: userContent },
+    ],
+    temperature: 0.6,
+    max_tokens: 400,
+  });
+
+  const text = completion.choices[0]?.message?.content?.trim();
+  if (!text) throw new Error('Aucune description générée');
+  return text;
+}
+
 export function isChatGptConfigured(): boolean {
   return !!process.env.CHATGPT_API_KEY;
+}
+
+/** Vrai si au moins une IA est configurée pour l'analyse visuelle (GPT-4o ou Claude vision). */
+export function isVisualAnalysisConfigured(): boolean {
+  return !!process.env.CHATGPT_API_KEY || !!process.env.OPENAI_API_KEY || !!process.env.ANTHROPIC_API_KEY;
 }
 
 /** Teste que la clé API GPT répond (appel minimal). */

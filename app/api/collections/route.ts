@@ -36,12 +36,8 @@ export async function GET(request: NextRequest) {
 
     const collections = await prisma.collection.findMany({
       where: { brandId },
-      include: {
-        _count: {
-          select: { designs: true },
-        },
-      },
-      orderBy: { createdAt: 'desc' },
+      include: { _count: { select: { designs: true } } },
+      orderBy: { name: 'asc' },
     });
 
     return NextResponse.json({ collections });

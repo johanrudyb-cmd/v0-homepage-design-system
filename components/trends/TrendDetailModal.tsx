@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { X, TrendingUp, BarChart3, Globe, Sparkles, Loader2, Palette, Mail, ImagePlus } from 'lucide-react';
+import { GenerationCostBadge } from '@/components/ui/generation-cost-badge';
 
 export interface TrendDetailModalTrend {
   productName: string;
@@ -20,9 +21,9 @@ export interface TrendDetailModalTrend {
   style: string | null;
   imageUrl?: string | null;
   generatedImageUrl?: string | null;
-  /** Conseils GPT (après scrape) */
+  /** Conseils IA (après scrape) */
   aiAdvice?: string | null;
-  /** Note GPT 1-10 (après scrape) */
+  /** Note IA 1-10 (après scrape) */
   aiRating?: number | null;
   recommendation?: 'recommended' | 'avoid';
   segment?: 'homme' | 'femme' | 'enfant' | null;
@@ -141,7 +142,7 @@ export function TrendDetailModal({
   const isAvoid = trend.recommendation === 'avoid';
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-[100] p-4" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/95 flex items-center justify-center z-[100] p-4" onClick={onClose}>
       <Card
         className="w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col border border-border shadow-2xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100"
         onClick={(e) => e.stopPropagation()}
@@ -196,12 +197,13 @@ export function TrendDetailModal({
               {imageGenerating ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
-                  Génération de l&apos;image (GPT + Higgsfield)…
+                  Génération de l&apos;image…
                 </>
               ) : (
                 <>
                   <ImagePlus className="w-4 h-4" />
                   Générer l&apos;image produit (IA)
+                  <GenerationCostBadge feature="trends_generate_image" />
                 </>
               )}
             </Button>
@@ -239,10 +241,6 @@ export function TrendDetailModal({
                 <div className="text-lg font-semibold">{trend.brands.length}</div>
               </div>
               <div className="rounded-lg border bg-muted/40 p-3">
-                <div className="text-xs text-muted-foreground">Prix moyen</div>
-                <div className="text-lg font-semibold">{trend.averagePrice.toFixed(2)} €</div>
-              </div>
-              <div className="rounded-lg border bg-muted/40 p-3">
                 <div className="text-xs text-muted-foreground">Style</div>
                 <div className="text-sm font-medium truncate">{trend.style || '—'}</div>
               </div>
@@ -276,7 +274,7 @@ export function TrendDetailModal({
           <div>
             <h3 className="text-sm font-semibold flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4" />
-              Conseils IA {displayAdvice ? '(données scrape + GPT)' : ''}
+              Conseils IA
             </h3>
             {displayAdvice && (
               <div className="rounded-lg border bg-muted/30 p-4 text-sm text-foreground whitespace-pre-wrap leading-relaxed mb-3">

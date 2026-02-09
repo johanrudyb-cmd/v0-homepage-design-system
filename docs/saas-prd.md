@@ -1,4 +1,4 @@
-# Product Requirements Document (PRD) - Application SaaS Mode
+# Product Requirements Document (PRD) - Application OUTFITY
 
 *Document créé via BMAD-Method - Product Manager (John)*
 

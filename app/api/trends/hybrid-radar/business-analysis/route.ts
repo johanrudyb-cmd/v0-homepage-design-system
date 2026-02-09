@@ -5,6 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { sanitizeErrorMessage } from '@/lib/utils';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { generateBusinessAnalysisForZones, isChatGptConfigured } from '@/lib/api/chatgpt';
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
 
     if (!isChatGptConfigured()) {
       return NextResponse.json(
-        { error: 'CHATGPT_API_KEY requise.' },
+        { error: 'Clé API requise.' },
         { status: 503 }
       );
     }
@@ -79,6 +80,6 @@ export async function POST(request: Request) {
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Erreur';
     console.error('[Business Analysis]', e);
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: sanitizeErrorMessage(message) }, { status: 500 });
   }
 }

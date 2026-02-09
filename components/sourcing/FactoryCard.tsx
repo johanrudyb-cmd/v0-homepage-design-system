@@ -1,11 +1,8 @@
 'use client';
 
-import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { RequestQuoteModal } from './RequestQuoteModal';
-import { FactoryReviews } from './FactoryReviews';
-import { MessageSquare, X } from 'lucide-react';
+import { Star, Info, ExternalLink } from 'lucide-react';
 
 interface Factory {
   id: string;
@@ -17,20 +14,18 @@ interface Factory {
   certifications: string[];
   contactEmail: string | null;
   contactPhone: string | null;
+  website?: string | null;
   rating: number | null;
 }
 
 interface FactoryCardProps {
   factory: Factory;
-  brandId: string;
-  isAlreadyQuoted: boolean;
-  preFilledMessage?: string;
-  preFilledSubject?: string;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
+  onViewDetail?: () => void;
 }
 
-export function FactoryCard({ factory, brandId, isAlreadyQuoted, preFilledMessage, preFilledSubject }: FactoryCardProps) {
-  const [showModal, setShowModal] = useState(false);
-  const [showReviews, setShowReviews] = useState(false);
+export function FactoryCard({ factory, isFavorite = false, onToggleFavorite, onViewDetail }: FactoryCardProps) {
 
   return (
     <>
@@ -39,42 +34,39 @@ export function FactoryCard({ factory, brandId, isAlreadyQuoted, preFilledMessag
           <div className="space-y-4">
             {/* Header */}
             <div>
-              <div className="flex items-start justify-between mb-2">
-                <h3 className="text-lg font-semibold text-foreground">
+              <div className="flex items-start justify-between mb-2 gap-2">
+                <h3 className="text-lg font-semibold text-foreground flex-1 min-w-0">
                   {factory.name}
                 </h3>
-                {factory.rating && (
-                  <div className="flex items-center gap-1 px-2 py-1 rounded bg-warning/10 border border-warning/20">
-                    <span className="text-warning">★</span>
-                    <span className="text-sm font-medium text-foreground">
-                      {factory.rating.toFixed(1)}
-                    </span>
-                  </div>
-                )}
+                <div className="flex items-center gap-1 flex-shrink-0">
+                  {onToggleFavorite && (
+                    <button
+                      type="button"
+                      onClick={onToggleFavorite}
+                      className="p-1.5 rounded hover:bg-muted transition-colors"
+                      title={isFavorite ? 'Retirer des favoris' : 'Mettre en favori (visible dans Gérer ma marque > Sourcing)'}
+                      aria-label={isFavorite ? 'Retirer des favoris' : 'Mettre en favori'}
+                    >
+                      <Star className={`w-5 h-5 ${isFavorite ? 'fill-amber-400 text-amber-500' : 'text-muted-foreground'}`} />
+                    </button>
+                  )}
+                  {factory.rating && (
+                    <div className="flex items-center gap-1 px-2 py-1 rounded bg-warning/10 border border-warning/20">
+                      <span className="text-warning">★</span>
+                      <span className="text-sm font-medium text-foreground">
+                        {factory.rating.toFixed(1)}
+                      </span>
+                    </div>
+                  )}
+                </div>
               </div>
               <div className="text-sm text-muted-foreground">
                 {factory.country}
               </div>
             </div>
 
-            {/* Infos principales */}
-            <div className="space-y-2 text-sm border-t border-border pt-3">
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">MOQ</span>
-                <span className="text-foreground font-medium">
-                  {factory.moq} pièces
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-muted-foreground">Délai</span>
-                <span className="text-foreground font-medium">
-                  {factory.leadTime} jours
-                </span>
-              </div>
-            </div>
-
             {/* Spécialités */}
-            <div>
+            <div className="border-t border-border pt-3">
               <div className="text-xs text-muted-foreground mb-2 font-medium uppercase">
                 Spécialités
               </div>
@@ -115,36 +107,29 @@ export function FactoryCard({ factory, brandId, isAlreadyQuoted, preFilledMessag
             )}
 
             {/* Actions */}
-            <div className="flex gap-2 pt-3 border-t border-border">
-              {isAlreadyQuoted ? (
-                <Button
-                  disabled
-                  className="flex-1 bg-muted text-muted-foreground"
-                >
-                  Devis envoyé
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => setShowModal(true)}
-                  className="flex-1"
-                >
-                  Demander un devis
-                </Button>
-              )}
-              <Button
-                variant="outline"
-                onClick={() => setShowReviews(true)}
-                title="Voir les avis"
-              >
-                <MessageSquare className="w-4 h-4" />
-              </Button>
-              {factory.contactEmail && (
+            <div className="flex flex-wrap gap-2 pt-3 border-t border-border">
+              {onViewDetail && (
                 <Button
                   variant="outline"
-                  onClick={() => window.open(`mailto:${factory.contactEmail}`)}
-                  className="border-stone-300 text-stone-700 font-light tracking-wide uppercase text-xs py-2 px-4"
+                  size="sm"
+                  onClick={onViewDetail}
+                  className="gap-1.5"
+                  title="Voir le détail du fournisseur"
                 >
-                  Contacter
+                  <Info className="w-4 h-4" />
+                  Voir le détail
+                </Button>
+              )}
+              {factory.website && (
+                <Button
+                  variant="default"
+                  size="sm"
+                  onClick={() => window.open(factory.website!, '_blank')}
+                  className="flex-1 min-w-[120px] gap-1.5"
+                  title="Voir le site web"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Voir le site web
                 </Button>
               )}
             </div>
@@ -152,42 +137,6 @@ export function FactoryCard({ factory, brandId, isAlreadyQuoted, preFilledMessag
         </CardContent>
       </Card>
 
-      {showModal && (
-        <RequestQuoteModal
-          factory={factory}
-          brandId={brandId}
-          onClose={() => setShowModal(false)}
-          onSuccess={() => {
-            setShowModal(false);
-            window.location.reload();
-          }}
-          preFilledMessage={preFilledMessage}
-          preFilledSubject={preFilledSubject}
-        />
-      )}
-
-      {showReviews && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-          <div className="bg-background rounded-xl shadow-modern-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-background border-b border-border p-4 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-foreground">Avis - {factory.name}</h3>
-              <button
-                onClick={() => setShowReviews(false)}
-                className="p-2 hover:bg-muted rounded-lg transition-colors"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-4">
-              <FactoryReviews
-                factoryId={factory.id}
-                factoryName={factory.name}
-                currentRating={factory.rating}
-              />
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 }

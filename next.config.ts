@@ -1,12 +1,14 @@
 import type { NextConfig } from 'next';
-import path from 'node:path';
+import path from 'path';
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
-  // Racine du projet pour Turbopack (évite l'avertissement "multiple lockfiles")
-  turbopack: {
-    root: path.resolve(process.cwd()),
-  },
+  // Définir explicitement la racine du workspace pour éviter les avertissements sur les lockfiles multiples
+  outputFileTracingRoot: path.resolve(process.cwd()),
+  // Ne pas bundler puppeteer / pdfkit (résolution depuis node_modules au runtime pour éviter ENOENT Helvetica.afm)
+  serverExternalPackages: ['puppeteer', 'puppeteer-extra', 'puppeteer-extra-plugin-stealth', 'pdfkit', 'nodemailer'],
+  // Turbopack désactivé en dev (--webpack) pour éviter "Failed to write app endpoint" sur Windows
+  // turbopack: { root: path.resolve(process.cwd()) },
   images: {
     // Deprecated: utiliser remotePatterns
     // domains: ['localhost'],
@@ -14,6 +16,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: '**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'd1yei2z3i6k35z.cloudfront.net',
+        pathname: '/6087651/**',
       },
       {
         protocol: 'http',

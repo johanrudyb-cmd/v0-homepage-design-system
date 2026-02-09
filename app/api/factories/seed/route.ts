@@ -3,131 +3,39 @@ import { prisma } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 
-/**
- * ⚠️ IMPORTANT : Route de seed pour données de DÉMONSTRATION uniquement
- * Les usines créées sont FICTIVES et servent uniquement à tester les fonctionnalités.
- */
-
-// Données des usines à seed
+// Nouvelle liste des fournisseurs (remplace les anciens fournisseurs test)
 const factories = [
-  // PORTUGAL
-  {
-    name: 'Textile Portugal Premium',
-    country: 'Portugal',
-    moq: 100,
-    specialties: ['Jersey', 'Coton GSM élevé', 'Tricot'],
-    leadTime: 30,
-    certifications: ['OEKO-TEX', 'GOTS'],
-    contactEmail: 'contact@textileportugal.pt',
-    contactPhone: '+351 21 123 4567',
-    rating: 4.8,
-  },
-  {
-    name: 'Moda Lisboa Manufacturing',
-    country: 'Portugal',
-    moq: 50,
-    specialties: ['Streetwear', 'Hoodie', 'Sweatshirt'],
-    leadTime: 25,
-    certifications: ['OEKO-TEX'],
-    contactEmail: 'info@modalisboa.pt',
-    contactPhone: '+351 21 234 5678',
-    rating: 4.6,
-  },
-  {
-    name: 'Porto Textile Works',
-    country: 'Portugal',
-    moq: 200,
-    specialties: ['Denim', 'Coton GSM élevé', 'T-shirt'],
-    leadTime: 35,
-    certifications: ['GOTS', 'OEKO-TEX'],
-    contactEmail: 'hello@portotextile.pt',
-    contactPhone: '+351 22 345 6789',
-    rating: 4.7,
-  },
-  // TURQUIE
-  {
-    name: 'Istanbul Fashion Manufacturing',
-    country: 'Turquie',
-    moq: 200,
-    specialties: ['Streetwear', 'Y2K', 'Hoodie'],
-    leadTime: 40,
-    certifications: ['OEKO-TEX'],
-    contactEmail: 'contact@istanbulfashion.tr',
-    contactPhone: '+90 212 123 4567',
-    rating: 4.6,
-  },
-  {
-    name: 'Bursa Textile Experts',
-    country: 'Turquie',
-    moq: 300,
-    specialties: ['Coton GSM élevé', 'Jersey', 'T-shirt'],
-    leadTime: 35,
-    certifications: ['OEKO-TEX', 'GOTS'],
-    contactEmail: 'info@bursatextile.tr',
-    contactPhone: '+90 224 234 5678',
-    rating: 4.7,
-  },
-  // CHINE
-  {
-    name: 'Guangzhou Fashion Hub',
-    country: 'Chine',
-    moq: 500,
-    specialties: ['Streetwear', 'Y2K', 'Hoodie'],
-    leadTime: 45,
-    certifications: ['OEKO-TEX'],
-    contactEmail: 'contact@guangzhoufashion.cn',
-    contactPhone: '+86 20 1234 5678',
-    rating: 4.5,
-  },
-  {
-    name: 'Shanghai Premium Textiles',
-    country: 'Chine',
-    moq: 300,
-    specialties: ['Premium', 'Luxe', 'Minimaliste'],
-    leadTime: 40,
-    certifications: ['OEKO-TEX', 'GOTS'],
-    contactEmail: 'info@shanghaipremium.cn',
-    contactPhone: '+86 21 2345 6789',
-    rating: 4.7,
-  },
+  { name: 'ASBX', country: 'Portugal', moq: 50, specialties: ['Knitwear', 'Streetwear', 'Luxury Jersey', 'Sustainable', 'Custom Manufacturing'], leadTime: 30, certifications: ['OEKO-TEX', 'GOTS'], contactEmail: 'hello@asbx.pt', contactPhone: null, website: 'https://asbx.pt', rating: 4.8 },
+  { name: 'Tetriberica', country: 'Portugal', moq: 100, specialties: ['Luxury Knits', 'Eco-fashion', 'Knitting textiles', 'Dyeing', 'Printing', 'Embroidery'], leadTime: 84, certifications: ['OEKO-TEX', 'GOTS'], contactEmail: 'info@tetriberica.pt', contactPhone: null, website: 'https://tetriberica.pt', rating: 4.7 },
+  { name: 'Create Fashion Brand', country: 'Portugal', moq: 50, specialties: ['Premium Streetwear', 'Heavyweight Cotton', 'Jackets', 'Denim', 'Chinos', 'Sports wear', 'Organic Cotton'], leadTime: 70, certifications: ['OEKO-TEX', 'GOTS', 'OCS', 'Global Recycled Standard'], contactEmail: 'hello@createfashionbrand.com', contactPhone: null, website: 'https://createfashionbrand.com', rating: 4.9 },
+  { name: 'Chantuque', country: 'Turkey', moq: 100, specialties: ['High-end contemporary apparel', 'Istanbul'], leadTime: 45, certifications: ['OEKO-TEX'], contactEmail: 'info@chantuque.com', contactPhone: null, website: 'https://chantuque.com', rating: 4.5 },
+  { name: 'Kardem', country: 'Turkey', moq: 500, specialties: ['Ready-made garments', 'Mass production', 'Global Retail', 'Turkey & Serbia'], leadTime: 45, certifications: ['OEKO-TEX'], contactEmail: 'info@kardem.com', contactPhone: null, website: 'https://kardem.com', rating: 4.3 },
+  { name: 'Hermin', country: 'Turkey', moq: 200, specialties: ['Textiles', 'Shirting', 'Woven garments'], leadTime: 40, certifications: ['OEKO-TEX'], contactEmail: 'info@hermin.com.tr', contactPhone: null, website: 'https://hermin.com.tr', rating: 4.4 },
+  { name: 'MPY Textile', country: 'Turkey', moq: 150, specialties: ['Fashion collection development'], leadTime: 38, certifications: ['OEKO-TEX'], contactEmail: 'info@mpytextile.com', contactPhone: null, website: 'https://mpytextile.com', rating: 4.6 },
+  { name: 'Confetil', country: 'Portugal', moq: 100, specialties: ['Activewear', 'High-tech jerseys'], leadTime: 32, certifications: ['OEKO-TEX'], contactEmail: 'info@confetil.pt', contactPhone: null, website: 'https://confetil.pt', rating: 4.6 },
+  { name: 'Sportinout', country: 'Portugal', moq: 100, specialties: ['Technical Sportswear', 'Performance fabrics'], leadTime: 35, certifications: ['OEKO-TEX'], contactEmail: 'info@sportinout.com', contactPhone: null, website: 'https://sportinout.com', rating: 4.5 },
+  { name: 'Quanzhou Haixin Garment Technology Co., Ltd', country: 'China', moq: 500, specialties: ['Garments', 'Apparel', 'Clothing technology', 'Quanzhou'], leadTime: 50, certifications: ['OEKO-TEX'], contactEmail: null, contactPhone: null, website: null, rating: 4.4 },
+  { name: 'QZHIC', country: 'China', moq: 500, specialties: ['Garments', 'Apparel', 'Alibaba', 'Quanzhou'], leadTime: 50, certifications: ['OEKO-TEX'], contactEmail: null, contactPhone: null, website: 'https://qzhic.en.alibaba.com/fr_FR/company_profile.html', rating: 4.4 },
 ];
 
-export async function POST(request: Request) {
+export async function POST() {
   if (process.env.NODE_ENV === 'production') {
-    return NextResponse.json(
-      { error: 'Non autorisé en production' },
-      { status: 403 }
-    );
+    return NextResponse.json({ error: 'Non autorisé en production' }, { status: 403 });
   }
 
   try {
-    // Vérifier si des usines existent déjà
-    const existingCount = await prisma.factory.count();
-
-    if (existingCount > 0) {
-      return NextResponse.json(
-        {
-          message: `${existingCount} usine(s) existent déjà. Utilisez le script CLI pour ajouter plus d'usines.`,
-          count: existingCount,
-        },
-        { status: 200 }
-      );
-    }
-
-    // Créer les usines
+    await prisma.factory.deleteMany({});
     const created = await prisma.factory.createMany({
       data: factories,
-      skipDuplicates: true,
     });
-
     return NextResponse.json({
-      message: `${created.count} usine(s) créée(s) avec succès`,
+      message: `${created.count} fournisseur(s) créé(s) avec succès`,
       count: created.count,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Erreur lors du seed des usines:', error);
     return NextResponse.json(
-      { error: 'Une erreur est survenue', details: error.message },
+      { error: 'Une erreur est survenue', details: error instanceof Error ? error.message : String(error) },
       { status: 500 }
     );
   }

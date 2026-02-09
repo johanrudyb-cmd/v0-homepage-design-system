@@ -1,11 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
+import { useQuota } from '@/lib/hooks/useQuota';
+import { useSurplusModal } from '@/components/usage/SurplusModalContext';
+import { GenerationCostBadge } from '@/components/ui/generation-cost-badge';
+import { ConfirmGenerateModal } from '@/components/ui/confirm-generate-modal';
+import { GenerationLoadingPopup } from '@/components/ui/generation-loading-popup';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, Copy, Edit2, Save, X, FileText, Sparkles } from 'lucide-react';
+import { Loader2, Copy, Edit2, Save, X, FileText, Sparkles, FolderPlus } from 'lucide-react';
 import { UGCContentHistory } from './UGCContentHistory';
 
 interface ScriptGeneratorProps {
@@ -20,6 +26,8 @@ interface Script {
 }
 
 export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
+  const scriptsQuota = useQuota('ugc_scripts');
+  const openSurplusModal = useSurplusModal();
   const [productDescription, setProductDescription] = useState('');
   const [count, setCount] = useState(5);
   const [tone, setTone] = useState('décontracté');
@@ -28,6 +36,15 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
   const [error, setError] = useState('');
   const [showHistory, setShowHistory] = useState(false);
   const [editingScript, setEditingScript] = useState<{ id: string; content: string } | null>(null);
+  // Ajouter script à un fichier (collection)
+  const [addToFileScriptId, setAddToFileScriptId] = useState<string | null>(null);
+  const [collections, setCollections] = useState<{ id: string; name: string }[]>([]);
+  const [fileCollectionId, setFileCollectionId] = useState('');
+  const [fileNewName, setFileNewName] = useState('');
+  const [fileArticleLabel, setFileArticleLabel] = useState('');
+  const [fileSaving, setFileSaving] = useState(false);
+  const [fileDone, setFileDone] = useState(false);
+  const [showConfirmGenerate, setShowConfirmGenerate] = useState(false);
 
   const handleGenerate = async () => {
     if (!productDescription.trim()) {
@@ -64,6 +81,7 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
         content: typeof s === 'string' ? s : s.content,
       })));
       setShowHistory(false);
+      window.dispatchEvent(new CustomEvent(USAGE_REFRESH_EVENT));
     } catch (err: any) {
       setError(err.message || 'Une erreur est survenue');
     } finally {
@@ -105,6 +123,55 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
   const handleSelectFromHistory = (content: any) => {
     setScripts([{ id: content.id, content: content.content }]);
     setShowHistory(false);
+  };
+
+  useEffect(() => {
+    if (!addToFileScriptId || !brandId) return;
+    fetch(`/api/collections?brandId=${encodeURIComponent(brandId)}`)
+      .then((res) => (res.ok ? res.json() : { collections: [] }))
+      .then((data) => setCollections(data.collections ?? []))
+      .catch(() => setCollections([]));
+  }, [addToFileScriptId, brandId]);
+
+  const handleAddScriptToFile = async () => {
+    if (!addToFileScriptId) return;
+    const collectionId = fileNewName.trim() ? null : fileCollectionId;
+    if (!collectionId && !fileNewName.trim()) return;
+    setFileSaving(true);
+    setFileDone(false);
+    try {
+      let targetId = collectionId;
+      if (fileNewName.trim()) {
+        const createRes = await fetch('/api/collections', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ brandId, name: fileNewName.trim() }),
+        });
+        if (!createRes.ok) throw new Error('Impossible de créer le fichier');
+        const { collection } = await createRes.json();
+        targetId = collection.id;
+      }
+      const res = await fetch(`/api/collections/${targetId}/articles`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'ugc',
+          label: fileArticleLabel.trim() || undefined,
+          payload: { ugcContentId: addToFileScriptId },
+        }),
+      });
+      if (!res.ok) throw new Error('Impossible d\'ajouter l\'article');
+      setFileDone(true);
+      setFileNewName('');
+      setFileArticleLabel('');
+      setFileCollectionId(collections[0]?.id ?? '');
+      setTimeout(() => setAddToFileScriptId(null), 1500);
+    } catch (e) {
+      console.error(e);
+      window.alert('Erreur lors de l\'ajout au fichier.');
+    } finally {
+      setFileSaving(false);
+    }
   };
 
   return (
@@ -200,25 +267,57 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
                 </div>
               )}
 
-              <Button
-                onClick={handleGenerate}
-                disabled={isGenerating || !productDescription.trim()}
-                className="w-full shadow-modern-lg"
-              >
-                {isGenerating ? (
-                  <>
-                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                    Génération en cours...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Générer {count} script{count > 1 ? 's' : ''}
-                  </>
-                )}
-              </Button>
+              {scriptsQuota?.isExhausted ? (
+                <Button
+                  onClick={openSurplusModal}
+                  className="w-full shadow-modern-lg bg-gradient-to-r from-primary to-primary/80"
+                >
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Recharger ce module
+                </Button>
+              ) : (
+                <>
+                  {scriptsQuota?.isAlmostFinished && (
+                    <div className="flex items-center justify-between gap-2 rounded-md bg-amber-500/15 px-3 py-2 text-amber-800 dark:text-amber-200 mb-3">
+                      <span className="text-xs font-medium">Stock épuisé bientôt !</span>
+                      <button type="button" onClick={openSurplusModal} className="text-xs font-semibold underline hover:no-underline">
+                        Prendre une recharge
+                      </button>
+                    </div>
+                  )}
+                  <Button
+                    onClick={() => setShowConfirmGenerate(true)}
+                    disabled={isGenerating || !productDescription.trim()}
+                    className="w-full shadow-modern-lg"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Génération en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Générer {count} script{count > 1 ? 's' : ''}
+                        <GenerationCostBadge feature="ugc_scripts" />
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
+
+          <GenerationLoadingPopup open={isGenerating} title="Génération des scripts en cours…" />
+          <ConfirmGenerateModal
+            open={showConfirmGenerate}
+            onClose={() => setShowConfirmGenerate(false)}
+            onConfirm={() => { setShowConfirmGenerate(false); handleGenerate(); }}
+            actionLabel={`Générer ${count} script${count > 1 ? 's' : ''}`}
+            remaining={scriptsQuota?.remaining ?? 0}
+            limit={scriptsQuota?.limit ?? 10}
+            loading={isGenerating}
+          />
 
           {/* Résultats */}
           {scripts.length > 0 && (
@@ -287,6 +386,18 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
                                   <Edit2 className="w-3 h-3" />
                                 </Button>
                               )}
+                              {script.id && (
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setAddToFileScriptId(addToFileScriptId === script.id ? null : script.id)}
+                                  className="border-2"
+                                  title="Ajouter à un fichier (collection)"
+                                >
+                                  <FolderPlus className="w-3 h-3 mr-1" />
+                                  Fichier
+                                </Button>
+                              )}
                               <Button
                                 variant="outline"
                                 size="sm"
@@ -301,6 +412,49 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
                           <p className="text-sm text-foreground font-medium whitespace-pre-wrap leading-relaxed">
                             {displayContent}
                           </p>
+                          {script.id && addToFileScriptId === script.id && (
+                            <div className="mt-4 pt-4 border-t border-border space-y-3">
+                              <p className="text-xs font-semibold text-muted-foreground uppercase">Ajouter ce script à un fichier (collection)</p>
+                              <div className="grid gap-2 sm:grid-cols-2">
+                                <select
+                                  value={fileCollectionId}
+                                  onChange={(e) => setFileCollectionId(e.target.value)}
+                                  disabled={!!fileNewName.trim()}
+                                  className="w-full h-9 rounded-lg border border-input bg-background px-2 text-sm"
+                                >
+                                  <option value="">— Fichier existant —</option>
+                                  {collections.map((c) => (
+                                    <option key={c.id} value={c.id}>{c.name}</option>
+                                  ))}
+                                </select>
+                                <Input
+                                  placeholder="Ou nouveau fichier"
+                                  value={fileNewName}
+                                  onChange={(e) => setFileNewName(e.target.value)}
+                                  onFocus={() => setFileCollectionId('')}
+                                  className="h-9 text-sm"
+                                />
+                              </div>
+                              <Input
+                                placeholder="Nom de l’article (optionnel)"
+                                value={fileArticleLabel}
+                                onChange={(e) => setFileArticleLabel(e.target.value)}
+                                className="h-9 text-sm"
+                              />
+                              <div className="flex gap-2 items-center">
+                                <Button
+                                  size="sm"
+                                  onClick={handleAddScriptToFile}
+                                  disabled={fileSaving || (!fileCollectionId && !fileNewName.trim())}
+                                >
+                                  {fileSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
+                                  {fileSaving ? 'Ajout…' : 'Ajouter au fichier'}
+                                </Button>
+                                <Button variant="ghost" size="sm" onClick={() => setAddToFileScriptId(null)}>Annuler</Button>
+                                {fileDone && <span className="text-xs text-green-600">Ajouté au fichier.</span>}
+                              </div>
+                            </div>
+                          )}
                         </>
                       )}
                     </div>

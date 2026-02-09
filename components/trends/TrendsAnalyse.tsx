@@ -40,7 +40,7 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
     try {
       const res = await fetch('/api/health/gpt');
       const data = await res.json();
-      if (res.ok) setGptTest({ ok: true, message: data.message ?? 'API GPT opérationnelle' });
+      if (res.ok) setGptTest({ ok: true, message: data.message ?? 'API IA opérationnelle' });
       else setGptTest({ ok: false, message: data.error ?? 'Erreur' });
     } catch (e) {
       setGptTest({ ok: false, message: e instanceof Error ? e.message : 'Erreur réseau' });
@@ -55,13 +55,13 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 animate-fade-in">
         <TrendsSubNav active="rapport" />
         <Card>
           <CardContent className="py-16 flex flex-col items-center justify-center gap-4">
-            <Loader2 className="w-12 h-12 animate-spin text-primary" />
-            <p className="text-muted-foreground">Génération de l&apos;analyse IA en cours…</p>
-            <p className="text-sm text-muted-foreground">Prévisions France, tendances à venir, recommandations.</p>
+            <div className="w-12 h-12 border-2 border-[#007AFF]/20 border-t-[#007AFF] rounded-full animate-apple-spin" />
+            <p className="text-[#1D1D1F]/70">Génération de l&apos;analyse IA en cours…</p>
+            <p className="text-sm text-[#1D1D1F]/50">Prévisions France, tendances à venir, recommandations.</p>
           </CardContent>
         </Card>
       </div>
@@ -77,8 +77,8 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
             <p className="text-destructive font-medium">Erreur</p>
             <p className="text-muted-foreground mt-1">{error}</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Button onClick={testGptConnection} variant="outline" size="sm" disabled={gptTestLoading} title="Vérifier que la clé API GPT est configurée">
-                {gptTestLoading ? 'Test…' : 'Tester l\'API GPT'}
+              <Button onClick={testGptConnection} variant="outline" size="sm" disabled={gptTestLoading} title="Vérifier que le service IA est configuré">
+                {gptTestLoading ? 'Test…' : 'Tester l\'API IA'}
               </Button>
               {gptTest && (
                 <span className={`text-xs px-2 py-1 rounded self-center ${gptTest.ok ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>
@@ -110,8 +110,8 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
           </p>
         </div>
         <div className="flex flex-wrap gap-2 shrink-0 items-center">
-          <Button variant="outline" size="sm" className="gap-2" onClick={testGptConnection} disabled={gptTestLoading} title="Vérifier que la clé API GPT est configurée et répond">
-            {gptTestLoading ? 'Test…' : 'Tester l\'API GPT'}
+          <Button variant="outline" size="sm" className="gap-2" onClick={testGptConnection} disabled={gptTestLoading} title="Vérifier que le service IA est configuré et répond">
+            {gptTestLoading ? 'Test…' : 'Tester l\'API IA'}
           </Button>
           {gptTest && (
             <span className={`text-xs px-2 py-1 rounded ${gptTest.ok ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>

@@ -9,7 +9,7 @@ Suivez ces étapes dans l'ordre :
 1. Allez sur [supabase.com](https://supabase.com)
 2. Créez un compte (GitHub recommandé)
 3. Créez un nouveau projet :
-   - **Name** : `saas-mode`
+   - **Name** : `outfity`
    - **Database Password** : ⚠️ **SAVEZ-LE !**
    - **Region** : `West Europe` (ou la plus proche)
    - **Plan** : `Free`

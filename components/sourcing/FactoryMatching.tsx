@@ -17,6 +17,7 @@ interface Factory {
   certifications: string[];
   contactEmail: string | null;
   contactPhone: string | null;
+  website?: string | null;
   rating: number | null;
 }
 
@@ -252,7 +253,6 @@ export function FactoryMatching({ brandId, sentQuotes }: FactoryMatchingProps) {
           <CardContent>
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
               {matchedFactories.map((factory, index) => {
-                const isQuoted = sentQuotes.some((q) => q.factoryId === factory.id);
                 return (
                   <div key={factory.id} className="relative">
                     {index === 0 && (
@@ -260,11 +260,7 @@ export function FactoryMatching({ brandId, sentQuotes }: FactoryMatchingProps) {
                         ⭐ Meilleur match
                       </div>
                     )}
-                    <FactoryCard
-                      factory={factory}
-                      brandId={brandId}
-                      isAlreadyQuoted={isQuoted}
-                    />
+                    <FactoryCard factory={factory} />
                   </div>
                 );
               })}

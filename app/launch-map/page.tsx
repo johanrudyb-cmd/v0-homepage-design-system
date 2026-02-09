@@ -1,19 +1,17 @@
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { LaunchMapStepper } from '@/components/launch-map/LaunchMapStepper';
+import { LaunchMapOverview } from '@/components/launch-map/LaunchMapOverview';
+import type { BrandIdentity } from '@/components/launch-map/LaunchMapStepper';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { Map } from 'lucide-react';
+import { getWeekEvents } from '@/lib/calendar-week-events';
 
 export default async function LaunchMapPage() {
   const user = await getCurrentUser();
-  if (!user) {
-    redirect('/auth/signin');
-  }
+  if (!user) redirect('/auth/signin');
 
-  // Récupérer ou créer une marque par défaut pour l'utilisateur
   let brand = await prisma.brand.findFirst({
     where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
     include: { launchMap: true },
   });
 
@@ -28,6 +26,7 @@ export default async function LaunchMapPage() {
             phase2: false,
             phase3: false,
             phase4: false,
+            phase5: false,
           },
         },
       },
@@ -35,30 +34,104 @@ export default async function LaunchMapPage() {
     });
   }
 
-  // Vérifier si l'identité existe
-  const hasIdentity = Boolean(brand.logo && brand.colorPalette);
+  const hasIdentity = Boolean(brand.name && brand.name.trim().length >= 2);
+
+  const [designCount, quoteCount, ugcCount, quotesWithFactory, favoriteFactories] = await Promise.all([
+    prisma.design.count({ where: { brandId: brand.id, status: 'completed' } }),
+    prisma.quote.count({ where: { brandId: brand.id } }),
+    prisma.uGCContent.count({ where: { brandId: brand.id } }),
+    prisma.quote.findMany({
+      where: { brandId: brand.id },
+      include: { factory: true },
+    }),
+    prisma.brandFavoriteFactory.findMany({
+      where: { brandId: brand.id },
+      include: { factory: true },
+    }),
+  ]);
+
+  const suppliersMap = new Map<string, { id: string; name: string; country: string; moq?: number; leadTime?: number; quoteCount: number }>();
+  
+  // D'abord ajouter les fournisseurs qui ont reçu des devis
+  for (const q of quotesWithFactory) {
+    const f = q.factory;
+    const existing = suppliersMap.get(f.id);
+    if (existing) {
+      existing.quoteCount += 1;
+    } else {
+      suppliersMap.set(f.id, {
+        id: f.id,
+        name: f.name,
+        country: f.country,
+        moq: f.moq,
+        leadTime: f.leadTime,
+        quoteCount: 1,
+      });
+    }
+  }
+  
+  // Ensuite ajouter les favoris (s'ils ne sont pas déjà dans la map)
+  for (const fav of favoriteFactories) {
+    const f = fav.factory;
+    const existing = suppliersMap.get(f.id);
+    if (!existing) {
+      // Ajouter le favori comme fournisseur avec qui on travaille
+      suppliersMap.set(f.id, {
+        id: f.id,
+        name: f.name,
+        country: f.country,
+        moq: f.moq,
+        leadTime: f.leadTime,
+        quoteCount: 0,
+      });
+    }
+  }
+  
+  const suppliers = Array.from(suppliersMap.values());
+
+  const lm = brand.launchMap;
+  const completedPhases = [
+    hasIdentity,
+    lm?.phase1,
+    lm?.phase2,
+    lm?.phase3,
+    lm?.phase4,
+    lm?.phase5,
+    lm?.phase6,
+  ].filter(Boolean).length;
+  const progressPercentage = Math.round((completedPhases / 7) * 100);
+
+  const launchMapForClient = lm
+    ? {
+        id: lm.id,
+        phase1: lm.phase1,
+        phase2: lm.phase2,
+        phase3: lm.phase3,
+        phase4: lm.phase4,
+        phase5: lm.phase5,
+        phase6: lm.phase6,
+        shopifyShopDomain: lm.shopifyShopDomain,
+        phase1Data: lm.phase1Data,
+        baseMockupByProductType: lm.baseMockupByProductType,
+        phaseSummaries: lm.phaseSummaries,
+        siteCreationTodo: lm.siteCreationTodo,
+      }
+    : null;
+
+  const weekEvents = getWeekEvents(lm?.contentCalendar ?? null);
 
   return (
-    <DashboardLayout>
-      <div className="p-8 max-w-7xl mx-auto space-y-8">
-        <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-lg bg-primary flex items-center justify-center">
-              <Map className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h1 className="text-3xl font-semibold tracking-tight text-foreground mb-1">
-                Créer ma marque
-              </h1>
-              <p className="text-muted-foreground text-sm">
-                Guidez <span className="font-medium text-primary">{brand.name}</span> de l'idée à la vente
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <LaunchMapStepper brandId={brand.id} launchMap={brand.launchMap} brand={brand} hasIdentity={hasIdentity} />
-      </div>
-    </DashboardLayout>
+    <LaunchMapOverview
+      brand={{ id: brand.id, name: brand.name, logo: brand.logo }}
+      launchMap={launchMapForClient}
+      brandFull={brand as unknown as BrandIdentity}
+      hasIdentity={hasIdentity}
+      designCount={designCount}
+      quoteCount={quoteCount}
+      ugcCount={ugcCount}
+      progressPercentage={progressPercentage}
+      suppliers={suppliers}
+      weekEvents={weekEvents}
+    />
   );
 }

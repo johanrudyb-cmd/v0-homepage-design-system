@@ -1,4 +1,4 @@
-# Spécification UX/UI - Application SaaS Mode
+# Spécification UX/UI - Application OUTFITY
 
 *Document créé via BMAD-Method - Architect (Alex)*
 

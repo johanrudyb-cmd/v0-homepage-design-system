@@ -69,10 +69,10 @@ async function testConnection() {
       console.log('');
     }
 
-    // Vérifier les tables attendues
+    // Vérifier les tables attendues (noms Prisma = noms de tables par défaut)
     const expectedTables = [
       'User', 'Account', 'Session', 'VerificationToken',
-      'Brand', 'LaunchMap', 'Design', 'Factory', 'Quote', 'BrandSpyAnalysis'
+      'Brand', 'LaunchMap', 'LaunchMapDesignDraft', 'Design', 'Factory', 'Quote', 'BrandSpyAnalysis'
     ];
     
     const foundTables = tables.map(t => t.table_name);
@@ -84,6 +84,18 @@ async function testConnection() {
       console.log('\n💡 Exécutez "npm run db:push" pour créer les tables manquantes.\n');
     } else {
       console.log('🎉 Toutes les tables attendues sont présentes !\n');
+    }
+
+    // Vérification spécifique historique designs (LaunchMapDesignDraft)
+    if (foundTables.includes('LaunchMapDesignDraft')) {
+      console.log('📋 Vérification table LaunchMapDesignDraft (historique designs)...');
+      try {
+        const countResult = await client.query('SELECT COUNT(*) as count FROM "LaunchMapDesignDraft"');
+        console.log(`   ✅ Table accessible. Nombre d\'entrées : ${countResult.rows[0].count}\n`);
+      } catch (e) {
+        console.log('   ❌ Erreur sur LaunchMapDesignDraft :', e.message);
+        console.log('   💡 Exécutez "npm run db:push" pour synchroniser le schéma.\n');
+      }
     }
 
     client.release();

@@ -8,13 +8,11 @@ interface TrendsSubNavProps {
 
 const tabs: { id: Tab; label: string; href: string }[] = [
   { id: 'classement', label: 'Classement', href: '/trends' },
-  { id: 'rapport', label: 'Rapport IA', href: '/trends/analyse' },
-  { id: 'phases', label: 'Phases (émergent → déclin)', href: '/trends/predictions' },
 ];
 
 export function TrendsSubNav({ active }: TrendsSubNavProps) {
   return (
-    <nav className="flex flex-wrap gap-1 p-1 rounded-lg bg-muted/60 w-fit" aria-label="Sections Tendances">
+    <nav className="flex flex-wrap gap-1 p-1 rounded-lg bg-muted/60 w-fit" aria-label="Sections Tendances de la semaine">
       {tabs.map((tab) =>
         tab.id === active ? (
           <span
