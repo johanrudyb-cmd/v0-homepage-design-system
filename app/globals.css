@@ -1,529 +1,158 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss';
+@import 'tw-animate-css';
 
-@layer base {
-  :root {
-    /* Design System - Apple Design Language */
-    /* Palette Apple - Luxueusement Simple */
-    /* Les variables de polices sont définies par next/font dans layout.tsx */
-    
-    /* Fond principal : Gris Apple très léger */
-    --background: 0 0% 96%; /* #F5F5F7 */
-    --foreground: 0 0% 12%; /* #1D1D1F - Gris anthracite */
-    
-    /* Dashboard background : Même que background */
-    --dashboard-background: 0 0% 96%; /* #F5F5F7 */
-    
-    /* Primary - Noir pur Apple */
-    --primary: 0 0% 0%; /* #000000 */
-    --primary-foreground: 0 0% 100%; /* #FFFFFF */
-    
-    /* Secondary - Bleu Apple pour éléments cliquables */
-    --secondary: 210 100% 50%; /* #007AFF */
-    --secondary-foreground: 0 0% 100%;
-    
-    /* Accent - Bleu Apple */
-    --accent: 210 100% 50%; /* #007AFF */
-    --accent-foreground: 0 0% 100%;
-    
-    /* Muted - Gris Apple */
-    --muted: 0 0% 90%;
-    --muted-foreground: 0 0% 45%;
-    
-    /* Border - Pas de bordures visibles dans Apple Design */
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
-    --ring: 210 100% 50%; /* #007AFF */
-    
-    /* Status Colors */
-    --success: 142 76% 36%;
-    --error: 0 84% 60%;
-    --warning: 38 92% 50%;
-    --info: 210 100% 40%;
-    
-    /* Sidebar - Glassmorphism */
-    --sidebar-background: 0 0% 100% / 80%;
-    --sidebar-foreground: 0 0% 12%;
-    --sidebar-border: transparent;
-    --sidebar-accent: 0 0% 96%;
-    
-    /* Card - Blanc pur avec ombre légère */
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 12%;
-    
-    /* Radius - Squircle (arrondis prononcés) */
-    --radius: 1.5rem; /* rounded-3xl */
-  }
+@custom-variant dark (&:is(.dark *));
 
-  .dark {
-    /* Mode sombre minimaliste si nécessaire */
-    --background: 0 0% 10%;
-    --foreground: 251 20% 98.5%;
-    
-    --primary: 251 20% 98.5%;
-    --primary-foreground: 0 0% 10%;
-    
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    
-    --sidebar-background: 0 0% 10%;
-    --sidebar-foreground: 251 20% 98.5%;
-    --sidebar-border: 0 0% 20%;
-    
-    --card: 0 0% 12%;
-    --card-foreground: 251 20% 98.5%;
-  }
+:root {
+  /* Médias Biangory Brand Colors */
+  --background: #ffffff;
+  --foreground: #000000;
+  --card: #ffffff;
+  --card-foreground: #000000;
+  --popover: #ffffff;
+  --popover-foreground: #000000;
+  --primary: #000000;
+  --primary-foreground: #ffffff;
+  --secondary: #D4AF37;
+  --secondary-foreground: #000000;
+  --muted: #F8F8F8;
+  --muted-foreground: #6B7280;
+  --accent: #FF69B4;
+  --accent-foreground: #000000;
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
+  --border: #e5e5e5;
+  --input: #e5e5e5;
+  --ring: #D4AF37;
+  --chart-1: #D4AF37;
+  --chart-2: #FF69B4;
+  --chart-3: #000000;
+  --chart-4: #F5D76E;
+  --chart-5: #FFB6C1;
+  --radius: 0.5rem; /* Preserving user's radius */
+  
+  /* Brand-specific tokens */
+  --gold: #D4AF37;
+  --gold-light: #F5D76E;
+  --pink: #FF69B4;
+  --pink-light: #FFB6C1;
+  --black: #000000;
+  --black-light: #1a1a1a;
+  --white: #ffffff;
+  --gray: #F8F8F8;
+  --success: #10B981;
+  --warning: #F59E0B;
+
+  /* Shadcn/ui sidebar variables (added) */
+  --sidebar: oklch(0.985 0 0); /* Default light mode */
+  --sidebar-foreground: oklch(0.145 0 0);
+  --sidebar-primary: oklch(0.205 0 0);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.97 0 0);
+  --sidebar-accent-foreground: oklch(0.205 0 0);
+  --sidebar-border: oklch(0.922 0 0);
+  --sidebar-ring: oklch(0.708 0 0);
+}
+ 
+.dark {
+  --background: oklch(0.145 0 0);
+  --foreground: oklch(0.985 0 0);
+  --card: oklch(0.145 0 0);
+  --card-foreground: oklch(0.985 0 0);
+  --popover: oklch(0.145 0 0);
+  --popover-foreground: oklch(0.985 0 0);
+  --primary: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.205 0 0);
+  --secondary: oklch(0.269 0 0);
+  --secondary-foreground: oklch(0.985 0 0);
+  --muted: oklch(0.269 0 0);
+  --muted-foreground: oklch(0.708 0 0);
+  --accent: oklch(0.269 0 0);
+  --accent-foreground: oklch(0.985 0 0);
+  --destructive: oklch(0.396 0.141 25.723);
+  --destructive-foreground: oklch(0.637 0.237 25.331);
+  --border: oklch(0.269 0 0);
+  --input: oklch(0.269 0 0);
+  --ring: oklch(0.439 0 0);
+  --chart-1: oklch(0.488 0.243 264.376);
+  --chart-2: oklch(0.696 0.17 162.48);
+  --chart-3: oklch(0.769 0.188 70.08);
+  --chart-4: oklch(0.627 0.265 303.9);
+  --chart-5: oklch(0.645 0.246 16.439);
+  --sidebar: oklch(0.205 0 0);
+  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar-primary: oklch(0.488 0.243 264.376);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.269 0 0);
+  --sidebar-accent-foreground: oklch(0.985 0 0);
+  --sidebar-border: oklch(0.269 0 0);
+  --sidebar-ring: oklch(0.439 0 0);
+}
+
+@theme inline {
+  --font-sans: 'Poppins', 'Geist', 'Geist Fallback', system-ui, sans-serif;
+  --font-mono: 'Geist Mono', 'Geist Mono Fallback', monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  
+  /* Brand Colors */
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-pink: var(--pink);
+  --color-pink-light: var(--pink-light);
+  --color-black: var(--black);
+  --color-black-light: var(--black-light);
+  --color-white: var(--white);
+  --color-gray: var(--gray);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+
+  /* Shadcn/ui sidebar color mappings (added) */
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
   }
-
   * {
-    @apply border-border;
+    @apply border-border outline-ring/50;
   }
-  
   body {
-    @apply bg-[#F5F5F7] text-[#1D1D1F];
-    font-family: var(--font-sans);
-    font-weight: 400;
-    font-feature-settings: "rlig" 1, "calt" 1;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    letter-spacing: -0.011em;
-  }
-  
-  /* Typography Apple - Titres très gros avec tracking-tight */
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-sans);
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    color: #1D1D1F;
-  }
-  
-  h1 {
-    @apply text-6xl lg:text-7xl;
-    font-weight: 600;
-    letter-spacing: -0.03em;
-  }
-  
-  h2 {
-    @apply text-5xl lg:text-6xl;
-    font-weight: 600;
-    letter-spacing: -0.025em;
-  }
-  
-  h3 {
-    @apply text-3xl lg:text-4xl;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-  }
-  
-  /* Body text - Gris anthracite pour lecture reposante */
-  p {
-    font-family: var(--font-sans);
-    font-weight: 400;
-    @apply leading-relaxed;
-    color: #1D1D1F;
-  }
-  
-  /* Boutons - Style Apple */
-  button {
-    font-family: var(--font-sans);
-    font-weight: 500;
-    letter-spacing: -0.011em;
-  }
-  
-  /* Pas de couleur automatique pour les liens - à appliquer explicitement */
-}
-
-@layer utilities {
-  /* Smooth scrolling */
-  .scroll-smooth {
-    scroll-behavior: smooth;
-  }
-  
-  /* Focus visible Apple */
-  .focus-visible-ring {
-    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF];
-  }
-  
-  /* Glassmorphism - Effet de profondeur Apple */
-  .glass {
-    @apply backdrop-blur-xl bg-white/80;
-  }
-  
-  /* Ombre Apple - Très légère et diffuse */
-  .shadow-apple {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
-  }
-  
-  .shadow-apple-lg {
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.03);
-  }
-  
-  /* Classe utilitaire pour liens interactifs/cliquables - Bleu Apple */
-  /* À utiliser uniquement pour les liens de navigation, actions, etc. */
-  .link-interactive {
-    @apply transition-colors duration-200;
-    color: #007AFF;
-    text-decoration: none;
-  }
-  
-  .link-interactive:hover {
-    color: #0056CC;
-  }
-  
-  /* Les liens dans le texte normal ne doivent PAS être bleus automatiquement */
-  /* Seuls les éléments explicitement marqués comme interactifs le seront */
-}
-
-/* Animations Apple - Transitions douces et élégantes */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
+    @apply bg-background text-foreground;
   }
 }
-
-@keyframes fadeOut {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-  }
-}
-
-@keyframes pageTransition {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideInRight {
-  from {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes slideInLeft {
-  from {
-    opacity: 0;
-    transform: translateX(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-@keyframes scaleIn {
-  from {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-@keyframes appleSpin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes applePulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee {
-  animation: marquee 30s linear infinite;
-}
-
-/* Marquee très lent style Apple */
-@keyframes marquee-slow {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-
-.animate-marquee-slow {
-  animation: marquee-slow 15s linear infinite;
-}
-
-/* Animations pour header - Art & Mode */
-@keyframes float {
-  0%, 100% {
-    transform: translate(0, 0) scale(1);
-  }
-  33% {
-    transform: translate(30px, -30px) scale(1.1);
-  }
-  66% {
-    transform: translate(-20px, 20px) scale(0.9);
-  }
-}
-
-@keyframes rotate {
-  0% {
-    transform: rotate(45deg) translate(0, 0);
-  }
-  50% {
-    transform: rotate(225deg) translate(20px, -20px);
-  }
-  100% {
-    transform: rotate(405deg) translate(0, 0);
-  }
-}
-
-@keyframes wave {
-  0%, 100% {
-    transform: translateX(0) scaleX(1);
-    opacity: 0.1;
-  }
-  50% {
-    transform: translateX(50px) scaleX(1.2);
-    opacity: 0.2;
-  }
-}
-
-@keyframes slide {
-  0% {
-    transform: translateX(0) translateY(0);
-  }
-  50% {
-    transform: translateX(-20px) translateY(10px);
-  }
-  100% {
-    transform: translateX(0) translateY(0);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.15;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.25;
-  }
-}
-
-@keyframes pulse-mode {
-  0%, 100% {
-    transform: scale(1);
-    opacity: 0.15;
-  }
-  50% {
-    transform: scale(1.2);
-    opacity: 0.25;
-  }
-}
-
-@keyframes shimmer {
-  0% {
-    background-position: -1000px 0;
-  }
-  100% {
-    background-position: 1000px 0;
-  }
-}
-
-@keyframes shimmer-header {
-  0% {
-    transform: translateX(-100%);
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.1;
-  }
-  100% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-}
-
-/* Animations header - Art & Mode */
-.animate-float {
-  animation: float 20s ease-in-out infinite;
-}
-
-.animate-rotate {
-  animation: rotate 25s linear infinite;
-}
-
-.animate-wave {
-  animation: wave 15s ease-in-out infinite;
-}
-
-.animate-slide {
-  animation: slide 30s linear infinite;
-}
-
-.animate-pulse-mode {
-  animation: pulse-mode 18s ease-in-out infinite;
-}
-
-.animate-shimmer-header {
-  animation: shimmer-header 12s ease-in-out infinite;
-}
-
-/* Classes d'animation Apple */
-.animate-fade-in {
-  animation: fadeIn 0.4s ease-out;
-}
-
-.animate-fade-out {
-  animation: fadeOut 0.3s ease-in;
-}
-
-.animate-page-transition {
-  animation: pageTransition 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.animate-slide-in-up {
-  animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.animate-slide-in-down {
-  animation: slideInDown 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.animate-slide-in-right {
-  animation: slideInRight 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.animate-slide-in-left {
-  animation: slideInLeft 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.animate-scale-in {
-  animation: scaleIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.animate-apple-spin {
-  animation: appleSpin 1s linear infinite;
-}
-
-.animate-apple-pulse {
-  animation: applePulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-}
-
-/* Transitions Apple - Smooth et élégantes */
-.transition-apple {
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.transition-apple-fast {
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.transition-apple-slow {
-  transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Transition de page Apple - Fluide et élégante */
-.page-transition-enter {
-  animation: pageTransition 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-.page-transition-exit {
-  animation: fadeOut 0.25s cubic-bezier(0.4, 0, 1, 1) forwards;
-}
-
-/* Stagger animation pour les listes */
-.animate-stagger > * {
-  animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
-}
-
-.animate-stagger > *:nth-child(1) { animation-delay: 0.05s; }
-.animate-stagger > *:nth-child(2) { animation-delay: 0.1s; }
-.animate-stagger > *:nth-child(3) { animation-delay: 0.15s; }
-.animate-stagger > *:nth-child(4) { animation-delay: 0.2s; }
-.animate-stagger > *:nth-child(5) { animation-delay: 0.25s; }
-.animate-stagger > *:nth-child(6) { animation-delay: 0.3s; }
-.animate-stagger > *:nth-child(7) { animation-delay: 0.35s; }
-.animate-stagger > *:nth-child(8) { animation-delay: 0.4s; }
-
-/* Skeleton loader style Apple */
-.skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0.06) 0%,
-    rgba(0, 0, 0, 0.1) 50%,
-    rgba(0, 0, 0, 0.06) 100%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s ease-in-out infinite;
-  border-radius: 0.5rem;
-}
-
