@@ -78,22 +78,8 @@ export async function POST(request: Request) {
       );
     }
 
-    // Étape 3: Vérifier que Prisma Client est disponible
-    errorStep = 'prisma_check';
-    try {
-      // Test simple pour vérifier que Prisma est initialisé
-      if (typeof prisma.user === 'undefined') {
-        throw new Error('Prisma Client non initialisé');
-      }
-    } catch (prismaInitError) {
-      console.error('[AUTH LOGIN] Prisma Client non disponible:', prismaInitError);
-      return NextResponse.json(
-        { error: 'Erreur de configuration serveur' },
-        { status: 500 }
-      );
-    }
-
-    // Étape 4: Rechercher l'utilisateur dans la base de données
+    // Étape 3: Rechercher l'utilisateur dans la base de données
+    // (On essaie directement, la vérification Prisma se fera automatiquement)
     errorStep = 'db_query';
     let user;
     try {
@@ -102,11 +88,30 @@ export async function POST(request: Request) {
       });
     } catch (dbError: unknown) {
       const dbErrorMessage = dbError instanceof Error ? dbError.message : String(dbError);
+      const errorStack = dbError instanceof Error ? dbError.stack : undefined;
+      
+      // Détecter les erreurs spécifiques Prisma/DATABASE_URL
+      const isPrismaInitError = 
+        dbErrorMessage.includes('Environment variable not found: DATABASE_URL') ||
+        dbErrorMessage.includes('PrismaClientInitializationError') ||
+        dbErrorMessage.includes('DATABASE_URL') ||
+        (errorStack && errorStack.includes('schema.prisma'));
+      
       console.error('[AUTH LOGIN] Erreur de connexion à la base de données:', {
         error: dbErrorMessage,
+        errorStack: errorStack?.substring(0, 200),
         email: email.substring(0, 5) + '***',
         hasDatabaseUrl: !!process.env.DATABASE_URL,
+        isPrismaInitError,
       });
+      
+      if (isPrismaInitError) {
+        return NextResponse.json(
+          { error: 'Configuration serveur incorrecte' },
+          { status: 500 }
+        );
+      }
+      
       return NextResponse.json(
         { error: 'Erreur de connexion à la base de données' },
         { status: 500 }
@@ -256,18 +261,34 @@ export async function POST(request: Request) {
     });
     
     // Détecter le type d'erreur
+    const isPrismaInitError = 
+      errorMessage.includes('Environment variable not found: DATABASE_URL') ||
+      errorMessage.includes('PrismaClientInitializationError') ||
+      (errorMessage.includes('DATABASE_URL') && errorMessage.includes('schema.prisma')) ||
+      (errorStack && errorStack.includes('schema.prisma'));
+    
     const isDatabaseError = 
-      errorMessage.includes('prisma') || 
-      errorMessage.includes('database') || 
-      errorMessage.includes('connection') ||
-      errorMessage.includes('P1001') || // Prisma connection error
-      errorMessage.includes('P2002') || // Prisma unique constraint
-      errorMessage.includes('P2025');   // Prisma record not found
+      !isPrismaInitError && (
+        errorMessage.includes('prisma') || 
+        errorMessage.includes('database') || 
+        errorMessage.includes('connection') ||
+        errorMessage.includes('P1001') || // Prisma connection error
+        errorMessage.includes('P2002') || // Prisma unique constraint
+        errorMessage.includes('P2025')    // Prisma record not found
+      );
     
     const isJwtError = 
       errorMessage.includes('JWT') || 
       errorMessage.includes('jose') ||
       errorMessage.includes('secret');
+    
+    // Si c'est une erreur Prisma initialization (DATABASE_URL manquant), retourner un message clair
+    if (isPrismaInitError) {
+      return NextResponse.json(
+        { error: 'Configuration serveur incorrecte' },
+        { status: 500 }
+      );
+    }
     
     // En production, ne pas exposer les détails de l'erreur pour la sécurité
     const prodCheck = isProduction();
