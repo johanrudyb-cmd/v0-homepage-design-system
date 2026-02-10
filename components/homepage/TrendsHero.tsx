@@ -133,9 +133,7 @@ export function TrendsHero() {
                       {brand.fallback || brand.name}
                     </span>
                   </div>
-                  {index < brands.length - 1 && (
-                    <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
-                  )}
+                  <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
                 </div>
               ))}
               {/* Duplication pour effet infini */}
@@ -169,9 +167,7 @@ export function TrendsHero() {
                       {brand.fallback || brand.name}
                     </span>
                   </div>
-                  {index < brands.length - 1 && (
-                    <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
-                  )}
+                  <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
                 </div>
               ))}
             </div>
