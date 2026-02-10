@@ -66,7 +66,7 @@ export async function POST(request: Request) {
       },
     });
 
-    // Définir le cookie de session
+    // Définir le cookie de session (compatible mobile / Safari)
     response.cookies.set('auth-token', token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -74,6 +74,9 @@ export async function POST(request: Request) {
       maxAge: 60 * 60 * 24 * 7, // 7 jours
       path: '/',
     });
+
+    // Éviter la mise en cache de la réponse (problèmes sur mobile)
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
 
     return response;
   } catch (error: any) {

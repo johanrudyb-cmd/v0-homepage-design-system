@@ -38,7 +38,7 @@ export function HeroSection() {
         />
       </div>
 
-      <div className="relative z-10 max-w-7xl mx-auto px-12 py-32">
+      <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-16 sm:py-24 lg:py-32">
         <div className="max-w-4xl mx-auto text-center space-y-12">
           {/* Titre principal avec animation */}
           <div

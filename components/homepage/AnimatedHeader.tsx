@@ -1,23 +1,28 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export function AnimatedHeader() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setIsLoggedIn(!!data?.user))
+      .catch(() => {});
+  }, []);
+
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#F2F2F2]">
-      <div className="max-w-7xl mx-auto px-6 lg:px-8 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-[#007AFF] flex items-center justify-center">
-            <span className="text-white font-bold text-sm">O</span>
-          </div>
-          <span className="text-lg font-semibold tracking-tight text-[#1D1D1F]">
-            OUTFITY
-          </span>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 lg:h-20 flex items-center justify-between gap-2">
+        <Link href={isLoggedIn ? '/dashboard' : '/'} className="shrink-0">
+          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-24 xl:w-24 object-contain bg-transparent" unoptimized />
         </Link>
 
         {/* Navigation - liens utiles à la navigation sur la page */}
-        <div className="hidden md:flex items-center gap-6 lg:gap-8">
+        <div className="hidden md:flex items-center gap-4 lg:gap-8">
           <Link
             href="#features"
             className="text-sm font-medium text-[#6e6e73] hover:text-[#007AFF] transition-colors whitespace-nowrap"
@@ -45,16 +50,16 @@ export function AnimatedHeader() {
         </div>
 
         {/* CTA - boutons alignés avec le reste du site */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <Link
             href="/auth/signin"
-            className="px-5 py-2.5 rounded-full text-sm font-medium border-2 border-[#E5E5E7] text-[#1D1D1F] hover:border-[#007AFF] hover:text-[#007AFF] transition-colors"
+            className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium border-2 border-[#E5E5E7] text-[#1D1D1F] hover:border-[#007AFF] hover:text-[#007AFF] transition-colors whitespace-nowrap"
           >
             Se connecter
           </Link>
           <Link
             href="/auth/signup"
-            className="px-5 py-2.5 rounded-full text-sm font-medium bg-[#007AFF] text-white hover:bg-[#0056CC] transition-colors shadow-sm"
+            className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#007AFF] text-white hover:bg-[#0056CC] transition-colors shadow-sm whitespace-nowrap"
           >
             Créer un compte
           </Link>

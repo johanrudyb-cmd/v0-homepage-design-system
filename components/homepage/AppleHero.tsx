@@ -13,7 +13,7 @@ export function AppleHero() {
 
   return (
     <section className="relative py-32 bg-[#F5F5F7]">
-      <div className="max-w-7xl mx-auto px-8 text-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
         <div
           className={cn(
             'space-y-8 transition-all duration-1000',

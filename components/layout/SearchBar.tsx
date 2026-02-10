@@ -102,7 +102,7 @@ export function SearchBar() {
   };
 
   return (
-    <div className="flex-1 max-w-lg relative" ref={searchRef}>
+    <div className="flex-1 w-full max-w-lg relative" ref={searchRef}>
       <div className="relative">
         <input
           ref={inputRef}
@@ -112,16 +112,18 @@ export function SearchBar() {
           onChange={(e) => setQuery(e.target.value)}
           onFocus={() => query.trim().length > 0 && setIsOpen(true)}
           onKeyDown={handleKeyDown}
-          className="w-full pl-4 pr-10 py-3 text-base bg-white/80 backdrop-blur-sm rounded-3xl shadow-apple focus:outline-none focus:ring-2 focus:ring-[#007AFF] transition-all placeholder:text-[#1D1D1F]/40"
+          className="w-full pl-3 sm:pl-4 pr-12 sm:pr-10 py-3 text-base bg-white/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl shadow-apple focus:outline-none focus:ring-2 focus:ring-[#007AFF] transition-all placeholder:text-[#1D1D1F]/40 min-h-[44px]"
         />
         {query && (
           <button
+            type="button"
+            aria-label="Effacer la recherche"
             onClick={() => {
               setQuery('');
               setIsOpen(false);
               inputRef.current?.focus();
             }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#1D1D1F]/40 hover:text-[#1D1D1F] transition-colors text-lg font-medium"
+            className="absolute right-1 top-1/2 -translate-y-1/2 touch-target flex items-center justify-center text-[#1D1D1F]/40 hover:text-[#1D1D1F] transition-colors text-lg font-medium rounded-xl"
           >
             ×
           </button>
@@ -129,7 +131,7 @@ export function SearchBar() {
       </div>
 
       {isOpen && results.length > 0 && (
-        <div className="absolute top-full mt-3 w-full bg-white/95 backdrop-blur-xl rounded-3xl shadow-apple-lg z-50 max-h-96 overflow-y-auto">
+        <div className="absolute left-0 right-0 top-full mt-2 sm:mt-3 w-full min-w-0 bg-white/95 backdrop-blur-xl rounded-2xl sm:rounded-3xl shadow-apple-lg z-50 max-h-[70vh] sm:max-h-96 overflow-y-auto">
           {results.map((result, index) => (
             <div
               key={`${result.href}-${index}`}

@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { TokenDisplay } from './TokenDisplay';
 import { Badge } from '@/components/ui/badge';
+import { X } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', description: 'Vue d\'ensemble', href: '/dashboard', tourId: 'tour-dashboard' },
@@ -20,26 +21,37 @@ const tools = [
   { name: 'Formation', description: 'Personal branding — mini formation gratuite + coaching 59€/mois', href: '/launch-map/formation', tourId: 'tour-formation' },
 ];
 
-export function Sidebar() {
+interface SidebarProps {
+  open?: boolean;
+  onClose?: () => void;
+}
+
+export function Sidebar({ open = false, onClose }: SidebarProps) {
   const pathname = usePathname();
+  const handleNav = () => onClose?.();
 
   return (
-    <aside className="fixed left-0 top-0 h-screen w-72 backdrop-blur-xl bg-white/80 flex flex-col z-50">
-      {/* Header avec logo et nom de l'app */}
-      <div className="px-6 pt-8 pb-6 border-b border-black/5">
-        <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-2xl bg-[#007AFF] flex items-center justify-center shrink-0 group-hover:bg-[#0056CC] transition-colors">
-            <span className="text-white font-bold text-lg">S</span>
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-lg font-semibold tracking-tight text-[#1D1D1F] group-hover:text-[#007AFF] transition-colors">
-              OUTFITY
-            </span>
-            <span className="text-xs text-[#1D1D1F]/40">
-              Fashion Launch
-            </span>
-          </div>
+    <aside
+      className={cn(
+        'fixed left-0 top-0 h-screen w-72 max-w-[85vw] backdrop-blur-xl bg-white/95 flex flex-col z-50',
+        'transform transition-transform duration-300 ease-out',
+        'lg:translate-x-0',
+        open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+      )}
+    >
+      {/* Header avec logo centré (desktop) / logo + fermer (mobile) */}
+      <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-black/5 flex items-center justify-between lg:justify-center gap-4">
+        <Link href="/dashboard" className="block shrink-0" onClick={handleNav}>
+          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-[72px] w-[72px] sm:h-20 sm:w-20 lg:h-24 lg:w-24 shrink-0 object-contain bg-transparent mx-auto lg:mx-0" unoptimized />
         </Link>
+        <button
+          type="button"
+          aria-label="Fermer le menu"
+          className="lg:hidden touch-target flex items-center justify-center rounded-xl text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#1D1D1F] active:bg-black/10"
+          onClick={onClose}
+        >
+          <X className="h-6 w-6 shrink-0" />
+        </button>
       </div>
 
       {/* Navigation Apple - Glassmorphism */}
@@ -57,8 +69,9 @@ export function Sidebar() {
                   key={item.name}
                   href={item.href}
                   data-tour={item.tourId}
+                  onClick={handleNav}
                   className={cn(
-                    'flex items-center justify-between px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
+                    'flex items-center justify-between min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
                     isActive
                       ? 'bg-black/5 text-[#007AFF]'
                       : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
@@ -90,8 +103,9 @@ export function Sidebar() {
                   key={item.name}
                   href={item.href}
                   data-tour={item.tourId}
+                  onClick={handleNav}
                   className={cn(
-                    'block px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
+                    'block min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center',
                     isActive
                       ? 'bg-black/5 text-[#007AFF]'
                       : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
@@ -107,11 +121,12 @@ export function Sidebar() {
       </nav>
 
       {/* Bottom Section */}
-      <div className="p-6 space-y-1 border-t border-black/5">
+      <div className="p-4 sm:p-6 space-y-1 border-t border-black/5">
         <Link
           href="/usage"
+          onClick={handleNav}
           className={cn(
-            'block px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
+            'block min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center',
             pathname === '/usage'
               ? 'bg-black/5 text-[#007AFF]'
               : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
@@ -122,8 +137,9 @@ export function Sidebar() {
         </Link>
         <Link
           href="/settings"
+          onClick={handleNav}
           className={cn(
-            'block px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
+            'block min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center',
             pathname === '/settings'
               ? 'bg-black/5 text-[#007AFF]'
               : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
@@ -132,11 +148,13 @@ export function Sidebar() {
           Paramètres
         </Link>
         <button
+          type="button"
+          className="min-h-[44px] w-full text-left px-4 py-3 rounded-2xl text-base font-medium text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF] transition-all duration-200 flex items-center active:bg-black/10"
           onClick={async () => {
+            onClose?.();
             await fetch('/api/auth/logout', { method: 'POST' });
             window.location.href = '/';
           }}
-          className="w-full text-left px-4 py-3 rounded-2xl text-base font-medium text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF] transition-all duration-200"
         >
           Déconnexion
         </button>

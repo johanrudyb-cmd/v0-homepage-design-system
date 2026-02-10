@@ -43,7 +43,7 @@ export function BentoGrid() {
 
   return (
     <section id="bento-grid" className="py-24 bg-[#F5F5F7]">
-      <div className="max-w-7xl mx-auto px-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Titre de section */}
         <div className="mb-16 text-center">
           <h2 className="text-5xl lg:text-6xl font-semibold tracking-tight text-[#000000] mb-4">

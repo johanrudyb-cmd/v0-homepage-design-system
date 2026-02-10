@@ -36,7 +36,7 @@ export function FAQSection() {
 
   return (
     <section id="faq-section" className="py-20 bg-white">
-      <div className="max-w-4xl mx-auto px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Titre */}
         <div className="mb-16 text-center">
           <h2 className="text-5xl lg:text-6xl font-bold tracking-tight text-[#000000] mb-4">
@@ -60,7 +60,7 @@ export function FAQSection() {
             >
               <button
                 onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                className="w-full px-8 py-6 flex items-center justify-between text-left"
+                className="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 flex items-center justify-between text-left"
               >
                 <span className="text-lg font-bold text-[#000000] pr-8">
                   {faq.question}
@@ -73,7 +73,7 @@ export function FAQSection() {
                 />
               </button>
               {openIndex === index && (
-                <div className="px-8 pb-6">
+                <div className="px-4 sm:px-6 lg:px-8 pb-4 sm:pb-6">
                   <p className="text-base text-[#6e6e73] font-normal leading-relaxed">
                     {faq.answer}
                   </p>

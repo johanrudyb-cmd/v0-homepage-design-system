@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
@@ -20,11 +20,35 @@ export function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Bloquer le scroll du body quand le menu drawer est ouvert (mobile/tablette)
+  useEffect(() => {
+    if (sidebarOpen && typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+  }, [sidebarOpen]);
+
   return (
-    <div className="min-h-screen bg-[#F5F5F7]">
-      <Sidebar />
-      <div className="pl-72 min-h-screen flex flex-col">
-        <Header />
+    <div className="min-h-screen bg-[#F5F5F7] overflow-x-hidden">
+      {/* Backdrop mobile quand la sidebar est ouverte */}
+      {sidebarOpen && (
+        <button
+          type="button"
+          aria-label="Fermer le menu"
+          className="fixed inset-0 z-40 bg-black/20 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      <Sidebar
+        open={sidebarOpen}
+        onClose={() => setSidebarOpen(false)}
+      />
+      <div className="pl-0 lg:pl-72 min-h-screen flex flex-col transition-[padding] duration-200">
+        <Header onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 min-h-[calc(100vh-4rem)] flex flex-col">
           <PageTransition className="flex-1 min-h-0 flex flex-col">
             <PaywallGate>{children}</PaywallGate>

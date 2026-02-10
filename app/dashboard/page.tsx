@@ -250,14 +250,14 @@ export default async function DashboardPage() {
     return (
       <DashboardLayout>
         <div className="min-h-screen">
-          <div className="px-12 py-16 max-w-7xl mx-auto space-y-12" data-tour="tour-dashboard-content">
+          <div className="px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 max-w-7xl mx-auto space-y-8 sm:space-y-12" data-tour="tour-dashboard-content">
           {/* Welcome Section */}
-          <div className="flex items-end justify-between pb-8 animate-slide-in-down">
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pb-6 sm:pb-8 animate-slide-in-down">
             <div className="space-y-4">
-              <h1 className="text-6xl lg:text-7xl font-semibold tracking-tight text-[#1D1D1F]">
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold tracking-tight text-[#1D1D1F]">
                 {user.name || 'Utilisateur'}
               </h1>
-              <p className="text-xl text-[#1D1D1F]/70">
+              <p className="text-base sm:text-lg lg:text-xl text-[#1D1D1F]/70">
                 Créez votre marque de vêtements de A à Z avec l'intelligence artificielle.
               </p>
             </div>
@@ -268,22 +268,22 @@ export default async function DashboardPage() {
         <DashboardNotifications />
 
           {/* Stats Section - Cards Squircle avec espace */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 animate-stagger">
-            <div className="bg-white rounded-3xl shadow-apple p-8">
-              <div className="text-sm text-[#1D1D1F]/60 mb-3">Designs créés</div>
-              <div className="text-5xl font-semibold tracking-tight text-[#1D1D1F]">{designCount}</div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 animate-stagger">
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-apple p-4 sm:p-6 lg:p-8">
+              <div className="text-xs sm:text-sm text-[#1D1D1F]/60 mb-2 sm:mb-3">Designs créés</div>
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F]">{designCount}</div>
             </div>
-            <div className="bg-white rounded-3xl shadow-apple p-8">
-              <div className="text-sm text-[#1D1D1F]/60 mb-3">Devis envoyés</div>
-              <div className="text-5xl font-semibold tracking-tight text-[#1D1D1F]">{quoteCount}</div>
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-apple p-4 sm:p-6 lg:p-8">
+              <div className="text-xs sm:text-sm text-[#1D1D1F]/60 mb-2 sm:mb-3">Devis envoyés</div>
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F]">{quoteCount}</div>
             </div>
-            <div className="bg-white rounded-3xl shadow-apple p-8">
-              <div className="text-sm text-[#1D1D1F]/60 mb-3">Contenus UGC</div>
-              <div className="text-5xl font-semibold tracking-tight text-[#1D1D1F]">{ugcCount}</div>
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-apple p-4 sm:p-6 lg:p-8">
+              <div className="text-xs sm:text-sm text-[#1D1D1F]/60 mb-2 sm:mb-3">Contenus UGC</div>
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F]">{ugcCount}</div>
             </div>
-            <div className="bg-white rounded-3xl shadow-apple p-8">
-              <div className="text-sm text-[#1D1D1F]/60 mb-3">Progression</div>
-              <div className="text-5xl font-semibold tracking-tight text-[#1D1D1F]">{completedSteps} / {steps.length}</div>
+            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-apple p-4 sm:p-6 lg:p-8">
+              <div className="text-xs sm:text-sm text-[#1D1D1F]/60 mb-2 sm:mb-3">Progression</div>
+              <div className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F]">{completedSteps} / {steps.length}</div>
             </div>
           </div>
 
@@ -405,10 +405,10 @@ export default async function DashboardPage() {
           {/* Shopify Account Creation Banner */}
           {!launchMap?.phase7 && (
             <div className="bg-gradient-to-br from-[#95BF47] to-[#5E8E3E] rounded-3xl shadow-apple-lg p-10">
-              <div className="flex items-center justify-between gap-8">
-                <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6 sm:gap-8">
+                <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6">
                   {/* Logo Shopify */}
-                  <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-apple p-3">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-apple p-3">
                     <Image 
                       src="/shopify-logo.png" 
                       alt="Shopify" 
@@ -418,10 +418,10 @@ export default async function DashboardPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <h3 className="text-3xl font-semibold tracking-tight text-white">
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-white text-center sm:text-left">
                       Créez votre boutique Shopify
                     </h3>
-                    <p className="text-lg text-white/90">
+                    <p className="text-sm sm:text-base lg:text-lg text-white/90 text-center sm:text-left">
                       Lancez votre boutique en ligne et commencez à vendre vos créations. Connectez votre compte Shopify pour finaliser votre marque.
                     </p>
                   </div>
@@ -437,14 +437,14 @@ export default async function DashboardPage() {
 
           {/* Progress Section */}
           <div className="bg-white rounded-3xl shadow-apple p-10">
-            <div className="flex items-end justify-between mb-10 pb-8 border-b border-black/5">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10 pb-6 sm:pb-8 border-b border-black/5">
               <div>
-                <h2 className="text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-2">Votre parcours vers votre première marque</h2>
-                <p className="text-lg text-[#1D1D1F]/70">
+                <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-2">Votre parcours vers votre première marque</h2>
+                <p className="text-base sm:text-lg text-[#1D1D1F]/70">
                   {completedSteps} phases sur {steps.length} complétées
                 </p>
               </div>
-              <span className="text-5xl font-semibold tracking-tight text-[#1D1D1F]">
+              <span className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F] shrink-0">
                 {Math.round((completedSteps / steps.length) * 100)}%
               </span>
             </div>
@@ -478,12 +478,12 @@ export default async function DashboardPage() {
           {/* Create Brand CTA */}
           {(!brand || (!brand.logo && !brand.colorPalette)) && (
             <div className="bg-white rounded-3xl shadow-apple p-10">
-              <div className="flex items-center justify-between">
-                <div className="space-y-3">
-                  <h3 className="text-3xl font-semibold tracking-tight text-[#1D1D1F]">
+              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <div className="space-y-2 sm:space-y-3 min-w-0">
+                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-[#1D1D1F]">
                     {!brand ? 'Créez votre première marque' : 'Complétez l\'identité de votre marque'}
                   </h3>
-                  <p className="text-lg text-[#1D1D1F]/70">
+                  <p className="text-base sm:text-lg text-[#1D1D1F]/70">
                     {!brand 
                       ? 'Définissez votre identité (nom, logo, couleurs) et lancez votre marque'
                       : 'Définissez le nom, logo et identité visuelle de votre marque pour commencer'}
@@ -506,7 +506,7 @@ export default async function DashboardPage() {
                 Tous les outils dont vous avez besoin pour créer et lancer votre marque
               </p>
             </div>
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
               {quickActions.map((action) => {
                 return (
                   <Link key={action.href} href={action.href} className="bg-white rounded-3xl shadow-apple p-8 hover:shadow-apple-lg transition-all group">

@@ -72,11 +72,11 @@ export function TrendsHero() {
   }, []);
 
   return (
-    <section className="bg-white py-24">
-      <div className="max-w-7xl mx-auto px-8">
+    <section className="bg-white py-12 sm:py-16 lg:py-24">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className={cn(
-            'text-center space-y-8 transition-all duration-1000',
+            'text-center space-y-6 sm:space-y-8 transition-all duration-1000',
             isVisible
               ? 'opacity-100 translate-y-0'
               : 'opacity-0 translate-y-12'
@@ -84,15 +84,15 @@ export function TrendsHero() {
         >
           {/* Titre principal */}
           <div>
-            <h1 className="text-6xl lg:text-7xl font-bold tracking-tight text-[#000000] mb-6">
+            <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-[#000000] mb-4 sm:mb-6 px-2">
               Créez votre marque avec les données des géants
             </h1>
-            <p className="text-xl text-[#6e6e73] font-light max-w-2xl mx-auto mb-8">
+            <p className="text-base sm:text-lg lg:text-xl text-[#6e6e73] font-light max-w-2xl mx-auto mb-6 sm:mb-8 px-2">
               Donnez à votre marque indépendante la puissance des leaders mondiaux. Mêmes données. Mêmes usines. Mêmes stratégies.
             </p>
             <Link
               href="/auth/signup"
-              className="inline-flex items-center gap-3 px-8 py-4 bg-[#000000] text-white rounded-full text-lg font-semibold hover:bg-[#1a1a1a] transition-all duration-200 group"
+              className="inline-flex items-center gap-2 sm:gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-[#000000] text-white rounded-full text-base sm:text-lg font-semibold hover:bg-[#1a1a1a] transition-all duration-200 group"
             >
               Découvrir les tendances
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -100,7 +100,7 @@ export function TrendsHero() {
           </div>
 
           {/* Bandeau défilant avec logos de marques en couleur */}
-          <div className="relative overflow-hidden mt-16 py-8">
+          <div className="relative overflow-hidden mt-10 sm:mt-14 lg:mt-16 py-6 sm:py-8">
             <div className="flex items-center whitespace-nowrap animate-marquee-slow">
               {/* Première série */}
               {brands.map((brand, index) => (

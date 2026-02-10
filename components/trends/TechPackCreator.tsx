@@ -67,7 +67,7 @@ export function TechPackCreator({ preSelectedId }: { preSelectedId?: string | nu
       });
       if (ageRange) params.set('ageRange', ageRange);
       const res = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (res.ok && Array.isArray(data.trends)) {
         setTrends(data.trends);
         if (preSelectedId) {
