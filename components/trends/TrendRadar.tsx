@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { TrendingUp, AlertCircle, Zap, Mail, Palette, Eye } from 'lucide-react';
 import { TrendDetailModal, type TrendDetailModalTrend } from './TrendDetailModal';
+import { useDebounce } from '@/lib/hooks/useDebounce';
 // Graphiques désactivés temporairement (recharts déjà installé mais peut nécessiter configuration)
 // import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
@@ -60,21 +61,28 @@ export function TrendRadar({ userId }: TrendRadarProps) {
   const [selectedProductType, setSelectedProductType] = useState<string>('');
   const [selectedSegment, setSelectedSegment] = useState<string>('');
 
+  // Debounce des filtres pour éviter trop de requêtes
+  const debouncedCountry = useDebounce(selectedCountry, 500);
+  const debouncedStyle = useDebounce(selectedStyle, 500);
+  const debouncedProductType = useDebounce(selectedProductType, 500);
+  const debouncedSegment = useDebounce(selectedSegment, 500);
+
   // Modal détail d'une tendance
   const [detailTrend, setDetailTrend] = useState<TrendSignal | null>(null);
 
   useEffect(() => {
     loadTrends();
     loadStats();
-  }, [selectedCountry, selectedStyle, selectedProductType, selectedSegment]);
+  }, [debouncedCountry, debouncedStyle, debouncedProductType, debouncedSegment]);
 
   const loadTrends = async () => {
     try {
+      setIsLoading(true);
       const params = new URLSearchParams();
-      if (selectedCountry) params.append('country', selectedCountry);
-      if (selectedStyle) params.append('style', selectedStyle);
-      if (selectedProductType) params.append('productType', selectedProductType);
-      if (selectedSegment) params.append('segment', selectedSegment);
+      if (debouncedCountry) params.append('country', debouncedCountry);
+      if (debouncedStyle) params.append('style', debouncedStyle);
+      if (debouncedProductType) params.append('productType', debouncedProductType);
+      if (debouncedSegment) params.append('segment', debouncedSegment);
       params.append('limit', '50');
       
       const response = await fetch(`/api/trends/confirmed?${params.toString()}`);

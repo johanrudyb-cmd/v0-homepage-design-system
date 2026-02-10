@@ -17,7 +17,8 @@ export function DashboardRefresh() {
     }, 1000);
   };
 
-  // Auto-refresh toutes les 60 secondes (seulement si page visible)
+  // Auto-refresh toutes les 5 minutes (seulement si page visible)
+  // Augmenté de 60s à 5min pour réduire la charge serveur
   useEffect(() => {
     // Ne pas auto-refresh si la page n'est pas visible (onglet inactif)
     if (typeof document === 'undefined') return;
@@ -36,7 +37,7 @@ export function DashboardRefresh() {
         if (!intervalId) {
           intervalId = setInterval(() => {
             router.refresh();
-          }, 60000); // 60 secondes
+          }, 300000); // 5 minutes (au lieu de 60 secondes)
         }
       }
     };
@@ -45,7 +46,7 @@ export function DashboardRefresh() {
     if (!document.hidden) {
       intervalId = setInterval(() => {
         router.refresh();
-      }, 60000);
+      }, 300000); // 5 minutes
     }
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
