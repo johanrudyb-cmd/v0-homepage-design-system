@@ -66,7 +66,7 @@ export const metadata: Metadata = {
 
 import { Providers } from '@/components/providers/Providers';
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 export default function RootLayout({
   children,

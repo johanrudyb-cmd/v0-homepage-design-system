@@ -1,7 +1,12 @@
 import { auth } from './auth';
 import { prisma, isDatabaseAvailable } from './prisma';
 
-export async function getCurrentUser() {
+import { cache } from 'react';
+
+// Utiliser React.cache pour mémoriser le résultat par requête (Request Memoization)
+// Cela évite de refaire la même requête prisma si getCurrentUser est appelé 
+// plusieurs fois dans différents composants du même arbre (ex: layout + page)
+export const getCurrentUser = cache(async () => {
   try {
     const session = await auth();
 
@@ -9,7 +14,8 @@ export async function getCurrentUser() {
       return null;
     }
 
-    // Récupérer le plan depuis la base de données pour avoir la valeur à jour
+    // Récupérer les infos essentielles depuis la DB
+    // On ne sélectionne que ce dont on a vraiment besoin pour la navigation/UI
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
       select: {
@@ -38,7 +44,7 @@ export async function getCurrentUser() {
     console.error('[getCurrentUser] Erreur:', error);
     return null;
   }
-}
+});
 
 export async function requireAuth() {
   const user = await getCurrentUser();

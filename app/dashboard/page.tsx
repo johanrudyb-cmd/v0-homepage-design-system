@@ -15,16 +15,21 @@ export default async function DashboardPage() {
   const user = await getCurrentUser();
   if (!user) redirect('/auth/signin');
 
-  // Récupérer la marque de l'utilisateur (rapide car indexé sur userId)
-  const brand = await prisma.brand.findFirst({
-    where: { userId: user.id },
-    orderBy: { createdAt: 'desc' },
-  });
+  // Récupérer la marque et le Launch Map en parallèle pour gagner du temps
+  const [brand, initialLaunchMap] = await Promise.all([
+    prisma.brand.findFirst({
+      where: { userId: user.id },
+      orderBy: { createdAt: 'desc' },
+    }),
+    prisma.launchMap.findFirst({
+      where: { brand: { userId: user.id } }, // Plus robuste via lien brand
+    })
+  ]);
 
   if (!brand) redirect('/onboarding');
 
-  // Récupérer le Launch Map (nécessaire pour plusieurs sections)
-  const launchMap = await prisma.launchMap.findUnique({
+  // Si on a trouvé un launchMap via l'ID de marque plutôt que l'utilisateur directement
+  const launchMap = initialLaunchMap || await prisma.launchMap.findUnique({
     where: { brandId: brand.id },
   });
 
