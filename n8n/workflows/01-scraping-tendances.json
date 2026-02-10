@@ -1,0 +1,256 @@
+[
+    {
+        "name": "🔄 OUTFITY - Scraping Tendances Quotidien",
+        "nodes": [
+            {
+                "parameters": {
+                    "rule": {
+                        "interval": [
+                            {
+                                "field": "cronExpression",
+                                "expression": "0 2 * * *"
+                            }
+                        ]
+                    }
+                },
+                "id": "cron-daily",
+                "name": "Tous les jours à 2h",
+                "type": "n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1.2,
+                "position": [
+                    240,
+                    300
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "GET",
+                    "url": "={{ $env.OUTFITY_APP_URL }}/api/cron/scan-trends",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                            }
+                        ]
+                    },
+                    "options": {
+                        "timeout": 120000
+                    }
+                },
+                "id": "scan-trends",
+                "name": "Scan Tendances",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    460,
+                    300
+                ]
+            },
+            {
+                "parameters": {
+                    "conditions": {
+                        "boolean": [],
+                        "number": [
+                            {
+                                "value1": "={{ $json.statusCode }}",
+                                "operation": "equal",
+                                "value2": 200
+                            }
+                        ]
+                    }
+                },
+                "id": "check-success",
+                "name": "Succès ?",
+                "type": "n8n-nodes-base.if",
+                "typeVersion": 2,
+                "position": [
+                    680,
+                    300
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "GET",
+                    "url": "={{ $env.OUTFITY_APP_URL }}/api/cron/refresh-zalando-trends",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                            }
+                        ]
+                    },
+                    "options": {
+                        "timeout": 180000
+                    }
+                },
+                "id": "refresh-zalando",
+                "name": "Refresh Zalando",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    900,
+                    200
+                ]
+            },
+            {
+                "parameters": {
+                    "functionCode": "const scanResult = $input.all()[0].json;\nconst zalandoResult = items[0].json;\n\nreturn [{\n  json: {\n    status: 'success',\n    timestamp: new Date().toISOString(),\n    scan: {\n      productsScraped: scanResult.productsScraped || 0,\n      signalsCreated: scanResult.signalsCreated || 0,\n      trendsConfirmed: scanResult.trendsConfirmed || 0\n    },\n    zalando: zalandoResult\n  }\n}];"
+                },
+                "id": "format-success",
+                "name": "Résumé Succès",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    1120,
+                    200
+                ]
+            },
+            {
+                "parameters": {
+                    "functionCode": "return [{\n  json: {\n    status: 'error',\n    timestamp: new Date().toISOString(),\n    error: $input.all()[0].json,\n    message: 'Le scraping des tendances a échoué'\n  }\n}];"
+                },
+                "id": "format-error",
+                "name": "Résumé Erreur",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    900,
+                    420
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "={{ $env.OUTFITY_APP_URL }}/api/n8n/log",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "name": "workflow",
+                                "value": "scraping-tendances"
+                            },
+                            {
+                                "name": "status",
+                                "value": "={{ $json.status }}"
+                            },
+                            {
+                                "name": "data",
+                                "value": "={{ JSON.stringify($json) }}"
+                            }
+                        ]
+                    }
+                },
+                "id": "log-result",
+                "name": "Log Résultat",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    1340,
+                    300
+                ]
+            }
+        ],
+        "connections": {
+            "Tous les jours à 2h": {
+                "main": [
+                    [
+                        {
+                            "node": "Scan Tendances",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Scan Tendances": {
+                "main": [
+                    [
+                        {
+                            "node": "Succès ?",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Succès ?": {
+                "main": [
+                    [
+                        {
+                            "node": "Refresh Zalando",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    [
+                        {
+                            "node": "Résumé Erreur",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Refresh Zalando": {
+                "main": [
+                    [
+                        {
+                            "node": "Résumé Succès",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Résumé Succès": {
+                "main": [
+                    [
+                        {
+                            "node": "Log Résultat",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Résumé Erreur": {
+                "main": [
+                    [
+                        {
+                            "node": "Log Résultat",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "tags": [
+            {
+                "name": "scraping"
+            },
+            {
+                "name": "tendances"
+            },
+            {
+                "name": "cron"
+            }
+        ]
+    }
+]

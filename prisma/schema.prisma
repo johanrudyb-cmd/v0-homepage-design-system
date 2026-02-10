@@ -274,6 +274,8 @@ model Design {
   @@index([brandId])
   @@index([collectionId])
   @@index([isTemplate, brandId])
+  @@index([type])
+  @@index([status])
 }
 
 model Factory {
@@ -294,6 +296,9 @@ model Factory {
   quotes            Quote[]
   reviews           FactoryReview[]
   favoriteByBrands  BrandFavoriteFactory[]
+
+  @@index([country])
+  @@index([specialties])
 }
 
 // Favoris fournisseurs par marque : affichés dans Sourcing (Gérer ma marque)

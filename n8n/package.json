@@ -1,0 +1,15 @@
+{
+    "name": "outfity-n8n-server",
+    "version": "1.0.0",
+    "description": "Serveur n8n pour OUTFITY - Automatisation workflows (scraping, emails, IA)",
+    "scripts": {
+        "start": "n8n start",
+        "start:tunnel": "n8n start --tunnel",
+        "import:workflows": "node import-workflows.js",
+        "setup": "npm install && node import-workflows.js",
+        "export": "n8n export:workflow --all --output=workflows/export-all.json"
+    },
+    "dependencies": {
+        "n8n": "^1.73.1"
+    }
+}

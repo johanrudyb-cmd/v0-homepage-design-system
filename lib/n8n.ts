@@ -1,94 +1,132 @@
 /**
- * Client n8n pour déclencher des workflows depuis votre app
+ * Client n8n étendu pour OUTFITY
+ * Permet de déclencher des workflows via Webhooks
  */
 
-const N8N_API_URL = process.env.N8N_API_URL;
-const N8N_API_KEY = process.env.N8N_API_KEY;
-const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
+const N8N_BASE_URL = process.env.N8N_WEBHOOK_URL || 'http://localhost:5678/webhook';
 
-interface TriggerWorkflowOptions {
-  workflowId: string;
-  data: Record<string, unknown>;
+interface N8nWebhookPayload {
+  [key: string]: unknown;
+}
+
+interface N8nTriggerResult {
+  success: boolean;
+  data?: unknown;
+  error?: string;
 }
 
 /**
- * Déclencher un workflow n8n via API
+ * Déclenche un workflow n8n via webhook
+ * Le call est fire-and-forget par défaut (ne bloque pas la response Next.js)
  */
-export async function triggerN8nWorkflow({ workflowId, data }: TriggerWorkflowOptions) {
-  if (!N8N_API_URL || !N8N_API_KEY) {
-    console.warn('[n8n] API URL ou Key non configurée');
-    return null;
-  }
+export async function triggerN8nWorkflow(
+  webhookPath: string,
+  payload: N8nWebhookPayload,
+  options: { waitForResponse?: boolean; timeout?: number } = {}
+): Promise<N8nTriggerResult> {
+  const { waitForResponse = false, timeout = 5000 } = options;
+  // Gérer le cas où webhookPath contient déjà le préfixe ou l'URL complète
+  let url = webhookPath.startsWith('http')
+    ? webhookPath
+    : `${N8N_BASE_URL}/${webhookPath.replace(/^\//, '')}`;
 
   try {
-    const response = await fetch(`${N8N_API_URL}/api/v1/workflows/${workflowId}/execute`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-N8N-API-KEY': N8N_API_KEY,
-      },
-      body: JSON.stringify({ data }),
-    });
+    if (waitForResponse) {
+      // Mode synchrone : attend la réponse de n8n
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(timeout),
+      });
 
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`n8n API error: ${response.status} - ${errorText}`);
+      if (!response.ok) {
+        throw new Error(`n8n webhook returned ${response.status}`);
+      }
+
+      const data = await response.json();
+      return { success: true, data };
+    } else {
+      // Mode fire-and-forget : n'attend pas la réponse
+      // On ne met pas de await ici volontairement
+      fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload),
+        signal: AbortSignal.timeout(timeout),
+      }).catch((err) => {
+        console.warn(`[n8n Trigger] Webhook ${webhookPath} fire-and-forget error:`, err.message);
+      });
+
+      return { success: true };
     }
-
-    return await response.json();
-  } catch (error) {
-    console.error('[n8n] Erreur lors du déclenchement du workflow:', error);
-    return null;
+  } catch (error: any) {
+    console.error(`[n8n Trigger] Erreur webhook ${webhookPath}:`, error.message);
+    return { success: false, error: error.message };
   }
 }
 
 /**
- * Déclencher un workflow via webhook (plus simple et recommandé)
- * 
- * @param webhookPath - Le chemin du webhook (ex: "stripe-purchase", "new-user")
- * @param data - Les données à envoyer au workflow
- * @returns La réponse du workflow ou null en cas d'erreur
- * 
- * @example
- * ```typescript
- * await triggerN8nWebhook('stripe-purchase', {
- *   userId: 'user_123',
- *   amount: 2999,
- *   plan: 'pro'
- * });
- * ```
+ * Déclenche la séquence d'onboarding pour un nouvel utilisateur
+ * Workflow: 02-email-onboarding.json
  */
-export async function triggerN8nWebhook(webhookPath: string, data: Record<string, unknown>) {
-  if (!N8N_WEBHOOK_URL) {
-    console.warn('[n8n] Webhook URL non configurée. Ajoutez N8N_WEBHOOK_URL dans vos variables d\'environnement.');
-    return null;
-  }
-
-  try {
-    const url = `${N8N_WEBHOOK_URL}/${webhookPath}`;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      throw new Error(`n8n webhook error: ${response.status} - ${errorText}`);
-    }
-
-    return await response.json();
-  } catch (error) {
-    console.error('[n8n] Erreur webhook:', error);
-    return null;
-  }
+export async function triggerOnboarding(user: {
+  userId: string;
+  email: string;
+  name?: string;
+  plan?: string;
+}) {
+  return triggerN8nWorkflow('outfity-onboarding', {
+    userId: user.userId,
+    email: user.email,
+    name: user.name || 'Créateur',
+    plan: user.plan || 'free',
+  });
 }
 
 /**
- * Vérifier si n8n est configuré
+ * Envoie une notification multi-canal via n8n
+ * Workflow: 04-notifications-multicanal.json
  */
+export async function triggerNotification(params: {
+  userId: string;
+  email: string;
+  name?: string;
+  eventType: 'trend_alert' | 'design_ready' | 'factory_match' | 'payment_success' | 'weekly_report';
+  data?: Record<string, unknown>;
+}) {
+  return triggerN8nWorkflow('outfity-notify', {
+    userId: params.userId,
+    email: params.email,
+    name: params.name || 'Créateur',
+    eventType: params.eventType,
+    data: params.data || {},
+  });
+}
+
+/**
+ * Synchro Stripe : transmet un événement Stripe à n8n
+ * Workflow: 05-sync-stripe.json
+ */
+export async function triggerStripeSync(event: {
+  type: string;
+  data: { object: Record<string, unknown> };
+}) {
+  return triggerN8nWorkflow('outfity-stripe-webhook', {
+    type: event.type,
+    eventType: event.type,
+    data: event.data,
+  });
+}
+
+/**
+ * Alias pour compatibilité existante
+ */
+export const triggerN8nWebhook = async (webhookPath: string, data: Record<string, unknown>) => {
+  const result = await triggerN8nWorkflow(webhookPath, data, { waitForResponse: true });
+  return result.success ? result.data : null;
+};
+
 export function isN8nConfigured(): boolean {
-  return !!(N8N_WEBHOOK_URL || (N8N_API_URL && N8N_API_KEY));
+  return !!process.env.N8N_WEBHOOK_URL;
 }

@@ -1,0 +1,211 @@
+[
+    {
+        "name": "🏥 OUTFITY - Monitoring Santé Système",
+        "nodes": [
+            {
+                "parameters": {
+                    "rule": {
+                        "interval": [
+                            {
+                                "field": "cronExpression",
+                                "expression": "*/15 * * * *"
+                            }
+                        ]
+                    }
+                },
+                "id": "cron-health",
+                "name": "Toutes les 15 min",
+                "type": "n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1.2,
+                "position": [
+                    240,
+                    300
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "GET",
+                    "url": "={{ $env.OUTFITY_APP_URL }}/api/health",
+                    "options": {
+                        "timeout": 10000
+                    }
+                },
+                "id": "check-api",
+                "name": "Check API Next.js",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    460,
+                    200
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "GET",
+                    "url": "={{ $env.OUTFITY_APP_URL }}/api/health/gpt",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                            }
+                        ]
+                    },
+                    "options": {
+                        "timeout": 30000
+                    }
+                },
+                "id": "check-ai",
+                "name": "Check API IA",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    460,
+                    400
+                ]
+            },
+            {
+                "parameters": {
+                    "functionCode": "const apiResult = $input.all()[0]?.json || {};\nconst aiResult = $input.all()[1]?.json || {};\n\nconst apiOk = apiResult.status === 'ok';\nconst aiOk = aiResult.status === 'ok' || aiResult.status === 'healthy';\n\nconst allOk = apiOk && aiOk;\n\nreturn [{\n  json: {\n    timestamp: new Date().toISOString(),\n    allHealthy: allOk,\n    services: {\n      api: { status: apiOk ? 'healthy' : 'down', details: apiResult },\n      ai: { status: aiOk ? 'healthy' : 'down', details: aiResult }\n    }\n  }\n}];"
+                },
+                "id": "aggregate-health",
+                "name": "Agréger Résultats",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    680,
+                    300
+                ]
+            },
+            {
+                "parameters": {
+                    "conditions": {
+                        "boolean": [
+                            {
+                                "value1": "={{ $json.allHealthy }}",
+                                "value2": true
+                            }
+                        ]
+                    }
+                },
+                "id": "all-ok",
+                "name": "Tout OK ?",
+                "type": "n8n-nodes-base.if",
+                "typeVersion": 2,
+                "position": [
+                    900,
+                    300
+                ]
+            },
+            {
+                "parameters": {},
+                "id": "no-action",
+                "name": "Pas d'action",
+                "type": "n8n-nodes-base.noOp",
+                "typeVersion": 1,
+                "position": [
+                    1120,
+                    200
+                ]
+            },
+            {
+                "parameters": {
+                    "fromEmail": "={{ $env.SMTP_FROM }}",
+                    "toEmail": "admin@outfity.fr",
+                    "subject": "🚨 OUTFITY ALERTE - Service indisponible !",
+                    "html": "<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">\n  <div style=\"background: #FF3B30; color: white; border-radius: 16px; padding: 24px; text-align: center;\">\n    <h1 style=\"font-size: 24px; margin: 0;\">⚠️ ALERTE OUTFITY</h1>\n    <p>Un ou plusieurs services sont indisponibles</p>\n  </div>\n  <div style=\"background: white; border-radius: 16px; padding: 24px; margin-top: 16px;\">\n    <h2 style=\"font-size: 18px;\">Détails</h2>\n    <pre style=\"background: #F5F5F7; padding: 16px; border-radius: 8px; overflow: auto; font-size: 13px;\">{{ JSON.stringify($json.services, null, 2) }}</pre>\n    <p style=\"color: #86868B; font-size: 13px;\">Heure: {{ $json.timestamp }}</p>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/api/health\" style=\"display: inline-block; background: #007AFF; color: #fff; padding: 10px 20px; border-radius: 100px; text-decoration: none; font-size: 14px;\">Vérifier maintenant</a>\n  </div>\n</div>",
+                    "options": {}
+                },
+                "id": "send-alert",
+                "name": "Envoyer Alerte Email",
+                "type": "n8n-nodes-base.emailSend",
+                "typeVersion": 2.1,
+                "position": [
+                    1120,
+                    420
+                ]
+            }
+        ],
+        "connections": {
+            "Toutes les 15 min": {
+                "main": [
+                    [
+                        {
+                            "node": "Check API Next.js",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Check API IA",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Check API Next.js": {
+                "main": [
+                    [
+                        {
+                            "node": "Agréger Résultats",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Check API IA": {
+                "main": [
+                    [
+                        {
+                            "node": "Agréger Résultats",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Agréger Résultats": {
+                "main": [
+                    [
+                        {
+                            "node": "Tout OK ?",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Tout OK ?": {
+                "main": [
+                    [
+                        {
+                            "node": "Pas d'action",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    [
+                        {
+                            "node": "Envoyer Alerte Email",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "tags": [
+            {
+                "name": "monitoring"
+            },
+            {
+                "name": "alertes"
+            }
+        ]
+    }
+]

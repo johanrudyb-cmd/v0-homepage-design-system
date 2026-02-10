@@ -1,0 +1,285 @@
+[
+    {
+        "name": "💳 OUTFITY - Sync Stripe Paiements",
+        "nodes": [
+            {
+                "parameters": {
+                    "httpMethod": "POST",
+                    "path": "outfity-stripe-webhook",
+                    "responseMode": "responseNode",
+                    "options": {}
+                },
+                "id": "webhook-stripe",
+                "name": "Webhook Stripe",
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 2,
+                "position": [
+                    240,
+                    300
+                ],
+                "webhookId": "outfity-stripe-webhook"
+            },
+            {
+                "parameters": {
+                    "functionCode": "const event = $input.first().json;\nconst eventType = event.type || event.eventType;\n\n// Types d'événements Stripe qu'on traite\nconst handledEvents = [\n  'checkout.session.completed',\n  'customer.subscription.created',\n  'customer.subscription.updated',\n  'customer.subscription.deleted',\n  'invoice.payment_succeeded',\n  'invoice.payment_failed'\n];\n\nif (!handledEvents.includes(eventType)) {\n  return [{ json: { skip: true, eventType, message: 'Event non géré' } }];\n}\n\nconst data = event.data?.object || event;\n\nreturn [{\n  json: {\n    skip: false,\n    eventType,\n    customerId: data.customer,\n    email: data.customer_email || data.customer_details?.email,\n    amount: data.amount_total ? (data.amount_total / 100) : (data.amount_paid ? data.amount_paid / 100 : 0),\n    currency: data.currency || 'eur',\n    subscriptionId: data.subscription || data.id,\n    status: data.status,\n    plan: data.metadata?.plan || 'pro',\n    timestamp: new Date().toISOString()\n  }\n}];"
+                },
+                "id": "parse-event",
+                "name": "Parser Événement",
+                "type": "n8n-nodes-base.code",
+                "typeVersion": 2,
+                "position": [
+                    460,
+                    300
+                ]
+            },
+            {
+                "parameters": {
+                    "respondWith": "json",
+                    "responseBody": "={ \"received\": true }",
+                    "options": {
+                        "responseCode": 200
+                    }
+                },
+                "id": "respond-ok",
+                "name": "Réponse 200",
+                "type": "n8n-nodes-base.respondToWebhook",
+                "typeVersion": 1,
+                "position": [
+                    680,
+                    180
+                ]
+            },
+            {
+                "parameters": {
+                    "conditions": {
+                        "boolean": [
+                            {
+                                "value1": "={{ $json.skip }}",
+                                "value2": false
+                            }
+                        ]
+                    }
+                },
+                "id": "should-process",
+                "name": "Traiter ?",
+                "type": "n8n-nodes-base.if",
+                "typeVersion": 2,
+                "position": [
+                    680,
+                    340
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "={{ $env.OUTFITY_APP_URL }}/api/n8n/stripe-sync",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                            },
+                            {
+                                "name": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "specifyBody": "json",
+                    "jsonBody": "={{ JSON.stringify($json) }}"
+                },
+                "id": "sync-db",
+                "name": "Sync Base de Données",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    900,
+                    260
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "={{ $env.OUTFITY_APP_URL }}/api/n8n/log",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "name": "workflow",
+                                "value": "stripe-sync"
+                            },
+                            {
+                                "name": "status",
+                                "value": "success"
+                            },
+                            {
+                                "name": "data",
+                                "value": "={{ JSON.stringify({ eventType: $json.eventType, email: $json.email, amount: $json.amount }) }}"
+                            }
+                        ]
+                    }
+                },
+                "id": "log-event",
+                "name": "Logger Transaction",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    1120,
+                    260
+                ]
+            },
+            {
+                "parameters": {
+                    "conditions": {
+                        "string": [
+                            {
+                                "value1": "={{ $json.eventType }}",
+                                "operation": "contains",
+                                "value2": "payment_succeeded"
+                            }
+                        ]
+                    }
+                },
+                "id": "is-payment",
+                "name": "Paiement réussi ?",
+                "type": "n8n-nodes-base.if",
+                "typeVersion": 2,
+                "position": [
+                    1340,
+                    260
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "=http://localhost:5678/webhook/outfity-notify",
+                    "sendBody": true,
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "name": "email",
+                                "value": "={{ $json.email }}"
+                            },
+                            {
+                                "name": "eventType",
+                                "value": "payment_success"
+                            },
+                            {
+                                "name": "data",
+                                "value": "={{ JSON.stringify({ amount: $json.amount, plan: $json.plan }) }}"
+                            }
+                        ]
+                    }
+                },
+                "id": "trigger-notif",
+                "name": "Notifier Utilisateur",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    1560,
+                    180
+                ]
+            }
+        ],
+        "connections": {
+            "Webhook Stripe": {
+                "main": [
+                    [
+                        {
+                            "node": "Parser Événement",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Parser Événement": {
+                "main": [
+                    [
+                        {
+                            "node": "Réponse 200",
+                            "type": "main",
+                            "index": 0
+                        },
+                        {
+                            "node": "Traiter ?",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Traiter ?": {
+                "main": [
+                    [
+                        {
+                            "node": "Sync Base de Données",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    []
+                ]
+            },
+            "Sync Base de Données": {
+                "main": [
+                    [
+                        {
+                            "node": "Logger Transaction",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Logger Transaction": {
+                "main": [
+                    [
+                        {
+                            "node": "Paiement réussi ?",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Paiement réussi ?": {
+                "main": [
+                    [
+                        {
+                            "node": "Notifier Utilisateur",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ],
+                    []
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "tags": [
+            {
+                "name": "stripe"
+            },
+            {
+                "name": "paiements"
+            },
+            {
+                "name": "sync"
+            }
+        ]
+    }
+]
