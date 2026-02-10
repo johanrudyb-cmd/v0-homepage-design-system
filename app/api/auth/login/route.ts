@@ -6,19 +6,25 @@ import { SignJWT } from 'jose';
 // Forcer Node.js runtime
 export const runtime = 'nodejs';
 
+// Helper pour détecter la production (compatible Turbopack)
+function isProduction(): boolean {
+  // Vérifier VERCEL d'abord (plus fiable)
+  if (process.env.VERCEL === '1') return true;
+  // Ensuite NODE_ENV (peut être undefined au build)
+  const nodeEnv = process.env.NODE_ENV;
+  return nodeEnv === 'production';
+}
+
 // Vérifier et encoder le secret JWT
 function getSecret(): Uint8Array {
   const secretValue = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
   
+  // Ne pas vérifier isProduction() au niveau du module (problème Turbopack)
+  // La vérification sera faite dans la fonction POST
+  
   if (!secretValue || secretValue === 'fallback-secret-key-change-in-production') {
-    const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
-    if (isProduction) {
-      console.error('[AUTH] ⚠️ CRITIQUE: NEXTAUTH_SECRET ou AUTH_SECRET doit être défini en production !');
-      // Ne pas throw ici car cela empêcherait le module de se charger
-      // On vérifiera plus tard dans la fonction POST
-    } else {
-      console.warn('[AUTH] ⚠️ Utilisation d\'un secret de fallback (développement uniquement)');
-    }
+    // Toujours utiliser fallback au niveau du module
+    // La vérification production sera faite dans POST()
   }
   
   return new TextEncoder().encode(secretValue || 'fallback-secret-key-change-in-production');
@@ -139,9 +145,8 @@ export async function POST(request: Request) {
     // Étape 6: Vérifier le secret avant de créer le token JWT
     errorStep = 'secret_check';
     const secretValue = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
-    const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
     
-    if (isProduction && (!secretValue || secretValue === 'fallback-secret-key-change-in-production')) {
+    if (isProduction() && (!secretValue || secretValue === 'fallback-secret-key-change-in-production')) {
       console.error('[AUTH LOGIN] ⚠️ CRITIQUE: NEXTAUTH_SECRET non configuré en production !');
       return NextResponse.json(
         { error: 'Configuration serveur incorrecte' },
@@ -196,16 +201,16 @@ export async function POST(request: Request) {
     // Définir le cookie de session (compatible mobile / Safari)
     // En production (Vercel), toujours utiliser secure=true car HTTPS est requis
     const isVercel = process.env.VERCEL === '1';
-    const isProduction = isVercel || process.env.NODE_ENV === 'production';
+    const prodCheck = isProduction();
     // Détecter HTTPS via x-forwarded-proto (Vercel) ou l'URL de la requête
     const forwardedProto = request.headers.get('x-forwarded-proto');
-    const isHttps = forwardedProto === 'https' || (isProduction && !forwardedProto) || request.url.startsWith('https://');
+    const isHttps = forwardedProto === 'https' || (prodCheck && !forwardedProto) || request.url.startsWith('https://');
     
     // Log pour diagnostic (uniquement en production pour voir ce qui se passe)
-    if (isProduction) {
+    if (prodCheck) {
       console.log('[AUTH LOGIN] Cookie config:', {
         isVercel,
-        isProduction,
+        isProduction: prodCheck,
         forwardedProto,
         isHttps,
         url: request.url.substring(0, 50),
@@ -217,7 +222,7 @@ export async function POST(request: Request) {
     try {
       response.cookies.set('auth-token', token, {
         httpOnly: true,
-        secure: isHttps || isProduction, // true en production (HTTPS requis), false en local (HTTP)
+        secure: isHttps || prodCheck, // true en production (HTTPS requis), false en local (HTTP)
         sameSite: 'lax',
         maxAge: 60 * 60 * 24 * 7, // 7 jours
         path: '/',
@@ -247,7 +252,7 @@ export async function POST(request: Request) {
       hasDatabaseUrl: !!process.env.DATABASE_URL,
       hasSecret: !!process.env.NEXTAUTH_SECRET || !!process.env.AUTH_SECRET,
       isVercel: process.env.VERCEL === '1',
-      nodeEnv: process.env.NODE_ENV,
+      nodeEnv: process.env.NODE_ENV || 'undefined',
     });
     
     // Détecter le type d'erreur
@@ -265,9 +270,9 @@ export async function POST(request: Request) {
       errorMessage.includes('secret');
     
     // En production, ne pas exposer les détails de l'erreur pour la sécurité
-    const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+    const prodCheck = isProduction();
     
-    if (isProduction) {
+    if (prodCheck) {
       // Retourner un message générique mais loguer les détails
       return NextResponse.json(
         { error: 'Une erreur est survenue lors de la connexion' },
