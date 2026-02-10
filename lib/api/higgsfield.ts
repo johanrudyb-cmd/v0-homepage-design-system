@@ -245,3 +245,65 @@ export async function generateShootingPhoto(
 
   throw new Error('Higgsfield: timeout (génération trop longue)');
 }
+
+/**
+ * Virtual Try-On : génère une image de mannequin portant le vêtement (design).
+ * Utilise l'API image-to-image avec l'image du design comme référence.
+ */
+export async function generateVirtualTryOn(designUrl: string, garmentType: string): Promise<string> {
+  const modelId = EDIT_MODEL_ID;
+  const url = `${HIGGSFIELD_BASE}/${modelId}`;
+  const prompt = `Professional fashion photography, model wearing ${garmentType}, full body, neutral background, the garment must match the design shown in the image, high quality, editorial style`;
+
+  const body: Record<string, unknown> = {
+    prompt,
+    image_urls: [designUrl.trim()],
+    aspect_ratio: '3:4',
+    resolution: '2K',
+  };
+
+  const submitRes = await fetch(url, {
+    method: 'POST',
+    headers: {
+      Authorization: getAuthHeader(),
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify(body),
+  });
+
+  if (!submitRes.ok) {
+    const errText = await submitRes.text();
+    throw new Error(`Higgsfield virtual try-on: ${submitRes.status} — ${errText || submitRes.statusText}`);
+  }
+
+  const submitData = (await submitRes.json()) as SubmitResponse;
+  const statusUrl = submitData.status_url;
+  const requestId = submitData.request_id;
+
+  if (!statusUrl || !requestId) {
+    throw new Error('Higgsfield: réponse invalide (status_url ou request_id manquant)');
+  }
+
+  for (let i = 0; i < MAX_POLL_ATTEMPTS; i++) {
+    await new Promise((r) => setTimeout(r, POLL_INTERVAL_MS));
+    const statusRes = await fetch(statusUrl, {
+      headers: {
+        Authorization: getAuthHeader(),
+        Accept: 'application/json',
+      },
+    });
+    if (!statusRes.ok) throw new Error(`Higgsfield status: ${statusRes.status}`);
+    const statusData = (await statusRes.json()) as StatusResponse;
+    if (statusData.status === 'completed') {
+      const imageUrl = statusData.images?.[0]?.url;
+      if (imageUrl) return imageUrl;
+      throw new Error('Higgsfield: aucune image dans la réponse complétée');
+    }
+    if (statusData.status === 'failed' || statusData.status === 'nsfw') {
+      const errMsg = (statusData as { error?: string }).error || statusData.status || 'Échec';
+      throw new Error(`Higgsfield: ${errMsg}`);
+    }
+  }
+  throw new Error('Higgsfield: timeout (génération trop longue)');
+}

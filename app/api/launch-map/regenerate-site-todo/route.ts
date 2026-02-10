@@ -4,6 +4,7 @@
  * Body: { brandId }
  */
 
+import { Prisma } from '@prisma/client';
 import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
@@ -41,7 +42,7 @@ export async function POST(request: Request) {
     }
 
     const steps = await generateSiteCreationTodo(brand.name, latestStrategy.strategyText);
-    const siteCreationTodo = { steps };
+    const siteCreationTodo = { steps } as unknown as Prisma.InputJsonValue;
 
     await prisma.launchMap.upsert({
       where: { brandId },

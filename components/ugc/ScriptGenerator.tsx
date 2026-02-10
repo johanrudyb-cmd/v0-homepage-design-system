@@ -390,7 +390,7 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  onClick={() => setAddToFileScriptId(addToFileScriptId === script.id ? null : script.id)}
+                                  onClick={() => setAddToFileScriptId(addToFileScriptId === script.id ? null : (script.id ?? null))}
                                   className="border-2"
                                   title="Ajouter à un fichier (collection)"
                                 >

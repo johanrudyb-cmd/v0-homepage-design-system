@@ -129,7 +129,7 @@ export function MockupPackSelector({ brandId, brandName, inline }: MockupPackSel
       <Button
         onClick={handleDownload}
         disabled={selected.size === 0 || isDownloading}
-        size={inline ? 'sm' : 'default'}
+        size={inline ? 'sm' : 'md'}
         className="gap-2 w-full sm:w-auto"
       >
         {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}

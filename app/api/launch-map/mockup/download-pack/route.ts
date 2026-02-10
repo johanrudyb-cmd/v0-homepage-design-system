@@ -76,7 +76,7 @@ export async function GET(request: Request) {
     });
 
     const safeName = brand.name.replace(/[^a-zA-Z0-9-_]/g, '-');
-    return new NextResponse(zipBuffer, {
+    return new NextResponse(new Uint8Array(zipBuffer), {
       headers: {
         'Content-Type': 'application/zip',
         'Content-Disposition': `attachment; filename="pack-mockup-${safeName}.zip"`,

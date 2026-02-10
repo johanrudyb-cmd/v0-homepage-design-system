@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation';
 import { PhasePageView } from '@/components/launch-map/PhasePageView';
-import type { BrandIdentity } from '@/components/launch-map/LaunchMapStepper';
+import type { BrandIdentity, LaunchMapData } from '@/components/launch-map/LaunchMapStepper';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
@@ -97,7 +97,7 @@ export default async function LaunchMapPhasePage({
 
   const lm = brand.launchMap;
   const launchMapForClient = lm
-    ? {
+    ? ({
         id: lm.id,
         phase1: lm.phase1,
         phase2: lm.phase2,
@@ -105,12 +105,13 @@ export default async function LaunchMapPhasePage({
         phase4: lm.phase4,
         phase5: lm.phase5,
         phase6: lm.phase6,
+        phase7: lm.phase7,
         shopifyShopDomain: lm.shopifyShopDomain,
         phase1Data: lm.phase1Data,
         baseMockupByProductType: lm.baseMockupByProductType,
         phaseSummaries: lm.phaseSummaries,
         siteCreationTodo: lm.siteCreationTodo,
-      }
+      } as LaunchMapData)
     : null;
 
   const [designCount, quoteCount, ugcCount] = await Promise.all([
@@ -123,7 +124,7 @@ export default async function LaunchMapPhasePage({
     <PhasePageView
       phaseId={phaseId}
       brand={{ id: brand.id, name: brand.name, logo: brand.logo }}
-      launchMap={launchMapForClient}
+      launchMap={launchMapForClient as LaunchMapData | null}
       brandFull={brand as unknown as BrandIdentity}
       hasIdentity={hasIdentity}
       designCount={designCount}

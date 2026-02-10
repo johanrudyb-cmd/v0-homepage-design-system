@@ -664,7 +664,7 @@ export function Phase1Calculator({ brandId, brand, initialData, onComplete }: Ph
                     <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-3">Répartition des coûts</p>
                     <ResponsiveContainer width="100%" height={200}>
                       <PieChart>
-                        <Pie data={cogsDonutData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" nameKey="name" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}>
+                        <Pie data={cogsDonutData} cx="50%" cy="50%" innerRadius={50} outerRadius={80} paddingAngle={2} dataKey="value" nameKey="name" label={({ name, percent }) => `${name} ${((percent ?? 0) * 100).toFixed(0)}%`}>
                           {cogsDonutData.map((_, i) => (
                             <Cell key={i} fill={COGS_COLORS[i % COGS_COLORS.length]} />
                           ))}

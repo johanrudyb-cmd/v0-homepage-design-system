@@ -108,9 +108,20 @@ export async function GET(request: Request) {
         const shuffled = seededShuffle(filtered, seed);
         
         // Prendre les N premiers après shuffle et formater
+        const now = Date.now();
         const selected = shuffled.slice(0, combo.count).map((p) => {
-          const trendGrowthPercent = p.trendGrowthPercent ?? estimateInternalTrendPercent(p);
-          const now = Date.now();
+          const daysInRadar = p.createdAt
+            ? Math.floor((now - p.createdAt.getTime()) / (24 * 60 * 60 * 1000))
+            : 0;
+          const trendGrowthPercent =
+            p.trendGrowthPercent ??
+            estimateInternalTrendPercent({
+              trendGrowthPercent: p.trendGrowthPercent ?? null,
+              trendScoreVisual: p.trendScoreVisual ?? null,
+              isGlobalTrendAlert: p.isGlobalTrendAlert ?? false,
+              daysInRadar,
+              recurrenceInCategory: 0,
+            });
           return {
             id: p.id,
             name: p.name ?? '',

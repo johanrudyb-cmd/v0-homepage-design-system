@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -9,7 +9,7 @@ import { UsageTracker } from '@/components/usage/UsageTracker';
 import { useSurplusModal } from '@/components/usage/SurplusModalContext';
 import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
 
-export default function UsagePage() {
+function UsagePageContent() {
   const openSurplusModal = useSurplusModal();
   const searchParams = useSearchParams();
   const [showSuccess, setShowSuccess] = useState(false);
@@ -35,49 +35,57 @@ export default function UsagePage() {
   }, [searchParams]);
 
   return (
-    <DashboardLayout>
-      <div className="px-12 py-16 max-w-4xl mx-auto space-y-16">
-        {showSuccess && (
-          <div className="flex items-center gap-4 border-b border-[#E5E5E1] border-b-[1px] pb-6">
-            <div>
-              <p className="font-light text-sm text-[#1A1A1A] mb-1">Paiement validé</p>
-              <p className="font-light text-xs text-[#1A1A1A] opacity-70">Vos crédits ont bien été ajoutés. Merci pour votre achat.</p>
-            </div>
+    <div className="px-12 py-16 max-w-4xl mx-auto space-y-16">
+      {showSuccess && (
+        <div className="flex items-center gap-4 border-b border-[#E5E5E1] border-b-[1px] pb-6">
+          <div>
+            <p className="font-light text-sm text-[#1A1A1A] mb-1">Paiement validé</p>
+            <p className="font-light text-xs text-[#1A1A1A] opacity-70">Vos crédits ont bien été ajoutés. Merci pour votre achat.</p>
           </div>
-        )}
-
-        {/* Header */}
-        <div className="space-y-4 border-b border-[#E5E5E1] border-b-[1px] pb-12">
-          <h1 className="font-serif text-5xl font-normal text-[#1A1A1A]">
-            Mes quotas
-          </h1>
-          <p className="font-light text-sm text-[#1A1A1A] opacity-70">
-            Pack Fashion Launch — suivez vos utilisations et rechargez si besoin
-          </p>
         </div>
+      )}
 
-        {/* Bouton Acheter des crédits */}
-        <div className="flex justify-end">
-          <Button
-            onClick={openSurplusModal}
-          >
-            Acheter des crédits supplémentaires
-          </Button>
-        </div>
-
-        {/* Usage Tracker par catégories */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Utilisation des modules</CardTitle>
-            <CardDescription>
-              Intelligence, Identité, Marketing — barres de progression et alertes de recharge
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <UsageTracker onRechargeClick={openSurplusModal} />
-          </CardContent>
-        </Card>
+      {/* Header */}
+      <div className="space-y-4 border-b border-[#E5E5E1] border-b-[1px] pb-12">
+        <h1 className="font-serif text-5xl font-normal text-[#1A1A1A]">
+          Mes quotas
+        </h1>
+        <p className="font-light text-sm text-[#1A1A1A] opacity-70">
+          Pack Fashion Launch — suivez vos utilisations et rechargez si besoin
+        </p>
       </div>
+
+      {/* Bouton Acheter des crédits */}
+      <div className="flex justify-end">
+        <Button
+          onClick={openSurplusModal}
+        >
+          Acheter des crédits supplémentaires
+        </Button>
+      </div>
+
+      {/* Usage Tracker par catégories */}
+      <Card>
+        <CardHeader>
+          <CardTitle>Utilisation des modules</CardTitle>
+          <CardDescription>
+            Intelligence, Identité, Marketing — barres de progression et alertes de recharge
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <UsageTracker onRechargeClick={openSurplusModal} />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+export default function UsagePage() {
+  return (
+    <DashboardLayout>
+      <Suspense fallback={<div className="px-12 py-16 max-w-4xl mx-auto">Chargement…</div>}>
+        <UsagePageContent />
+      </Suspense>
     </DashboardLayout>
   );
 }

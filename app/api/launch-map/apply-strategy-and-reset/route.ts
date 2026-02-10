@@ -5,6 +5,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 import { generateSiteCreationTodo } from '@/lib/api/claude';
@@ -86,12 +87,12 @@ export async function POST(request: Request) {
         phase4: false,
         phase5: false,
         phase6: false,
-        phase1Data: null,
-        phaseSummaries: null,
-        contentCalendar: null,
-        recommendationsCache: null,
+        phase1Data: Prisma.JsonNull,
+        phaseSummaries: Prisma.JsonNull,
+        contentCalendar: Prisma.JsonNull,
+        recommendationsCache: Prisma.JsonNull,
         recommendationsCachedAt: null,
-        baseMockupByProductType: null,
+        baseMockupByProductType: Prisma.JsonNull,
         siteCreationTodo: siteCreationTodo ?? undefined,
       },
       create: {

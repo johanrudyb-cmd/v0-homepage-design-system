@@ -4,6 +4,7 @@
  */
 
 import { NextResponse } from 'next/server';
+import type { Prisma } from '@prisma/client';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 export async function PATCH(
@@ -88,8 +89,8 @@ export async function PATCH(
     await prisma.design.update({
       where: { id },
       data: {
-        techPack: updatedTechPack,
-        ...(hasMockupPatch ? { mockupSpec: updatedMockupSpec } : {}),
+        techPack: updatedTechPack as Prisma.InputJsonValue,
+        ...(hasMockupPatch ? { mockupSpec: updatedMockupSpec as Prisma.InputJsonValue } : {}),
         ...(material !== undefined ? { material } : {}),
       },
     });

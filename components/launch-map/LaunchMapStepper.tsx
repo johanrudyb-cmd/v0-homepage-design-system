@@ -29,6 +29,7 @@ export interface LaunchMapData {
   phase1Data: any;
   baseMockupByProductType?: Record<string, string> | null;
   phaseSummaries?: Record<string, string> | null;
+  siteCreationTodo?: unknown;
 }
 
 export interface BrandIdentity {
@@ -434,7 +435,7 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
             <Phase6Shopify
               brandId={brandId}
               shopifyShopDomain={launchMap?.shopifyShopDomain ?? null}
-              siteCreationTodo={launchMap?.siteCreationTodo ?? null}
+              siteCreationTodo={(launchMap?.siteCreationTodo as { steps: { id: string; label: string; done: boolean }[] } | null | undefined) ?? null}
               onComplete={() => handlePhaseComplete(7)}
             />
           )}

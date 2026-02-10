@@ -23,10 +23,20 @@ export default async function DesignTechPackPage({
 
   if (!design) notFound();
 
+  const designForView = {
+    ...design,
+    createdAt: design.createdAt?.toISOString?.() ?? undefined,
+    updatedAt: design.updatedAt?.toISOString?.() ?? undefined,
+    brand: {
+      name: design.brand?.name ?? null,
+      logo: design.brand?.logo ?? null,
+    },
+  };
+
   return (
     <DashboardLayout>
       <div className="p-6 md:p-8 max-w-7xl mx-auto">
-        <TechPackVisualView design={design} />
+        <TechPackVisualView design={designForView} />
       </div>
     </DashboardLayout>
   );

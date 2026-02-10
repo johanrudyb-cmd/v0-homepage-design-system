@@ -30,7 +30,14 @@ function buildStatus(u: { limit: number; used: number; remaining: number; isUnli
   };
 }
 
-export function useQuota(feature?: QuotaFeatureKey): QuotaFeatureStatus | null | { getFeatureStatus: (f: QuotaFeatureKey) => QuotaFeatureStatus | null; canUse: (f: QuotaFeatureKey) => boolean; data: QuotaData | null; loading: boolean; refresh: () => void } {
+type UseQuotaReturn =
+  | QuotaFeatureStatus
+  | null
+  | { getFeatureStatus: (f: QuotaFeatureKey) => QuotaFeatureStatus | null; canUse: (f: QuotaFeatureKey) => boolean; data: QuotaData | null; loading: boolean; refresh: () => void };
+
+export function useQuota(feature: QuotaFeatureKey): QuotaFeatureStatus | null;
+export function useQuota(): UseQuotaReturn;
+export function useQuota(feature?: QuotaFeatureKey): UseQuotaReturn {
   const [data, setData] = useState<QuotaData | null>(null);
   const [loading, setLoading] = useState(true);
 

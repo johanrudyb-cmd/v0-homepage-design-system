@@ -303,7 +303,7 @@ Rédige un email professionnel de demande de devis. Format JSON : {"subject":"..
 /** Contexte pour description produit (marque + stratégie + identité). */
 export interface ProductDescriptionContext {
   brandName: string;
-  styleGuide?: { preferredStyle?: string; positioning?: string; targetAudience?: string; productType?: string; tagline?: string; description?: string } | null;
+  styleGuide?: { story?: string; preferredStyle?: string; positioning?: string; targetAudience?: string; productType?: string; tagline?: string; description?: string } | null;
   phase1Data?: { productType?: string; weight?: string } | null;
   phaseSummaries?: Record<string, string> | null;
   designType: string;
@@ -442,7 +442,7 @@ export interface GarmentDesignPromptResult {
 
 /** Génère un prompt Ideogram pour un design vêtement à partir du contexte marque + identité + inspiration. */
 export async function generateGarmentDesignPrompt(context: GarmentDesignPromptContext): Promise<GarmentDesignPromptResult> {
-  const parts: string[] = [
+  const parts: (string | null)[] = [
     `Marque : ${context.brand_name}`,
     context.inspiration_brand ? `Marque d'inspiration : ${context.inspiration_brand}` : null,
     context.technical_style_keywords ? `Technical style keywords (use in Ideogram prompt) : ${context.technical_style_keywords}` : null,

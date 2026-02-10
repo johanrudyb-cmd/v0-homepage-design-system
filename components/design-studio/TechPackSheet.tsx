@@ -140,7 +140,7 @@ export function TechPackSheet({ design, designerName, manufacturer, mainPlacemen
   const frontImageUrl = design.productImageUrl || design.flatSketchUrl;
   const backImageUrl = design.flatSketchUrl && design.productImageUrl ? design.flatSketchUrl : null;
   const hasBack = !!backImageUrl && backImageUrl !== frontImageUrl;
-  const mockupType = (sd?.mockupType as string) || design.type || 'T-shirt';
+  const mockupType = sd?.mockupType || design.type || 'T-shirt';
 
   const brandName = design.brand?.name ?? '—';
   const brandLogoUrl = design.brand?.logo ?? null;

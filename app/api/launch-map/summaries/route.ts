@@ -41,7 +41,7 @@ export async function PATCH(request: Request) {
 
     const launchMap = await prisma.launchMap.upsert({
       where: { brandId },
-      update: summaries !== undefined ? { phaseSummaries: summaries } : undefined,
+      update: summaries !== undefined ? { phaseSummaries: summaries } : {},
       create: {
         brandId,
         phase1: false,

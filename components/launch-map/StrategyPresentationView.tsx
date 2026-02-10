@@ -421,7 +421,7 @@ export function StrategyPresentationView({
                 </Pie>
                 <Tooltip
                   contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: '4px' }}
-                  formatter={(value: number) => [`${value} %`, 'Part']}
+                  formatter={(value: number | undefined) => [`${value ?? 0} %`, 'Part']}
                   labelFormatter={(_, payload) => payload?.[0]?.payload?.fullName ?? _}
                 />
               </PieChart>
@@ -475,7 +475,7 @@ export function StrategyPresentationView({
               <YAxis type="category" dataKey="label" width={85} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
               <Tooltip
                 contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: '4px' }}
-                formatter={(value: number) => [`${value} €`, 'Prix']}
+                formatter={(value: number | undefined) => [`${value ?? 0} €`, 'Prix']}
                 labelFormatter={(label) => label}
               />
               <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={22}>

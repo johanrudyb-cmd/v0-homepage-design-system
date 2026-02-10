@@ -236,34 +236,34 @@ export function TechPackVisualView({ design }: TechPackVisualViewProps) {
               <dt className="text-muted-foreground">Matière</dt>
               <dd className="font-medium">{design.material || '—'}</dd>
             </div>
-            {spec?.colorMain && (
+            {Boolean(spec?.colorMain) && (
               <div>
                 <dt className="text-muted-foreground">Couleur principale</dt>
-                <dd className="font-medium">{String(spec.colorMain)}</dd>
+                <dd className="font-medium">{String(spec?.colorMain)}</dd>
               </div>
             )}
-            {spec?.neckline && (
+            {Boolean(spec?.neckline) && (
               <div>
                 <dt className="text-muted-foreground">Encolure</dt>
-                <dd className="font-medium">{String(spec.neckline)}</dd>
+                <dd className="font-medium">{String(spec?.neckline)}</dd>
               </div>
             )}
-            {spec?.sleeves && (
+            {Boolean(spec?.sleeves) && (
               <div>
                 <dt className="text-muted-foreground">Manches</dt>
-                <dd className="font-medium">{String(spec.sleeves)}</dd>
+                <dd className="font-medium">{String(spec?.sleeves)}</dd>
               </div>
             )}
-            {spec?.designType && spec.designType !== 'none' && (
+            {Boolean(spec?.designType && spec.designType !== 'none') && (
               <>
                 <div>
                   <dt className="text-muted-foreground">Visuel</dt>
-                  <dd className="font-medium">{String(spec.designType)}</dd>
+                  <dd className="font-medium">{String(spec?.designType)}</dd>
                 </div>
-                {spec.designPlacement && (
+                {Boolean(spec?.designPlacement) && (
                   <div>
                     <dt className="text-muted-foreground">Placement</dt>
-                    <dd className="font-medium">{String(spec.designPlacement)}</dd>
+                    <dd className="font-medium">{String(spec?.designPlacement)}</dd>
                   </div>
                 )}
               </>

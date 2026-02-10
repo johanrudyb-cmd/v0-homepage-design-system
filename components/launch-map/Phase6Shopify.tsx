@@ -9,7 +9,7 @@ import { Loader2, CheckCircle2, Store, ExternalLink, Circle, CheckCircle, Refres
 import Image from 'next/image';
 import Link from 'next/link';
 import { AppleLoader } from '@/components/ui/apple-loader';
-import type { SiteCreationTodoStep } from './LaunchMapStepper';
+import type { SiteCreationTodoStep } from '@/lib/api/claude';
 
 interface Phase6ShopifyProps {
   brandId: string;
