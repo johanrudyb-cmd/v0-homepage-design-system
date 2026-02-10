@@ -40,14 +40,14 @@ export function StatsSection() {
   }, []);
 
   return (
-    <section id="stats-section" className="py-20 sm:py-24 bg-[#F5F5F7]">
+    <section id="stats-section" className="py-20 sm:py-24 bg-[#000000] border-t border-white/5">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {stats.map((stat, index) => (
             <div
               key={index}
               className={cn(
-                'bg-white p-6 sm:p-8 rounded-3xl border border-black/5 shadow-apple transition-all duration-700',
+                'bg-[#1C1C1E] p-6 sm:p-8 rounded-2xl sm:rounded-[32px] border border-white/5 shadow-2xl transition-all duration-700',
                 isVisible
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-8'
@@ -58,16 +58,16 @@ export function StatsSection() {
             >
               <div className="flex flex-col items-center sm:items-start text-center sm:text-left gap-4">
                 <div
-                  className="w-12 h-12 rounded-2xl flex items-center justify-center mb-1"
-                  style={{ backgroundColor: `${stat.color}10` }}
+                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-1"
+                  style={{ backgroundColor: `${stat.color}20` }}
                 >
                   <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
                 </div>
                 <div>
-                  <div className="text-3xl sm:text-4xl font-bold tracking-tight text-[#000000]">
+                  <div className="text-3xl sm:text-4xl font-bold tracking-tight text-white">
                     {stat.value}
                   </div>
-                  <div className="text-xs sm:text-sm text-[#6e6e73] font-medium mt-1">
+                  <div className="text-xs sm:text-sm text-white/50 font-medium mt-1">
                     {stat.label}
                   </div>
                 </div>

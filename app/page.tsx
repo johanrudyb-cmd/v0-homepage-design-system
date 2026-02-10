@@ -27,8 +27,8 @@ export default function Home() {
       <MarginCalculator />
       <TestimonialsSection />
       <SalesPricing />
-      <FAQSection />
       <CTASection />
+      <FAQSection />
       <Footer />
     </main>
   );

@@ -233,13 +233,13 @@ export function TrendsByMarket() {
             {displayedTrends.slice(0, 4).map((product) => {
               const segmentLabel = product.segment === 'homme' ? 'Homme' : product.segment === 'femme' ? 'Femme' : product.segment;
               const isFree = user?.plan === 'free';
-              const isVisible = !isFree || homepageIds.has(product.id);
+              const isPubliclyVisible = !isFree || homepageIds.has(product.id);
               const canAnalyze = !isFree || (analysesCount !== null && analysesCount < 3);
 
               return (
                 <div key={product.id} className="group relative">
-                  <div className={`bg-white rounded-2xl sm:rounded-[32px] border border-[#F2F2F2] overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-apple ${isFree && !isVisible ? 'blur-sm' : ''}`}>
-                    {isFree && !isVisible && (
+                  <div className={`bg-white rounded-2xl sm:rounded-[32px] border border-[#F2F2F2] overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-apple ${isFree && !isPubliclyVisible ? 'blur-sm' : ''}`}>
+                    {isFree && !isPubliclyVisible && (
                       <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 rounded-2xl sm:rounded-[32px]">
                         <Link
                           href="/auth/choose-plan"
@@ -250,7 +250,7 @@ export function TrendsByMarket() {
                       </div>
                     )}
                     {/* Image du produit */}
-                    <div className="relative aspect-[4/5] sm:aspect-square bg-[#F5F5F7] overflow-hidden">
+                    <div className="relative aspect-[4/5] sm:aspect-square min-h-[250px] sm:min-h-0 bg-[#F5F5F7] overflow-hidden">
                       {product.imageUrl ? (
                         <Image
                           src={product.imageUrl}
@@ -268,7 +268,7 @@ export function TrendsByMarket() {
                       )}
 
                       {/* Badge segment/zone */}
-                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
+                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-20">
                         <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#000000] text-white text-[10px] sm:text-xs font-semibold">
                           {segmentLabel} {product.zone}
                         </span>
@@ -288,7 +288,7 @@ export function TrendsByMarket() {
                       {/* Bouton Analyser la tendance */}
                       <button
                         onClick={(e) => {
-                          if (isFree && !isVisible) {
+                          if (isFree && !isPubliclyVisible) {
                             e.preventDefault();
                             router.push('/auth/choose-plan');
                             return;
@@ -298,19 +298,24 @@ export function TrendsByMarket() {
                         disabled={!canAnalyze}
                         className={cn(
                           'w-full px-3 py-2 sm:px-4 sm:py-3 rounded-full text-[10px] sm:text-sm font-semibold transition-all duration-200 group-hover:scale-[1.02]',
-                          canAnalyze && (!isFree || isVisible)
+                          canAnalyze && (!isFree || isPubliclyVisible)
                             ? 'bg-[#000000] text-white hover:bg-[#1D1D1F]'
                             : 'bg-[#E5E5E7] text-[#6e6e73] cursor-not-allowed'
                         )}
                       >
                         {!user
                           ? 'Se connecter pour analyser'
-                          : isFree && !isVisible
+                          : isFree && !isPubliclyVisible
                             ? 'Passer au plan Créateur'
                             : isFree && analysesCount !== null && analysesCount >= 3
                               ? 'Limite atteinte (3/mois)'
                               : 'Analyser la tendance'}
                       </button>
+                      {user?.plan === 'free' && analysesCount !== null && (
+                        <p className="text-xs text-center text-[#6e6e73]">
+                          {analysesCount}/3 analyses ce mois
+                        </p>
+                      )}
                     </div>
                   </div>
                 </div>
