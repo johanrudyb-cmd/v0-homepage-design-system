@@ -131,41 +131,23 @@ function calculateDiffs(
  * Handler GET pour le tracking (appelé par CRON)
  */
 export async function GET(request: Request) {
-  // Vérifier le secret CRON
-  const authHeader = request.headers.get('authorization');
-  const cronSecret = process.env.CRON_SECRET;
-  
-  if (!cronSecret) {
-    console.error('[CRON] CRON_SECRET non configuré');
-    return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
-  }
+  try {
+    // Vérifier le secret CRON
+    const cronSecret = process.env.CRON_SECRET;
+    
+    if (!cronSecret) {
+      console.error('[CRON] CRON_SECRET non configuré');
+      return NextResponse.json({ error: 'CRON_SECRET not configured' }, { status: 500 });
+    }
 
-  // Vérifier l'autorisation (Vercel envoie le secret dans l'header)
-  // Format: "Bearer <secret>" ou juste le secret
-  const providedSecret = authHeader?.replace('Bearer ', '') || request.headers.get('x-cron-secret');
-  
+    // Vérifier l'autorisation (Vercel envoie le secret dans l'header)
+    // Format: "Bearer <secret>" ou juste le secret dans x-cron-secret
+    const authHeader = request.headers.get('authorization');
+    const providedSecret = authHeader?.replace('Bearer ', '') || request.headers.get('x-cron-secret');
+    
     if (providedSecret !== cronSecret) {
       console.warn('[CRON] Tentative d\'accès non autorisée');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-  try {
-    // Vérifier le secret CRON
-    const authHeader = request.headers.get('authorization');
-    const cronSecret = process.env.CRON_SECRET;
-
-    if (!cronSecret) {
-      console.error('[Track Inventory] CRON_SECRET non défini dans .env');
-      return NextResponse.json(
-        { error: 'Configuration manquante' },
-        { status: 500 }
-      );
-    }
-
-    if (authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json(
-        { error: 'Non autorisé' },
-        { status: 401 }
-      );
     }
 
     // Récupérer toutes les marques avec tracking actif

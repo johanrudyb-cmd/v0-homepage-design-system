@@ -7,6 +7,7 @@ import { Sidebar } from './Sidebar';
 import { DashboardTutorial } from '@/components/dashboard/DashboardTutorial';
 import { PageTransition } from './PageTransition';
 import { PaywallGate } from '@/components/paywall/PaywallGate';
+import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 
 function DashboardTutorialGate() {
   const pathname = usePathname();
@@ -50,9 +51,11 @@ export function DashboardLayout({
       <div className="pl-0 lg:pl-72 min-h-screen flex flex-col transition-[padding] duration-200">
         <Header onMenuClick={() => setSidebarOpen(true)} />
         <main className="flex-1 min-h-[calc(100vh-4rem)] flex flex-col">
-          <PageTransition className="flex-1 min-h-0 flex flex-col">
-            <PaywallGate>{children}</PaywallGate>
-          </PageTransition>
+          <ErrorBoundary>
+            <PageTransition className="flex-1 min-h-0 flex flex-col">
+              <PaywallGate>{children}</PaywallGate>
+            </PageTransition>
+          </ErrorBoundary>
         </main>
       </div>
       <Suspense fallback={null}>

@@ -26,6 +26,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Marque non trouvée' }, { status: 404 });
     }
 
+    // Vérifier que Higgsfield est configuré
+    const higgsfieldApiKey = process.env.HIGGSFIELD_API_KEY;
+    const higgsfieldApiSecret = process.env.HIGGSFIELD_API_SECRET;
+    if (!higgsfieldApiKey || !higgsfieldApiSecret) {
+      return NextResponse.json(
+        { 
+          error: 'Clés API Higgsfield non configurées. Veuillez configurer HIGGSFIELD_API_KEY et HIGGSFIELD_API_SECRET dans les variables d\'environnement.'
+        },
+        { status: 503 }
+      );
+    }
+
     // Générer le Virtual Try-On avec Higgsfield (limite 1/mois plan base + budget)
     let imageUrl: string;
     try {
@@ -40,6 +52,15 @@ export async function POST(request: Request) {
       const msg = err instanceof Error ? err.message : 'Quota dépassé';
       if (msg.includes('Virtual try-on') || msg.includes('Quota') || msg.includes('épuisé')) {
         return NextResponse.json({ error: msg }, { status: 403 });
+      }
+      // Si erreur liée à la configuration API
+      if (msg.includes('HIGGSFIELD_API_KEY') || msg.includes('doivent être définis')) {
+        return NextResponse.json(
+          { 
+            error: 'Clés API Higgsfield non configurées. Veuillez configurer HIGGSFIELD_API_KEY et HIGGSFIELD_API_SECRET dans les variables d\'environnement.'
+          },
+          { status: 503 }
+        );
       }
       throw err;
     }

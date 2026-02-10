@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { SurplusModalProvider } from '@/components/usage/SurplusModalContext';
 import { BackToTop } from '@/components/layout/BackToTop';
+import { ErrorBoundary } from '@/components/error/ErrorBoundary';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -76,8 +77,10 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
       <body className="font-sans antialiased min-h-screen safe-area-padding">
-        <SurplusModalProvider>{children}</SurplusModalProvider>
-        <BackToTop />
+        <ErrorBoundary>
+          <SurplusModalProvider>{children}</SurplusModalProvider>
+          <BackToTop />
+        </ErrorBoundary>
       </body>
     </html>
   );

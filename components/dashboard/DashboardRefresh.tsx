@@ -17,13 +17,43 @@ export function DashboardRefresh() {
     }, 1000);
   };
 
-  // Auto-refresh toutes les 60 secondes
+  // Auto-refresh toutes les 60 secondes (seulement si page visible)
   useEffect(() => {
-    const interval = setInterval(() => {
-      router.refresh();
-    }, 60000); // 60 secondes
+    // Ne pas auto-refresh si la page n'est pas visible (onglet inactif)
+    if (typeof document === 'undefined') return;
+    
+    let intervalId: NodeJS.Timeout | null = null;
+    
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Page cachée : arrêter le refresh
+        if (intervalId) {
+          clearInterval(intervalId);
+          intervalId = null;
+        }
+      } else {
+        // Page visible : démarrer le refresh
+        if (!intervalId) {
+          intervalId = setInterval(() => {
+            router.refresh();
+          }, 60000); // 60 secondes
+        }
+      }
+    };
 
-    return () => clearInterval(interval);
+    // Démarrer seulement si page visible
+    if (!document.hidden) {
+      intervalId = setInterval(() => {
+        router.refresh();
+      }, 60000);
+    }
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, [router]);
 
   return (

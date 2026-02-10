@@ -50,11 +50,12 @@ export function ProductDetailRecommendations({
   // Affichage direct : si pas d'analyse en base, génération automatique au chargement
   useEffect(() => {
     const hasAnalysis = analysis != null && analysis.trim() !== '';
-    if (!hasAnalysis && !hasAutoFetched.current) {
+    if (!hasAnalysis && !hasAutoFetched.current && !loading) {
       hasAutoFetched.current = true;
       load();
     }
-  }, [productId, analysis]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [productId]); // Retirer 'analysis' des dépendances pour éviter boucle infinie
 
   const handleRegenerate = () => {
     hasAutoFetched.current = true;

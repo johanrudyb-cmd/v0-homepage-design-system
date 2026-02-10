@@ -94,13 +94,45 @@ export async function POST(request: Request) {
         ? `${basePrompt}, ${detailsList ? detailsList + ', ' : ''}${customPrompt}`
         : `${basePrompt}${detailsList ? ', ' + detailsList : ''}`;
 
+      // Vérifier que OpenAI est configuré
+      const openaiApiKey = process.env.CHATGPT_API_KEY || process.env.OPENAI_API_KEY;
+      if (!openaiApiKey) {
+        await prisma.design.update({
+          where: { id: design.id },
+          data: { status: 'failed', errorMessage: 'Clé API OpenAI non configurée' },
+        });
+        return NextResponse.json(
+          { 
+            error: 'Clé API OpenAI non configurée. Veuillez configurer OPENAI_API_KEY ou CHATGPT_API_KEY dans les variables d\'environnement.',
+            designId: design.id 
+          },
+          { status: 503 }
+        );
+      }
+
       // Améliorer le prompt avec ChatGPT
       const enhancedPrompt = await enhancePrompt(fullPrompt, {
         type,
         style: 'professional',
       });
 
-      // Générer le flat sketch avec Higgsfield
+      // Vérifier que Ideogram est configuré (pour flat sketch)
+      const ideogramApiKey = process.env.IDEogram_API_KEY;
+      if (!ideogramApiKey) {
+        await prisma.design.update({
+          where: { id: design.id },
+          data: { status: 'failed', errorMessage: 'Clé API Ideogram non configurée' },
+        });
+        return NextResponse.json(
+          { 
+            error: 'Clé API Ideogram non configurée. Veuillez configurer IDEogram_API_KEY dans les variables d\'environnement.',
+            designId: design.id 
+          },
+          { status: 503 }
+        );
+      }
+
+      // Générer le flat sketch avec Ideogram
       const flatSketchUrl = await generateFlatSketch(enhancedPrompt);
 
       // Générer le tech pack avec ChatGPT

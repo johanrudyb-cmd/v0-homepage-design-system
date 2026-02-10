@@ -32,7 +32,8 @@
     "seed:trend-signals": "npx tsx scripts/seed-trend-signals.ts",
     "scrape:zalando": "npx tsx scripts/scrape-zalando-save.ts",
     "scrape:zalando:quick": "npx tsx scripts/scrape-zalando-save.ts --quick",
-    "enrich:trend": "npx tsx scripts/enrich-one-trend.ts"
+    "enrich:trend": "npx tsx scripts/enrich-one-trend.ts",
+    "seed:production": "npx tsx scripts/seed-production.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",

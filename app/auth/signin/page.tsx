@@ -46,21 +46,25 @@ function SignInContent() {
       
       // En production, attendre plus longtemps pour que le cookie soit propagé
       const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-      const delay = isProduction ? 500 : 200;
+      const initialDelay = isProduction ? 800 : 300;
+      const maxAttempts = 5;
+      let attempts = 0;
       
-      setTimeout(() => {
-        // Vérifier que le cookie est présent avant de rediriger
+      const checkCookieAndRedirect = () => {
+        attempts++;
         const hasCookie = document.cookie.includes('auth-token');
-        if (hasCookie || isProduction) {
-          // Utiliser router.push pour éviter le rechargement complet et permettre Next.js de gérer la navigation
+        
+        if (hasCookie || attempts >= maxAttempts) {
+          // Cookie présent ou max tentatives atteint : rediriger
           router.push(target);
         } else {
-          // Si le cookie n'est pas encore là, attendre un peu plus
-          setTimeout(() => {
-            router.push(target);
-          }, 300);
+          // Attendre un peu plus et réessayer
+          setTimeout(checkCookieAndRedirect, 200);
         }
-      }, delay);
+      };
+      
+      // Démarrer la vérification après le délai initial
+      setTimeout(checkCookieAndRedirect, initialDelay);
     } catch (err: any) {
       console.error('Erreur lors de la connexion:', err);
       setError('Une erreur est survenue. Vérifiez votre connexion.');
