@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers';
 import { jwtVerify } from 'jose';
-import { prisma } from './prisma';
+import { prisma, isDatabaseAvailable } from './prisma';
 
 const secret = new TextEncoder().encode(
   process.env.NEXTAUTH_SECRET || 'fallback-secret-key-change-in-production'
@@ -8,6 +8,10 @@ const secret = new TextEncoder().encode(
 
 export async function getCurrentUser() {
   try {
+    if (!isDatabaseAvailable()) {
+      return null;
+    }
+
     const cookieStore = await cookies();
     const token = cookieStore.get('auth-token')?.value;
 
