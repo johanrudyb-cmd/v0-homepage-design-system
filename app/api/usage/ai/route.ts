@@ -13,7 +13,19 @@ const FEATURES_WITH_COST = Object.keys(AI_FEATURE_COSTS) as AIFeatureKey[];
 export async function GET() {
   const user = await getCurrentUser();
   if (!user) {
-    return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+    // Retourner des données par défaut au lieu de 401 pour éviter les erreurs côté client
+    const fallbackBudget = -1; // Illimité pour plan free
+    return NextResponse.json({
+      used: 0,
+      budget: null,
+      remaining: null,
+      tokens: fallbackBudget,
+      tokensBudget: null,
+      generationsRemaining: fallbackBudget,
+      generationsBudget: null,
+      plan: 'free',
+      costs: {},
+    });
   }
 
   try {

@@ -7,7 +7,11 @@ export async function GET(request: NextRequest) {
   try {
     const user = await getCurrentUser();
     if (!user) {
-      return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+      // Retourner des données vides au lieu de 401 pour éviter les erreurs côté client
+      return NextResponse.json({
+        notifications: [],
+        unreadCount: 0,
+      });
     }
 
     const searchParams = request.nextUrl.searchParams;

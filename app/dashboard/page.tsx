@@ -14,7 +14,8 @@ export default async function DashboardPage() {
   let user;
   try {
     user = await getCurrentUser();
-  } catch {
+  } catch (error) {
+    console.error('[Dashboard] Erreur getCurrentUser:', error);
     redirect('/auth/signin');
   }
   if (!user) {
@@ -23,54 +24,108 @@ export default async function DashboardPage() {
 
   let brand;
   try {
+    // Vérifier que la base de données est disponible avant d'utiliser Prisma
+    if (!process.env.DATABASE_URL) {
+      console.error('[Dashboard] DATABASE_URL non configuré');
+      redirect('/auth/signin');
+    }
+    
     // Récupérer la marque la plus récente (celle de l'onboarding ou la dernière créée)
-    brand = await prisma.brand.findFirst({
-      where: { userId: user.id },
-      orderBy: { createdAt: 'desc' },
-    });
+    try {
+      brand = await prisma.brand.findFirst({
+        where: { userId: user.id },
+        orderBy: { createdAt: 'desc' },
+      });
+    } catch (dbError: unknown) {
+      const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
+      console.error('[Dashboard] Erreur Prisma brand.findFirst:', errorMessage);
+      // Si erreur Prisma, rediriger vers signin
+      if (errorMessage.includes('DATABASE_URL') || errorMessage.includes('PrismaClient')) {
+        redirect('/auth/signin');
+      }
+      throw dbError;
+    }
 
     if (!brand) {
-      brand = await prisma.brand.create({
-        data: {
-          userId: user.id,
-          name: 'Ma Première Marque',
-        },
-      });
-      // Créer le Launch Map associé
-      await prisma.launchMap.create({
-        data: {
-          brandId: brand.id,
-          phase1: false,
-          phase2: false,
-          phase3: false,
-          phase4: false,
-          phase5: false,
-        },
-      });
+      try {
+        brand = await prisma.brand.create({
+          data: {
+            userId: user.id,
+            name: 'Ma Première Marque',
+          },
+        });
+        // Créer le Launch Map associé
+        await prisma.launchMap.create({
+          data: {
+            brandId: brand.id,
+            phase1: false,
+            phase2: false,
+            phase3: false,
+            phase4: false,
+            phase5: false,
+          },
+        });
+      } catch (dbError: unknown) {
+        const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
+        console.error('[Dashboard] Erreur Prisma brand.create:', errorMessage);
+        if (errorMessage.includes('DATABASE_URL') || errorMessage.includes('PrismaClient')) {
+          redirect('/auth/signin');
+        }
+        throw dbError;
+      }
     }
 
     // Récupérer le Launch Map pour vérifier la progression
-    const launchMap = await prisma.launchMap.findUnique({
-      where: { brandId: brand.id },
-    });
+    let launchMap;
+    try {
+      launchMap = await prisma.launchMap.findUnique({
+        where: { brandId: brand.id },
+      });
+    } catch (dbError: unknown) {
+      const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
+      console.error('[Dashboard] Erreur Prisma launchMap.findUnique:', errorMessage);
+      if (errorMessage.includes('DATABASE_URL') || errorMessage.includes('PrismaClient')) {
+        redirect('/auth/signin');
+      }
+      // Continuer avec launchMap = null
+      launchMap = null;
+    }
 
     // Vérifier si l'identité est complète
     const hasIdentity = !!(brand.logo || brand.colorPalette || brand.typography);
 
     // Vérifier les designs créés
-    const designCount = await prisma.design.count({
-      where: { brandId: brand.id, status: 'completed' },
-    });
+    let designCount = 0;
+    try {
+      designCount = await prisma.design.count({
+        where: { brandId: brand.id, status: 'completed' },
+      });
+    } catch (dbError: unknown) {
+      console.error('[Dashboard] Erreur Prisma design.count:', dbError);
+      // Continuer avec 0
+    }
 
     // Vérifier les devis envoyés
-    const quoteCount = await prisma.quote.count({
-      where: { brandId: brand.id },
-    });
+    let quoteCount = 0;
+    try {
+      quoteCount = await prisma.quote.count({
+        where: { brandId: brand.id },
+      });
+    } catch (dbError: unknown) {
+      console.error('[Dashboard] Erreur Prisma quote.count:', dbError);
+      // Continuer avec 0
+    }
 
     // Vérifier les contenus UGC créés
-    const ugcCount = await prisma.uGCContent.count({
-      where: { brandId: brand.id },
-    });
+    let ugcCount = 0;
+    try {
+      ugcCount = await prisma.uGCContent.count({
+        where: { brandId: brand.id },
+      });
+    } catch (dbError: unknown) {
+      console.error('[Dashboard] Erreur Prisma uGCContent.count:', dbError);
+      // Continuer avec 0
+    }
 
     // Récupérer les données pour les graphiques (30 derniers jours)
     const thirtyDaysAgo = new Date();
@@ -78,30 +133,43 @@ export default async function DashboardPage() {
     thirtyDaysAgo.setHours(0, 0, 0, 0);
 
     // Récupérer tous les designs, devis et UGC des 30 derniers jours
-    const [designs, quotes, ugcContents] = await Promise.all([
-      prisma.design.findMany({
-        where: {
-          brandId: brand.id,
-          status: 'completed',
-          createdAt: { gte: thirtyDaysAgo },
-        },
-        select: { createdAt: true },
-      }),
-      prisma.quote.findMany({
-        where: {
-          brandId: brand.id,
-          createdAt: { gte: thirtyDaysAgo },
-        },
-        select: { createdAt: true },
-      }),
-      prisma.uGCContent.findMany({
-        where: {
-          brandId: brand.id,
-          createdAt: { gte: thirtyDaysAgo },
-        },
-        select: { createdAt: true },
-      }),
-    ]);
+    let designs: { createdAt: Date }[] = [];
+    let quotes: { createdAt: Date }[] = [];
+    let ugcContents: { createdAt: Date }[] = [];
+    
+    try {
+      [designs, quotes, ugcContents] = await Promise.all([
+        prisma.design.findMany({
+          where: {
+            brandId: brand.id,
+            status: 'completed',
+            createdAt: { gte: thirtyDaysAgo },
+          },
+          select: { createdAt: true },
+        }),
+        prisma.quote.findMany({
+          where: {
+            brandId: brand.id,
+            createdAt: { gte: thirtyDaysAgo },
+          },
+          select: { createdAt: true },
+        }),
+        prisma.uGCContent.findMany({
+          where: {
+            brandId: brand.id,
+            createdAt: { gte: thirtyDaysAgo },
+          },
+          select: { createdAt: true },
+        }),
+      ]);
+    } catch (dbError: unknown) {
+      const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
+      console.error('[Dashboard] Erreur Prisma Promise.all:', errorMessage);
+      // Continuer avec des tableaux vides
+      designs = [];
+      quotes = [];
+      ugcContents = [];
+    }
 
     // Créer un objet pour chaque jour des 30 derniers jours
     const chartDataMap = new globalThis.Map<string, { designs: number; quotes: number; ugc: number }>();
@@ -521,7 +589,26 @@ export default async function DashboardPage() {
       </div>
     </DashboardLayout>
     );
-  } catch (err) {
-    throw err;
+  } catch (err: unknown) {
+    const errorMessage = err instanceof Error ? err.message : String(err);
+    console.error('[Dashboard] Erreur lors du rendu:', {
+      error: errorMessage,
+      userId: user?.id,
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+    });
+    
+    // Si erreur Prisma/DATABASE_URL, rediriger vers signin avec message
+    if (
+      errorMessage.includes('Environment variable not found: DATABASE_URL') ||
+      errorMessage.includes('PrismaClientInitializationError') ||
+      errorMessage.includes('DATABASE_URL')
+    ) {
+      console.error('[Dashboard] DATABASE_URL non configuré, redirection vers signin');
+      redirect('/auth/signin');
+    }
+    
+    // Pour les autres erreurs, rediriger aussi pour éviter l'erreur Server Component
+    // En production, on ne veut pas exposer les erreurs
+    redirect('/auth/signin');
   }
 }
