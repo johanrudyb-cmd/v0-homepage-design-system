@@ -42,7 +42,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
       {/* Header avec logo centré (desktop) / logo + fermer (mobile) */}
       <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-black/5 flex items-center justify-between lg:justify-center gap-4">
         <Link href="/dashboard" className="block shrink-0" onClick={handleNav}>
-          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-[72px] w-[72px] sm:h-20 sm:w-20 lg:h-24 lg:w-24 shrink-0 object-contain bg-transparent mx-auto lg:mx-0" unoptimized />
+          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-24 w-24 sm:h-28 sm:w-28 md:h-32 md:w-32 lg:h-24 lg:w-24 shrink-0 object-contain bg-transparent mx-auto lg:mx-0" unoptimized />
         </Link>
         <button
           type="button"
