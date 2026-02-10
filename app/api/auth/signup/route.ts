@@ -5,6 +5,14 @@ export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
+    const { isDatabaseAvailable } = await import('@/lib/prisma');
+    if (!isDatabaseAvailable()) {
+      return NextResponse.json(
+        { error: 'Service temporairement indisponible. Veuillez réessayer plus tard.' },
+        { status: 503 }
+      );
+    }
+
     const { name, email, password } = await request.json();
 
     if (!email || !password) {

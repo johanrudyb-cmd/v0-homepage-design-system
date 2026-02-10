@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, isDatabaseAvailable } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
 import { SignJWT } from 'jose';
 
@@ -12,6 +12,13 @@ const secret = new TextEncoder().encode(
 
 export async function POST(request: Request) {
   try {
+    if (!isDatabaseAvailable()) {
+      return NextResponse.json(
+        { error: 'Service temporairement indisponible. Veuillez réessayer plus tard.' },
+        { status: 503 }
+      );
+    }
+
     const { email, password } = await request.json();
 
     if (!email || !password) {
