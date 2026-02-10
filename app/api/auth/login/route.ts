@@ -6,18 +6,41 @@ import { SignJWT } from 'jose';
 // Forcer Node.js runtime
 export const runtime = 'nodejs';
 
-const secret = new TextEncoder().encode(
-  process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET || 'fallback-secret-key-change-in-production'
-);
+// Vérifier et encoder le secret JWT
+function getSecret(): Uint8Array {
+  const secretValue = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
+  
+  if (!secretValue || secretValue === 'fallback-secret-key-change-in-production') {
+    const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+    if (isProduction) {
+      console.error('[AUTH] ⚠️ CRITIQUE: NEXTAUTH_SECRET ou AUTH_SECRET doit être défini en production !');
+      // Ne pas throw ici car cela empêcherait le module de se charger
+      // On vérifiera plus tard dans la fonction POST
+    } else {
+      console.warn('[AUTH] ⚠️ Utilisation d\'un secret de fallback (développement uniquement)');
+    }
+  }
+  
+  return new TextEncoder().encode(secretValue || 'fallback-secret-key-change-in-production');
+}
 
-// Vérifier que le secret est configuré en production
-if ((process.env.VERCEL || process.env.NODE_ENV === 'production') && (!process.env.NEXTAUTH_SECRET && !process.env.AUTH_SECRET)) {
-  console.error('[AUTH] ⚠️ NEXTAUTH_SECRET ou AUTH_SECRET doit être défini en production !');
+// Initialiser le secret (peut utiliser fallback en dev)
+let secret: Uint8Array;
+try {
+  secret = getSecret();
+} catch (error) {
+  // En cas d'erreur, utiliser un fallback temporaire
+  console.error('[AUTH] Erreur lors de l\'initialisation du secret:', error);
+  secret = new TextEncoder().encode('fallback-secret-key-change-in-production');
 }
 
 export async function POST(request: Request) {
+  const startTime = Date.now();
+  let errorStep = 'initialization';
+  
   try {
-    // Vérifier que la base de données est disponible
+    // Étape 1: Vérifier les variables d'environnement
+    errorStep = 'env_check';
     if (!process.env.DATABASE_URL) {
       console.error('[AUTH LOGIN] DATABASE_URL non configuré');
       return NextResponse.json(
@@ -26,7 +49,21 @@ export async function POST(request: Request) {
       );
     }
 
-    const { email, password } = await request.json();
+    // Étape 2: Parser le body de la requête
+    errorStep = 'parse_body';
+    let email: string;
+    let password: string;
+    try {
+      const body = await request.json();
+      email = body.email;
+      password = body.password;
+    } catch (parseError) {
+      console.error('[AUTH LOGIN] Erreur parsing JSON:', parseError);
+      return NextResponse.json(
+        { error: 'Format de requête invalide' },
+        { status: 400 }
+      );
+    }
 
     if (!email || !password) {
       return NextResponse.json(
@@ -35,14 +72,35 @@ export async function POST(request: Request) {
       );
     }
 
-    // Rechercher l'utilisateur avec gestion d'erreur explicite
+    // Étape 3: Vérifier que Prisma Client est disponible
+    errorStep = 'prisma_check';
+    try {
+      // Test simple pour vérifier que Prisma est initialisé
+      if (typeof prisma.user === 'undefined') {
+        throw new Error('Prisma Client non initialisé');
+      }
+    } catch (prismaInitError) {
+      console.error('[AUTH LOGIN] Prisma Client non disponible:', prismaInitError);
+      return NextResponse.json(
+        { error: 'Erreur de configuration serveur' },
+        { status: 500 }
+      );
+    }
+
+    // Étape 4: Rechercher l'utilisateur dans la base de données
+    errorStep = 'db_query';
     let user;
     try {
       user = await prisma.user.findUnique({
-        where: { email },
+        where: { email: email.toLowerCase().trim() },
       });
-    } catch (dbError) {
-      console.error('[AUTH LOGIN] Erreur de connexion à la base de données:', dbError);
+    } catch (dbError: unknown) {
+      const dbErrorMessage = dbError instanceof Error ? dbError.message : String(dbError);
+      console.error('[AUTH LOGIN] Erreur de connexion à la base de données:', {
+        error: dbErrorMessage,
+        email: email.substring(0, 5) + '***',
+        hasDatabaseUrl: !!process.env.DATABASE_URL,
+      });
       return NextResponse.json(
         { error: 'Erreur de connexion à la base de données' },
         { status: 500 }
@@ -50,14 +108,26 @@ export async function POST(request: Request) {
     }
 
     if (!user || !user.password) {
+      // Ne pas révéler si l'email existe ou non (sécurité)
       return NextResponse.json(
         { error: 'Email ou mot de passe incorrect' },
         { status: 401 }
       );
     }
 
-    // Vérifier le mot de passe
-    const isPasswordValid = await bcrypt.compare(password, user.password);
+    // Étape 5: Vérifier le mot de passe avec bcrypt
+    errorStep = 'password_check';
+    let isPasswordValid: boolean;
+    try {
+      isPasswordValid = await bcrypt.compare(password, user.password);
+    } catch (bcryptError: unknown) {
+      const bcryptMessage = bcryptError instanceof Error ? bcryptError.message : String(bcryptError);
+      console.error('[AUTH LOGIN] Erreur lors de la vérification du mot de passe:', bcryptMessage);
+      return NextResponse.json(
+        { error: 'Erreur lors de la vérification' },
+        { status: 500 }
+      );
+    }
 
     if (!isPasswordValid) {
       return NextResponse.json(
@@ -66,19 +136,53 @@ export async function POST(request: Request) {
       );
     }
 
-    // Créer un token JWT
-    const token = await new SignJWT({
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      plan: user.plan,
-    })
-      .setProtectedHeader({ alg: 'HS256' })
-      .setIssuedAt()
-      .setExpirationTime('7d')
-      .sign(secret);
+    // Étape 6: Vérifier le secret avant de créer le token JWT
+    errorStep = 'secret_check';
+    const secretValue = process.env.NEXTAUTH_SECRET || process.env.AUTH_SECRET;
+    const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+    
+    if (isProduction && (!secretValue || secretValue === 'fallback-secret-key-change-in-production')) {
+      console.error('[AUTH LOGIN] ⚠️ CRITIQUE: NEXTAUTH_SECRET non configuré en production !');
+      return NextResponse.json(
+        { error: 'Configuration serveur incorrecte' },
+        { status: 500 }
+      );
+    }
+    
+    // Re-générer le secret au cas où il aurait changé
+    const currentSecret = new TextEncoder().encode(
+      secretValue || 'fallback-secret-key-change-in-production'
+    );
+    
+    // Étape 7: Créer le token JWT
+    errorStep = 'jwt_create';
+    let token: string;
+    try {
+      token = await new SignJWT({
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        plan: user.plan,
+      })
+        .setProtectedHeader({ alg: 'HS256' })
+        .setIssuedAt()
+        .setExpirationTime('7d')
+        .sign(currentSecret);
+    } catch (jwtError: unknown) {
+      const jwtMessage = jwtError instanceof Error ? jwtError.message : String(jwtError);
+      console.error('[AUTH LOGIN] Erreur lors de la création du token JWT:', {
+        error: jwtMessage,
+        hasSecret: !!secretValue,
+        secretLength: secretValue?.length || 0,
+      });
+      return NextResponse.json(
+        { error: 'Erreur lors de la création de la session' },
+        { status: 500 }
+      );
+    }
 
-    // Créer la réponse avec le cookie
+    // Étape 8: Créer la réponse avec le cookie
+    errorStep = 'response_create';
     const response = NextResponse.json({
       success: true,
       user: {
@@ -106,40 +210,82 @@ export async function POST(request: Request) {
         isHttps,
         url: request.url.substring(0, 50),
         hasSecret: !!process.env.NEXTAUTH_SECRET || !!process.env.AUTH_SECRET,
+        duration: `${Date.now() - startTime}ms`,
       });
     }
     
-    response.cookies.set('auth-token', token, {
-      httpOnly: true,
-      secure: isHttps || isProduction, // true en production (HTTPS requis), false en local (HTTP)
-      sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 jours
-      path: '/',
-      // Ne pas définir domain pour permettre le cookie sur tous les sous-domaines
-    });
+    try {
+      response.cookies.set('auth-token', token, {
+        httpOnly: true,
+        secure: isHttps || isProduction, // true en production (HTTPS requis), false en local (HTTP)
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 24 * 7, // 7 jours
+        path: '/',
+        // Ne pas définir domain pour permettre le cookie sur tous les sous-domaines
+      });
+    } catch (cookieError: unknown) {
+      const cookieMessage = cookieError instanceof Error ? cookieError.message : String(cookieError);
+      console.error('[AUTH LOGIN] Erreur lors de la définition du cookie:', cookieMessage);
+      // Continuer quand même, le token est dans la réponse JSON
+    }
 
     // Éviter la mise en cache de la réponse (problèmes sur mobile)
     response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
 
     return response;
   } catch (error: unknown) {
-    console.error('[AUTH LOGIN] Erreur:', error);
-    const errorMessage = error instanceof Error ? error.message : 'Erreur inconnue';
-    const isDatabaseError = errorMessage.includes('prisma') || errorMessage.includes('database') || errorMessage.includes('connection');
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const errorStack = error instanceof Error ? error.stack : undefined;
+    const duration = Date.now() - startTime;
+    
+    // Log détaillé pour diagnostic
+    console.error('[AUTH LOGIN] Erreur capturée:', {
+      step: errorStep,
+      error: errorMessage,
+      stack: errorStack?.substring(0, 500), // Limiter la taille du log
+      duration: `${duration}ms`,
+      hasDatabaseUrl: !!process.env.DATABASE_URL,
+      hasSecret: !!process.env.NEXTAUTH_SECRET || !!process.env.AUTH_SECRET,
+      isVercel: process.env.VERCEL === '1',
+      nodeEnv: process.env.NODE_ENV,
+    });
+    
+    // Détecter le type d'erreur
+    const isDatabaseError = 
+      errorMessage.includes('prisma') || 
+      errorMessage.includes('database') || 
+      errorMessage.includes('connection') ||
+      errorMessage.includes('P1001') || // Prisma connection error
+      errorMessage.includes('P2002') || // Prisma unique constraint
+      errorMessage.includes('P2025');   // Prisma record not found
+    
+    const isJwtError = 
+      errorMessage.includes('JWT') || 
+      errorMessage.includes('jose') ||
+      errorMessage.includes('secret');
     
     // En production, ne pas exposer les détails de l'erreur pour la sécurité
-    if (process.env.VERCEL === '1' || process.env.NODE_ENV === 'production') {
+    const isProduction = process.env.VERCEL === '1' || process.env.NODE_ENV === 'production';
+    
+    if (isProduction) {
+      // Retourner un message générique mais loguer les détails
       return NextResponse.json(
         { error: 'Une erreur est survenue lors de la connexion' },
         { status: 500 }
       );
     }
     
-    // En développement, retourner plus de détails pour le debug
+    // En développement/preview, retourner plus de détails pour le debug
     return NextResponse.json(
       { 
         error: 'Une erreur est survenue lors de la connexion',
-        details: isDatabaseError ? 'Erreur de connexion à la base de données' : errorMessage
+        step: errorStep,
+        details: isDatabaseError 
+          ? 'Erreur de connexion à la base de données' 
+          : isJwtError
+          ? 'Erreur lors de la création du token'
+          : errorMessage,
+        duration: `${duration}ms`,
       },
       { status: 500 }
     );
