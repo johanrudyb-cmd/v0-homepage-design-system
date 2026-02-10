@@ -313,6 +313,10 @@ export interface TechPackSpeedDemon {
   issueNo: string;
   inDate: string;
   outDate: string;
+  /** Type de mockup (T-shirt, Hoodie, etc.) pour les placements et dimensions */
+  mockupType?: string;
+  /** Saison (ex. SS25, FW24) */
+  season?: string;
   /** Tailles souhaitées (S, M, L, XL, etc.) - affichées avec tableau dimensions */
   sizes?: string[];
   /** Dimensions par taille (tableau complet : longueur, tourPoitrine, etc.) */

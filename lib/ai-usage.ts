@@ -4,6 +4,7 @@
  * Reset mensuel à la date d'abonnement (subscribedAt ou createdAt).
  */
 
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import {
   getBudgetForPlan,
@@ -197,7 +198,7 @@ export async function recordAIUsage(
         userId,
         feature,
         costEur: cost,
-        metadata: metadata ?? undefined,
+        metadata: (metadata ?? undefined) as Prisma.InputJsonValue | undefined,
       },
     });
   } catch (e) {

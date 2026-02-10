@@ -60,8 +60,8 @@ export function Phase3Sourcing({ brandId, onComplete }: Phase3SourcingProps) {
           console.error('Erreur parsing quotes:', err);
         }
 
-        const quotes = quotesData.quotes || [];
-        const sentQuotes = quotes.filter((q: { status: string }) => q.status === 'sent');
+        const quotes = (quotesData.quotes || []) as { status: string; factory?: { id: string; name: string; country: string; moq?: number; leadTime?: number } | null }[];
+        const sentQuotes = quotes.filter((q) => q.status === 'sent');
         setQuoteCount(sentQuotes.length);
 
         if (sentQuotes.length >= 2 && !isCompleted) {
@@ -71,7 +71,7 @@ export function Phase3Sourcing({ brandId, onComplete }: Phase3SourcingProps) {
         }
 
         // Récupérer les favoris d'abord
-        let favData = { factories: [] };
+        let favData: { factories?: { id: string; name: string; country: string; moq?: number; leadTime?: number }[] } = { factories: [] };
         try {
           if (favRes.ok) {
             favData = await favRes.json();

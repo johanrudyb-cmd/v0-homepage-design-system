@@ -21,7 +21,6 @@ export async function GET(request: Request) {
       where: { id: brandId, userId: user.id },
       include: {
         launchMap: true,
-        styleGuide: true,
       },
     });
 

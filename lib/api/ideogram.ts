@@ -130,7 +130,7 @@ export async function remixImage(
   if (options?.negative_prompt?.trim()) {
     form.append('negative_prompt', options.negative_prompt.trim());
   }
-  form.append('image', new Blob([imageBuffer], { type: 'image/png' }), 'design.png');
+  form.append('image', new Blob([new Uint8Array(imageBuffer)], { type: 'image/png' }), 'design.png');
 
   const res = await fetch(url, {
     method: 'POST',

@@ -1490,9 +1490,9 @@ export function Phase2Design({ brandId, brand, launchMap, onComplete }: Phase2De
             <div className="rounded-lg border border-border bg-muted/20 p-4">
               <p className="text-sm font-medium text-foreground mb-2">Logo / design validé (phase précédente)</p>
               <p className="text-xs text-muted-foreground mb-3">Ce visuel est repris dans le prompt et intégré à l’image du mockup lors de la génération.</p>
-              {designSet && designSet.length > 1 ? (
+              {(designSet?.length ?? 0) > 1 ? (
                 <div className="flex flex-wrap gap-3">
-                  {designSet.map((d) => (
+                  {(designSet ?? []).map((d) => (
                     <div key={d.placement} className="flex flex-col items-center gap-1">
                       <div className="rounded-lg overflow-hidden border border-border aspect-square w-20 h-20 bg-muted/30">
                         <PreviewWatermark src={d.imageUrl.startsWith('blob:') ? d.imageUrl : proxyImageUrl(d.imageUrl)} alt={d.placement} className="w-full h-full object-cover" />
@@ -1503,7 +1503,7 @@ export function Phase2Design({ brandId, brand, launchMap, onComplete }: Phase2De
                 </div>
               ) : designImageUrl ? (
                 <div className="rounded-lg overflow-hidden border border-border aspect-square max-w-[120px] bg-muted/30">
-                  <PreviewWatermark src={designImageUrl.startsWith('blob:') ? designImageUrl : proxyImageUrl(designImageUrl)} alt="Logo validé" className="w-full h-full object-contain" />
+                  <PreviewWatermark src={designImageUrl!.startsWith('blob:') ? designImageUrl! : proxyImageUrl(designImageUrl!)} alt="Logo validé" className="w-full h-full object-contain" />
                 </div>
               ) : null}
             </div>
@@ -1577,7 +1577,7 @@ export function Phase2Design({ brandId, brand, launchMap, onComplete }: Phase2De
                     <Button key={s} type="button" variant={mockupAnswers.seams === s ? 'default' : 'outline'} size="sm" onClick={() => updateMockup({ seams: s })}>{s}</Button>
                   ))}
                 </div>
-                <Input value={mockupAnswers.seams && !SEAMS_OPTIONS.includes(mockupAnswers.seams) ? mockupAnswers.seams : ''} onChange={(e) => updateMockup({ seams: e.target.value || undefined })} placeholder="Ou précisez (ex. surpiqure 2 mm)" className="mt-2" />
+                <Input value={mockupAnswers.seams && !SEAMS_OPTIONS.includes(mockupAnswers.seams ?? '') ? mockupAnswers.seams : ''} onChange={(e) => updateMockup({ seams: e.target.value?.trim() || '' })} placeholder="Ou précisez (ex. surpiqure 2 mm)" className="mt-2" />
               </div>
               <div className="sm:col-span-2">
                 <Label>Grammage tissu</Label>
@@ -1679,7 +1679,7 @@ export function Phase2Design({ brandId, brand, launchMap, onComplete }: Phase2De
                     }}
                     className="rounded-xl overflow-hidden border border-border bg-muted/30 aspect-square max-w-[280px] relative block w-full cursor-pointer hover:ring-2 hover:ring-primary/30 transition-shadow focus:outline-none focus:ring-2 focus:ring-primary"
                   >
-                    <PreviewWatermark src={proxyImageUrl(mockupImageUrl)} alt="Mockup Tech Pack" className="w-full h-full object-cover" />
+                    <PreviewWatermark src={proxyImageUrl(mockupImageUrl ?? '')} alt="Mockup Tech Pack" className="w-full h-full object-cover" />
                   </button>
                 )}
                 <div className="space-y-2">
@@ -1751,7 +1751,7 @@ export function Phase2Design({ brandId, brand, launchMap, onComplete }: Phase2De
                     }}
                     className="rounded-xl overflow-hidden border border-border bg-muted/30 aspect-square max-w-sm mx-auto relative block w-full cursor-pointer hover:ring-2 hover:ring-primary/30 transition-shadow focus:outline-none focus:ring-2 focus:ring-primary"
                   >
-                    <PreviewWatermark src={previewImageUrl} alt="Preview" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
+                    <PreviewWatermark src={previewImageUrl ?? ''} alt="Preview" className="absolute inset-0 w-full h-full object-cover pointer-events-none" />
                   </button>
                 )}
                 <Button onClick={handleSavePreview} disabled={isSaving} className="gap-2">

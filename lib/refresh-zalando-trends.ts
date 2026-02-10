@@ -16,8 +16,6 @@ const ACTIVE_CITIES = ['paris', 'berlin', 'milan', 'copenhagen', 'stockholm', 'a
 const ACTIVE_HOMME_IDS = ACTIVE_CITIES.map((c) => `zalando-trend-homme-${c}`);
 const ACTIVE_FEMME_IDS = ACTIVE_CITIES.map((c) => `zalando-trend-femme-${c}`);
 
-import { inferCategory } from '@/lib/infer-trend-category';
-
 function inferProductBrandFromName(name: string): string | null {
   const first = name.trim().split(/\s+/)[0];
   if (!first || first.length < 2 || first.length > 25) return null;

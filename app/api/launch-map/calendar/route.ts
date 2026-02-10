@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { Prisma } from '@prisma/client';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { prisma } from '@/lib/prisma';
 
@@ -52,7 +53,7 @@ export interface ContentCalendarPayload {
 function parseCalendar(raw: unknown): ContentCalendarPayload {
   if (raw && typeof raw === 'object' && 'events' in raw && Array.isArray((raw as { events: unknown }).events)) {
     const events = ((raw as { events: unknown[] }).events)
-      .filter((e): e is ContentCalendarEvent => e && typeof e === 'object' && 'id' in e && 'type' in e && 'title' in e && 'start' in e)
+      .filter((e): e is ContentCalendarEvent => Boolean(e && typeof e === 'object' && 'id' in e && 'type' in e && 'title' in e && 'start' in e))
       .map((e) => {
         const ev = e as ContentCalendarEvent & { structuredContent?: unknown };
         let structuredContent: StructuredPostContent | undefined;
@@ -163,7 +164,7 @@ export async function PATCH(request: Request) {
       const existing = parseCalendar(brand.launchMap.contentCalendar);
       (payload as { meta?: ContentCalendarMeta }).meta = existing.meta;
     }
-    const contentCalendar = payload as unknown as Record<string, unknown>;
+    const contentCalendar = payload as unknown as Prisma.InputJsonValue;
 
     if (brand.launchMap) {
       await prisma.launchMap.update({

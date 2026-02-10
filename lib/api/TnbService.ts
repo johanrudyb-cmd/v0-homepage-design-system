@@ -98,7 +98,7 @@ export async function generateClothing(params: GenerateClothingParams): Promise<
   const res = await fetch(url, {
     method: 'POST',
     headers: headers,
-    body: formBuffer,
+    body: new Uint8Array(formBuffer),
   });
 
   if (!res.ok) {

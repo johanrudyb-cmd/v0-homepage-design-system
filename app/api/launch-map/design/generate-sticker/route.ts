@@ -63,7 +63,9 @@ export async function POST(request: Request) {
     const designAvoid = typeof designAvoidRaw === 'string' && designAvoidRaw.trim() ? designAvoidRaw.trim() : null;
     const designInspiration = typeof inspirationRaw === 'string' && inspirationRaw.trim() ? inspirationRaw.trim() : null;
     const garmentColorHex = typeof garmentColorRaw === 'string' && /^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$/.test(garmentColorRaw.trim()) ? garmentColorRaw.trim() : null;
-    const productLabel = { tshirt: 't-shirt', hoodie: 'hoodie', veste: 'veste', pantalon: 'pantalon' }[productType || 'tshirt'] || 't-shirt';
+    const productTypeKeys = ['tshirt', 'hoodie', 'veste', 'pantalon'] as const;
+    const productTypeKey = productTypeKeys.includes(productType as (typeof productTypeKeys)[number]) ? (productType as (typeof productTypeKeys)[number]) : 'tshirt';
+    const productLabel = { tshirt: 't-shirt', hoodie: 'hoodie', veste: 'veste', pantalon: 'pantalon' }[productTypeKey] ?? 't-shirt';
     const useLogoFrame = !!logoUrl && typeof logoUrl === 'string' && logoUrl.trim().length > 0;
 
     const placementRaw = placement;
@@ -90,7 +92,8 @@ export async function POST(request: Request) {
     const positioning = latestStrategy?.positioning || '';
     const targetAudience = latestStrategy?.targetAudience || '';
     const styleGuide = brand.styleGuide && typeof brand.styleGuide === 'object' ? (brand.styleGuide as Record<string, unknown>) : null;
-    const preferredStyle = styleGuide?.preferredStyle || styleGuide?.positioning || positioning || 'streetwear';
+    const preferredStyleRaw = styleGuide?.preferredStyle ?? styleGuide?.positioning ?? positioning ?? 'streetwear';
+    const preferredStyle = typeof preferredStyleRaw === 'string' && preferredStyleRaw.trim() ? preferredStyleRaw.trim() : 'streetwear';
     const vi = (latestStrategy?.visualIdentity && typeof latestStrategy.visualIdentity === 'object' ? latestStrategy.visualIdentity : null) as { colorPalette?: { primary?: string; secondary?: string; accent?: string }; typography?: { heading?: string; body?: string } } | null;
     const brandPalette = (brand.colorPalette && typeof brand.colorPalette === 'object' ? brand.colorPalette : null) as { primary?: string; secondary?: string; accent?: string } | null;
     const brandTypography = (brand.typography && typeof brand.typography === 'object' ? brand.typography : null) as { heading?: string; body?: string } | null;

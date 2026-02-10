@@ -6,7 +6,7 @@ export const RETAILER_NAMES_EXCLUDED = ['zalando', 'zara', 'asos'] as const;
 
 export function isRetailerBrand(brand: string | null | undefined): boolean {
   if (!brand || !brand.trim()) return false;
-  return RETAILER_NAMES_EXCLUDED.includes(brand.trim().toLowerCase());
+  return (RETAILER_NAMES_EXCLUDED as readonly string[]).includes(brand.trim().toLowerCase());
 }
 
 /** Valeurs à ne pas afficher comme marque (artefacts, placeholders). */

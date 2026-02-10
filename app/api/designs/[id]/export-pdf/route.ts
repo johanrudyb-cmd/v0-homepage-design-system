@@ -178,7 +178,7 @@ export async function GET(
 
       // ——— Matières et fournitures ———
       const materials = techPack.materials as { name: string; composition?: string; weight?: string; ref?: string }[];
-      if (materials?.length > 0) {
+      if (materials && materials.length > 0) {
         doc.fontSize(16).font('Helvetica-Bold').fillColor(primaryColor).text('Matières et fournitures', { underline: true });
         doc.moveDown(0.5);
         materials.forEach((m, i) => {
@@ -198,7 +198,7 @@ export async function GET(
 
       // ——— Tableau des mesures (cm) ———
       const measurementsTable = techPack.measurementsTable as { size: string; measurements: Record<string, number> }[] | undefined;
-      if (measurementsTable?.length > 0) {
+      if (measurementsTable && measurementsTable.length > 0) {
         ensurePage(600);
         doc.fontSize(16).font('Helvetica-Bold').fillColor(primaryColor).text('Tableau des mesures (cm)', { underline: true });
         doc.moveDown(0.5);
@@ -256,7 +256,7 @@ export async function GET(
 
       // ——— Fournitures (trims) ———
       const trims = techPack.trims as { name: string; ref?: string; placement?: string }[] | undefined;
-      if (trims?.length > 0) {
+      if (trims && trims.length > 0) {
         ensurePage(600);
         doc.fontSize(16).font('Helvetica-Bold').fillColor(primaryColor).text('Fournitures (boutons, fermetures, etc.)', { underline: true });
         doc.moveDown(0.5);

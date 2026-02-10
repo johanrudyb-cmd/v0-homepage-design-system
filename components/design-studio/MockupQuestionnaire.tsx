@@ -82,6 +82,7 @@ interface MockupQuestionnaireProps {
 }
 
 export function MockupQuestionnaire({ brandId, brandName, onDesignCreated }: MockupQuestionnaireProps) {
+  const router = useRouter();
   const [stepIndex, setStepIndex] = useState(0);
   const [answers, setAnswers] = useState<MockupQuestionnaireAnswers>({ ...defaultAnswers, brandName: brandName || '' });
   const [isGenerating, setIsGenerating] = useState(false);
