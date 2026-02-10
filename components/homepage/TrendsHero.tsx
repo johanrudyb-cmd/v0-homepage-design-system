@@ -7,58 +7,58 @@ import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const brands = [
-  { 
-    name: 'ZARA', 
+  {
+    name: 'ZARA',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Zara_logo_1980.svg',
     fallback: 'ZARA'
   },
-  { 
-    name: 'NIKE', 
+  {
+    name: 'NIKE',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg',
     fallback: 'NIKE'
   },
-  { 
-    name: 'ASOS', 
+  {
+    name: 'ASOS',
     logo: 'https://www.google.com/s2/favicons?domain=asos.com&sz=256',
     fallback: 'ASOS'
   },
-  { 
-    name: 'ADIDAS', 
+  {
+    name: 'ADIDAS',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg',
     fallback: 'ADIDAS'
   },
-  { 
-    name: 'H&M', 
+  {
+    name: 'H&M',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/H%26M-Logo.svg',
     fallback: 'H&M'
   },
-  { 
-    name: "LEVI'S", 
+  {
+    name: "LEVI'S",
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Levi%27s_logo.svg/256px-Levi%27s_logo.svg.png',
     fallback: "LEVI'S"
   },
-  { 
-    name: 'MANGO', 
+  {
+    name: 'MANGO',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Logo_of_Mango_%28new%29.svg',
     fallback: 'MANGO'
   },
-  { 
-    name: 'BERSHKA', 
+  {
+    name: 'BERSHKA',
     logo: 'https://www.google.com/s2/favicons?domain=bershka.com&sz=256',
     fallback: 'BERSHKA'
   },
-  { 
-    name: 'THE NORTH FACE', 
+  {
+    name: 'THE NORTH FACE',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/The_North_Face_logo.svg/256px-The_North_Face_logo.svg.png',
     fallback: 'THE NORTH FACE'
   },
-  { 
-    name: 'JACQUEMUS', 
+  {
+    name: 'JACQUEMUS',
     logo: 'https://www.google.com/s2/favicons?domain=jacquemus.com&sz=256',
     fallback: 'JACQUEMUS'
   },
-  { 
-    name: 'RALPH LAUREN', 
+  {
+    name: 'RALPH LAUREN',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Ralph_Lauren_logo.svg/256px-Ralph_Lauren_logo.svg.png',
     fallback: 'RALPH LAUREN'
   },
@@ -108,13 +108,13 @@ export function TrendsHero() {
                   key={`first-${index}`}
                   className="inline-flex items-center justify-center shrink-0 px-4"
                 >
-                  <div className="relative h-10 min-w-[120px] max-w-[140px] flex items-center justify-center">
+                  <div className="relative h-16 sm:h-20 lg:h-14 min-w-[140px] max-w-[180px] flex items-center justify-center">
                     <Image
                       src={brand.logo}
                       alt={brand.name}
-                      width={140}
-                      height={40}
-                      className="object-contain h-10 w-auto max-w-[140px]"
+                      width={180}
+                      height={80}
+                      className="object-contain h-16 sm:h-20 lg:h-14 w-auto max-w-[180px]"
                       unoptimized
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -144,13 +144,13 @@ export function TrendsHero() {
                   key={`second-${index}`}
                   className="inline-flex items-center justify-center shrink-0 px-4"
                 >
-                  <div className="relative h-10 min-w-[120px] max-w-[140px] flex items-center justify-center">
+                  <div className="relative h-16 sm:h-20 lg:h-14 min-w-[140px] max-w-[180px] flex items-center justify-center">
                     <Image
                       src={brand.logo}
                       alt={brand.name}
-                      width={140}
-                      height={40}
-                      className="object-contain h-10 w-auto max-w-[140px]"
+                      width={180}
+                      height={80}
+                      className="object-contain h-16 sm:h-20 lg:h-14 w-auto max-w-[180px]"
                       unoptimized
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
