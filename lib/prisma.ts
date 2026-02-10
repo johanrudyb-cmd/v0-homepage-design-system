@@ -20,15 +20,14 @@ function createPrismaClient(): PrismaClient {
     console.error('[PRISMA]', error.message);
     throw error;
   }
-  
+
   try {
     // Configuration optimisée pour production avec connection pooling
     // Si Session Pooler Supabase détecté, ajouter paramètres optimisés
-    const isPooler = url.includes('pooler') || url.includes(':6543');
-    const optimizedUrl = isPooler && !url.includes('pgbouncer=true')
-      ? `${url}${url.includes('?') ? '&' : '?'}pgbouncer=true&connect_timeout=10&pool_timeout=10&statement_cache_size=0`
-      : url;
-    
+    const optimizedUrl = url.includes('connect_timeout')
+      ? url
+      : `${url}${url.includes('?') ? '&' : '?'}connect_timeout=15&pool_timeout=15`;
+
     const client = new PrismaClient({
       log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
       datasources: {
@@ -39,17 +38,17 @@ function createPrismaClient(): PrismaClient {
       // Configuration pour éviter les connexions inutiles
       errorFormat: 'minimal',
     });
-    
+
     // Vérifier que le client est bien créé
     if (!client || typeof client.user === 'undefined') {
       throw new Error('Prisma Client créé mais modèle User non disponible. Vérifiez que prisma generate a été exécuté.');
     }
-    
+
     return client;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('[PRISMA] Erreur lors de la création du client:', errorMessage);
-    
+
     // Si c'est une erreur de génération Prisma, donner un message plus clair
     if (errorMessage.includes('Cannot find module') || errorMessage.includes('@prisma/client')) {
       throw new Error(
@@ -57,7 +56,7 @@ function createPrismaClient(): PrismaClient {
         'En production, vérifiez que "postinstall" script est configuré dans package.json.'
       );
     }
-    
+
     throw error;
   }
 }
@@ -76,32 +75,32 @@ async function withRetry<T>(
   delay = 100
 ): Promise<T> {
   let lastError: Error | unknown;
-  
+
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await operation();
     } catch (error) {
       lastError = error;
       const errorMessage = error instanceof Error ? error.message : String(error);
-      
+
       // Si c'est une erreur de connexion, réessayer une fois
       if (
         attempt < maxRetries &&
         (errorMessage.includes('P1001') || // Prisma connection error
-         errorMessage.includes('connection') ||
-         errorMessage.includes('ECONNREFUSED') ||
-         errorMessage.includes('ETIMEDOUT'))
+          errorMessage.includes('connection') ||
+          errorMessage.includes('ECONNREFUSED') ||
+          errorMessage.includes('ETIMEDOUT'))
       ) {
         console.warn(`[PRISMA] Tentative ${attempt + 1}/${maxRetries + 1} échouée, réessai...`);
         await new Promise(resolve => setTimeout(resolve, delay));
         continue;
       }
-      
+
       // Sinon, propager l'erreur
       throw error;
     }
   }
-  
+
   throw lastError;
 }
 
@@ -114,17 +113,17 @@ export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
     if (prop === Symbol.toPrimitive || prop === Symbol.toStringTag || prop === 'then') {
       return undefined;
     }
-    
+
     const client = getPrismaClient();
     const originalValue = Reflect.get(client, prop, receiver);
-    
+
     // Si c'est une méthode (findUnique, findMany, etc.), wrapper avec retry
     if (typeof originalValue === 'function' && prop !== 'constructor') {
       return function (this: unknown, ...args: unknown[]) {
         return withRetry(() => originalValue.apply(this, args));
       };
     }
-    
+
     return originalValue;
   },
 });

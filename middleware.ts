@@ -1,13 +1,18 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { jwtVerify } from 'jose';
 
-export function middleware(request: NextRequest) {
+const secret = new TextEncoder().encode(
+  process.env.NEXTAUTH_SECRET || 'fallback-secret-key-change-in-production'
+);
+
+export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  
-  // Routes publiques (pas de vérification d'auth)
+
+  // Routes publiques
   const publicRoutes = ['/auth', '/api'];
   const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
-  
+
   // Routes protégées
   const isProtectedRoute =
     pathname.startsWith('/dashboard') ||
@@ -22,22 +27,39 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/settings');
 
   // Vérifier le token de session
-  const token = request.cookies.get('auth-token');
-  const isAuthenticated = !!token;
+  const token = request.cookies.get('auth-token')?.value;
 
-  // RÈGLE SIMPLE 1: Si connecté et sur page auth → rediriger vers dashboard
-  if (isAuthenticated && pathname.startsWith('/auth')) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
+  let isAuthenticated = false;
+  let isTokenValid = false;
+
+  if (token) {
+    isAuthenticated = true;
+    try {
+      await jwtVerify(token, secret);
+      isTokenValid = true;
+    } catch (e) {
+      // Token invalide ou expiré
+      isTokenValid = false;
+    }
   }
 
-  // RÈGLE SIMPLE 2: Si pas connecté et route protégée → rediriger vers signin avec redirect param
-  if (!isAuthenticated && isProtectedRoute) {
+  // RÈGLE 1: Si sur une route protégée et pas de token OU token invalide
+  if (isProtectedRoute && (!isAuthenticated || !isTokenValid)) {
+    const response = NextResponse.redirect(new URL('/auth/signin', request.url));
+    if (isAuthenticated && !isTokenValid) {
+      // Si le token existe mais est invalide, on le supprime pour éviter la boucle
+      response.cookies.delete('auth-token');
+    }
     const redirectUrl = new URL('/auth/signin', request.url);
     redirectUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Sinon, laisser passer
+  // RÈGLE 2: Si connecté avec token VALIDE et sur page auth → rediriger vers dashboard
+  if (isAuthenticated && isTokenValid && pathname.startsWith('/auth')) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
   return NextResponse.next();
 }
 
