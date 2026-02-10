@@ -62,16 +62,17 @@ function seededShuffle<T>(array: T[], seed: number): T[] {
  * - 2 femme 25-34 ans
  */
 export async function GET(request: Request) {
+  // Générer une seed basée sur le mois actuel pour la sélection aléatoire mensuelle
+  // (défini en dehors du try pour être disponible dans les catch)
+  const now = new Date();
+  const monthSeed = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+  
   try {
     // Return empty data gracefully when DATABASE_URL is not configured
     if (!isDatabaseAvailable()) {
       console.warn('[Homepage Featured] DATABASE_URL is not set. Returning empty trends.');
-      return NextResponse.json({ trends: [], monthSeed: '' });
+      return NextResponse.json({ trends: [], monthSeed });
     }
-
-    // Générer une seed basée sur le mois actuel pour la sélection aléatoire mensuelle
-    const now = new Date();
-    const monthSeed = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 
     const combinations = [
       { segment: 'homme', ageRange: '18-24', count: 2 },
@@ -92,11 +93,29 @@ export async function GET(request: Request) {
         segment: combo.segment,
       };
 
-      const products = await prisma.trendProduct.findMany({
-        where,
-        orderBy: SORT_OPTIONS.best.orderBy,
-        take: 50,
-      });
+      let products;
+      try {
+        products = await prisma.trendProduct.findMany({
+          where,
+          orderBy: SORT_OPTIONS.best.orderBy,
+          take: 50,
+        });
+      } catch (prismaError: unknown) {
+        const errorMessage = prismaError instanceof Error ? prismaError.message : String(prismaError);
+        
+        // Si DATABASE_URL n'est pas configuré ou erreur de connexion Prisma
+        if (
+          errorMessage.includes('Environment variable not found: DATABASE_URL') ||
+          errorMessage.includes('PrismaClientInitializationError') ||
+          errorMessage.includes('DATABASE_URL')
+        ) {
+          console.warn('[Homepage Featured] DATABASE_URL non configuré ou erreur Prisma. Returning empty trends.');
+          return NextResponse.json({ trends: [], monthSeed });
+        }
+        
+        // Autre erreur Prisma, la propager
+        throw prismaError;
+      }
 
       // Filtrer les produits exclus
       let filtered = products.filter((p) => !isExcludedProduct(p.name ?? ''));
@@ -154,7 +173,20 @@ export async function GET(request: Request) {
       trends: featuredTrends,
       monthSeed,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    
+    // Si c'est une erreur liée à DATABASE_URL ou Prisma initialization, retourner vide
+    if (
+      errorMessage.includes('Environment variable not found: DATABASE_URL') ||
+      errorMessage.includes('PrismaClientInitializationError') ||
+      errorMessage.includes('DATABASE_URL') ||
+      errorMessage.includes('Prisma Client')
+    ) {
+      console.warn('[Homepage Featured] Erreur Prisma/DATABASE_URL. Returning empty trends.');
+      return NextResponse.json({ trends: [], monthSeed: '' });
+    }
+    
     console.error('[Homepage Featured] Erreur:', error);
     return NextResponse.json(
       { error: 'Une erreur est survenue', trends: [] },
