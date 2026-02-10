@@ -32,10 +32,10 @@ export function Header({ onMenuClick }: HeaderProps) {
           <button
             type="button"
             aria-label="Ouvrir le menu"
-            className="lg:hidden p-2 -ml-1 rounded-xl text-[#1D1D1F] hover:bg-black/5"
+            className="lg:hidden touch-target flex items-center justify-center -ml-1 rounded-xl text-[#1D1D1F] hover:bg-black/5 active:bg-black/10"
             onClick={onMenuClick}
           >
-            <Menu className="h-6 w-6" />
+            <Menu className="h-6 w-6 shrink-0" />
           </button>
         )}
         {/* Search - masqué sur très petit écran, raccourci sur mobile */}

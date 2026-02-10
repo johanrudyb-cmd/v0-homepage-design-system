@@ -47,10 +47,10 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
         <button
           type="button"
           aria-label="Fermer le menu"
-          className="lg:hidden p-2 rounded-xl text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#1D1D1F]"
+          className="lg:hidden touch-target flex items-center justify-center rounded-xl text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#1D1D1F] active:bg-black/10"
           onClick={onClose}
         >
-          <X className="h-6 w-6" />
+          <X className="h-6 w-6 shrink-0" />
         </button>
       </div>
 
@@ -71,7 +71,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
                   data-tour={item.tourId}
                   onClick={handleNav}
                   className={cn(
-                    'flex items-center justify-between px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
+                    'flex items-center justify-between min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
                     isActive
                       ? 'bg-black/5 text-[#007AFF]'
                       : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
@@ -105,7 +105,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
                   data-tour={item.tourId}
                   onClick={handleNav}
                   className={cn(
-                    'block px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
+                    'block min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center',
                     isActive
                       ? 'bg-black/5 text-[#007AFF]'
                       : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
@@ -126,7 +126,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
           href="/usage"
           onClick={handleNav}
           className={cn(
-            'block px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
+            'block min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center',
             pathname === '/usage'
               ? 'bg-black/5 text-[#007AFF]'
               : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
@@ -139,7 +139,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
           href="/settings"
           onClick={handleNav}
           className={cn(
-            'block px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200',
+            'block min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center',
             pathname === '/settings'
               ? 'bg-black/5 text-[#007AFF]'
               : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
@@ -148,12 +148,13 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
           Paramètres
         </Link>
         <button
+          type="button"
+          className="min-h-[44px] w-full text-left px-4 py-3 rounded-2xl text-base font-medium text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF] transition-all duration-200 flex items-center active:bg-black/10"
           onClick={async () => {
             onClose?.();
             await fetch('/api/auth/logout', { method: 'POST' });
             window.location.href = '/';
           }}
-          className="w-full text-left px-4 py-3 rounded-2xl text-base font-medium text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF] transition-all duration-200"
         >
           Déconnexion
         </button>

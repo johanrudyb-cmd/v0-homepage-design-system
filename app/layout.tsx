@@ -17,6 +17,7 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
+  viewportFit: 'cover' as const, // safe-area pour encoches (téléphone/tablette)
 };
 
 export const metadata: Metadata = {
@@ -74,7 +75,7 @@ export default function RootLayout({
         <link rel="shortcut icon" href="/apple-icon.png" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
-      <body className="font-sans antialiased">
+      <body className="font-sans antialiased min-h-screen safe-area-padding">
         <SurplusModalProvider>{children}</SurplusModalProvider>
         <BackToTop />
       </body>

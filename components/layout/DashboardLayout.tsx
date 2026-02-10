@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
@@ -21,6 +21,16 @@ export function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Bloquer le scroll du body quand le menu drawer est ouvert (mobile/tablette)
+  useEffect(() => {
+    if (sidebarOpen && typeof window !== 'undefined' && window.matchMedia('(max-width: 1023px)').matches) {
+      document.body.style.overflow = 'hidden';
+      return () => {
+        document.body.style.overflow = '';
+      };
+    }
+  }, [sidebarOpen]);
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] overflow-x-hidden">
