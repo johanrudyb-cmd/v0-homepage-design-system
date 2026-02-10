@@ -291,4 +291,21 @@ Si vous avez des problèmes :
 
 ---
 
+---
+
+## 🔄 n8n (Optionnel - Automatisation Workflows)
+
+### Variables n8n
+
+| Variable | Description | Exemple | Obligatoire |
+|----------|-------------|---------|-------------|
+| `N8N_WEBHOOK_URL` | URL de base pour les webhooks n8n | `https://votre-instance.n8n.cloud/webhook` | Non |
+| `N8N_API_URL` | URL de l'API n8n (si utilisation API) | `https://votre-instance.n8n.cloud` | Non |
+| `N8N_API_KEY` | Clé API n8n (si utilisation API) | `n8n_api_xxxxx` | Non |
+| `N8N_WEBHOOK_SECRET` | Secret pour authentifier les webhooks entrants | `votre_secret_aleatoire` | Non |
+
+**Note** : Ces variables sont optionnelles. Voir `docs/INTEGRATION-N8N.md` pour plus d'informations.
+
+---
+
 **Une fois toutes les variables OBLIGATOIRES et IMPORTANTES configurées, l'app sera fonctionnelle !** 🎉
