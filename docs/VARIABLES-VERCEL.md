@@ -153,9 +153,9 @@ SMTP_FROM=noreply@outfity.fr
 
 ### 11. Stripe (Paiements)
 ```env
-STRIPE_SECRET_KEY=sk_test_xxxxxxxxxxxxxxxxxxxxxxxx
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_xxxxxxxxxxxxxxxxxxxxxxxx
-STRIPE_WEBHOOK_SECRET=whsec_xxxxxxxxxxxxxxxxxxxxxxxx
+STRIPE_SECRET_KEY=sk_test_votre_cle_secrete_stripe
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_votre_cle_publique_stripe
+STRIPE_WEBHOOK_SECRET=whsec_votre_secret_webhook_stripe
 ```
 **Où trouver** : https://dashboard.stripe.com/apikeys
 
@@ -254,18 +254,18 @@ NEXT_PUBLIC_INSTAGRAM_GROUP_URL=https://instagram.com/groups/xxx
 ```env
 # OBLIGATOIRES
 DATABASE_URL=postgresql://postgres:password@db.xxx.supabase.co:5432/postgres
-NEXTAUTH_SECRET=abc123def456ghi789jkl012mno345pqr678stu901vwx234yz567
+NEXTAUTH_SECRET=votre_secret_aleatoire_32_caracteres_minimum
 NEXTAUTH_URL=https://outfity.fr
 
 # IMPORTANTES
-OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-IDEogram_API_KEY=ideogram_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-HIGGSFIELD_API_KEY=higgsfield_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-HIGGSFIELD_API_SECRET=higgsfield_secret_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
-CRON_SECRET=xyz789abc012def345ghi678jkl901mno234pqr567stu890vwx123
+OPENAI_API_KEY=sk-proj-votre_cle_openai_ici
+IDEogram_API_KEY=votre_cle_ideogram_ici
+HIGGSFIELD_API_KEY=votre_cle_higgsfield_ici
+HIGGSFIELD_API_SECRET=votre_secret_higgsfield_ici
+CRON_SECRET=votre_secret_cron_32_caracteres_minimum
 
 # OPTIONNELLES (Recommandées)
-ANTHROPIC_API_KEY=sk-ant-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+ANTHROPIC_API_KEY=sk-ant-votre_cle_anthropic_ici
 NEXT_PUBLIC_APP_URL=https://outfity.fr
 NODE_ENV=production
 ```
