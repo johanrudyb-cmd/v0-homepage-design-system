@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { TokenDisplay } from './TokenDisplay';
@@ -25,20 +26,10 @@ export function Sidebar() {
 
   return (
     <aside className="fixed left-0 top-0 h-screen w-72 backdrop-blur-xl bg-white/80 flex flex-col z-50">
-      {/* Header avec logo et nom de l'app */}
-      <div className="px-6 pt-8 pb-6 border-b border-black/5">
-        <Link href="/dashboard" className="flex items-center gap-3 group">
-          <div className="w-10 h-10 rounded-2xl bg-[#007AFF] flex items-center justify-center shrink-0 group-hover:bg-[#0056CC] transition-colors">
-            <span className="text-white font-bold text-lg">S</span>
-          </div>
-          <div className="flex flex-col min-w-0">
-            <span className="text-lg font-semibold tracking-tight text-[#1D1D1F] group-hover:text-[#007AFF] transition-colors">
-              OUTFITY
-            </span>
-            <span className="text-xs text-[#1D1D1F]/40">
-              Fashion Launch
-            </span>
-          </div>
+      {/* Header avec logo */}
+      <div className="px-6 py-5 border-b border-black/5 flex justify-center">
+        <Link href="/dashboard" className="block group">
+          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-24 w-24 shrink-0 object-contain bg-transparent" unoptimized />
         </Link>
       </div>
 

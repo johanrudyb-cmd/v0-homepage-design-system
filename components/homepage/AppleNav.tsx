@@ -1,23 +1,27 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 
 export function AppleNav() {
   const pathname = usePathname();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    fetch('/api/auth/me')
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => setIsLoggedIn(!!data?.user))
+      .catch(() => {});
+  }, []);
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-8 h-16 flex items-center justify-between">
-        {/* Logo */}
-        <Link href="/" className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-xl bg-[#007AFF] flex items-center justify-center">
-            <span className="text-white font-bold text-sm">S</span>
-          </div>
-          <span className="text-lg font-semibold tracking-tight text-[#000000]">
-            OUTFITY
-          </span>
+      <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+        <Link href={isLoggedIn ? '/dashboard' : '/'} className="shrink-0">
+          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-24 w-24 object-contain bg-transparent" unoptimized />
         </Link>
 
         {/* Navigation Links */}

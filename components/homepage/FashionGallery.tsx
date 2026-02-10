@@ -6,29 +6,30 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { ArrowRight } from 'lucide-react';
 
-// Images de mode - Les fichiers doivent être dans public/fashion/
+// Les 4 images de la section Shooting — à placer dans public/fashion/
+// Noms attendus : fashion-1.png, fashion-2.png, fashion-3.png, fashion-4.png (ou mettre vos fichiers et adapter les chemins ci-dessous)
 const fashionImages = [
   {
-    src: '/fashion/fashion-1.png',
-    alt: 'Mode urbaine contemporaine',
+    src: '/fashion/hf_20260131_195003_c7ee5196-eb3f-437e-8261-900b196185fb.png',
+    alt: 'Shooting mode 1',
     aspect: 'portrait' as const,
     fallback: '👔',
   },
   {
-    src: '/fashion/fashion-2.png',
-    alt: 'Style professionnel élégant',
+    src: '/fashion/hf_20260202_064558_2c745b26-af10-4bd1-bc72-6c20c20cbae8.png',
+    alt: 'Shooting mode 2',
     aspect: 'portrait' as const,
     fallback: '👗',
   },
   {
-    src: '/fashion/fashion-3.png',
-    alt: 'Vêtement de mode',
+    src: '/fashion/hf_20260206_221357_069cdbaa-9fae-417b-a95e-bb863d6fe412.png',
+    alt: 'Shooting mode 3',
     aspect: 'portrait' as const,
     fallback: '🧥',
   },
   {
-    src: '/fashion/fashion-4.png',
-    alt: 'Mode streetwear',
+    src: '/fashion/hf_20260208_124626_4fe0953f-e187-4e25-beef-257400d22a65.png',
+    alt: 'Shooting mode 4',
     aspect: 'landscape' as const,
     fallback: '👟',
   },

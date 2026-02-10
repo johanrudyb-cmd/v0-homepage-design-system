@@ -160,8 +160,8 @@ export function TendancesContent() {
       if (brandFromUrl) params.set('brand', brandFromUrl);
       params.set('limit', '50');
       const res = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
-      const data = await res.json();
-      setTrends(data.trends || []);
+      const data = res.ok ? await res.json().catch(() => ({})) : {};
+      setTrends(Array.isArray(data.trends) ? data.trends : []);
     } catch (e) {
       console.error(e);
       setTrends([]);
@@ -184,7 +184,7 @@ export function TendancesContent() {
         setUser(u);
         if (u?.plan === 'free') {
           fetch('/api/trends/analyses-count')
-            .then((r) => r.json())
+            .then((r) => (r.ok ? r.json() : Promise.resolve({ count: 0 })))
             .then((d) => setAnalysesCount(d.count ?? 0))
             .catch(() => {});
         }
@@ -196,7 +196,7 @@ export function TendancesContent() {
 
   useEffect(() => {
     fetch('/api/trends/hybrid-radar/sources')
-      .then((r) => r.json())
+      .then((r) => (r.ok ? r.json() : Promise.resolve({ sources: [] })))
       .then((data) => setSourcesList(data.sources || []))
       .catch(() => setSourcesList([]));
   }, []);
@@ -266,7 +266,7 @@ export function TendancesContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
       });
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       if (res.ok && data.results?.length > 0) {
         const src = data.results[0];
         setPreviewResult({
@@ -359,8 +359,8 @@ export function TendancesContent() {
           params.set('limit', '50');
           const resTrends = await fetch(`/api/trends/hybrid-radar?${params.toString()}`, { signal: abortTrends.signal });
           clearTimeout(timeoutTrends);
-          const dataTrends = await resTrends.json();
-          setTrends(dataTrends.trends || []);
+          const dataTrends = await resTrends.json().catch(() => ({}));
+          setTrends(Array.isArray(dataTrends.trends) ? dataTrends.trends : []);
         } catch (e) {
           clearTimeout(timeoutTrends);
           console.error(e);
@@ -432,8 +432,8 @@ export function TendancesContent() {
             if (brandFromUrl) params.set('brand', brandFromUrl);
             params.set('limit', '50');
             const resTrends = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
-            const dataTrends = await resTrends.json();
-            setTrends(dataTrends.trends || []);
+            const dataTrends = await resTrends.json().catch(() => ({}));
+            setTrends(Array.isArray(dataTrends.trends) ? dataTrends.trends : []);
           } catch (e) {
             console.error(e);
           } finally {

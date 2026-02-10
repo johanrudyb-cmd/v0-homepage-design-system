@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
 import { SurplusModalProvider } from '@/components/usage/SurplusModalContext';
+import { BackToTop } from '@/components/layout/BackToTop';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -14,6 +15,10 @@ const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://outfity.fr';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  icons: {
+    icon: '/apple-icon.png',
+    apple: '/apple-icon.png',
+  },
   title: {
     default: 'OUTFITY - Créez votre marque avec les données des géants',
     template: '%s | OUTFITY',
@@ -58,8 +63,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="fr" className={inter.variable}>
+      <head>
+        <link rel="icon" type="image/png" href="/apple-icon.png" />
+        <link rel="shortcut icon" href="/apple-icon.png" />
+        <link rel="apple-touch-icon" href="/apple-icon.png" />
+      </head>
       <body className="font-sans antialiased">
         <SurplusModalProvider>{children}</SurplusModalProvider>
+        <BackToTop />
       </body>
     </html>
   );

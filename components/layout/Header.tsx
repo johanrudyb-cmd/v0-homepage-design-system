@@ -10,9 +10,9 @@ export function Header() {
 
   useEffect(() => {
     fetch('/api/auth/me')
-      .then((res) => res.json())
+      .then((res) => (res.ok ? res.json() : Promise.resolve(null)))
       .then((data) => {
-        if (data.user) {
+        if (data?.user) {
           setUser(data.user);
         }
       })

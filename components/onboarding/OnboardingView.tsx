@@ -28,7 +28,7 @@ function OnboardingContent() {
   useEffect(() => {
     if (subscribed) {
       fetch('/api/brands')
-        .then((r) => r.json())
+        .then((r) => (r.ok ? r.json() : Promise.resolve({ brands: [] })))
         .then((data) => {
           if (data.brands && Array.isArray(data.brands) && data.brands.length > 0) {
             setExistingBrands(data.brands);

@@ -69,7 +69,7 @@ export function HybridRadarDashboard() {
       if (globalOnly) params.set('globalOnly', 'true');
       params.set('limit', '50');
       const res = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
-      const data = await res.json();
+      const data = await res.json().catch(() => ({}));
       setTrends(data.trends || []);
     } catch (e) {
       console.error(e);

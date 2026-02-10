@@ -28,6 +28,9 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  async rewrites() {
+    return [{ source: '/favicon.ico', destination: '/apple-icon.png' }];
+  },
   // Headers de sécurité
   async headers() {
     return [
