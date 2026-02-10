@@ -38,7 +38,7 @@ export function MarginCalculator() {
 
   return (
     <section id="margin-calculator" className="py-24 bg-[#F5F5F7]">
-      <div className="max-w-4xl mx-auto px-8">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className={cn(
             'bg-white rounded-[32px] p-12 border border-[#F2F2F2] shadow-sm',

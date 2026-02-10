@@ -19,13 +19,13 @@ export function AppleNav() {
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
-      <div className="max-w-7xl mx-auto px-8 h-20 flex items-center justify-between">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 lg:h-20 flex items-center justify-between gap-2">
         <Link href={isLoggedIn ? '/dashboard' : '/'} className="shrink-0">
-          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-24 w-24 object-contain bg-transparent" unoptimized />
+          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-10 w-10 sm:h-12 sm:w-12 lg:h-16 lg:w-16 xl:h-24 xl:w-24 object-contain bg-transparent" unoptimized />
         </Link>
 
         {/* Navigation Links */}
-        <div className="hidden md:flex items-center gap-8">
+        <div className="hidden md:flex items-center gap-4 lg:gap-8">
           <Link
             href="#features"
             className="text-sm font-medium text-[#000000] hover:text-[#007AFF] transition-colors duration-200"
@@ -47,16 +47,16 @@ export function AppleNav() {
         </div>
 
         {/* CTA */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 shrink-0">
           <Link
             href="/auth/signin"
-            className="text-sm font-medium text-[#000000] hover:text-[#007AFF] transition-colors duration-200"
+            className="text-xs sm:text-sm font-medium text-[#000000] hover:text-[#007AFF] transition-colors duration-200 whitespace-nowrap"
           >
             Se connecter
           </Link>
           <Link
             href="/auth/signup"
-            className="px-5 py-2 bg-[#000000] text-white rounded-full text-sm font-medium hover:bg-[#1D1D1F] transition-all duration-200"
+            className="px-3 py-1.5 sm:px-5 sm:py-2 bg-[#000000] text-white rounded-full text-xs sm:text-sm font-medium hover:bg-[#1D1D1F] transition-all duration-200 whitespace-nowrap"
           >
             Créer un compte
           </Link>

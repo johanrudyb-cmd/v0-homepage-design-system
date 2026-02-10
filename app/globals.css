@@ -79,6 +79,7 @@
 @layer base {
   html {
     scroll-behavior: smooth;
+    overflow-x: hidden;
   }
 
   * {
@@ -93,6 +94,7 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     letter-spacing: -0.011em;
+    overflow-x: hidden;
   }
   
   /* Typography Apple - Titres très gros avec tracking-tight */

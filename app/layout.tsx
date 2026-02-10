@@ -13,6 +13,12 @@ const inter = Inter({
 
 const siteUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://outfity.fr';
 
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   icons: {
