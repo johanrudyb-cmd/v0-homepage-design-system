@@ -99,7 +99,7 @@ export async function POST(request: Request) {
       if (!openaiApiKey) {
         await prisma.design.update({
           where: { id: design.id },
-          data: { status: 'failed', errorMessage: 'Clé API OpenAI non configurée' },
+          data: { status: 'failed' },
         });
         return NextResponse.json(
           { 
@@ -121,7 +121,7 @@ export async function POST(request: Request) {
       if (!ideogramApiKey) {
         await prisma.design.update({
           where: { id: design.id },
-          data: { status: 'failed', errorMessage: 'Clé API Ideogram non configurée' },
+          data: { status: 'failed' },
         });
         return NextResponse.json(
           { 

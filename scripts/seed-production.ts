@@ -26,9 +26,28 @@ async function seedFactories() {
 
   console.log('📦 Seed des usines...');
   
-  // Importer et exécuter le seed des usines
-  const { seedFactories } = await import('./seed-factories.js');
-  await seedFactories();
+  // Vérifier si des usines existent déjà avec les mêmes noms
+  // Si oui, on skip. Sinon, on utilise la route API ou on crée directement
+  // Pour simplifier, on utilise createMany avec skipDuplicates
+  const factories = [
+    {
+      name: 'ASBX',
+      country: 'Portugal',
+      moq: 50,
+      specialties: ['Knitwear', 'Streetwear', 'Luxury Jersey', 'Sustainable', 'Custom Manufacturing'],
+      leadTime: 30,
+      certifications: ['OEKO-TEX', 'GOTS'],
+      contactEmail: 'hello@asbx.pt',
+      website: 'https://asbx.pt',
+      rating: 4.8,
+    },
+  ];
+  
+  // Utiliser createMany avec skipDuplicates pour éviter les doublons
+  await prisma.factory.createMany({
+    data: factories,
+    skipDuplicates: true,
+  });
   
   console.log('✅ Seed des usines terminé.');
 }
