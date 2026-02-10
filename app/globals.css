@@ -352,13 +352,13 @@
 }
 
 .animate-marquee-slow {
-  animation: marquee-slow 15s linear infinite;
+  animation: marquee-slow 12s linear infinite;
 }
 
 /* Défilement plus rapide sur téléphone et tablette */
 @media (max-width: 1024px) {
   .animate-marquee-slow {
-    animation-duration: 8s;
+    animation-duration: 6s;
   }
 }
 

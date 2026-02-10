@@ -19,9 +19,9 @@ export default function Home() {
       <AnimatedHeader />
       <TrendsHero />
       <TrendsByMarket />
+      <TechPackShowcase />
       <StatsSection />
       <FashionGallery />
-      <TechPackShowcase />
       <FoundationGrid />
       <CreativeGrid />
       <MarginCalculator />

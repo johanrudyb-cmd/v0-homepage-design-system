@@ -49,10 +49,10 @@ export function TechPackShowcase() {
                 <FileText className="w-7 h-7 text-[#007AFF]" />
               </div>
               <div>
-                <h2 className="text-4xl lg:text-5xl font-bold tracking-tight text-[#000000]">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[#000000]">
                   Tech Pack Professionnel
                 </h2>
-                <p className="text-sm text-[#6e6e73] font-normal mt-1">
+                <p className="text-xs sm:text-sm text-[#6e6e73] font-normal mt-1">
                   Créez vos spécifications techniques complètes
                 </p>
               </div>
@@ -108,7 +108,7 @@ export function TechPackShowcase() {
           {/* Image du tech pack */}
           <div
             className={cn(
-              'relative rounded-[32px] overflow-hidden border border-[#F2F2F2] shadow-lg',
+              'relative rounded-2xl sm:rounded-[32px] overflow-hidden border border-[#F2F2F2] shadow-lg',
               'transition-all duration-700',
               isVisible ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-8'
             )}

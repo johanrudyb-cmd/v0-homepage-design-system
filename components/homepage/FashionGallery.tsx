@@ -78,7 +78,7 @@ export function FashionGallery() {
         {/* Grille asymétrique style Bento */}
         <div
           className={cn(
-            'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6',
+            'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-6',
             'transition-all duration-1000',
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
           )}
@@ -86,13 +86,13 @@ export function FashionGallery() {
           {/* Image 1 - Grande carte portrait */}
           <div
             className={cn(
-              'relative overflow-hidden rounded-[32px] bg-[#F5F5F7]',
-              'md:row-span-2',
+              'relative overflow-hidden rounded-2xl sm:rounded-[32px] bg-[#F5F5F7]',
+              'md:row-span-2 col-span-2 sm:col-span-1',
               'group cursor-pointer',
               'transition-all duration-500 hover:scale-[1.02]'
             )}
           >
-            <div className="relative w-full h-full min-h-[280px] sm:min-h-[380px] lg:min-h-[500px]">
+            <div className="relative w-full h-full min-h-[300px] sm:min-h-[380px] lg:min-h-[500px]">
               <Image
                 src={fashionImages[0].src}
                 alt={fashionImages[0].alt}
@@ -119,12 +119,12 @@ export function FashionGallery() {
           {/* Image 2 - Carte moyenne portrait */}
           <div
             className={cn(
-              'relative overflow-hidden rounded-[32px] bg-[#F5F5F7]',
+              'relative overflow-hidden rounded-2xl sm:rounded-[32px] bg-[#F5F5F7]',
               'group cursor-pointer',
               'transition-all duration-500 hover:scale-[1.02]'
             )}
           >
-            <div className="relative w-full h-full min-h-[240px] sm:min-h-[320px] lg:min-h-[400px]">
+            <div className="relative w-full h-full min-h-[180px] sm:min-h-[320px] lg:min-h-[400px]">
               <Image
                 src={fashionImages[1].src}
                 alt={fashionImages[1].alt}
@@ -151,12 +151,12 @@ export function FashionGallery() {
           {/* Image 3 - Petite carte portrait */}
           <div
             className={cn(
-              'relative overflow-hidden rounded-[32px] bg-[#F5F5F7]',
+              'relative overflow-hidden rounded-2xl sm:rounded-[32px] bg-[#F5F5F7]',
               'group cursor-pointer',
               'transition-all duration-500 hover:scale-[1.02]'
             )}
           >
-            <div className="relative w-full h-full min-h-[200px] sm:min-h-[260px] lg:min-h-[300px]">
+            <div className="relative w-full h-full min-h-[180px] sm:min-h-[260px] lg:min-h-[300px]">
               <Image
                 src={fashionImages[2].src}
                 alt={fashionImages[2].alt}
@@ -183,13 +183,13 @@ export function FashionGallery() {
           {/* Image 4 - Grande carte paysage */}
           <div
             className={cn(
-              'relative overflow-hidden rounded-[32px] bg-[#F5F5F7]',
-              'md:col-span-2',
+              'relative overflow-hidden rounded-2xl sm:rounded-[32px] bg-[#F5F5F7]',
+              'col-span-2',
               'group cursor-pointer',
               'transition-all duration-500 hover:scale-[1.02]'
             )}
           >
-            <div className="relative w-full h-full min-h-[240px] sm:min-h-[320px] lg:min-h-[400px]">
+            <div className="relative w-full h-full min-h-[200px] sm:min-h-[320px] lg:min-h-[400px]">
               <Image
                 src={fashionImages[3].src}
                 alt={fashionImages[3].alt}

@@ -6,37 +6,37 @@ import { Star } from 'lucide-react';
 
 const testimonials = [
   {
-    name: 'Sophie Martin',
+    name: 'Sophie',
     role: 'Fondatrice de Mode Éthique',
     rating: 5,
     text: 'OUTFITY a transformé ma façon de créer ma marque. En quelques semaines, j\'ai pu lancer ma collection complète avec des designs professionnels et trouver les meilleurs fournisseurs.',
   },
   {
-    name: 'Lucas Dubois',
+    name: 'Lucas',
     role: 'Créateur de streetwear',
     rating: 5,
     text: 'La génération de logo par IA est incroyable. J\'ai obtenu 4 propositions parfaites en quelques minutes et j\'ai pu choisir celui qui correspondait le mieux à mon identité.',
   },
   {
-    name: 'Emma Chen',
+    name: 'Emma',
     role: 'Designer indépendante',
     rating: 5,
     text: 'Le calendrier de contenu et la génération de posts IA m\'ont permis de me concentrer sur le design. Ma présence sur les réseaux sociaux a explosé !',
   },
   {
-    name: 'Thomas Leroy',
+    name: 'Thomas',
     role: 'Entrepreneur mode',
     rating: 5,
     text: 'La base de données de fournisseurs est une mine d\'or. J\'ai trouvé des usines au Portugal qui correspondent parfaitement à mes besoins en quelques minutes.',
   },
   {
-    name: 'Camille Rousseau',
+    name: 'Camille',
     role: 'Créatrice de mode durable',
     rating: 5,
     text: 'L\'analyse des tendances m\'aide à anticiper ce qui va marcher. J\'ai lancé un produit qui est devenu best-seller grâce aux insights de la plateforme.',
   },
   {
-    name: 'Alexandre Moreau',
+    name: 'Alexandre',
     role: 'Fondateur de marque premium',
     rating: 5,
     text: 'Le Launch Map m\'a guidé étape par étape. De l\'identité de marque au lancement Shopify, tout est pensé pour réussir. Un outil indispensable !',

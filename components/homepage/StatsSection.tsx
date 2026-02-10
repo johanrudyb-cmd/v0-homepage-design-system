@@ -40,7 +40,7 @@ export function StatsSection() {
   return (
     <section id="stats-section" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
           {stats.map((stat, index) => (
             <div
               key={index}
@@ -54,10 +54,10 @@ export function StatsSection() {
                 transitionDelay: `${index * 100}ms`,
               }}
             >
-              <div className="text-5xl lg:text-6xl font-bold text-[#000000] mb-2">
+              <div className="text-3xl sm:text-4xl lg:text-6xl font-bold text-[#000000] mb-2">
                 {stat.value}
               </div>
-              <div className="text-base text-[#6e6e73] font-normal">
+              <div className="text-xs sm:text-base text-[#6e6e73] font-normal px-2">
                 {stat.label}
               </div>
             </div>

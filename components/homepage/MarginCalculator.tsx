@@ -37,25 +37,24 @@ export function MarginCalculator() {
   }, []);
 
   return (
-    <section id="margin-calculator" className="py-24 bg-[#F5F5F7]">
+    <section id="margin-calculator" className="py-24 bg-[#000000]">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div
           className={cn(
-            'bg-white rounded-[32px] p-12 border border-[#F2F2F2] shadow-sm',
+            'bg-[#1C1C1E] rounded-2xl sm:rounded-[32px] p-6 sm:p-12 border border-white/10 shadow-2xl',
             'transition-all duration-500',
-            'hover:shadow-lg',
             isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           )}
         >
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-14 h-14 rounded-2xl bg-[#FF9500]/10 flex items-center justify-center">
-              <Calculator className="w-7 h-7 text-[#FF9500]" />
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#FF9500]/20 flex items-center justify-center">
+              <Calculator className="w-6 h-6 sm:w-7 sm:h-7 text-[#FF9500]" />
             </div>
             <div>
-              <h2 className="text-3xl font-bold tracking-tight text-[#000000]">
+              <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
                 Calculateur de marge
               </h2>
-              <p className="text-sm text-[#6e6e73] font-normal mt-1">
+              <p className="text-xs sm:text-sm text-white/60 font-normal mt-1">
                 Calculez rapidement votre marge bénéficiaire
               </p>
             </div>
@@ -63,56 +62,56 @@ export function MarginCalculator() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div>
-              <label className="block text-sm font-semibold text-[#000000] mb-3">
+              <label className="block text-sm font-semibold text-white/80 mb-3">
                 Prix de revient
               </label>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <input
                   type="number"
                   value={cost}
                   onChange={(e) => setCost(Number(e.target.value))}
-                  className="flex-1 px-4 py-3 bg-[#F5F5F7] rounded-xl border border-[#E5E5E7] text-[#000000] font-bold text-lg focus:outline-none focus:border-[#007AFF] transition-colors"
+                  className="flex-1 px-4 py-3 bg-white/5 rounded-xl border border-white/10 text-white font-bold text-lg focus:outline-none focus:border-[#FF9500] transition-colors"
                 />
-                <span className="text-lg font-bold text-[#000000]">€</span>
+                <span className="text-lg font-bold text-white">€</span>
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-[#000000] mb-3">
+              <label className="block text-sm font-semibold text-white/80 mb-3">
                 Prix de vente
               </label>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <input
                   type="number"
                   value={price}
                   onChange={(e) => setPrice(Number(e.target.value))}
-                  className="flex-1 px-4 py-3 bg-[#F5F5F7] rounded-xl border border-[#E5E5E7] text-[#000000] font-bold text-lg focus:outline-none focus:border-[#007AFF] transition-colors"
+                  className="flex-1 px-4 py-3 bg-white/5 rounded-xl border border-white/10 text-white font-bold text-lg focus:outline-none focus:border-[#FF9500] transition-colors"
                 />
-                <span className="text-lg font-bold text-[#000000]">€</span>
+                <span className="text-lg font-bold text-white">€</span>
               </div>
             </div>
           </div>
 
-          <div className="pt-8 border-t border-[#E5E5E7]">
-            <div className="flex items-center justify-between mb-6">
+          <div className="pt-8 border-t border-white/10">
+            <div className="flex items-center justify-between mb-8">
               <div>
-                <div className="text-sm text-[#6e6e73] font-normal mb-1">Marge</div>
-                <div className="text-3xl font-bold text-[#000000]">
+                <div className="text-xs sm:text-sm text-white/60 font-normal mb-1">Marge nette</div>
+                <div className="text-2xl sm:text-4xl font-bold text-[#34C759]">
                   {margin.toFixed(2)} €
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-[#6e6e73] font-normal mb-1">Marge %</div>
-                <div className="text-3xl font-bold text-[#000000]">
+                <div className="text-xs sm:text-sm text-white/60 font-normal mb-1">Rentabilité</div>
+                <div className="text-2xl sm:text-4xl font-bold text-[#FF9500]">
                   {marginPercentage}%
                 </div>
               </div>
             </div>
             <Link
               href="/auth/signup"
-              className="inline-flex items-center gap-3 px-6 py-3 bg-[#000000] text-white rounded-full font-medium hover:bg-[#1a1a1a] transition-all duration-200 group"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#FF9500] text-white rounded-full font-bold text-base sm:text-lg hover:bg-[#FF8A00] transition-all duration-200 shadow-lg shadow-[#FF9500]/20 active:scale-95 group"
             >
-              Calculer en détail
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              Accéder au calculateur complet
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
         </div>

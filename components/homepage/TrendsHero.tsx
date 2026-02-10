@@ -106,15 +106,15 @@ export function TrendsHero() {
               {brands.map((brand, index) => (
                 <div
                   key={`first-${index}`}
-                  className="inline-flex items-center justify-center shrink-0 px-4"
+                  className="inline-flex items-center justify-center shrink-0 px-2 sm:px-4"
                 >
-                  <div className="relative h-16 sm:h-20 lg:h-14 min-w-[140px] max-w-[180px] flex items-center justify-center">
+                  <div className="relative h-16 sm:h-20 lg:h-14 min-w-[100px] sm:min-w-[140px] max-w-[140px] sm:max-w-[180px] flex items-center justify-center">
                     <Image
                       src={brand.logo}
                       alt={brand.name}
                       width={180}
                       height={80}
-                      className="object-contain h-16 sm:h-20 lg:h-14 w-auto max-w-[180px]"
+                      className="object-contain h-16 sm:h-20 lg:h-14 w-auto max-w-[140px] sm:max-w-[180px]"
                       unoptimized
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -134,7 +134,7 @@ export function TrendsHero() {
                     </span>
                   </div>
                   {index < brands.length - 1 && (
-                    <span className="mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
+                    <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
                   )}
                 </div>
               ))}
@@ -142,15 +142,15 @@ export function TrendsHero() {
               {brands.map((brand, index) => (
                 <div
                   key={`second-${index}`}
-                  className="inline-flex items-center justify-center shrink-0 px-4"
+                  className="inline-flex items-center justify-center shrink-0 px-2 sm:px-4"
                 >
-                  <div className="relative h-16 sm:h-20 lg:h-14 min-w-[140px] max-w-[180px] flex items-center justify-center">
+                  <div className="relative h-16 sm:h-20 lg:h-14 min-w-[100px] sm:min-w-[140px] max-w-[140px] sm:max-w-[180px] flex items-center justify-center">
                     <Image
                       src={brand.logo}
                       alt={brand.name}
                       width={180}
                       height={80}
-                      className="object-contain h-16 sm:h-20 lg:h-14 w-auto max-w-[180px]"
+                      className="object-contain h-16 sm:h-20 lg:h-14 w-auto max-w-[140px] sm:max-w-[180px]"
                       unoptimized
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -170,7 +170,7 @@ export function TrendsHero() {
                     </span>
                   </div>
                   {index < brands.length - 1 && (
-                    <span className="mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
+                    <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
                   )}
                 </div>
               ))}

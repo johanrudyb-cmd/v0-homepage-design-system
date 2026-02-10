@@ -225,7 +225,7 @@ export function TrendsByMarket() {
         ) : (
           <div
             className={cn(
-              'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6',
+              'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6',
               'transition-all duration-1000',
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             )}
@@ -257,7 +257,7 @@ export function TrendsByMarket() {
                           alt={product.name}
                           fill
                           className="object-cover transition-transform duration-700 group-hover:scale-110"
-                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                          sizes="(max-width: 768px) 50vw, (max-width: 1024px) 50vw, 25vw"
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-[#6e6e73]">
@@ -268,21 +268,21 @@ export function TrendsByMarket() {
                       )}
 
                       {/* Badge segment/zone */}
-                      <div className="absolute top-3 left-3">
-                        <span className="px-3 py-1 rounded-full bg-[#000000] text-white text-xs font-semibold">
+                      <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
+                        <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#000000] text-[10px] sm:text-xs font-semibold">
                           {segmentLabel} {product.zone}
                         </span>
                       </div>
                     </div>
 
                     {/* Informations du produit */}
-                    <div className="p-4 sm:p-6 space-y-3">
+                    <div className="p-3 sm:p-6 space-y-2 sm:space-y-3">
                       <div>
-                        <h3 className="text-lg font-semibold text-[#000000] mb-1 line-clamp-2">
+                        <h3 className="text-sm sm:text-lg font-semibold text-[#000000] mb-0.5 sm:mb-1 line-clamp-2 leading-tight">
                           {product.name}
                         </h3>
-                        <p className="text-sm text-[#6e6e73]">{product.category}</p>
-                        <p className="text-sm text-[#6e6e73] font-medium">{product.brand}</p>
+                        <p className="text-[10px] sm:text-sm text-[#6e6e73] truncate">{product.category}</p>
+                        <p className="text-[10px] sm:text-sm text-[#6e6e73] font-medium truncate">{product.brand}</p>
                       </div>
 
                       {/* Bouton Analyser la tendance */}
@@ -297,7 +297,7 @@ export function TrendsByMarket() {
                         }}
                         disabled={!canAnalyze}
                         className={cn(
-                          'w-full px-4 py-3 rounded-full text-sm font-semibold transition-all duration-200 group-hover:scale-[1.02]',
+                          'w-full px-3 py-2 sm:px-4 sm:py-3 rounded-full text-[10px] sm:text-sm font-semibold transition-all duration-200 group-hover:scale-[1.02]',
                           canAnalyze && (!isFree || isVisible)
                             ? 'bg-[#000000] text-white hover:bg-[#1D1D1F]'
                             : 'bg-[#E5E5E7] text-[#6e6e73] cursor-not-allowed'
