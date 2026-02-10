@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, isDatabaseAvailable } from '@/lib/prisma';
 
 export const runtime = 'nodejs';
 
@@ -9,6 +9,12 @@ export const runtime = 'nodejs';
  */
 export async function GET() {
   try {
+    // Return empty data gracefully when DATABASE_URL is not configured
+    if (!isDatabaseAvailable()) {
+      console.warn('[Homepage Featured Factories] DATABASE_URL is not set. Returning empty factories.');
+      return NextResponse.json({ factories: [] });
+    }
+
     const [chinaFactory, portugalFactory, turkeyFactory] = await Promise.all([
       prisma.factory.findFirst({
         where: { country: 'China' },

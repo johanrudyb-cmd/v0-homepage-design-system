@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { prisma, isDatabaseAvailable } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import type { Prisma } from '@prisma/client';
 import { getProductBrand, brandsMatch } from '@/lib/brand-utils';
@@ -63,6 +63,12 @@ function seededShuffle<T>(array: T[], seed: number): T[] {
  */
 export async function GET(request: Request) {
   try {
+    // Return empty data gracefully when DATABASE_URL is not configured
+    if (!isDatabaseAvailable()) {
+      console.warn('[Homepage Featured] DATABASE_URL is not set. Returning empty trends.');
+      return NextResponse.json({ trends: [], monthSeed: '' });
+    }
+
     // Générer une seed basée sur le mois actuel pour la sélection aléatoire mensuelle
     const now = new Date();
     const monthSeed = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
