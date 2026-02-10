@@ -1,5 +1,6 @@
 'use client';
 
+import { signOut } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
@@ -150,10 +151,9 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
         <button
           type="button"
           className="min-h-[44px] w-full text-left px-4 py-3 rounded-2xl text-base font-medium text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF] transition-all duration-200 flex items-center active:bg-black/10"
-          onClick={async () => {
+          onClick={() => {
             onClose?.();
-            await fetch('/api/auth/logout', { method: 'POST' });
-            window.location.href = '/';
+            signOut({ callbackUrl: '/' });
           }}
         >
           Déconnexion
