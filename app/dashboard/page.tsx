@@ -16,10 +16,15 @@ export default async function DashboardPage() {
     user = await getCurrentUser();
   } catch (error) {
     console.error('[Dashboard] Erreur getCurrentUser:', error);
-    redirect('/auth/signin');
+    // Ne pas rediriger immédiatement si erreur temporaire (cookie en propagation)
+    // Laisser le middleware gérer
+    user = null;
   }
+  
+  // Si pas d'utilisateur, laisser le middleware gérer la redirection
+  // pour éviter les boucles de redirection infinies
   if (!user) {
-    redirect('/auth/signin');
+    redirect('/auth/signin?redirect=/dashboard');
   }
 
   let brand;
