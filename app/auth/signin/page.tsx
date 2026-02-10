@@ -26,6 +26,7 @@ function SignInContent() {
         headers: {
           'Content-Type': 'application/json',
         },
+        credentials: 'same-origin',
         body: JSON.stringify({ email, password }),
       });
 
@@ -37,9 +38,12 @@ function SignInContent() {
         return;
       }
 
-      // Connexion réussie : redirection vers onboarding si demandé, sinon dashboard
+      // Connexion réussie : laisser le temps au navigateur d'enregistrer le cookie (important sur mobile)
       const redirectTo = searchParams.get('redirect') || '/dashboard';
-      window.location.href = redirectTo.startsWith('/') ? redirectTo : '/dashboard';
+      const target = redirectTo.startsWith('/') ? redirectTo : '/dashboard';
+      setTimeout(() => {
+        window.location.replace(target);
+      }, 200);
     } catch (err: any) {
       console.error('Erreur lors de la connexion:', err);
       setError('Une erreur est survenue. Vérifiez votre connexion.');
@@ -48,64 +52,68 @@ function SignInContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-background px-4">
-      <Card className="w-full max-w-md border-2 shadow-modern-lg">
-        <CardHeader className="space-y-4 text-center">
-          <div>
-            <CardTitle className="text-3xl font-bold">Connexion</CardTitle>
-            <div className="w-12 h-1 bg-gradient-to-r from-primary via-secondary to-accent mx-auto mt-3 rounded-full"></div>
-          </div>
-          <CardDescription className="text-base font-medium">
-            Accédez à votre compte OUTFITY
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {error && (
-              <div className="p-4 text-sm text-error bg-error/10 border-2 border-error/20 rounded-lg font-medium">
-                {error}
-              </div>
-            )}
+    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-background px-4 py-8 safe-area-padding overflow-y-auto">
+      <div className="w-full max-w-md my-auto">
+        <Card className="w-full border-2 shadow-modern-lg">
+          <CardHeader className="space-y-4 text-center px-4 sm:px-6 pt-6 sm:pt-8">
+            <div>
+              <CardTitle className="text-2xl sm:text-3xl font-bold">Connexion</CardTitle>
+              <div className="w-12 h-1 bg-gradient-to-r from-primary via-secondary to-accent mx-auto mt-3 rounded-full"></div>
+            </div>
+            <CardDescription className="text-sm sm:text-base font-medium">
+              Accédez à votre compte OUTFITY
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="px-4 sm:px-6 pb-8">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              {error && (
+                <div className="p-4 text-sm text-error bg-error/10 border-2 border-error/20 rounded-lg font-medium">
+                  {error}
+                </div>
+              )}
 
-            <Input
-              type="email"
-              label="Email"
-              placeholder="votre@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
+              <Input
+                type="email"
+                label="Email"
+                placeholder="votre@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                autoComplete="email"
+              />
 
-            <Input
-              type="password"
-              label="Mot de passe"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+              <Input
+                type="password"
+                label="Mot de passe"
+                placeholder="••••••••"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
 
-            <Button
-              type="submit"
-              variant="default"
-              className="w-full shadow-modern-lg"
-              loading={loading}
-            >
-              Se connecter
-            </Button>
-          </form>
+              <Button
+                type="submit"
+                variant="default"
+                className="w-full shadow-modern-lg min-h-[48px]"
+                loading={loading}
+              >
+                Se connecter
+              </Button>
+            </form>
 
-          <div className="mt-8 text-center text-sm text-muted-foreground font-medium">
-            <span>Pas encore de compte ? </span>
-            <Link
-              href="/auth/signup"
-              className="text-primary hover:underline font-semibold"
-            >
-              Créer un compte
-            </Link>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="mt-6 sm:mt-8 text-center text-sm text-muted-foreground font-medium">
+              <span>Pas encore de compte ? </span>
+              <Link
+                href="/auth/signup"
+                className="text-primary hover:underline font-semibold"
+              >
+                Créer un compte
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }

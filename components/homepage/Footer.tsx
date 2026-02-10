@@ -41,12 +41,12 @@ export function Footer() {
             <h3 className="text-sm font-bold text-[#000000] mb-4 uppercase tracking-wide">
               Produit
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {footerLinks.produit.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#6e6e73] font-normal hover:text-[#007AFF] transition-colors"
+                    className="inline-block min-h-[44px] py-2 flex items-center text-sm text-[#6e6e73] font-normal hover:text-[#007AFF] transition-colors touch-manipulation"
                   >
                     {link.name}
                   </Link>
@@ -60,12 +60,12 @@ export function Footer() {
             <h3 className="text-sm font-bold text-[#000000] mb-4 uppercase tracking-wide">
               Ressources
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {footerLinks.ressources.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#6e6e73] font-normal hover:text-[#007AFF] transition-colors"
+                    className="inline-block min-h-[44px] py-2 flex items-center text-sm text-[#6e6e73] font-normal hover:text-[#007AFF] transition-colors touch-manipulation"
                   >
                     {link.name}
                   </Link>
@@ -79,12 +79,12 @@ export function Footer() {
             <h3 className="text-sm font-bold text-[#000000] mb-4 uppercase tracking-wide">
               Entreprise
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {footerLinks.entreprise.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#6e6e73] font-normal hover:text-[#007AFF] transition-colors"
+                    className="inline-block min-h-[44px] py-2 flex items-center text-sm text-[#6e6e73] font-normal hover:text-[#007AFF] transition-colors touch-manipulation"
                   >
                     {link.name}
                   </Link>
@@ -98,12 +98,12 @@ export function Footer() {
             <h3 className="text-sm font-bold text-[#000000] mb-4 uppercase tracking-wide">
               Légal
             </h3>
-            <ul className="space-y-3">
+            <ul className="space-y-2 sm:space-y-3">
               {footerLinks.légal.map((link) => (
                 <li key={link.name}>
                   <Link
                     href={link.href}
-                    className="text-sm text-[#6e6e73] font-normal hover:text-[#007AFF] transition-colors"
+                    className="inline-block min-h-[44px] py-2 flex items-center text-sm text-[#6e6e73] font-normal hover:text-[#007AFF] transition-colors touch-manipulation"
                   >
                     {link.name}
                   </Link>
@@ -114,14 +114,14 @@ export function Footer() {
         </div>
 
         {/* Réseaux sociaux - BIANGORY */}
-        <div className="flex flex-wrap items-center justify-center gap-6 py-8 border-t border-[#F2F2F2]">
+        <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 py-6 sm:py-8 border-t border-[#F2F2F2]">
           {SOCIAL_LINKS.map((social) => (
             <Link
               key={social.name}
               href={social.href}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm font-medium text-[#6e6e73] hover:text-[#007AFF] transition-colors"
+              className="flex items-center gap-2 min-h-[44px] py-2 text-sm font-medium text-[#6e6e73] hover:text-[#007AFF] transition-colors touch-manipulation"
               aria-label={social.name + ' - BIANGORY'}
             >
               {social.icon === 'instagram' ? (

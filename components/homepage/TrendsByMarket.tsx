@@ -146,32 +146,33 @@ export function TrendsByMarket() {
   };
 
   return (
-    <section id="trends-by-market" className="py-20 bg-white">
+    <section id="trends-by-market" className="py-12 sm:py-16 lg:py-20 bg-white border-t border-[#F2F2F2]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* En-tête avec titre et indicateur */}
-        <div className="mb-8">
-          <h2 className="text-5xl lg:text-6xl font-bold tracking-tight text-[#000000] mb-4">
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#000000] mb-3 sm:mb-4">
             Tendances par marché
           </h2>
-          <div className="flex items-center gap-2 text-sm text-[#6e6e73]">
-            <Flame className="w-4 h-4 text-[#007AFF]" />
-            <span>Indicateur tendance basé sur plus de 15000 références.</span>
+          <div className="flex flex-wrap items-center gap-2 text-sm text-[#6e6e73]">
+            <Flame className="w-4 h-4 text-[#007AFF] shrink-0" />
+            <span>Indicateur tendance basé sur plus de 15 000 références.</span>
           </div>
         </div>
 
         {/* Filtres */}
-        <div className="mb-12 flex flex-wrap items-center gap-3">
+        <div className="mb-8 sm:mb-12 flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Filtres d'âge */}
           <div className="flex gap-2">
             {['18-24 ans', '25-34 ans'].map((age) => (
               <button
                 key={age}
+                type="button"
                 onClick={() => setSelectedAge(selectedAge === age ? null : age)}
                 className={cn(
-                  'px-4 py-2 rounded-full text-sm font-medium transition-all',
+                  'min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium transition-all touch-manipulation',
                   selectedAge === age
                     ? 'bg-[#000000] text-white'
-                    : 'bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7]'
+                    : 'bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] active:bg-[#E0E0E0]'
                 )}
               >
                 {age}
@@ -184,12 +185,13 @@ export function TrendsByMarket() {
             {['Homme', 'Femme'].map((gender) => (
               <button
                 key={gender}
+                type="button"
                 onClick={() => setSelectedGender(selectedGender === gender ? null : gender)}
                 className={cn(
-                  'px-4 py-2 rounded-full text-sm font-medium transition-all',
+                  'min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium transition-all touch-manipulation',
                   selectedGender === gender
                     ? 'bg-[#000000] text-white'
-                    : 'bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7]'
+                    : 'bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] active:bg-[#E0E0E0]'
                 )}
               >
                 {gender}
@@ -199,21 +201,22 @@ export function TrendsByMarket() {
 
           {/* Zone */}
           <button
-            className="px-4 py-2 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all"
+            type="button"
+            className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all touch-manipulation"
           >
             {selectedZone}
           </button>
 
           {/* Tri */}
           <div className="relative ml-auto">
-            <button className="px-4 py-2 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all flex items-center gap-2">
+            <button type="button" className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all flex items-center gap-2 touch-manipulation">
               {sortBy}
-              <ChevronDown className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4 shrink-0" />
             </button>
           </div>
 
           {/* Filtres avancés */}
-          <button className="px-4 py-2 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all">
+          <button type="button" className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all touch-manipulation">
             Filtres avancés
           </button>
         </div>
@@ -230,7 +233,7 @@ export function TrendsByMarket() {
         ) : (
           <div
             className={cn(
-              'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6',
+              'grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6',
               'transition-all duration-1000',
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             )}
@@ -243,9 +246,9 @@ export function TrendsByMarket() {
               
               return (
                 <div key={product.id} className="group relative">
-                  <div className={`bg-white rounded-[32px] border border-[#F2F2F2] overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-apple ${isFree && !isVisible ? 'blur-sm' : ''}`}>
+                  <div className={`bg-white rounded-2xl sm:rounded-[32px] border border-[#F2F2F2] overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-apple ${isFree && !isVisible ? 'blur-sm' : ''}`}>
                     {isFree && !isVisible && (
-                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 rounded-[32px]">
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 rounded-2xl sm:rounded-[32px]">
                         <Link
                           href="/auth/choose-plan"
                           className="px-4 py-2 bg-white text-black rounded-full text-sm font-semibold hover:bg-gray-100"
@@ -281,7 +284,7 @@ export function TrendsByMarket() {
                     </div>
 
                     {/* Informations du produit */}
-                    <div className="p-6 space-y-3">
+                    <div className="p-4 sm:p-6 space-y-3">
                       <div>
                         <h3 className="text-lg font-semibold text-[#000000] mb-1 line-clamp-2">
                           {product.name}
@@ -330,10 +333,10 @@ export function TrendsByMarket() {
         )}
 
         {/* Lien vers toutes les tendances */}
-        <div className="mt-12 text-center">
+        <div className="mt-8 sm:mt-12 text-center">
           <Link
             href="/trends"
-            className="inline-flex items-center gap-2 text-[#007AFF] hover:underline group text-lg font-medium"
+            className="inline-flex items-center gap-2 min-h-[44px] items-center justify-center text-[#007AFF] hover:underline group text-base sm:text-lg font-medium touch-manipulation"
           >
             Voir toutes les tendances
             <svg

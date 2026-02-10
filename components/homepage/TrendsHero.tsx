@@ -100,7 +100,7 @@ export function TrendsHero() {
           </div>
 
           {/* Bandeau défilant avec logos de marques en couleur */}
-          <div className="relative overflow-hidden mt-16 py-8">
+          <div className="relative overflow-hidden mt-10 sm:mt-14 lg:mt-16 py-6 sm:py-8">
             <div className="flex items-center whitespace-nowrap animate-marquee-slow">
               {/* Première série */}
               {brands.map((brand, index) => (

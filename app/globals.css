@@ -355,6 +355,13 @@
   animation: marquee-slow 15s linear infinite;
 }
 
+/* Défilement plus rapide sur téléphone et tablette */
+@media (max-width: 1024px) {
+  .animate-marquee-slow {
+    animation-duration: 8s;
+  }
+}
+
 /* Animations pour header - Art & Mode */
 @keyframes float {
   0%, 100% {

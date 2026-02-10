@@ -21,7 +21,7 @@ export function AppleNav() {
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 lg:h-20 flex items-center justify-between gap-2">
         <Link href={isLoggedIn ? '/dashboard' : '/'} className="shrink-0">
-          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-10 w-10 sm:h-12 sm:w-12 lg:h-16 lg:w-16 xl:h-24 xl:w-24 object-contain bg-transparent" unoptimized />
+          <Image src="/icon.png" alt="Logo" width={96} height={96} className="h-12 w-12 sm:h-14 sm:w-14 md:h-16 md:w-16 lg:h-20 lg:w-20 xl:h-24 xl:w-24 object-contain bg-transparent" unoptimized />
         </Link>
 
         {/* Navigation Links */}

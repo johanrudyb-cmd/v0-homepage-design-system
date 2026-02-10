@@ -32,19 +32,19 @@ export function Header({ onMenuClick }: HeaderProps) {
           <button
             type="button"
             aria-label="Ouvrir le menu"
-            className="lg:hidden touch-target flex items-center justify-center -ml-1 rounded-xl text-[#1D1D1F] hover:bg-black/5 active:bg-black/10"
+            className="lg:hidden touch-target flex items-center justify-center rounded-xl text-[#1D1D1F] hover:bg-black/5 active:bg-black/10 shrink-0"
             onClick={onMenuClick}
           >
             <Menu className="h-6 w-6 shrink-0" />
           </button>
         )}
-        {/* Search - masqué sur très petit écran, raccourci sur mobile */}
+        {/* Recherche à gauche */}
         <div className="flex-1 min-w-0 max-w-xl">
           <SearchBar />
         </div>
 
-        {/* Right Section */}
-        <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 shrink-0">
+        {/* À droite : Illimité (crédits), cloche, mon nom */}
+        <div className="flex items-center gap-2 sm:gap-4 lg:gap-6 shrink-0 ml-auto">
           <TokenDisplay />
           <NotificationsDropdown />
           <div className="hidden sm:flex items-center gap-4 pl-2 lg:pl-6 lg:border-l border-black/5">
