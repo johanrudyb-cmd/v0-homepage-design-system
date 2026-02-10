@@ -26,14 +26,16 @@ function SignInContent() {
         headers: {
           'Content-Type': 'application/json',
         },
-        credentials: 'same-origin',
+        credentials: 'include', // Inclure les cookies dans la requête (important pour cross-origin)
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.error || 'Email ou mot de passe incorrect');
+        // Afficher l'erreur spécifique retournée par le serveur
+        const errorMsg = data.error || data.details || 'Email ou mot de passe incorrect';
+        setError(errorMsg);
         setLoading(false);
         return;
       }
