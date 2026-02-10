@@ -47,14 +47,13 @@ export async function POST(request: Request) {
         }
 
         if (!user && customerId) {
-            // Fallback: chercher par stripeCustomerId
-            user = await prisma.user.findFirst({
-                where: { stripeCustomerId: customerId },
-            });
+            // Fallback: impossible car stripeCustomerId n'existe pas dans le schéma User actuel
+            // On log juste l'info pour debug
+            console.warn(`[Stripe Sync] Impossible de trouver l'user par customerId ${customerId} (champ inexistant)`);
         }
 
         if (!user) {
-            console.warn(`[Stripe Sync] Utilisateur non trouvé: ${email || customerId}`);
+            console.warn(`[Stripe Sync] Utilisateur non trouvé pour l'email: ${email}`);
             return NextResponse.json({
                 success: false,
                 message: 'Utilisateur non trouvé',
@@ -62,55 +61,50 @@ export async function POST(request: Request) {
         }
 
         // Traiter selon le type d'événement
+        // Note: Le schéma User ne contient pas stripeCustomerId, subscriptionId, subscriptionStatus
+        // On ne met à jour que le 'plan' et 'subscribedAt'
         switch (eventType) {
             case 'checkout.session.completed':
             case 'customer.subscription.created':
                 await prisma.user.update({
                     where: { id: user.id },
                     data: {
-                        stripeCustomerId: customerId || user.stripeCustomerId,
-                        subscriptionId: subscriptionId || user.subscriptionId,
-                        subscriptionStatus: 'active',
                         plan: plan || 'pro',
+                        subscribedAt: new Date(),
                     },
                 });
-                console.log(`[Stripe Sync] ✅ Abonnement activé pour ${email}`);
+                console.log(`[Stripe Sync] ✅ Abonnement activé pour ${user.email} (Plan: ${plan || 'pro'})`);
                 break;
 
             case 'customer.subscription.updated':
                 await prisma.user.update({
                     where: { id: user.id },
                     data: {
-                        subscriptionStatus: status || 'active',
                         plan: plan || user.plan,
+                        // On ne touche pas à subscribedAt lors d'un update, sauf si réabonnement
                     },
                 });
-                console.log(`[Stripe Sync] ✅ Abonnement mis à jour pour ${email}`);
+                console.log(`[Stripe Sync] ✅ Abonnement mis à jour pour ${user.email}`);
                 break;
 
             case 'customer.subscription.deleted':
                 await prisma.user.update({
                     where: { id: user.id },
                     data: {
-                        subscriptionStatus: 'canceled',
                         plan: 'free',
+                        subscribedAt: null, // Fin de l'abonnement
                     },
                 });
-                console.log(`[Stripe Sync] ❌ Abonnement annulé pour ${email}`);
+                console.log(`[Stripe Sync] ❌ Abonnement annulé pour ${user.email}`);
                 break;
 
             case 'invoice.payment_succeeded':
-                console.log(`[Stripe Sync] 💰 Paiement ${amount}€ reçu de ${email}`);
+                console.log(`[Stripe Sync] 💰 Paiement ${amount}€ reçu de ${user.email}`);
                 break;
 
             case 'invoice.payment_failed':
-                await prisma.user.update({
-                    where: { id: user.id },
-                    data: {
-                        subscriptionStatus: 'past_due',
-                    },
-                });
-                console.log(`[Stripe Sync] ⚠️ Paiement échoué pour ${email}`);
+                // Pas de champ status pour marquer "past_due", on log juste
+                console.warn(`[Stripe Sync] ⚠️ Paiement échoué pour ${user.email}`);
                 break;
 
             default:
