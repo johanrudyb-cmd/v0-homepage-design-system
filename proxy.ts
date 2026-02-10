@@ -22,15 +22,20 @@ export function proxy(request: NextRequest) {
   // MAIS éviter la redirection si on vient juste de se connecter (éviter la boucle)
   if (isAuthenticated && isAuthPage) {
     // Vérifier le referer pour éviter les redirections en boucle
+    // Mais ne pas dépendre uniquement du referer (peut être bloqué)
     const referer = request.headers.get('referer');
     const isFromLogin = referer?.includes('/auth/signin') || referer?.includes('/auth/signup');
     
-    // Si on vient de la page de connexion, laisser passer pour éviter la boucle
-    // Le client gérera la redirection avec router.push
-    if (isFromLogin && pathname === '/auth/signin') {
+    // Vérifier aussi si c'est une requête POST (formulaire de connexion)
+    const isPostRequest = request.method === 'POST';
+    
+    // Si on vient de la page de connexion OU c'est une requête POST, laisser passer
+    // Le client gérera la redirection avec router.push après que le cookie soit propagé
+    if ((isFromLogin || isPostRequest) && pathname === '/auth/signin') {
       return NextResponse.next();
     }
     
+    // Sinon, rediriger vers dashboard (utilisateur déjà connecté)
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

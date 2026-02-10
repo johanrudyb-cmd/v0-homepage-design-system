@@ -211,6 +211,9 @@ export async function POST(request: Request) {
     const forwardedProto = request.headers.get('x-forwarded-proto');
     const isHttps = forwardedProto === 'https' || (prodCheck && !forwardedProto) || request.url.startsWith('https://');
     
+    // En production Vercel, FORCER secure=true (HTTPS toujours disponible)
+    const shouldUseSecure = isVercel || prodCheck || isHttps;
+    
     // Log pour diagnostic (uniquement en production pour voir ce qui se passe)
     if (prodCheck) {
       console.log('[AUTH LOGIN] Cookie config:', {
@@ -218,6 +221,7 @@ export async function POST(request: Request) {
         isProduction: prodCheck,
         forwardedProto,
         isHttps,
+        shouldUseSecure,
         url: request.url.substring(0, 50),
         hasSecret: !!process.env.NEXTAUTH_SECRET || !!process.env.AUTH_SECRET,
         duration: `${Date.now() - startTime}ms`,
@@ -227,12 +231,15 @@ export async function POST(request: Request) {
     try {
       response.cookies.set('auth-token', token, {
         httpOnly: true,
-        secure: isHttps || prodCheck, // true en production (HTTPS requis), false en local (HTTP)
-        sameSite: 'lax',
+        secure: shouldUseSecure, // true en production Vercel (HTTPS toujours), false en local (HTTP)
+        sameSite: 'lax', // Compatible avec les redirections cross-site
         maxAge: 60 * 60 * 24 * 7, // 7 jours
         path: '/',
-        // Ne pas définir domain pour permettre le cookie sur tous les sous-domaines
+        // Ne pas définir domain pour permettre le cookie sur tous les sous-domaines Vercel
       });
+      
+      // Ajouter un header pour confirmer que le cookie a été défini
+      response.headers.set('X-Auth-Cookie-Set', 'true');
     } catch (cookieError: unknown) {
       const cookieMessage = cookieError instanceof Error ? cookieError.message : String(cookieError);
       console.error('[AUTH LOGIN] Erreur lors de la définition du cookie:', cookieMessage);

@@ -40,26 +40,37 @@ function SignInContent() {
         return;
       }
 
+      // Stocker le header X-Auth-Cookie-Set pour vérification
+      const cookieSetHeader = response.headers.get('X-Auth-Cookie-Set');
+
       // Connexion réussie : vérifier que le cookie est bien défini avant de rediriger
       const redirectTo = searchParams.get('redirect') || '/dashboard';
       const target = redirectTo.startsWith('/') ? redirectTo : '/dashboard';
       
       // En production, attendre plus longtemps pour que le cookie soit propagé
       const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-      const initialDelay = isProduction ? 800 : 300;
-      const maxAttempts = 5;
+      const initialDelay = isProduction ? 1000 : 400; // Augmenté pour production
+      const maxAttempts = 8; // Augmenté pour être sûr
       let attempts = 0;
       
       const checkCookieAndRedirect = () => {
         attempts++;
         const hasCookie = document.cookie.includes('auth-token');
         
-        if (hasCookie || attempts >= maxAttempts) {
+        // Vérifier aussi le header X-Auth-Cookie-Set si présent (stocké dans la closure)
+        const cookieConfirmed = hasCookie || cookieSetHeader === 'true';
+        
+        if (cookieConfirmed || attempts >= maxAttempts) {
           // Cookie présent ou max tentatives atteint : rediriger
+          if (cookieConfirmed) {
+            console.log('[SignIn] Cookie confirmé, redirection vers', target);
+          } else {
+            console.warn('[SignIn] Cookie non confirmé après', attempts, 'tentatives, redirection quand même');
+          }
           router.push(target);
         } else {
           // Attendre un peu plus et réessayer
-          setTimeout(checkCookieAndRedirect, 200);
+          setTimeout(checkCookieAndRedirect, 250);
         }
       };
       
