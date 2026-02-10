@@ -23,11 +23,17 @@ function createPrismaClient(): PrismaClient {
   
   try {
     // Configuration optimisée pour production avec connection pooling
+    // Si Session Pooler Supabase détecté, ajouter paramètres optimisés
+    const isPooler = url.includes('pooler') || url.includes(':6543');
+    const optimizedUrl = isPooler && !url.includes('pgbouncer=true')
+      ? `${url}${url.includes('?') ? '&' : '?'}pgbouncer=true&connect_timeout=10&pool_timeout=10&statement_cache_size=0`
+      : url;
+    
     const client = new PrismaClient({
       log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
       datasources: {
         db: {
-          url,
+          url: optimizedUrl,
         },
       },
       // Configuration pour éviter les connexions inutiles

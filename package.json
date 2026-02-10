@@ -15,7 +15,7 @@
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio",
-    "db:test": "node scripts/test-supabase-connection.js",
+    "db:test": "npx tsx scripts/test-supabase-connection.ts",
     "db:fix": "node scripts/fix-prisma.js",
     "db:seed-factories": "node scripts/seed-factories.js",
     "db:seed-products": "node scripts/seed-products.js",
