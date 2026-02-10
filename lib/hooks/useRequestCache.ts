@@ -1,3 +1,7 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+
 /**
  * Cache simple pour les requêtes API
  * Évite les requêtes répétées pour les mêmes données
