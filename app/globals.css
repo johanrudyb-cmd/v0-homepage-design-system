@@ -7,54 +7,63 @@
     /* Design System - Apple Design Language */
     /* Palette Apple - Luxueusement Simple */
     /* Les variables de polices sont définies par next/font dans layout.tsx */
-    
+
     /* Fond principal : Gris Apple très léger */
-    --background: 0 0% 96%; /* #F5F5F7 */
-    --foreground: 0 0% 12%; /* #1D1D1F - Gris anthracite */
-    
+    --background: 0 0% 96%;
+    /* #F5F5F7 */
+    --foreground: 0 0% 12%;
+    /* #1D1D1F - Gris anthracite */
+
     /* Dashboard background : Même que background */
-    --dashboard-background: 0 0% 96%; /* #F5F5F7 */
-    
+    --dashboard-background: 0 0% 96%;
+    /* #F5F5F7 */
+
     /* Primary - Noir pur Apple */
-    --primary: 0 0% 0%; /* #000000 */
-    --primary-foreground: 0 0% 100%; /* #FFFFFF */
-    
+    --primary: 0 0% 0%;
+    /* #000000 */
+    --primary-foreground: 0 0% 100%;
+    /* #FFFFFF */
+
     /* Secondary - Bleu Apple pour éléments cliquables */
-    --secondary: 210 100% 50%; /* #007AFF */
+    --secondary: 210 100% 50%;
+    /* #007AFF */
     --secondary-foreground: 0 0% 100%;
-    
+
     /* Accent - Bleu Apple */
-    --accent: 210 100% 50%; /* #007AFF */
+    --accent: 210 100% 50%;
+    /* #007AFF */
     --accent-foreground: 0 0% 100%;
-    
+
     /* Muted - Gris Apple */
     --muted: 0 0% 90%;
     --muted-foreground: 0 0% 45%;
-    
+
     /* Border - Pas de bordures visibles dans Apple Design */
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 210 100% 50%; /* #007AFF */
-    
+    --ring: 210 100% 50%;
+    /* #007AFF */
+
     /* Status Colors */
     --success: 142 76% 36%;
     --error: 0 84% 60%;
     --warning: 38 92% 50%;
     --info: 210 100% 40%;
-    
+
     /* Sidebar - Glassmorphism */
     --sidebar-background: 0 0% 100% / 80%;
     --sidebar-foreground: 0 0% 12%;
     --sidebar-border: transparent;
     --sidebar-accent: 0 0% 96%;
-    
+
     /* Card - Blanc pur avec ombre légère */
     --card: 0 0% 100%;
     --card-foreground: 0 0% 12%;
-    
+
     /* Radius - Squircle (arrondis prononcés) */
-    --radius: 1.5rem; /* rounded-3xl */
-    
+    --radius: 1.5rem;
+    /* rounded-3xl */
+
     /* Safe-area pour encoches (téléphone / tablette) */
     --safe-area-inset-top: env(safe-area-inset-top, 0px);
     --safe-area-inset-right: env(safe-area-inset-right, 0px);
@@ -66,17 +75,17 @@
     /* Mode sombre minimaliste si nécessaire */
     --background: 0 0% 10%;
     --foreground: 251 20% 98.5%;
-    
+
     --primary: 251 20% 98.5%;
     --primary-foreground: 0 0% 10%;
-    
+
     --border: 0 0% 20%;
     --input: 0 0% 20%;
-    
+
     --sidebar-background: 0 0% 10%;
     --sidebar-foreground: 251 20% 98.5%;
     --sidebar-border: 0 0% 20%;
-    
+
     --card: 0 0% 12%;
     --card-foreground: 251 20% 98.5%;
   }
@@ -91,7 +100,7 @@
   * {
     @apply border-border;
   }
-  
+
   body {
     @apply bg-[#F5F5F7] text-[#1D1D1F];
     font-family: var(--font-sans);
@@ -103,9 +112,10 @@
     overflow-x: hidden;
     -webkit-tap-highlight-color: transparent;
   }
-  
+
   /* Éviter le zoom automatique iOS sur focus des inputs (min 16px) */
   @media (max-width: 1024px) {
+
     input[type="text"],
     input[type="search"],
     input[type="email"],
@@ -116,33 +126,38 @@
       font-size: 16px !important;
     }
   }
-  
+
   /* Typography Apple - Titres très gros avec tracking-tight */
-  h1, h2, h3, h4, h5, h6 {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
     font-family: var(--font-sans);
     font-weight: 600;
     letter-spacing: -0.02em;
     color: #1D1D1F;
   }
-  
+
   h1 {
     @apply text-6xl lg:text-7xl;
     font-weight: 600;
     letter-spacing: -0.03em;
   }
-  
+
   h2 {
     @apply text-5xl lg:text-6xl;
     font-weight: 600;
     letter-spacing: -0.025em;
   }
-  
+
   h3 {
     @apply text-3xl lg:text-4xl;
     font-weight: 600;
     letter-spacing: -0.02em;
   }
-  
+
   /* Body text - Gris anthracite pour lecture reposante */
   p {
     font-family: var(--font-sans);
@@ -150,18 +165,19 @@
     @apply leading-relaxed;
     color: #1D1D1F;
   }
-  
+
   /* Boutons - Style Apple */
   button {
     font-family: var(--font-sans);
     font-weight: 500;
     letter-spacing: -0.011em;
   }
-  
+
   /* Pas de couleur automatique pour les liens - à appliquer explicitement */
 }
 
 @layer utilities {
+
   /* Safe-area : padding pour encoches (téléphone / tablette) */
   .safe-area-padding {
     padding-top: var(--safe-area-inset-top);
@@ -169,37 +185,37 @@
     padding-bottom: var(--safe-area-inset-bottom);
     padding-left: var(--safe-area-inset-left);
   }
-  
+
   /* Zone tactile minimale 44px (recommandation Apple / WCAG) */
   .touch-target {
     min-height: 44px;
     min-width: 44px;
   }
-  
+
   /* Smooth scrolling */
   .scroll-smooth {
     scroll-behavior: smooth;
   }
-  
+
   /* Focus visible Apple */
   .focus-visible-ring {
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF];
   }
-  
+
   /* Glassmorphism - Effet de profondeur Apple */
   .glass {
     @apply backdrop-blur-xl bg-white/80;
   }
-  
+
   /* Ombre Apple - Très légère et diffuse */
   .shadow-apple {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
   }
-  
+
   .shadow-apple-lg {
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06), 0 2px 4px rgba(0, 0, 0, 0.03);
   }
-  
+
   /* Classe utilitaire pour liens interactifs/cliquables - Bleu Apple */
   /* À utiliser uniquement pour les liens de navigation, actions, etc. */
   .link-interactive {
@@ -207,11 +223,11 @@
     color: #007AFF;
     text-decoration: none;
   }
-  
+
   .link-interactive:hover {
     color: #0056CC;
   }
-  
+
   /* Les liens dans le texte normal ne doivent PAS être bleus automatiquement */
   /* Seuls les éléments explicitement marqués comme interactifs le seront */
 }
@@ -221,6 +237,7 @@
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -230,6 +247,7 @@
   from {
     opacity: 1;
   }
+
   to {
     opacity: 0;
   }
@@ -240,6 +258,7 @@
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -251,6 +270,7 @@
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -262,6 +282,7 @@
     opacity: 0;
     transform: translateY(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -273,6 +294,7 @@
     opacity: 0;
     transform: translateX(-20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -284,6 +306,7 @@
     opacity: 0;
     transform: translateX(20px);
   }
+
   to {
     opacity: 1;
     transform: translateX(0);
@@ -295,6 +318,7 @@
     opacity: 0;
     transform: scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: scale(1);
@@ -305,15 +329,19 @@
   0% {
     transform: rotate(0deg);
   }
+
   100% {
     transform: rotate(360deg);
   }
 }
 
 @keyframes applePulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.5;
   }
@@ -323,6 +351,7 @@
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -332,6 +361,7 @@
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -346,6 +376,7 @@
   0% {
     transform: translateX(0);
   }
+
   100% {
     transform: translateX(-50%);
   }
@@ -364,12 +395,16 @@
 
 /* Animations pour header - Art & Mode */
 @keyframes float {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translate(0, 0) scale(1);
   }
+
   33% {
     transform: translate(30px, -30px) scale(1.1);
   }
+
   66% {
     transform: translate(-20px, 20px) scale(0.9);
   }
@@ -379,19 +414,24 @@
   0% {
     transform: rotate(45deg) translate(0, 0);
   }
+
   50% {
     transform: rotate(225deg) translate(20px, -20px);
   }
+
   100% {
     transform: rotate(405deg) translate(0, 0);
   }
 }
 
 @keyframes wave {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateX(0) scaleX(1);
     opacity: 0.1;
   }
+
   50% {
     transform: translateX(50px) scaleX(1.2);
     opacity: 0.2;
@@ -402,19 +442,24 @@
   0% {
     transform: translateX(0) translateY(0);
   }
+
   50% {
     transform: translateX(-20px) translateY(10px);
   }
+
   100% {
     transform: translateX(0) translateY(0);
   }
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.15;
   }
+
   50% {
     transform: scale(1.2);
     opacity: 0.25;
@@ -422,10 +467,13 @@
 }
 
 @keyframes pulse-mode {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: scale(1);
     opacity: 0.15;
   }
+
   50% {
     transform: scale(1.2);
     opacity: 0.25;
@@ -436,6 +484,7 @@
   0% {
     background-position: -1000px 0;
   }
+
   100% {
     background-position: 1000px 0;
   }
@@ -446,9 +495,11 @@
     transform: translateX(-100%);
     opacity: 0;
   }
+
   50% {
     opacity: 0.1;
   }
+
   100% {
     transform: translateX(100%);
     opacity: 0;
@@ -544,29 +595,81 @@
 }
 
 /* Stagger animation pour les listes */
-.animate-stagger > * {
+.animate-stagger>* {
   animation: slideInUp 0.5s cubic-bezier(0.16, 1, 0.3, 1) backwards;
 }
 
-.animate-stagger > *:nth-child(1) { animation-delay: 0.05s; }
-.animate-stagger > *:nth-child(2) { animation-delay: 0.1s; }
-.animate-stagger > *:nth-child(3) { animation-delay: 0.15s; }
-.animate-stagger > *:nth-child(4) { animation-delay: 0.2s; }
-.animate-stagger > *:nth-child(5) { animation-delay: 0.25s; }
-.animate-stagger > *:nth-child(6) { animation-delay: 0.3s; }
-.animate-stagger > *:nth-child(7) { animation-delay: 0.35s; }
-.animate-stagger > *:nth-child(8) { animation-delay: 0.4s; }
+.animate-stagger>*:nth-child(1) {
+  animation-delay: 0.05s;
+}
+
+.animate-stagger>*:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.animate-stagger>*:nth-child(3) {
+  animation-delay: 0.15s;
+}
+
+.animate-stagger>*:nth-child(4) {
+  animation-delay: 0.2s;
+}
+
+.animate-stagger>*:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+.animate-stagger>*:nth-child(6) {
+  animation-delay: 0.3s;
+}
+
+.animate-stagger>*:nth-child(7) {
+  animation-delay: 0.35s;
+}
+
+.animate-stagger>*:nth-child(8) {
+  animation-delay: 0.4s;
+}
 
 /* Skeleton loader style Apple */
 .skeleton {
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0.06) 0%,
-    rgba(0, 0, 0, 0.1) 50%,
-    rgba(0, 0, 0, 0.06) 100%
-  );
+  background: linear-gradient(90deg,
+      rgba(0, 0, 0, 0.06) 0%,
+      rgba(0, 0, 0, 0.1) 50%,
+      rgba(0, 0, 0, 0.06) 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s ease-in-out infinite;
   border-radius: 0.5rem;
 }
 
+
+/* Animations de transition de page ultra-rapides */
+.ease-apple {
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.animate-in {
+  animation-duration: 300ms;
+  animation-fill-mode: forwards;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.fade-in {
+  animation-name: fadeIn;
+}
+
+.slide-in-from-bottom-2 {
+  animation-name: slideInFromBottom2;
+}
+
+@keyframes slideInFromBottom2 {
+  from {
+    transform: translateY(8px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
