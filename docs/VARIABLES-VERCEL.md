@@ -153,9 +153,9 @@ SMTP_FROM=noreply@outfity.fr
 
 ### 11. Stripe (Paiements)
 ```env
-STRIPE_SECRET_KEY=sk_test_votre_cle_secrete_stripe
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_votre_cle_publique_stripe
-STRIPE_WEBHOOK_SECRET=whsec_votre_secret_webhook_stripe
+STRIPE_SECRET_KEY=votre_cle_secrete_stripe_commence_par_sk_test
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=votre_cle_publique_stripe_commence_par_pk_test
+STRIPE_WEBHOOK_SECRET=votre_secret_webhook_stripe_commence_par_whsec
 ```
 **Où trouver** : https://dashboard.stripe.com/apikeys
 
