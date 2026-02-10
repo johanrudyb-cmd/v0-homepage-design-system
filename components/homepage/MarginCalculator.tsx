@@ -47,8 +47,8 @@ export function MarginCalculator() {
           )}
         >
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#FF9500]/20 flex items-center justify-center">
-              <Calculator className="w-6 h-6 sm:w-7 sm:h-7 text-[#FF9500]" />
+            <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-[#007AFF]/20 flex items-center justify-center">
+              <Calculator className="w-6 h-6 sm:w-7 sm:h-7 text-[#007AFF]" />
             </div>
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
@@ -70,7 +70,7 @@ export function MarginCalculator() {
                   type="number"
                   value={cost}
                   onChange={(e) => setCost(Number(e.target.value))}
-                  className="flex-1 px-4 py-3 bg-white/5 rounded-xl border border-white/10 text-white font-bold text-lg focus:outline-none focus:border-[#FF9500] transition-colors"
+                  className="flex-1 px-4 py-3 bg-white/5 rounded-xl border border-white/10 text-white font-bold text-lg focus:outline-none focus:border-[#007AFF] transition-colors"
                 />
                 <span className="text-lg font-bold text-white">€</span>
               </div>
@@ -84,7 +84,7 @@ export function MarginCalculator() {
                   type="number"
                   value={price}
                   onChange={(e) => setPrice(Number(e.target.value))}
-                  className="flex-1 px-4 py-3 bg-white/5 rounded-xl border border-white/10 text-white font-bold text-lg focus:outline-none focus:border-[#FF9500] transition-colors"
+                  className="flex-1 px-4 py-3 bg-white/5 rounded-xl border border-white/10 text-white font-bold text-lg focus:outline-none focus:border-[#007AFF] transition-colors"
                 />
                 <span className="text-lg font-bold text-white">€</span>
               </div>
@@ -101,14 +101,14 @@ export function MarginCalculator() {
               </div>
               <div className="text-right">
                 <div className="text-xs sm:text-sm text-white/60 font-normal mb-1">Rentabilité</div>
-                <div className="text-2xl sm:text-4xl font-bold text-[#FF9500]">
+                <div className="text-2xl sm:text-4xl font-bold text-[#007AFF]">
                   {marginPercentage}%
                 </div>
               </div>
             </div>
             <Link
               href="/auth/signup"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#FF9500] text-white rounded-full font-bold text-base sm:text-lg hover:bg-[#FF8A00] transition-all duration-200 shadow-lg shadow-[#FF9500]/20 active:scale-95 group"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-3 px-8 py-4 bg-[#007AFF] text-white rounded-full font-bold text-base sm:text-lg hover:bg-[#0056CC] transition-all duration-200 shadow-lg shadow-[#007AFF]/20 active:scale-95 group"
             >
               Accéder au calculateur complet
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

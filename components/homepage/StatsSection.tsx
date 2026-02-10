@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
 
+import { Users, ShoppingBag, Rocket, Star } from 'lucide-react';
+
 const stats = [
-  { value: '150+', label: 'Créateurs actifs' },
-  { value: '15,000+', label: 'Références analysées' },
-  { value: '500+', label: 'Marques créées' },
-  { value: '4.9/5', label: 'Note moyenne' },
+  { value: '150+', label: 'Créateurs actifs', icon: Users, color: '#007AFF' },
+  { value: '15,000+', label: 'Références analysées', icon: ShoppingBag, color: '#FF9500' },
+  { value: '500+', label: 'Marques créées', icon: Rocket, color: '#34C759' },
+  { value: '4.9/5', label: 'Note moyenne', icon: Star, color: '#FF2D55' },
 ];
 
 export function StatsSection() {
@@ -38,14 +40,14 @@ export function StatsSection() {
   }, []);
 
   return (
-    <section id="stats-section" className="py-20 bg-white">
+    <section id="stats-section" className="py-20 sm:py-24 bg-[#F5F5F7]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
           {stats.map((stat, index) => (
             <div
               key={index}
               className={cn(
-                'text-center transition-all duration-700',
+                'bg-white p-6 sm:p-8 rounded-3xl border border-black/5 shadow-apple transition-all duration-700',
                 isVisible
                   ? 'opacity-100 translate-y-0'
                   : 'opacity-0 translate-y-8'
@@ -54,11 +56,21 @@ export function StatsSection() {
                 transitionDelay: `${index * 100}ms`,
               }}
             >
-              <div className="text-3xl sm:text-4xl lg:text-6xl font-bold text-[#000000] mb-2">
-                {stat.value}
-              </div>
-              <div className="text-xs sm:text-base text-[#6e6e73] font-normal px-2">
-                {stat.label}
+              <div className="flex flex-col items-center sm:items-start text-center sm:text-left gap-4">
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center mb-1"
+                  style={{ backgroundColor: `${stat.color}10` }}
+                >
+                  <stat.icon className="w-6 h-6" style={{ color: stat.color }} />
+                </div>
+                <div>
+                  <div className="text-3xl sm:text-4xl font-bold tracking-tight text-[#000000]">
+                    {stat.value}
+                  </div>
+                  <div className="text-xs sm:text-sm text-[#6e6e73] font-medium mt-1">
+                    {stat.label}
+                  </div>
+                </div>
               </div>
             </div>
           ))}
