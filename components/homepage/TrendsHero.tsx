@@ -108,13 +108,13 @@ export function TrendsHero() {
                   key={`first-${index}`}
                   className="inline-flex items-center justify-center shrink-0 px-2 sm:px-4"
                 >
-                  <div className="relative h-16 sm:h-20 lg:h-14 min-w-[100px] sm:min-w-[140px] max-w-[140px] sm:max-w-[180px] flex items-center justify-center">
+                  <div className="relative h-24 sm:h-28 lg:h-14 min-w-[140px] sm:min-w-[180px] max-w-[180px] sm:max-w-[220px] flex items-center justify-center">
                     <Image
                       src={brand.logo}
                       alt={brand.name}
-                      width={180}
-                      height={80}
-                      className="object-contain h-16 sm:h-20 lg:h-14 w-auto max-w-[140px] sm:max-w-[180px]"
+                      width={220}
+                      height={112}
+                      className="object-contain h-24 sm:h-28 lg:h-14 w-auto max-w-[180px] sm:max-w-[220px]"
                       unoptimized
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -122,7 +122,7 @@ export function TrendsHero() {
                         const parent = target.parentElement;
                         if (parent && !parent.querySelector('.fallback-text')) {
                           const fallback = document.createElement('span');
-                          fallback.className = 'fallback-text text-sm font-bold text-[#000000] uppercase tracking-tight whitespace-nowrap';
+                          fallback.className = 'fallback-text text-xl sm:text-2xl font-bold text-[#000000] uppercase tracking-tight whitespace-nowrap';
                           fallback.textContent = brand.fallback || brand.name;
                           parent.appendChild(fallback);
                         }
@@ -142,13 +142,13 @@ export function TrendsHero() {
                   key={`second-${index}`}
                   className="inline-flex items-center justify-center shrink-0 px-2 sm:px-4"
                 >
-                  <div className="relative h-16 sm:h-20 lg:h-14 min-w-[100px] sm:min-w-[140px] max-w-[140px] sm:max-w-[180px] flex items-center justify-center">
+                  <div className="relative h-24 sm:h-28 lg:h-14 min-w-[140px] sm:min-w-[180px] max-w-[180px] sm:max-w-[220px] flex items-center justify-center">
                     <Image
                       src={brand.logo}
                       alt={brand.name}
-                      width={180}
-                      height={80}
-                      className="object-contain h-16 sm:h-20 lg:h-14 w-auto max-w-[140px] sm:max-w-[180px]"
+                      width={220}
+                      height={112}
+                      className="object-contain h-24 sm:h-28 lg:h-14 w-auto max-w-[180px] sm:max-w-[220px]"
                       unoptimized
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
@@ -156,7 +156,41 @@ export function TrendsHero() {
                         const parent = target.parentElement;
                         if (parent && !parent.querySelector('.fallback-text')) {
                           const fallback = document.createElement('span');
-                          fallback.className = 'fallback-text text-sm font-bold text-[#000000] uppercase tracking-tight whitespace-nowrap';
+                          fallback.className = 'fallback-text text-xl sm:text-2xl font-bold text-[#000000] uppercase tracking-tight whitespace-nowrap';
+                          fallback.textContent = brand.fallback || brand.name;
+                          parent.appendChild(fallback);
+                        }
+                      }}
+                    />
+                    {/* Fallback texte si l'image ne charge pas */}
+                    <span className="fallback-text-hidden absolute text-sm font-bold text-[#000000] uppercase tracking-tight opacity-0 pointer-events-none whitespace-nowrap">
+                      {brand.fallback || brand.name}
+                    </span>
+                  </div>
+                  <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
+                </div>
+              ))}
+              {/* Troisième duplication pour sécurité sur très grands écrans */}
+              {brands.map((brand, index) => (
+                <div
+                  key={`third-${index}`}
+                  className="inline-flex items-center justify-center shrink-0 px-2 sm:px-4"
+                >
+                  <div className="relative h-24 sm:h-28 lg:h-14 min-w-[140px] sm:min-w-[180px] max-w-[180px] sm:max-w-[220px] flex items-center justify-center">
+                    <Image
+                      src={brand.logo}
+                      alt={brand.name}
+                      width={220}
+                      height={112}
+                      className="object-contain h-24 sm:h-28 lg:h-14 w-auto max-w-[180px] sm:max-w-[220px]"
+                      unoptimized
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement;
+                        if (parent && !parent.querySelector('.fallback-text')) {
+                          const fallback = document.createElement('span');
+                          fallback.className = 'fallback-text text-xl sm:text-2xl font-bold text-[#000000] uppercase tracking-tight whitespace-nowrap';
                           fallback.textContent = brand.fallback || brand.name;
                           parent.appendChild(fallback);
                         }

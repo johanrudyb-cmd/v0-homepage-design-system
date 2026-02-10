@@ -154,7 +154,7 @@ export function TrendsByMarket() {
         {/* Filtres */}
         <div className="mb-8 sm:mb-12 flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Filtres d'âge */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {['18-24 ans', '25-34 ans'].map((age) => (
               <button
                 key={age}
@@ -173,7 +173,7 @@ export function TrendsByMarket() {
           </div>
 
           {/* Filtres de genre */}
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {['Homme', 'Femme'].map((gender) => (
               <button
                 key={gender}
@@ -191,26 +191,24 @@ export function TrendsByMarket() {
             ))}
           </div>
 
-          {/* Zone */}
-          <button
-            type="button"
-            className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all touch-manipulation"
-          >
-            {selectedZone}
-          </button>
+          {/* Zone et Tri */}
+          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto lg:ml-auto">
+            <button
+              type="button"
+              className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all touch-manipulation"
+            >
+              {selectedZone}
+            </button>
 
-          {/* Tri */}
-          <div className="relative ml-auto">
             <button type="button" className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all flex items-center gap-2 touch-manipulation">
               {sortBy}
               <ChevronDown className="w-4 h-4 shrink-0" />
             </button>
-          </div>
 
-          {/* Filtres avancés */}
-          <button type="button" className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all touch-manipulation">
-            Filtres avancés
-          </button>
+            <button type="button" className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all touch-manipulation">
+              Filtres
+            </button>
+          </div>
         </div>
 
         {/* Grille de produits */}
