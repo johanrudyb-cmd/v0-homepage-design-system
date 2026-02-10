@@ -9,6 +9,7 @@
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { Prisma } from '@prisma/client';
 
 export const runtime = 'nodejs';
 
@@ -66,7 +67,7 @@ export async function GET(request: Request) {
             trendsConfirmed = await prisma.trendProduct.count({
                 where: {
                     createdAt: { gte: weekAgo },
-                    isConfirmedTrend: true,
+                    isGlobalTrendAlert: true,
                 },
             });
         } catch {
@@ -85,7 +86,7 @@ export async function GET(request: Request) {
             techPacks = await prisma.design.count({
                 where: {
                     createdAt: { gte: weekAgo },
-                    techPackUrl: { not: null },
+                    techPack: { not: Prisma.DbNull },
                 },
             });
         } catch {
@@ -108,17 +109,18 @@ export async function GET(request: Request) {
         let aiRequests = 0;
         let aiCost = 0;
         try {
+            // @ts-ignore - Prisma aggregate types can be tricky
             const aiUsage = await prisma.aIUsage.aggregate({
                 where: {
                     createdAt: { gte: weekAgo },
                 },
                 _count: true,
                 _sum: {
-                    cost: true,
+                    costEur: true,
                 },
             });
             aiRequests = aiUsage._count || 0;
-            aiCost = Math.round((aiUsage._sum.cost || 0) * 100) / 100;
+            aiCost = Math.round((aiUsage._sum.costEur || 0) * 100) / 100;
         } catch {
             // Table may not exist yet
         }
@@ -127,13 +129,11 @@ export async function GET(request: Request) {
         const proUsers = await prisma.user.count({
             where: {
                 plan: 'pro',
-                subscriptionStatus: 'active',
             },
         });
         const enterpriseUsers = await prisma.user.count({
             where: {
                 plan: 'enterprise',
-                subscriptionStatus: 'active',
             },
         });
         const revenue = (proUsers * 29) + (enterpriseUsers * 99); // MRR estimé
