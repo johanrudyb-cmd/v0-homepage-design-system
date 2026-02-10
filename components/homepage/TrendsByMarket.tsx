@@ -230,7 +230,7 @@ export function TrendsByMarket() {
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             )}
           >
-            {displayedTrends.map((product) => {
+            {displayedTrends.slice(0, 4).map((product) => {
               const segmentLabel = product.segment === 'homme' ? 'Homme' : product.segment === 'femme' ? 'Femme' : product.segment;
               const isFree = user?.plan === 'free';
               const isVisible = !isFree || homepageIds.has(product.id);
@@ -250,7 +250,7 @@ export function TrendsByMarket() {
                       </div>
                     )}
                     {/* Image du produit */}
-                    <div className="relative aspect-square bg-[#F5F5F7] overflow-hidden">
+                    <div className="relative aspect-[4/5] sm:aspect-square bg-[#F5F5F7] overflow-hidden">
                       {product.imageUrl ? (
                         <Image
                           src={product.imageUrl}
@@ -269,7 +269,7 @@ export function TrendsByMarket() {
 
                       {/* Badge segment/zone */}
                       <div className="absolute top-2 left-2 sm:top-3 sm:left-3">
-                        <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#000000] text-[10px] sm:text-xs font-semibold">
+                        <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#000000] text-white text-[10px] sm:text-xs font-semibold">
                           {segmentLabel} {product.zone}
                         </span>
                       </div>
@@ -311,11 +311,6 @@ export function TrendsByMarket() {
                               ? 'Limite atteinte (3/mois)'
                               : 'Analyser la tendance'}
                       </button>
-                      {user?.plan === 'free' && analysesCount !== null && (
-                        <p className="text-xs text-center text-[#6e6e73]">
-                          {analysesCount}/3 analyses ce mois
-                        </p>
-                      )}
                     </div>
                   </div>
                 </div>
