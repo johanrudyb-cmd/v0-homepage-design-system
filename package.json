@@ -2,6 +2,7 @@
   "name": "medias-biangory-saas",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "npm@10.2.0",
   "scripts": {
     "dev": "next dev --webpack",
     "dev:turbo": "next dev --turbopack",
