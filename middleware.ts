@@ -3,7 +3,12 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-  const isAuthPage = pathname.startsWith('/auth');
+  
+  // Routes publiques (pas de vérification d'auth)
+  const publicRoutes = ['/auth', '/api'];
+  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
+  
+  // Routes protégées
   const isProtectedRoute =
     pathname.startsWith('/dashboard') ||
     pathname.startsWith('/brands') ||
@@ -12,67 +17,27 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/sourcing') ||
     pathname.startsWith('/ugc') ||
     pathname.startsWith('/launch-map') ||
-    pathname.startsWith('/design-studio');
+    pathname.startsWith('/design-studio') ||
+    pathname.startsWith('/onboarding') ||
+    pathname.startsWith('/settings');
 
   // Vérifier le token de session
   const token = request.cookies.get('auth-token');
   const isAuthenticated = !!token;
-  
-  // Vérifier le referer pour détecter la navigation interne
-  const referer = request.headers.get('referer');
-  const isFromProtectedRoute = referer ? (
-    referer.includes('/dashboard') ||
-    referer.includes('/brands') ||
-    referer.includes('/trends') ||
-    referer.includes('/spy') ||
-    referer.includes('/sourcing') ||
-    referer.includes('/ugc') ||
-    referer.includes('/launch-map') ||
-    referer.includes('/design-studio')
-  ) : false;
 
-  // Si l'utilisateur est connecté et essaie d'accéder à /auth, rediriger vers dashboard
-  // MAIS éviter la redirection si on vient juste de se connecter (éviter la boucle)
-  if (isAuthenticated && isAuthPage) {
-    // Vérifier si on vient de la page de connexion
-    const isFromLogin = referer?.includes('/auth/signin') || referer?.includes('/auth/signup');
-    
-    // Vérifier aussi si c'est une requête POST (formulaire de connexion)
-    const isPostRequest = request.method === 'POST';
-    
-    // Si on vient de la page de connexion OU c'est une requête POST, laisser passer
-    // Le client gérera la redirection avec router.push après que le cookie soit propagé
-    if ((isFromLogin || isPostRequest) && pathname === '/auth/signin') {
-      return NextResponse.next();
-    }
-    
-    // Sinon, rediriger vers dashboard (utilisateur déjà connecté)
+  // RÈGLE SIMPLE 1: Si connecté et sur page auth → rediriger vers dashboard
+  if (isAuthenticated && pathname.startsWith('/auth')) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // Si l'utilisateur n'est pas connecté et essaie d'accéder à une route protégée
+  // RÈGLE SIMPLE 2: Si pas connecté et route protégée → rediriger vers signin avec redirect param
   if (!isAuthenticated && isProtectedRoute) {
-    // IMPORTANT: Si on vient d'une route protégée (navigation interne), 
-    // ne pas rediriger immédiatement pour éviter les boucles
-    // Le cookie pourrait être en train de se propager
-    if (isFromProtectedRoute) {
-      // Laisser passer et laisser la page Server Component gérer la redirection
-      // Cela évite les boucles de redirection infinies lors de la navigation
-      return NextResponse.next();
-    }
-    
-    // Sinon, rediriger vers la page de connexion
     const redirectUrl = new URL('/auth/signin', request.url);
     redirectUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(redirectUrl);
   }
 
-  // Si l'utilisateur est authentifié, laisser passer toutes les routes (protégées ou non)
-  // Cela permet la navigation fluide dans l'app
-  if (isAuthenticated) {
-    return NextResponse.next();
-  }
-
+  // Sinon, laisser passer
   return NextResponse.next();
 }
 

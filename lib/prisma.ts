@@ -22,17 +22,19 @@ function createPrismaClient(): PrismaClient {
   }
   
   try {
-    // Pass the datasource URL programmatically to bypass schema-level env() validation
+    // Configuration optimisée pour production avec connection pooling
     const client = new PrismaClient({
-      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+      log: process.env.NODE_ENV === 'development' ? ['error', 'warn'] : ['error'],
       datasources: {
         db: {
           url,
         },
       },
+      // Configuration pour éviter les connexions inutiles
+      errorFormat: 'minimal',
     });
     
-    // Vérifier que le client est bien créé (test simple)
+    // Vérifier que le client est bien créé
     if (!client || typeof client.user === 'undefined') {
       throw new Error('Prisma Client créé mais modèle User non disponible. Vérifiez que prisma generate a été exécuté.');
     }
@@ -61,6 +63,42 @@ function getPrismaClient(): PrismaClient {
   return globalForPrisma.prisma;
 }
 
+// Helper pour gérer les erreurs de connexion avec retry simple
+async function withRetry<T>(
+  operation: () => Promise<T>,
+  maxRetries = 1,
+  delay = 100
+): Promise<T> {
+  let lastError: Error | unknown;
+  
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await operation();
+    } catch (error) {
+      lastError = error;
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      
+      // Si c'est une erreur de connexion, réessayer une fois
+      if (
+        attempt < maxRetries &&
+        (errorMessage.includes('P1001') || // Prisma connection error
+         errorMessage.includes('connection') ||
+         errorMessage.includes('ECONNREFUSED') ||
+         errorMessage.includes('ETIMEDOUT'))
+      ) {
+        console.warn(`[PRISMA] Tentative ${attempt + 1}/${maxRetries + 1} échouée, réessai...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      // Sinon, propager l'erreur
+      throw error;
+    }
+  }
+  
+  throw lastError;
+}
+
 // Use a Proxy so the PrismaClient is only created on first actual use,
 // not at import time. This prevents the schema-level env("DATABASE_URL")
 // validation from running when the module is first imported.
@@ -71,16 +109,16 @@ export const prisma: PrismaClient = new Proxy({} as PrismaClient, {
       return undefined;
     }
     
-    try {
-      return Reflect.get(getPrismaClient(), prop, receiver);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.error('[PRISMA] Erreur lors de l\'accès à Prisma Client:', {
-        property: String(prop),
-        error: errorMessage,
-        hasDatabaseUrl: !!process.env.DATABASE_URL,
-      });
-      throw error;
+    const client = getPrismaClient();
+    const originalValue = Reflect.get(client, prop, receiver);
+    
+    // Si c'est une méthode (findUnique, findMany, etc.), wrapper avec retry
+    if (typeof originalValue === 'function' && prop !== 'constructor') {
+      return function (this: unknown, ...args: unknown[]) {
+        return withRetry(() => originalValue.apply(this, args));
+      };
     }
+    
+    return originalValue;
   },
 });

@@ -11,18 +11,10 @@ import { DashboardNotifications } from '@/components/dashboard/DashboardNotifica
 import { getWeekEvents } from '@/lib/calendar-week-events';
 
 export default async function DashboardPage() {
-  let user;
-  try {
-    user = await getCurrentUser();
-  } catch (error) {
-    console.error('[Dashboard] Erreur getCurrentUser:', error);
-    // Ne pas rediriger immédiatement si erreur temporaire (cookie en propagation)
-    // Laisser le middleware gérer
-    user = null;
-  }
+  const user = await getCurrentUser();
   
-  // Si pas d'utilisateur, laisser le middleware gérer la redirection
-  // pour éviter les boucles de redirection infinies
+  // Si pas d'utilisateur, rediriger vers signin
+  // Le middleware devrait déjà avoir géré ça, mais sécurité supplémentaire
   if (!user) {
     redirect('/auth/signin?redirect=/dashboard');
   }
