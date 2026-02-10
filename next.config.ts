@@ -26,6 +26,10 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'lp2.hm.com' },
       { protocol: 'https', hostname: 'image.uniqlo.com' },
 
+      // Authentification (Avatars)
+      { protocol: 'https', hostname: 'lh3.googleusercontent.com' }, // Google
+      { protocol: 'https', hostname: 'avatars.githubusercontent.com' }, // GitHub
+
       // Développement local
       { protocol: 'http', hostname: 'localhost' },
     ],

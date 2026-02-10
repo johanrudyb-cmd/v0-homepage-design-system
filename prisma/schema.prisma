@@ -131,6 +131,8 @@ model Brand {
   mannequins           Mannequin[]
   strategyGenerations  StrategyGeneration[]
   favoriteFactories    BrandFavoriteFactory[]
+
+  @@index([userId])
 }
 
 /// Mannequins créés dans Virtual Try-On ou uploadés, réutilisables dans Shooting photo (Higgsfield).
@@ -327,6 +329,9 @@ model Quote {
   updatedAt DateTime @updatedAt
 
   factory Factory @relation(fields: [factoryId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+  @@index([factoryId])
 }
 
 model FactoryReview {
@@ -443,6 +448,8 @@ model UGCContent {
   updatedAt DateTime @updatedAt
 
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
 }
 
 model TrendProduct {
