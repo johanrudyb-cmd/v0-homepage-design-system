@@ -18,13 +18,18 @@
 
 ### 1. Base de Données
 ```env
-DATABASE_URL=postgresql://user:password@host:5432/database
+DATABASE_URL=postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-[NUMBER]-[REGION].pooler.supabase.com:6543/postgres?pgbouncer=true&connect_timeout=10&pool_timeout=10&statement_cache_size=0
 ```
 **Où trouver** : 
-- Supabase : Dashboard → Settings → Database → Connection String (Direct connection, port 5432)
-- Format : `postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres`
+- Supabase : Dashboard → Settings → Database → Connection String
+- **IMPORTANT** : Utiliser **"Session pooler"** (pas "Direct connection")
+- **Port** : **6543** (pas 5432)
+- Format : `postgresql://postgres.[PROJECT_REF]:[PASSWORD]@aws-[NUMBER]-[REGION].pooler.supabase.com:6543/postgres`
 
-**⚠️ CRITIQUE** : Sans ça, l'app ne peut pas démarrer
+**⚠️ CRITIQUE** : 
+- Sans ça, l'app ne peut pas démarrer
+- Utiliser le **Session Pooler** (port 6543) pour éviter les problèmes de connexion
+- Voir `docs/CONFIGURATION-SUPABASE.md` pour plus de détails
 
 ---
 
