@@ -102,19 +102,26 @@ export async function GET(request: Request) {
         });
       } catch (prismaError: unknown) {
         const errorMessage = prismaError instanceof Error ? prismaError.message : String(prismaError);
+        const errorStack = prismaError instanceof Error ? prismaError.stack : undefined;
         
         // Si DATABASE_URL n'est pas configuré ou erreur de connexion Prisma
-        if (
+        const isPrismaInitError = 
           errorMessage.includes('Environment variable not found: DATABASE_URL') ||
           errorMessage.includes('PrismaClientInitializationError') ||
-          errorMessage.includes('DATABASE_URL')
-        ) {
+          errorMessage.includes('DATABASE_URL') ||
+          (errorStack && errorStack.includes('schema.prisma'));
+        
+        if (isPrismaInitError) {
           console.warn('[Homepage Featured] DATABASE_URL non configuré ou erreur Prisma. Returning empty trends.');
           return NextResponse.json({ trends: [], monthSeed });
         }
         
-        // Autre erreur Prisma, la propager
-        throw prismaError;
+        // Autre erreur Prisma, logger et retourner vide plutôt que de propager
+        console.error('[Homepage Featured] Erreur Prisma:', {
+          error: errorMessage,
+          stack: errorStack?.substring(0, 200),
+        });
+        return NextResponse.json({ trends: [], monthSeed });
       }
 
       // Filtrer les produits exclus

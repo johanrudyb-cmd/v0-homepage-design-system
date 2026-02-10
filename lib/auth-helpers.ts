@@ -22,17 +22,36 @@ export async function getCurrentUser() {
     const { payload } = await jwtVerify(token, secret);
 
     // Récupérer le plan depuis la base de données pour avoir la valeur à jour
-    const user = await prisma.user.findUnique({
-      where: { id: payload.id as string },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        plan: true,
-        subscribedAt: true,
-        createdAt: true,
-      },
-    });
+    let user;
+    try {
+      user = await prisma.user.findUnique({
+        where: { id: payload.id as string },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          plan: true,
+          subscribedAt: true,
+          createdAt: true,
+        },
+      });
+    } catch (dbError: unknown) {
+      const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
+      
+      // Si erreur Prisma/DATABASE_URL, retourner null silencieusement
+      if (
+        errorMessage.includes('Environment variable not found: DATABASE_URL') ||
+        errorMessage.includes('PrismaClientInitializationError') ||
+        errorMessage.includes('DATABASE_URL')
+      ) {
+        console.warn('[getCurrentUser] DATABASE_URL non configuré ou erreur Prisma');
+        return null;
+      }
+      
+      // Autre erreur DB, logger et retourner null
+      console.error('[getCurrentUser] Erreur DB:', errorMessage);
+      return null;
+    }
 
     if (!user) {
       return null;
@@ -47,6 +66,7 @@ export async function getCurrentUser() {
       createdAt: user.createdAt,
     };
   } catch (error) {
+    // Erreur JWT ou autre, retourner null silencieusement
     return null;
   }
 }
