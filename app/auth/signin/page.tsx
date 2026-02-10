@@ -40,12 +40,27 @@ function SignInContent() {
         return;
       }
 
-      // Connexion réussie : laisser le temps au navigateur d'enregistrer le cookie (important sur mobile)
+      // Connexion réussie : vérifier que le cookie est bien défini avant de rediriger
       const redirectTo = searchParams.get('redirect') || '/dashboard';
       const target = redirectTo.startsWith('/') ? redirectTo : '/dashboard';
+      
+      // En production, attendre plus longtemps pour que le cookie soit propagé
+      const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+      const delay = isProduction ? 500 : 200;
+      
       setTimeout(() => {
-        window.location.replace(target);
-      }, 200);
+        // Vérifier que le cookie est présent avant de rediriger
+        const hasCookie = document.cookie.includes('auth-token');
+        if (hasCookie || isProduction) {
+          // Utiliser router.push pour éviter le rechargement complet et permettre Next.js de gérer la navigation
+          router.push(target);
+        } else {
+          // Si le cookie n'est pas encore là, attendre un peu plus
+          setTimeout(() => {
+            router.push(target);
+          }, 300);
+        }
+      }, delay);
     } catch (err: any) {
       console.error('Erreur lors de la connexion:', err);
       setError('Une erreur est survenue. Vérifiez votre connexion.');
