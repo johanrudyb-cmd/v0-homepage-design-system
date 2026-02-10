@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import { Menu } from 'lucide-react';
 import { NotificationsDropdown } from '@/components/notifications/NotificationsDropdown';
 import { SearchBar } from './SearchBar';
@@ -11,18 +11,9 @@ interface HeaderProps {
 }
 
 export function Header({ onMenuClick }: HeaderProps) {
-  const [user, setUser] = useState<{ name?: string; email?: string } | null>(null);
+  const { data: session } = useSession();
+  const user = session?.user;
 
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then((res) => (res.ok ? res.json() : Promise.resolve(null)))
-      .then((data) => {
-        if (data?.user) {
-          setUser(data.user);
-        }
-      })
-      .catch(() => {});
-  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/80 border-b border-black/5">

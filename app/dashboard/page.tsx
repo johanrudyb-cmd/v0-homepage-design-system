@@ -1,611 +1,170 @@
+import { Suspense } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
-import Image from 'next/image';
+import { DashboardRefresh } from '@/components/dashboard/DashboardRefresh';
+import { DashboardNotifications } from '@/components/dashboard/DashboardNotifications';
+import { DashboardStats, DashboardStatsSkeleton } from '@/components/dashboard/DashboardStats';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { DashboardCharts } from '@/components/dashboard/DashboardCharts';
-import { DashboardRefresh } from '@/components/dashboard/DashboardRefresh';
-import { DashboardNotifications } from '@/components/dashboard/DashboardNotifications';
+import Link from 'next/link';
+import Image from 'next/image';
+import { Button } from '@/components/ui/button';
 import { getWeekEvents } from '@/lib/calendar-week-events';
 
 export default async function DashboardPage() {
   const user = await getCurrentUser();
-  
-  // Si pas d'utilisateur, rediriger vers signin
-  // Le middleware devrait déjà avoir géré ça, mais sécurité supplémentaire
-  if (!user) {
-    redirect('/auth/signin?redirect=/dashboard');
-  }
+  if (!user) redirect('/auth/signin');
 
-  let brand;
-  try {
-    // Vérifier que la base de données est disponible avant d'utiliser Prisma
-    if (!process.env.DATABASE_URL) {
-      console.error('[Dashboard] DATABASE_URL non configuré');
-      redirect('/auth/signin');
-    }
-    
-    // Récupérer la marque la plus récente (celle de l'onboarding ou la dernière créée)
-    try {
-      brand = await prisma.brand.findFirst({
-        where: { userId: user.id },
-        orderBy: { createdAt: 'desc' },
-      });
-    } catch (dbError: unknown) {
-      const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
-      console.error('[Dashboard] Erreur Prisma brand.findFirst:', errorMessage);
-      // Si erreur Prisma, rediriger vers signin
-      if (errorMessage.includes('DATABASE_URL') || errorMessage.includes('PrismaClient')) {
-        redirect('/auth/signin');
-      }
-      throw dbError;
-    }
+  // Récupérer la marque de l'utilisateur (rapide car indexé sur userId)
+  const brand = await prisma.brand.findFirst({
+    where: { userId: user.id },
+    orderBy: { createdAt: 'desc' },
+  });
 
-    if (!brand) {
-      try {
-        brand = await prisma.brand.create({
-          data: {
-            userId: user.id,
-            name: 'Ma Première Marque',
-          },
-        });
-        // Créer le Launch Map associé
-        await prisma.launchMap.create({
-          data: {
-            brandId: brand.id,
-            phase1: false,
-            phase2: false,
-            phase3: false,
-            phase4: false,
-            phase5: false,
-          },
-        });
-      } catch (dbError: unknown) {
-        const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
-        console.error('[Dashboard] Erreur Prisma brand.create:', errorMessage);
-        if (errorMessage.includes('DATABASE_URL') || errorMessage.includes('PrismaClient')) {
-          redirect('/auth/signin');
-        }
-        throw dbError;
-      }
-    }
+  if (!brand) redirect('/onboarding');
 
-    // Récupérer le Launch Map pour vérifier la progression
-    let launchMap;
-    try {
-      launchMap = await prisma.launchMap.findUnique({
-        where: { brandId: brand.id },
-      });
-    } catch (dbError: unknown) {
-      const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
-      console.error('[Dashboard] Erreur Prisma launchMap.findUnique:', errorMessage);
-      if (errorMessage.includes('DATABASE_URL') || errorMessage.includes('PrismaClient')) {
-        redirect('/auth/signin');
-      }
-      // Continuer avec launchMap = null
-      launchMap = null;
-    }
+  // Récupérer le Launch Map (nécessaire pour plusieurs sections)
+  const launchMap = await prisma.launchMap.findUnique({
+    where: { brandId: brand.id },
+  });
 
-    // Vérifier si l'identité est complète
-    const hasIdentity = !!(brand.logo || brand.colorPalette || brand.typography);
+  const hasIdentity = !!(brand.logo || brand.colorPalette || brand.typography);
+  const weekEvents = getWeekEvents(launchMap?.contentCalendar ?? null);
 
-    // Vérifier les designs créés
-    let designCount = 0;
-    try {
-      designCount = await prisma.design.count({
-        where: { brandId: brand.id, status: 'completed' },
-      });
-    } catch (dbError: unknown) {
-      console.error('[Dashboard] Erreur Prisma design.count:', dbError);
-      // Continuer avec 0
-    }
+  const steps = [
+    { id: 0, title: 'Définissez l\'identité de votre marque', description: 'Nom de la marque, produit principal et style guide.', completed: hasIdentity, href: '/launch-map' },
+    { id: 1, title: 'Calquez votre stratégie marketing', description: 'Calquez les meilleures marques de votre style.', completed: !!launchMap?.phase1, href: '/launch-map' },
+    { id: 2, title: 'Calculez la rentabilité', description: 'Définissez votre prix et calculez votre marge.', completed: !!launchMap?.phase2, href: '/launch-map' },
+    { id: 3, title: 'Créez votre mockup avec l\'IA', description: 'Téléchargez votre pack de mockup professionnel.', completed: !!launchMap?.phase3, href: '/launch-map' },
+    { id: 4, title: 'Générez votre Tech Pack', description: 'Transformez votre mockup en dossier technique.', completed: !!launchMap?.phase4, href: '/launch-map' },
+    { id: 5, title: 'Sourcing usines', description: 'Trouvez des fournisseurs et obtenez des devis.', completed: !!launchMap?.phase5, href: '/launch-map' },
+    { id: 6, title: 'Contenu marketing', description: 'Générez et planifiez vos posts stratégiques.', completed: !!launchMap?.phase6, href: '/launch-map' },
+    { id: 7, title: 'Lancez votre boutique Shopify', description: 'Connectez votre boutique pour vendre.', completed: !!launchMap?.phase7, href: '/launch-map' },
+  ];
 
-    // Vérifier les devis envoyés
-    let quoteCount = 0;
-    try {
-      quoteCount = await prisma.quote.count({
-        where: { brandId: brand.id },
-      });
-    } catch (dbError: unknown) {
-      console.error('[Dashboard] Erreur Prisma quote.count:', dbError);
-      // Continuer avec 0
-    }
+  const completedSteps = steps.filter(s => s.completed).length;
 
-    // Vérifier les contenus UGC créés
-    let ugcCount = 0;
-    try {
-      ugcCount = await prisma.uGCContent.count({
-        where: { brandId: brand.id },
-      });
-    } catch (dbError: unknown) {
-      console.error('[Dashboard] Erreur Prisma uGCContent.count:', dbError);
-      // Continuer avec 0
-    }
+  return (
+    <DashboardLayout>
+      <div className="min-h-screen">
+        <div className="px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 max-w-7xl mx-auto space-y-8 sm:space-y-12">
 
-    // Récupérer les données pour les graphiques (30 derniers jours)
-    const thirtyDaysAgo = new Date();
-    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
-    thirtyDaysAgo.setHours(0, 0, 0, 0);
-
-    // Récupérer tous les designs, devis et UGC des 30 derniers jours
-    let designs: { createdAt: Date }[] = [];
-    let quotes: { createdAt: Date }[] = [];
-    let ugcContents: { createdAt: Date }[] = [];
-    
-    try {
-      [designs, quotes, ugcContents] = await Promise.all([
-        prisma.design.findMany({
-          where: {
-            brandId: brand.id,
-            status: 'completed',
-            createdAt: { gte: thirtyDaysAgo },
-          },
-          select: { createdAt: true },
-        }),
-        prisma.quote.findMany({
-          where: {
-            brandId: brand.id,
-            createdAt: { gte: thirtyDaysAgo },
-          },
-          select: { createdAt: true },
-        }),
-        prisma.uGCContent.findMany({
-          where: {
-            brandId: brand.id,
-            createdAt: { gte: thirtyDaysAgo },
-          },
-          select: { createdAt: true },
-        }),
-      ]);
-    } catch (dbError: unknown) {
-      const errorMessage = dbError instanceof Error ? dbError.message : String(dbError);
-      console.error('[Dashboard] Erreur Prisma Promise.all:', errorMessage);
-      // Continuer avec des tableaux vides
-      designs = [];
-      quotes = [];
-      ugcContents = [];
-    }
-
-    // Créer un objet pour chaque jour des 30 derniers jours
-    const chartDataMap = new globalThis.Map<string, { designs: number; quotes: number; ugc: number }>();
-
-    for (let i = 29; i >= 0; i--) {
-      const date = new Date();
-      date.setDate(date.getDate() - i);
-      date.setHours(0, 0, 0, 0);
-      const dateKey = date.toISOString().split('T')[0];
-      chartDataMap.set(dateKey, { designs: 0, quotes: 0, ugc: 0 });
-    }
-
-    // Compter par jour
-    designs.forEach((design) => {
-      const dateKey = new Date(design.createdAt).toISOString().split('T')[0];
-      const existing = chartDataMap.get(dateKey);
-      if (existing) {
-        existing.designs++;
-      }
-    });
-
-    quotes.forEach((quote) => {
-      const dateKey = new Date(quote.createdAt).toISOString().split('T')[0];
-      const existing = chartDataMap.get(dateKey);
-      if (existing) {
-        existing.quotes++;
-      }
-    });
-
-    ugcContents.forEach((ugc) => {
-      const dateKey = new Date(ugc.createdAt).toISOString().split('T')[0];
-      const existing = chartDataMap.get(dateKey);
-      if (existing) {
-        existing.ugc++;
-      }
-    });
-
-    // Convertir en array et formater les dates (formatage déterministe pour éviter les erreurs d'hydratation)
-    const chartData = Array.from(chartDataMap.entries()).map(([date, data]) => {
-      const d = new Date(date);
-      const day = String(d.getDate()).padStart(2, '0');
-      const month = String(d.getMonth() + 1).padStart(2, '0');
-      return {
-        date: `${day}/${month}`,
-        designs: data.designs,
-        quotes: data.quotes,
-        ugc: data.ugc,
-      };
-    });
-
-    // Calculer la progression réelle selon le nouveau parcours
-    const steps = [
-    {
-      id: 0,
-      title: 'Définissez l\'identité de votre marque',
-      description:
-        'Nom de la marque, produit principal et style guide pour créer votre identité visuelle.',
-      completed: hasIdentity || false,
-      href: '/launch-map',
-    },
-    {
-      id: 1,
-      title: 'Calquez votre stratégie marketing',
-      description:
-        'Choisissez une grande marque dans votre style et calquez sa stratégie pour votre marque.',
-      completed: launchMap?.phase1 || false,
-      href: '/launch-map',
-    },
-    {
-      id: 2,
-      title: 'Calculez la rentabilité par vêtement',
-      description:
-        'Définissez votre prix de vente, coût de production et frais marketing pour calculer votre marge nette.',
-      completed: launchMap?.phase2 || false,
-      href: '/launch-map',
-    },
-    {
-      id: 3,
-      title: 'Créez votre mockup avec l\'IA',
-      description:
-        'Apprenez à créer votre design et téléchargez votre pack de mockup professionnel.',
-      completed: launchMap?.phase3 || false,
-      href: '/launch-map',
-    },
-    {
-      id: 4,
-      title: 'Générez votre Tech Pack',
-      description:
-        'Transformez votre mockup en tech pack et définissez les dimensions du vêtement.',
-      completed: launchMap?.phase4 || false,
-      href: '/launch-map',
-    },
-    {
-      id: 5,
-      title: 'Contactez des usines pour la production',
-      description:
-        'Explorez le Sourcing Hub pour trouver des fournisseurs qualifiés et obtenez des devis.',
-      completed: launchMap?.phase5 || false,
-      href: '/launch-map',
-    },
-    {
-      id: 6,
-      title: 'Créez votre contenu marketing',
-      description:
-        'Générez des posts structurés (accroche, corps, CTA, hashtags) par IA et planifiez-les dans le calendrier.',
-      completed: launchMap?.phase6 || false,
-      href: '/launch-map',
-    },
-    {
-      id: 7,
-      title: 'Lancez votre boutique Shopify',
-      description:
-        'Connectez votre compte Shopify pour créer et lancer votre boutique en ligne.',
-      completed: launchMap?.phase7 || false,
-      href: '/launch-map',
-    },
-    ];
-
-    const completedSteps = steps.filter((s) => s.completed).length;
-
-    const weekEvents = getWeekEvents(launchMap?.contentCalendar ?? null);
-
-    const quickActions = [
-      {
-      title: 'Tendances de la semaine',
-      description: 'Nouveautés chaque semaine — ne vous désabonnez pas',
-      href: '/trends',
-    },
-    {
-      title: 'Analyse de marque & tendances',
-      description: 'Analyse IA de marques et analyseur de tendances',
-      href: '/brands/analyze',
-    },
-    {
-      title: 'Sourcing Hub',
-      description: 'Trouvez des usines qualifiées',
-      href: '/sourcing',
-    },
-    {
-      title: 'Gérer ma marque',
-      description: 'Guide complet de lancement',
-      href: '/launch-map',
-    },
-    ];
-
-    return (
-      <DashboardLayout>
-        <div className="min-h-screen">
-          <div className="px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 max-w-7xl mx-auto space-y-8 sm:space-y-12" data-tour="tour-dashboard-content">
-          {/* Welcome Section */}
+          {/* Welcome Header */}
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 pb-6 sm:pb-8 animate-slide-in-down">
             <div className="space-y-4">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold tracking-tight text-[#1D1D1F]">
-                {user.name || 'Utilisateur'}
+                Hello, {user.name?.split(' ')[0] || 'Utilisateur'}
               </h1>
-              <p className="text-base sm:text-lg lg:text-xl text-[#1D1D1F]/70">
-                Créez votre marque de vêtements de A à Z avec l'intelligence artificielle.
+              <p className="text-base sm:text-lg lg:text-xl text-[#1D1D1F]/70 font-medium">
+                Voici l&apos;avancée de <span className="text-[#1D1D1F] font-bold">{brand.name}</span> aujourd&apos;hui.
               </p>
             </div>
-            <DashboardRefresh />
-          </div>
-
-        {/* Notifications : affichage via la cloche uniquement (DashboardNotifications ne rend rien) */}
-        <DashboardNotifications />
-
-          {/* Stats Section - Cards Squircle avec espace */}
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 animate-stagger">
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-apple p-4 sm:p-6 lg:p-8">
-              <div className="text-xs sm:text-sm text-[#1D1D1F]/60 mb-2 sm:mb-3">Designs créés</div>
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F]">{designCount}</div>
-            </div>
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-apple p-4 sm:p-6 lg:p-8">
-              <div className="text-xs sm:text-sm text-[#1D1D1F]/60 mb-2 sm:mb-3">Devis envoyés</div>
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F]">{quoteCount}</div>
-            </div>
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-apple p-4 sm:p-6 lg:p-8">
-              <div className="text-xs sm:text-sm text-[#1D1D1F]/60 mb-2 sm:mb-3">Contenus UGC</div>
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F]">{ugcCount}</div>
-            </div>
-            <div className="bg-white rounded-2xl sm:rounded-3xl shadow-apple p-4 sm:p-6 lg:p-8">
-              <div className="text-xs sm:text-sm text-[#1D1D1F]/60 mb-2 sm:mb-3">Progression</div>
-              <div className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F]">{completedSteps} / {steps.length}</div>
+            <div className="flex items-center gap-3">
+              <DashboardNotifications />
+              <DashboardRefresh />
             </div>
           </div>
 
-          {/* Groupe Instagram */}
+          {/* Stats Section with Suspense & Skeletons */}
+          <Suspense fallback={<DashboardStatsSkeleton />}>
+            <DashboardStats brandId={brand.id} />
+          </Suspense>
+
+          {/* Instagram Group */}
           {process.env.NEXT_PUBLIC_INSTAGRAM_GROUP_URL && (
-            <div className="bg-white rounded-3xl shadow-apple p-10">
+            <div className="bg-white rounded-3xl shadow-apple p-8 sm:p-10 border border-black/5">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
                 <div className="space-y-2">
-                  <h3 className="text-3xl font-semibold tracking-tight text-[#1D1D1F]">Rejoignez notre groupe Instagram</h3>
-                  <p className="text-lg text-[#1D1D1F]/70">
-                    Actus business, conseils exclusifs, tendances mode et accompagnement pour lancer votre marque.
+                  <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1D1D1F]">Le Cercle OUTFITY</h3>
+                  <p className="text-base sm:text-lg text-[#1D1D1F]/70">
+                    Rejoignez les autres créateurs sur Instagram pour des conseils exclusifs.
                   </p>
                 </div>
-                <Link href={process.env.NEXT_PUBLIC_INSTAGRAM_GROUP_URL} target="_blank" rel="noopener noreferrer">
-                  <Button variant="secondary">
-                    Rejoindre le groupe
-                  </Button>
+                <Link href={process.env.NEXT_PUBLIC_INSTAGRAM_GROUP_URL} target="_blank">
+                  <Button variant="secondary" className="h-12 px-8">Rejoindre le groupe</Button>
                 </Link>
               </div>
             </div>
           )}
 
-          {/* Activité récente - Détails clairs */}
-          {chartData.length > 0 && (
-            <div className="bg-white rounded-3xl shadow-apple p-10">
-              <div className="mb-8">
-                <h2 className="text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-2">Activité récente</h2>
-                <p className="text-lg text-[#1D1D1F]/70">Vos créations et actions des 7 derniers jours</p>
-              </div>
-              <div className="space-y-4">
-                {chartData.slice(-7).reverse().map((item, idx) => {
-                  const currentValue = item.designs + item.quotes + item.ugc;
-                  const hasActivity = currentValue > 0;
-                  
-                  if (!hasActivity) {
-                    return (
-                      <div key={idx} className="flex items-center justify-between py-3 border-b border-black/5 last:border-b-0">
-                        <span className="text-base text-[#1D1D1F]/40">{item.date}</span>
-                        <span className="text-sm text-[#1D1D1F]/40">Aucune activité</span>
-                      </div>
-                    );
-                  }
-                  
-                  return (
-                    <div key={idx} className="flex items-center justify-between py-4 border-b border-black/5 last:border-b-0">
-                      <div className="flex items-center gap-4">
-                        <span className="text-base font-medium text-[#1D1D1F] min-w-[80px]">{item.date}</span>
-                        <div className="flex items-center gap-4">
-                          {item.designs > 0 && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-[#1D1D1F]/60">Designs</span>
-                              <span className="text-base font-semibold text-[#1D1D1F]">{item.designs}</span>
-                            </div>
-                          )}
-                          {item.quotes > 0 && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-[#1D1D1F]/60">Devis</span>
-                              <span className="text-base font-semibold text-[#1D1D1F]">{item.quotes}</span>
-                            </div>
-                          )}
-                          {item.ugc > 0 && (
-                            <div className="flex items-center gap-2">
-                              <span className="text-sm text-[#1D1D1F]/60">Contenus UGC</span>
-                              <span className="text-base font-semibold text-[#1D1D1F]">{item.ugc}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <span className="text-sm font-medium text-[#007AFF]">
-                        {currentValue} {currentValue > 1 ? 'actions' : 'action'}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          )}
-
-          {/* Événements de la semaine */}
-          <div className="bg-white rounded-3xl shadow-apple p-10">
-            <div className="flex items-center justify-between mb-8">
-              <div>
-                <h2 className="text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-2">Événements de la semaine</h2>
-                <p className="text-lg text-[#1D1D1F]/70">Tournages, posts et contenus planifiés</p>
-              </div>
-              <Link href="/launch-map/calendar">
-                <Button variant="outline">
-                  Ouvrir le calendrier
-                </Button>
-              </Link>
-            </div>
-            {weekEvents.length === 0 ? (
-              <p className="text-lg text-[#1D1D1F]/60">
-                Aucun événement cette semaine. Planifiez vos tournages et posts dans le calendrier contenu.
-              </p>
-            ) : (
-              <ul className="space-y-0 divide-y divide-black/5">
-                {weekEvents.map((ev) => (
-                  <li key={ev.id} className="flex items-center justify-between gap-6 py-6">
-                    <div className="min-w-0 flex-1">
-                      <p className="text-base font-semibold text-[#1D1D1F] mb-1">{ev.title}</p>
-                      <p className="text-sm text-[#1D1D1F]/60">
-                        {ev.type === 'tournage' ? 'Tournage' : ev.type === 'post' ? 'Post-production' : 'Contenu / Script'}
-                        {' · '}
-                        {ev.start.includes('T') && ev.start.length >= 16
-                          ? `${ev.start.slice(0, 10)} à ${ev.start.slice(11, 16).replace(':', 'h')}`
-                          : ev.start.slice(0, 10)}
-                      </p>
-                    </div>
-                    <Link href="/launch-map/calendar">
-                      <Button variant="ghost">Voir</Button>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-
-          {/* Shopify Account Creation Banner */}
-          {!launchMap?.phase7 && (
-            <div className="bg-gradient-to-br from-[#95BF47] to-[#5E8E3E] rounded-3xl shadow-apple-lg p-10">
-              <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-6 sm:gap-8">
-                <div className="flex flex-col sm:flex-row items-center sm:items-center gap-4 sm:gap-6">
-                  {/* Logo Shopify */}
-                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-apple p-3">
-                    <Image 
-                      src="/shopify-logo.png" 
-                      alt="Shopify" 
-                      width={48}
-                      height={48}
-                      className="object-contain"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-white text-center sm:text-left">
-                      Créez votre boutique Shopify
-                    </h3>
-                    <p className="text-sm sm:text-base lg:text-lg text-white/90 text-center sm:text-left">
-                      Lancez votre boutique en ligne et commencez à vendre vos créations. Connectez votre compte Shopify pour finaliser votre marque.
-                    </p>
-                  </div>
-                </div>
-                <Link href="/launch-map">
-                  <Button className="bg-white text-[#1D1D1F] hover:bg-white/90 font-semibold h-12 px-8 text-base shadow-apple">
-                    Créer mon compte Shopify
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Progress Section */}
-          <div className="bg-white rounded-3xl shadow-apple p-10">
+          {/* Journey Progress */}
+          <div className="bg-white rounded-3xl shadow-apple p-8 sm:p-10 border border-black/5">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10 pb-6 sm:pb-8 border-b border-black/5">
               <div>
-                <h2 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-2">Votre parcours vers votre première marque</h2>
+                <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-1">Votre Parcours</h2>
                 <p className="text-base sm:text-lg text-[#1D1D1F]/70">
                   {completedSteps} phases sur {steps.length} complétées
                 </p>
               </div>
-              <span className="text-3xl sm:text-4xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F] shrink-0">
+              <span className="text-4xl sm:text-5xl font-semibold tracking-tight text-[#1D1D1F]">
                 {Math.round((completedSteps / steps.length) * 100)}%
               </span>
             </div>
-            <div className="space-y-0 divide-y divide-black/5">
-              {steps.map((step, index) => {
-                return (
-                  <Link
-                    key={step.id}
-                    href={step.href}
-                    className="flex items-start gap-6 py-8 transition-colors hover:bg-black/5 first:rounded-t-3xl last:rounded-b-3xl -mx-10 px-10 group"
-                  >
-                    <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center mt-1">
-                      {step.completed ? (
-                        <div className="w-3 h-3 bg-[#1D1D1F] rounded-full"></div>
-                      ) : (
-                        <div className="w-3 h-3 border-2 border-[#1D1D1F]/20 rounded-full"></div>
-                      )}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <h3 className="text-xl font-semibold text-[#1D1D1F] mb-2 group-hover:text-[#007AFF] transition-colors">
-                        {step.title}
-                      </h3>
-                      <p className="text-base text-[#1D1D1F]/70 leading-relaxed">{step.description}</p>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Create Brand CTA */}
-          {(!brand || (!brand.logo && !brand.colorPalette)) && (
-            <div className="bg-white rounded-3xl shadow-apple p-10">
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div className="space-y-2 sm:space-y-3 min-w-0">
-                  <h3 className="text-xl sm:text-2xl lg:text-3xl font-semibold tracking-tight text-[#1D1D1F]">
-                    {!brand ? 'Créez votre première marque' : 'Complétez l\'identité de votre marque'}
-                  </h3>
-                  <p className="text-base sm:text-lg text-[#1D1D1F]/70">
-                    {!brand 
-                      ? 'Définissez votre identité (nom, logo, couleurs) et lancez votre marque'
-                      : 'Définissez le nom, logo et identité visuelle de votre marque pour commencer'}
-                  </p>
-                </div>
-                <Link href="/brands/create">
-                  <Button>
-                    {!brand ? 'Gérer ma marque' : 'Compléter l\'identité'}
-                  </Button>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {steps.map((step) => (
+                <Link key={step.id} href={step.href} className="group p-6 rounded-2xl hover:bg-black/5 transition-colors border border-black/5">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className={`text-xs font-bold uppercase tracking-wider ${step.completed ? 'text-primary' : 'text-gray-400'}`}>
+                      {step.completed ? 'Complété' : 'À Faire'}
+                    </span>
+                    {step.completed && <div className="w-2 h-2 bg-primary rounded-full" />}
+                  </div>
+                  <h3 className="text-lg font-semibold text-[#1D1D1F] transition-colors">{step.title}</h3>
+                  <p className="text-sm text-[#1D1D1F]/60 mt-1">{step.description}</p>
                 </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Quick Actions - Espacement aéré */}
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-2">Accès rapide aux outils</h2>
-              <p className="text-lg text-[#1D1D1F]/70">
-                Tous les outils dont vous avez besoin pour créer et lancer votre marque
-              </p>
-            </div>
-            <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
-              {quickActions.map((action) => {
-                return (
-                  <Link key={action.href} href={action.href} className="bg-white rounded-3xl shadow-apple p-8 hover:shadow-apple-lg transition-all group">
-                    <h3 className="text-xl font-semibold text-[#1D1D1F] mb-2 group-hover:text-[#007AFF] transition-colors">{action.title}</h3>
-                    <p className="text-base text-[#1D1D1F]/70">{action.description}</p>
-                  </Link>
-                );
-              })}
+              ))}
             </div>
           </div>
+
+          {/* Events & Calendar */}
+          <div className="bg-white rounded-3xl shadow-apple p-8 sm:p-10 border border-black/5">
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1D1D1F]">Calendrier de la semaine</h2>
+              <Link href="/launch-map/calendar">
+                <Button variant="ghost">Voir tout</Button>
+              </Link>
+            </div>
+            {weekEvents.length === 0 ? (
+              <p className="text-[#1D1D1F]/60 py-4">Aucun événement planifié cette semaine.</p>
+            ) : (
+              <div className="space-y-4">
+                {weekEvents.map((ev) => (
+                  <div key={ev.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                    <div>
+                      <p className="font-semibold">{ev.title}</p>
+                      <p className="text-xs text-gray-500 uppercase font-bold">{ev.type}</p>
+                    </div>
+                    <Link href="/launch-map/calendar">
+                      <Button variant="outline" size="sm">Détails</Button>
+                    </Link>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Quick Actions */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link href="/trends" className="bg-[#F5F5F7] p-6 rounded-3xl hover:bg-[#E8E8ED] transition-colors group">
+              <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Tendances</h4>
+              <p className="text-sm text-gray-500">Nouveautés de la semaine</p>
+            </Link>
+            <Link href="/sourcing" className="bg-[#F5F5F7] p-6 rounded-3xl hover:bg-[#E8E8ED] transition-colors group">
+              <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Sourcing</h4>
+              <p className="text-sm text-gray-500">Trouvez vos usines</p>
+            </Link>
+            <Link href="/brands/analyze" className="bg-[#F5F5F7] p-6 rounded-3xl hover:bg-[#E8E8ED] transition-colors group">
+              <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Spy Tool</h4>
+              <p className="text-sm text-gray-500">Analysez vos concurrents</p>
+            </Link>
+            <Link href="/launch-map" className="bg-[#F5F5F7] p-6 rounded-3xl hover:bg-[#E8E8ED] transition-colors group">
+              <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Lancement</h4>
+              <p className="text-sm text-gray-500">Guide complet</p>
+            </Link>
+          </div>
+
         </div>
       </div>
     </DashboardLayout>
-    );
-  } catch (err: unknown) {
-    const errorMessage = err instanceof Error ? err.message : String(err);
-    console.error('[Dashboard] Erreur lors du rendu:', {
-      error: errorMessage,
-      userId: user?.id,
-      hasDatabaseUrl: !!process.env.DATABASE_URL,
-    });
-    
-    // Si erreur Prisma/DATABASE_URL, rediriger vers signin avec message
-    if (
-      errorMessage.includes('Environment variable not found: DATABASE_URL') ||
-      errorMessage.includes('PrismaClientInitializationError') ||
-      errorMessage.includes('DATABASE_URL')
-    ) {
-      console.error('[Dashboard] DATABASE_URL non configuré, redirection vers signin');
-      redirect('/auth/signin');
-    }
-    
-    // Pour les autres erreurs, rediriger aussi pour éviter l'erreur Server Component
-    // En production, on ne veut pas exposer les erreurs
-    redirect('/auth/signin');
-  }
+  );
 }

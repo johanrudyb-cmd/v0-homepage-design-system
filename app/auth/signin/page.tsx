@@ -2,6 +2,7 @@
 
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -21,33 +22,23 @@ function SignInContent() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        credentials: 'include', // Inclure les cookies dans la requête (important pour cross-origin)
-        body: JSON.stringify({ email, password }),
+      const result = await signIn('credentials', {
+        email: email.toLowerCase().trim(),
+        password,
+        redirect: false,
       });
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        // Afficher l'erreur spécifique retournée par le serveur
-        const errorMsg = data.error || data.details || 'Email ou mot de passe incorrect';
-        setError(errorMsg);
+      if (result?.error) {
+        setError('Email ou mot de passe incorrect');
         setLoading(false);
         return;
       }
 
-      // Connexion réussie : rediriger immédiatement
-      // Le cookie est défini par le serveur, le middleware gérera l'auth
+      // Connexion réussie
       const redirectTo = searchParams.get('redirect') || '/dashboard';
       const target = redirectTo.startsWith('/') ? redirectTo : '/dashboard';
-      
-      // Redirection simple et directe
-      // Le cookie est déjà défini par le serveur, pas besoin de vérifier
       router.push(target);
+      router.refresh();
     } catch (err: any) {
       console.error('Erreur lors de la connexion:', err);
       setError('Une erreur est survenue. Vérifiez votre connexion.');

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getProductBrand } from '@/lib/brand-utils';
@@ -95,8 +96,9 @@ export function TendancesContent() {
 
   const [trends, setTrends] = useState<HybridTrend[]>([]);
   const [trendsLoading, setTrendsLoading] = useState(true);
+  const { data: session } = useSession();
+  const user = session?.user as any;
   const [zone, setZone] = useState<string>('EU');
-  const [user, setUser] = useState<{ plan?: string } | null>(null);
   const [homepageIds, setHomepageIds] = useState<Set<string>>(new Set());
   const [analysesCount, setAnalysesCount] = useState<number | null>(null);
   const limitReached = searchParams.get('limit') === 'reached';
@@ -175,24 +177,20 @@ export function TendancesContent() {
   }, [loadTrends]);
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/auth/me').then((r) => r.ok ? r.json() : null),
-      fetch('/api/trends/homepage-featured').then((r) => r.ok ? r.json() : null),
-    ]).then(([meData, featuredData]) => {
-      const u = meData?.user ?? meData;
-      if (u) {
-        setUser(u);
-        if (u?.plan === 'free') {
-          fetch('/api/trends/analyses-count')
-            .then((r) => (r.ok ? r.json() : Promise.resolve({ count: 0 })))
-            .then((d) => setAnalysesCount(d.count ?? 0))
-            .catch(() => {});
-        }
-      }
+    // Récupérer les tendances à la une pour la homepage (visibles en gratuit)
+    fetch('/api/trends/homepage-featured').then((r) => r.ok ? r.json() : null).then((featuredData) => {
       const ids = (featuredData?.trends ?? []).map((t: { id?: string }) => t.id).filter(Boolean);
       setHomepageIds(new Set(ids));
-    }).catch(() => {});
-  }, []);
+    }).catch(() => { });
+
+    // Récupérer le nombre d'analyses si l'utilisateur est sur un plan gratuit
+    if (user?.plan === 'free') {
+      fetch('/api/trends/analyses-count')
+        .then((r) => (r.ok ? r.json() : Promise.resolve({ count: 0 })))
+        .then((d) => setAnalysesCount(d.count ?? 0))
+        .catch(() => { });
+    }
+  }, [user?.plan]);
 
   useEffect(() => {
     fetch('/api/trends/hybrid-radar/sources')
@@ -617,71 +615,71 @@ export function TendancesContent() {
                     sessionStorage.setItem('trends-list-scroll', String(window.scrollY ?? document.documentElement.scrollTop ?? 0));
                     sessionStorage.setItem('trends-list-segment', segment || 'homme');
                     sessionStorage.setItem('trends-list-ageRange', ageRange || '25-34');
-                  } catch (_) {}
+                  } catch (_) { }
                 };
                 return (
-                <Card key={t.id} className={`overflow-hidden flex flex-col relative ${isFree && !isVisible ? 'blur-sm' : ''}`}>
-                  {isFree && !isVisible && (
-                    <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 rounded-lg">
-                      <Link
-                        href="/auth/choose-plan"
-                        className="px-4 py-2 bg-white text-black rounded-full text-sm font-semibold hover:bg-gray-100"
-                      >
-                        Passer au plan Créateur pour voir
-                      </Link>
-                    </div>
-                  )}
-                  <div className="aspect-[3/4] bg-muted relative shrink-0">
-                    {t.imageUrl ? (
-                      <img
-                        src={t.imageUrl}
-                        alt={t.name}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                        <Globe className="w-12 h-12 opacity-40" />
+                  <Card key={t.id} className={`overflow-hidden flex flex-col relative ${isFree && !isVisible ? 'blur-sm' : ''}`}>
+                    {isFree && !isVisible && (
+                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 rounded-lg">
+                        <Link
+                          href="/auth/choose-plan"
+                          className="px-4 py-2 bg-white text-black rounded-full text-sm font-semibold hover:bg-gray-100"
+                        >
+                          Passer au plan Créateur pour voir
+                        </Link>
                       </div>
                     )}
-                    <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                      {t.segment && (
-                        <span className="px-2 py-0.5 rounded-md bg-primary/90 text-primary-foreground text-xs font-medium capitalize">
-                          {t.segment}
-                        </span>
+                    <div className="aspect-[3/4] bg-muted relative shrink-0">
+                      {t.imageUrl ? (
+                        <img
+                          src={t.imageUrl}
+                          alt={t.name}
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          <Globe className="w-12 h-12 opacity-40" />
+                        </div>
                       )}
-                      <span className="px-2 py-0.5 rounded-md bg-background/90 text-xs font-medium">
-                        {t.marketZone || '—'}
-                      </span>
-                      {t.isGlobalTrendAlert && (
-                        <span className="px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-xs font-medium">
-                          Global Trend Alert
+                      <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                        {t.segment && (
+                          <span className="px-2 py-0.5 rounded-md bg-primary/90 text-primary-foreground text-xs font-medium capitalize">
+                            {t.segment}
+                          </span>
+                        )}
+                        <span className="px-2 py-0.5 rounded-md bg-background/90 text-xs font-medium">
+                          {t.marketZone || '—'}
                         </span>
-                      )}
+                        {t.isGlobalTrendAlert && (
+                          <span className="px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-xs font-medium">
+                            Global Trend Alert
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                  <CardContent className="p-4 flex-1 flex flex-col">
-                    <h3 className="text-sm font-semibold line-clamp-4 leading-snug">{t.name}</h3>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {t.category} · {t.cut || '—'} · {(() => { const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand); return b; })()}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">
-                      {(t.material && t.material.trim() && t.material !== 'Non spécifié') ? t.material : '—'}
-                    </p>
-                    <Link
-                      href={isFree && (!canAnalyze || !isVisible) ? '/auth/choose-plan' : `/trends/${t.id}`}
-                      className="inline-flex h-9 w-full items-center justify-center rounded-lg border border-border bg-background px-4 text-xs font-semibold transition-all hover:bg-muted hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-3"
-                      onClick={handleAnalyzeClick}
-                    >
-                      {isFree && !canAnalyze ? 'Limite atteinte — Passer au plan Créateur' : 'Analyser la tendance'}
-                    </Link>
-                    {t.businessAnalysis ? (
-                      <p className="text-xs text-muted-foreground mt-2 line-clamp-3 border-t pt-2">
-                        {t.businessAnalysis}
+                    <CardContent className="p-4 flex-1 flex flex-col">
+                      <h3 className="text-sm font-semibold line-clamp-4 leading-snug">{t.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {t.category} · {t.cut || '—'} · {(() => { const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand); return b; })()}
                       </p>
-                    ) : null}
-                  </CardContent>
-                </Card>
-              );
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {(t.material && t.material.trim() && t.material !== 'Non spécifié') ? t.material : '—'}
+                      </p>
+                      <Link
+                        href={isFree && (!canAnalyze || !isVisible) ? '/auth/choose-plan' : `/trends/${t.id}`}
+                        className="inline-flex h-9 w-full items-center justify-center rounded-lg border border-border bg-background px-4 text-xs font-semibold transition-all hover:bg-muted hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-3"
+                        onClick={handleAnalyzeClick}
+                      >
+                        {isFree && !canAnalyze ? 'Limite atteinte — Passer au plan Créateur' : 'Analyser la tendance'}
+                      </Link>
+                      {t.businessAnalysis ? (
+                        <p className="text-xs text-muted-foreground mt-2 line-clamp-3 border-t pt-2">
+                          {t.businessAnalysis}
+                        </p>
+                      ) : null}
+                    </CardContent>
+                  </Card>
+                );
               })}
             </div>
             <p className="text-xs text-muted-foreground mt-4 text-center">
@@ -1010,20 +1008,20 @@ export function TendancesContent() {
                         title="Appliqué aux articles sans indicateur de croissance"
                       />
                       <Button
-                      type="button"
-                      onClick={handleValidatePreview}
-                      disabled={savingPreview}
-                      variant="default"
-                      size="sm"
-                      className="gap-2"
-                    >
-                      {savingPreview ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <CheckCircle className="w-4 h-4" />
-                      )}
-                      Valider et enregistrer
-                    </Button>
+                        type="button"
+                        onClick={handleValidatePreview}
+                        disabled={savingPreview}
+                        variant="default"
+                        size="sm"
+                        className="gap-2"
+                      >
+                        {savingPreview ? (
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                        ) : (
+                          <CheckCircle className="w-4 h-4" />
+                        )}
+                        Valider et enregistrer
+                      </Button>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -1081,7 +1079,7 @@ export function TendancesContent() {
                     </span>
                     {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
-                    {isExpanded && (
+                  {isExpanded && (
                     <div className="p-4 border-t bg-background">
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {source.items.map((item, idx) => {

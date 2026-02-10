@@ -64,6 +64,10 @@ export const metadata: Metadata = {
   },
 };
 
+import { Providers } from '@/components/providers/Providers';
+
+export const dynamic = 'force-dynamic';
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -78,7 +82,9 @@ export default function RootLayout({
       </head>
       <body className="font-sans antialiased min-h-screen safe-area-padding">
         <ErrorBoundary>
-          <SurplusModalProvider>{children}</SurplusModalProvider>
+          <Providers>
+            <SurplusModalProvider>{children}</SurplusModalProvider>
+          </Providers>
           <BackToTop />
         </ErrorBoundary>
       </body>

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -23,6 +24,8 @@ interface TrendProduct {
 
 export function TrendsByMarket() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const user = session?.user as any;
   const [isVisible, setIsVisible] = useState(false);
   const [trends, setTrends] = useState<TrendProduct[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,7 +33,6 @@ export function TrendsByMarket() {
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [selectedZone] = useState('Zone EU');
   const [sortBy] = useState('Meilleures tendances (score)');
-  const [user, setUser] = useState<{ id: string; plan: string } | null>(null);
   const [analysesCount, setAnalysesCount] = useState<number | null>(null);
   const [homepageIds, setHomepageIds] = useState<Set<string>>(new Set());
 
@@ -39,32 +41,22 @@ export function TrendsByMarket() {
     const loadTrends = async () => {
       setLoading(true);
       try {
-        const [trendsRes, userRes] = await Promise.all([
-          fetch('/api/trends/homepage-featured'),
-          fetch('/api/auth/me').catch(() => null),
-        ]);
+        const trendsRes = await fetch('/api/trends/homepage-featured');
 
         if (trendsRes.ok) {
           const trendsData = await trendsRes.json();
           const trendsList = trendsData.trends || [];
           setTrends(trendsList);
-          // Extraire les IDs des tendances homepage pour le blur
-          const ids = trendsList.map((t: { id?: string }) => t.id).filter(Boolean);
+          const ids = trendsList.map((t: TrendProduct) => t.id).filter(Boolean);
           setHomepageIds(new Set(ids));
         }
 
-        if (userRes?.ok) {
-          const data = await userRes.json();
-          const userData = data.user ?? data;
-          setUser(userData);
-          
-          // Récupérer le nombre d'analyses ce mois pour les utilisateurs gratuits
-          if (userData?.plan === 'free') {
-            const analysesRes = await fetch('/api/trends/analyses-count');
-            if (analysesRes.ok) {
-              const analysesData = await analysesRes.json();
-              setAnalysesCount(analysesData.count || 0);
-            }
+        // Récupérer le nombre d'analyses ce mois pour les utilisateurs gratuits
+        if (user?.plan === 'free') {
+          const analysesRes = await fetch('/api/trends/analyses-count');
+          if (analysesRes.ok) {
+            const analysesData = await analysesRes.json();
+            setAnalysesCount(analysesData.count || 0);
           }
         }
       } catch (error) {
@@ -75,7 +67,7 @@ export function TrendsByMarket() {
     };
 
     loadTrends();
-  }, []);
+  }, [user?.plan]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -110,7 +102,7 @@ export function TrendsByMarket() {
         return false;
       }
     }
-    
+
     // Filtre par genre
     if (selectedGender) {
       const genderLower = selectedGender.toLowerCase();
@@ -122,13 +114,13 @@ export function TrendsByMarket() {
         return false;
       }
     }
-    
+
     return true;
   });
 
   const handleAnalyzeClick = (e: React.MouseEvent, trendId: string) => {
     e.preventDefault();
-    
+
     // Vérifier si l'utilisateur est connecté
     if (!user) {
       router.push('/auth/signin?redirect=/trends/' + trendId);
@@ -243,7 +235,7 @@ export function TrendsByMarket() {
               const isFree = user?.plan === 'free';
               const isVisible = !isFree || homepageIds.has(product.id);
               const canAnalyze = !isFree || (analysesCount !== null && analysesCount < 3);
-              
+
               return (
                 <div key={product.id} className="group relative">
                   <div className={`bg-white rounded-2xl sm:rounded-[32px] border border-[#F2F2F2] overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-apple ${isFree && !isVisible ? 'blur-sm' : ''}`}>
@@ -274,7 +266,7 @@ export function TrendsByMarket() {
                           </svg>
                         </div>
                       )}
-                      
+
                       {/* Badge segment/zone */}
                       <div className="absolute top-3 left-3">
                         <span className="px-3 py-1 rounded-full bg-[#000000] text-white text-xs font-semibold">
@@ -314,10 +306,10 @@ export function TrendsByMarket() {
                         {!user
                           ? 'Se connecter pour analyser'
                           : isFree && !isVisible
-                          ? 'Passer au plan Créateur'
-                          : isFree && analysesCount !== null && analysesCount >= 3
-                          ? 'Limite atteinte (3/mois)'
-                          : 'Analyser la tendance'}
+                            ? 'Passer au plan Créateur'
+                            : isFree && analysesCount !== null && analysesCount >= 3
+                              ? 'Limite atteinte (3/mois)'
+                              : 'Analyser la tendance'}
                       </button>
                       {user?.plan === 'free' && analysesCount !== null && (
                         <p className="text-xs text-center text-[#6e6e73]">

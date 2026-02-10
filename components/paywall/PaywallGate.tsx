@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { Lock, Sparkles } from 'lucide-react';
 
@@ -25,19 +26,11 @@ function isPaywalledPath(pathname: string): boolean {
 
 export function PaywallGate({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const [user, setUser] = useState<{ plan?: string } | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
+  const user = session?.user as any;
+  const loading = status === 'loading';
   const [showPaywall, setShowPaywall] = useState(false);
 
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then((res) => res.ok ? res.json() : null)
-      .then((data) => {
-        if (data?.user) setUser(data.user);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
 
   useEffect(() => {
     if (loading) return;

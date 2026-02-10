@@ -1,18 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
 
 export function AnimatedHeader() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const { data: session } = useSession();
+  const isLoggedIn = !!session?.user;
 
-  useEffect(() => {
-    fetch('/api/auth/me')
-      .then((res) => (res.ok ? res.json() : null))
-      .then((data) => setIsLoggedIn(!!data?.user))
-      .catch(() => {});
-  }, []);
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#F2F2F2]">
