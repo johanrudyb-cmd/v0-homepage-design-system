@@ -1,0 +1,22 @@
+# Configuration Render pour déployer n8n
+# Utiliser avec : render.com → New Web Service → Connect repo → Select render.yaml
+
+services:
+  - type: web
+    name: n8n
+    env: docker
+    dockerfilePath: ./Dockerfile.n8n
+    dockerContext: .
+    plan: free
+    envVars:
+      - key: N8N_BASIC_AUTH_ACTIVE
+        value: true
+      - key: N8N_BASIC_AUTH_USER
+        value: admin
+      - key: N8N_BASIC_AUTH_PASSWORD
+        sync: false  # À définir manuellement dans Render Dashboard
+      - key: WEBHOOK_URL
+        fromService:
+          type: web
+          name: n8n
+          property: host

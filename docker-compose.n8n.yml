@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    restart: unless-stopped
+    ports:
+      - "5678:5678"
+    environment:
+      # Authentification basique (recommandé)
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=${N8N_PASSWORD:-changez_moi_en_production}
+      
+      # Configuration serveur
+      - N8N_HOST=0.0.0.0
+      - N8N_PORT=5678
+      - N8N_PROTOCOL=http
+      
+      # URL pour les webhooks (à modifier selon votre installation)
+      - WEBHOOK_URL=http://localhost:5678
+      
+      # Optionnel : Base de données PostgreSQL (recommandé pour production)
+      # Si vous voulez utiliser votre Supabase :
+      # - DB_TYPE=postgresdb
+      # - DB_POSTGRESDB_HOST=${DATABASE_HOST}
+      # - DB_POSTGRESDB_PORT=5432
+      # - DB_POSTGRESDB_DATABASE=postgres
+      # - DB_POSTGRESDB_USER=${DATABASE_USER}
+      # - DB_POSTGRESDB_PASSWORD=${DATABASE_PASSWORD}
+      
+      # Optionnel : Email pour notifications
+      # - N8N_EMAIL_MODE=smtp
+      # - N8N_SMTP_HOST=smtp.gmail.com
+      # - N8N_SMTP_PORT=587
+      # - N8N_SMTP_USER=${SMTP_USER}
+      # - N8N_SMTP_PASS=${SMTP_PASS}
+      
+      # Optionnel : Variables personnalisées (pour vos workflows)
+      # - N8N_CUSTOM_EXTENSIONS=/home/node/.n8n/custom
+    volumes:
+      # Persistance des données (workflows, credentials, etc.)
+      - n8n_data:/home/node/.n8n
+    networks:
+      - n8n_network
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:5678/healthz"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  n8n_data:
+    driver: local
+
+networks:
+  n8n_network:
+    driver: bridge

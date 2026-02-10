@@ -1,0 +1,11 @@
+# Dockerfile pour n8n (utilisé par Render)
+FROM n8nio/n8n:latest
+
+# n8n est déjà configuré dans l'image officielle
+# Pas besoin de configuration supplémentaire
+
+# Exposer le port
+EXPOSE 5678
+
+# La commande par défaut de l'image démarre n8n
+# CMD est déjà défini dans l'image de base
