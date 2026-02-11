@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
-import Image from 'next/image';
+import { proxyImageUrl } from '@/lib/image-proxy';
 
 interface Product {
   id: string;
@@ -64,11 +64,10 @@ export function ProductCard({ product, userId, isFavorite: initialIsFavorite }: 
       <Card className="hover:border-primary/30 transition-colors cursor-pointer group overflow-hidden">
         <div className="relative aspect-square bg-muted rounded-t-lg overflow-hidden">
           {product.imageUrl ? (
-            <Image
-              src={product.imageUrl}
+            <img
+              src={proxyImageUrl(product.imageUrl) || product.imageUrl}
               alt={product.name}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform"
+              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-stone-400">
@@ -79,11 +78,10 @@ export function ProductCard({ product, userId, isFavorite: initialIsFavorite }: 
           )}
           <button
             onClick={handleToggleFavorite}
-            className={`absolute top-3 right-3 p-2 rounded-lg transition-colors ${
-              isFavorite
+            className={`absolute top-3 right-3 p-2 rounded-lg transition-colors ${isFavorite
                 ? 'bg-primary text-white'
                 : 'bg-background/80 text-muted-foreground hover:bg-background border border-border'
-            }`}
+              }`}
           >
             <svg className="w-5 h-5" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />

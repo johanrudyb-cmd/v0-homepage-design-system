@@ -5,6 +5,7 @@ import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getProductBrand } from '@/lib/brand-utils';
+import { proxyImageUrl } from '@/lib/image-proxy';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Loader2, Eye, ChevronDown, ChevronUp, Globe, AlertTriangle, Flame, MapPin, CheckCircle } from 'lucide-react';
@@ -632,9 +633,17 @@ export function TendancesContent() {
                     <div className="aspect-[3/4] bg-muted relative shrink-0">
                       {t.imageUrl ? (
                         <img
-                          src={t.imageUrl}
+                          src={proxyImageUrl(t.imageUrl) || t.imageUrl}
                           alt={t.name}
                           className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // En cas d'erreur, afficher l'icône par défaut
+                            e.currentTarget.style.display = 'none';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-12 h-12 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
+                            }
+                          }}
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center text-muted-foreground">
@@ -1029,7 +1038,7 @@ export function TendancesContent() {
                       <div key={idx} className="rounded-lg border overflow-hidden bg-background flex flex-col">
                         <div className="aspect-square bg-muted relative">
                           {item.imageUrl ? (
-                            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                            <img src={proxyImageUrl(item.imageUrl) || item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">Pas d&apos;image</div>
                           )}
@@ -1092,7 +1101,7 @@ export function TendancesContent() {
                               <div className="aspect-square bg-muted relative">
                                 {item.imageUrl ? (
                                   <img
-                                    src={item.imageUrl}
+                                    src={proxyImageUrl(item.imageUrl) || item.imageUrl}
                                     alt={item.name}
                                     className="w-full h-full object-cover"
                                   />
