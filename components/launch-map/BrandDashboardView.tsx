@@ -560,12 +560,10 @@ export function BrandDashboardView({
 
         {/* Onglets : un par phase */}
         <div className="flex gap-1 p-1 rounded-lg bg-muted/80 border border-border overflow-x-auto">
-          {LAUNCH_MAP_PHASES.filter((p) => p.id !== 2 && p.id !== 6).map((p, filteredIndex) => {
+          {LAUNCH_MAP_PHASES.map((p, originalIndex) => {
             const Icon = PHASE_ICONS[p.id];
             const completed = progress[`phase${p.id}` as keyof typeof progress] || (p.id === 0 && hasIdentity);
             const accessible = isPhaseAccessible();
-            // Trouver l'index original dans LAUNCH_MAP_PHASES pour activePhaseIndex
-            const originalIndex = LAUNCH_MAP_PHASES.findIndex((phase) => phase.id === p.id);
             return (
               <button
                 key={p.id}
@@ -649,7 +647,7 @@ export function BrandDashboardView({
                   brandName={brand.name}
                   titleMode="strategy"
                   visualIdentityLocked
-                  onClose={() => {}}
+                  onClose={() => { }}
                   embedded
                 />
               ) : (
