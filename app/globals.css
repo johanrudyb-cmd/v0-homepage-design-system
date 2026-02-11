@@ -378,18 +378,18 @@
   }
 
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-33.333%);
   }
 }
 
 .animate-marquee-slow {
-  animation: marquee-slow 12s linear infinite;
+  animation: marquee-slow 20s linear infinite;
 }
 
 /* Défilement plus rapide sur téléphone et tablette */
 @media (max-width: 1024px) {
   .animate-marquee-slow {
-    animation-duration: 6s;
+    animation-duration: 12s;
   }
 }
 

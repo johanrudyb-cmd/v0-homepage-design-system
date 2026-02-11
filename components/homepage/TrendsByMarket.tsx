@@ -151,7 +151,7 @@ export function TrendsByMarket() {
           </div>
         </div>
 
-        {/* Filtres */}
+        {/* Filtres simplifiés */}
         <div className="mb-8 sm:mb-12 flex flex-wrap items-center gap-2 sm:gap-3">
           {/* Filtres d'âge */}
           <div className="flex flex-wrap gap-2">
@@ -190,25 +190,6 @@ export function TrendsByMarket() {
               </button>
             ))}
           </div>
-
-          {/* Zone et Tri */}
-          <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto lg:ml-auto">
-            <button
-              type="button"
-              className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all touch-manipulation"
-            >
-              {selectedZone}
-            </button>
-
-            <button type="button" className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all flex items-center gap-2 touch-manipulation">
-              {sortBy}
-              <ChevronDown className="w-4 h-4 shrink-0" />
-            </button>
-
-            <button type="button" className="min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] transition-all touch-manipulation">
-              Filtres
-            </button>
-          </div>
         </div>
 
         {/* Grille de produits */}
@@ -223,7 +204,7 @@ export function TrendsByMarket() {
         ) : (
           <div
             className={cn(
-              'grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6',
+              'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6',
               'transition-all duration-1000',
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             )}
