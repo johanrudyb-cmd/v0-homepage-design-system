@@ -19,10 +19,6 @@ export async function GET(req: NextRequest) {
         const brands = await prisma.brand.findMany({
             where: {
                 userId: user.id,
-                styleGuide: {
-                    path: ['lastAIUpdate'],
-                    not: null
-                }
             },
             select: {
                 id: true,
