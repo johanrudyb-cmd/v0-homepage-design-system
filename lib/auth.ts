@@ -24,19 +24,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
 
           if (!user || !user.password) {
+            console.log('[Auth] Utilisateur non trouvé ou sans mot de passe');
             return null;
           }
 
-          const bcryptLib = await bcrypt;
-          const isPasswordValid = await bcryptLib.default.compare(
+          // Utiliser bcrypt.compare directement (pas .default)
+          const isPasswordValid = await bcrypt.compare(
             credentials.password as string,
             user.password
           );
 
+          console.log('[Auth] Validation mot de passe:', isPasswordValid);
+
           if (!isPasswordValid) {
+            console.log('[Auth] Mot de passe invalide');
             return null;
           }
 
+          console.log('[Auth] Connexion réussie pour:', user.email);
           return {
             id: user.id,
             email: user.email,
