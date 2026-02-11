@@ -82,7 +82,7 @@ export function LaunchMapNav({
 
   return (
     <nav className="sticky top-14 sm:top-16 z-30 w-full border-b border-border bg-card shadow-sm">
-      <div className="grid grid-cols-4 lg:flex h-auto lg:h-14 items-stretch lg:items-center gap-1 p-1 md:px-6 md:gap-2">
+      <div className="flex overflow-x-auto no-scrollbar lg:flex-wrap lg:h-14 items-center gap-1 p-1 md:px-6 md:gap-2">
         {/* Vue d'ensemble */}
         <Link
           href="/launch-map"

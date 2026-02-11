@@ -33,7 +33,6 @@ export default async function CalculatorPage() {
                         brandId={brand.id}
                         brand={brand as any}
                         initialData={initialData}
-                        onComplete={() => { }}
                     />
                 </div>
             </div>

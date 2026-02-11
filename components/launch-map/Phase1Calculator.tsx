@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Loader2, User, FileText, Euro, Package, FolderPlus, Save } from 'lucide-react';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import type { BrandIdentity } from './LaunchMapStepper';
+import { useToast } from '@/components/ui/toast';
 
 const ACCENT = '#8B5CF6';
 const COGS_COLORS = [ACCENT, '#0EA5E9', '#10B981', '#F59E0B', '#EC4899'];
@@ -143,7 +144,7 @@ interface Phase1CalculatorProps {
     weight?: string;
     completed?: boolean;
   };
-  onComplete: () => void;
+  onComplete?: () => void;
 }
 
 function styleGuideField(sg: Record<string, unknown> | null | undefined, key: string): string {
@@ -154,6 +155,7 @@ function styleGuideField(sg: Record<string, unknown> | null | undefined, key: st
 
 export function Phase1Calculator({ brandId, brand, initialData, onComplete }: Phase1CalculatorProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const [sellingPrice, setSellingPrice] = useState(String(initialData?.sellingPrice ?? ''));
   const [productionCost, setProductionCost] = useState(String(initialData?.productionCost ?? ''));
   const [marketingCost, setMarketingCost] = useState(String(initialData?.marketingCost ?? ''));
@@ -281,12 +283,12 @@ export function Phase1Calculator({ brandId, brand, initialData, onComplete }: Ph
   const cogsDonutData =
     breakdownTotal > 0
       ? [
-          { name: 'Matière première', value: costMatiereNum },
-          { name: 'CMT (main d\'œuvre)', value: costFabricationNum },
-          { name: 'Accessoires', value: costAccessoiresNum },
-          { name: 'Packaging', value: costPackagingNum },
-          { name: 'Transport usine', value: costTransportNum },
-        ].filter((d) => d.value > 0)
+        { name: 'Matière première', value: costMatiereNum },
+        { name: 'CMT (main d\'œuvre)', value: costFabricationNum },
+        { name: 'Accessoires', value: costAccessoiresNum },
+        { name: 'Packaging', value: costPackagingNum },
+        { name: 'Transport usine', value: costTransportNum },
+      ].filter((d) => d.value > 0)
       : [];
 
   const handleSave = async () => {
@@ -324,11 +326,21 @@ export function Phase1Calculator({ brandId, brand, initialData, onComplete }: Ph
       });
       if (response.ok) {
         setIsCompleted(true);
+        toast({
+          title: 'Calcul enregistré !',
+          message: 'Votre simulation de rentabilité a été mise à jour.',
+          type: 'success',
+        });
         router.refresh();
-        onComplete();
+        if (onComplete) onComplete();
       }
     } catch (error) {
       console.error('Erreur lors de la sauvegarde:', error);
+      toast({
+        title: 'Erreur',
+        message: 'Impossible d\'enregistrer vos modifications.',
+        type: 'error',
+      });
     } finally {
       setIsSaving(false);
     }
@@ -378,6 +390,11 @@ export function Phase1Calculator({ brandId, brand, initialData, onComplete }: Ph
       });
       if (!res.ok) throw new Error('Impossible d\'ajouter l\'article');
       setSaveToFileDone(true);
+      toast({
+        title: 'Article ajouté !',
+        message: `Calcul ajouté au fichier "${newCollectionName.trim() || collections.find(c => c.id === targetCollectionId)?.name}".`,
+        type: 'success',
+      });
       setNewCollectionName('');
       setArticleLabel('');
       setSelectedCollectionId(collections[0]?.id ?? '');
@@ -761,11 +778,10 @@ export function Phase1Calculator({ brandId, brand, initialData, onComplete }: Ph
                       key={moq}
                       type="button"
                       onClick={() => setQuantity(String(moq))}
-                      className={`rounded-lg border-2 p-3 text-left transition-colors ${
-                        isSelected
-                          ? 'border-primary bg-primary/10 text-foreground'
-                          : 'border-border bg-muted/20 hover:border-primary/50 hover:bg-muted/40'
-                      }`}
+                      className={`rounded-lg border-2 p-3 text-left transition-colors ${isSelected
+                        ? 'border-primary bg-primary/10 text-foreground'
+                        : 'border-border bg-muted/20 hover:border-primary/50 hover:bg-muted/40'
+                        }`}
                     >
                       <div className="text-xs font-semibold text-foreground">MoQ {moq} pcs</div>
                       <div className="text-xs text-muted-foreground mt-1.5">À investir (total)</div>

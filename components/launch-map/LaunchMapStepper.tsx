@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'rea
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Loader2, ChevronRight } from 'lucide-react';
+import { useToast } from '@/components/ui/toast';
 import { Phase0Identity } from './Phase0Identity';
 import { Phase1Strategy } from './Phase1Strategy';
 import { Phase1Calculator } from './Phase1Calculator';
@@ -87,6 +88,7 @@ function mergePhase1DataWithPhase0(phase1Data: any, styleGuide: BrandIdentity['s
 const phases = LAUNCH_MAP_PHASES;
 
 export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = false, focusedPhase, userPlan = 'free' }: LaunchMapStepperProps) {
+  const { toast } = useToast();
   // Calculer la phase initiale : toujours privilégier focusedPhase s'il est défini
   const initialPhase = useMemo(() => {
     if (typeof focusedPhase === 'number') {
@@ -184,9 +186,12 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
 
   const handlePhaseComplete = (phase: number) => {
     setProgress((prev) => ({ ...prev, [`phase${phase}`]: true }));
+    toast({
+      title: `Étape ${phase} validée ! 🎉`,
+      message: `Vous avez complété la phase : ${phases.find(p => p.id === phase)?.title}.`,
+      type: 'success',
+    });
     // En mode phase focalisée (ex. /launch-map/phase/4), ne pas lancer la transition :
-    // elle démonte le composant puis le remonte avec l'état initial (step 1), ce qui
-    // renvoie l'utilisateur au choix du type de produit au lieu de rester sur l'étape 5.
     if (typeof focusedPhase === 'number') return;
     let nextPhase: number;
     if (phase < 7) {
@@ -257,7 +262,7 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
                   key={phase.id}
                   onClick={() => setCurrentPhase(phase.id)}
                   disabled={false}
-                  className={`relative p-4 rounded-xl border-2 transition-all ${isCurrent
+                  className={`relative p-3 sm:p-4 rounded-xl border-2 transition-all ${isCurrent
                     ? 'border-primary bg-primary/10 shadow-modern'
                     : isCompleted
                       ? 'border-success bg-success/10'
@@ -266,9 +271,9 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
                         : 'border-border bg-muted opacity-50 cursor-not-allowed'
                     }`}
                 >
-                  <div className="flex items-center gap-3 mb-2">
+                  <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                     <div
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${isCompleted
+                      className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center text-xs sm:text-sm font-bold shrink-0 ${isCompleted
                         ? 'gradient-primary text-white shadow-modern'
                         : isCurrent
                           ? 'bg-primary/20 text-primary'
@@ -277,18 +282,18 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
                     >
                       {isCompleted ? '✓' : phase.id}
                     </div>
-                    <div className="text-left">
-                      <div className="text-sm font-bold text-foreground">
+                    <div className="text-left min-w-0">
+                      <div className="text-xs sm:text-sm font-bold text-foreground truncate">
                         {phase.title}
                       </div>
-                      <div className="text-xs text-muted-foreground font-medium">
+                      <div className="text-[10px] sm:text-xs text-muted-foreground font-medium truncate hidden sm:block">
                         {phase.subtitle}
                       </div>
                     </div>
                   </div>
                   {index < phases.length - 1 && (
                     <div
-                      className={`absolute top-1/2 -right-2 w-4 h-0.5 ${isCompleted ? 'bg-primary' : 'bg-border'
+                      className={`absolute top-1/2 -right-2 w-4 h-0.5 hidden lg:block ${isCompleted ? 'bg-primary' : 'bg-border'
                         }`}
                       style={{ transform: 'translateY(-50%)' }}
                     />

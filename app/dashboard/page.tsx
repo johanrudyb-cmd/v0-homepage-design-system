@@ -73,7 +73,7 @@ export default async function DashboardPage() {
             <DashboardStats brandId={brand.id} />
           </Suspense>
 
-          {/* Shopify Connection Panel - RESTORED */}
+          {/* Shopify Creation Panel */}
           {!launchMap?.shopifyShopDomain && (
             <div className="bg-gradient-to-br from-[#95BF47] to-[#5E8E3E] rounded-3xl shadow-apple-lg p-6 sm:p-10 text-white relative overflow-hidden group">
               {/* Cercle décoratif */}
@@ -83,7 +83,7 @@ export default async function DashboardPage() {
                 <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
                   <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-apple p-3">
                     <Image
-                      src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Shopify_logo_icon.svg"
+                      src="/shopify-logo.png"
                       alt="Shopify"
                       width={48}
                       height={48}
@@ -92,22 +92,22 @@ export default async function DashboardPage() {
                   </div>
                   <div className="space-y-2">
                     <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight">
-                      Prêt à vendre sur Shopify ?
+                      Créez votre boutique Shopify
                     </h3>
                     <p className="text-base sm:text-lg text-white/90 max-w-xl">
-                      Connectez votre boutique pour synchroniser vos designs, suivre vos ventes et finaliser votre lancement.
+                      Lancez votre boutique en ligne et commencez à vendre vos créations. C&apos;est l&apos;étape finale pour valider votre marque.
                     </p>
                   </div>
                 </div>
                 <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 shrink-0 mt-4 lg:mt-0">
-                  <Link href="/launch-map/phase/7" className="w-full sm:w-auto">
+                  <Link href="https://www.shopify.com/fr-fr/start" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
                     <Button className="w-full bg-white text-[#1D1D1F] hover:bg-white/90 font-semibold h-12 px-8 text-base shadow-apple">
-                      Connecter ma boutique
+                      Créer mon compte Shopify
                     </Button>
                   </Link>
-                  <Link href="https://www.shopify.com/fr-fr/start" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
-                    <Button variant="ghost" className="w-full text-white hover:bg-white/10 h-12 px-6">
-                      Découvrir Shopify
+                  <Link href="/launch-map/phase/7" className="w-full sm:w-auto">
+                    <Button variant="ghost" className="w-full text-white hover:bg-white/10 h-12 px-6 font-medium">
+                      J&apos;ai déjà une boutique
                     </Button>
                   </Link>
                 </div>
@@ -190,19 +190,19 @@ export default async function DashboardPage() {
 
           {/* Quick Actions */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link href="/trends" className="bg-[#F5F5F7] p-6 rounded-3xl hover:bg-[#E8E8ED] transition-colors group">
+            <Link href="/trends" className="bg-white p-6 rounded-3xl shadow-apple border border-black/5 hover:bg-[#F5F5F7] transition-all duration-300 group">
               <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Tendances</h4>
               <p className="text-sm text-gray-500">Nouveautés de la semaine</p>
             </Link>
-            <Link href="/sourcing" className="bg-[#F5F5F7] p-6 rounded-3xl hover:bg-[#E8E8ED] transition-colors group">
+            <Link href="/sourcing" className="bg-white p-6 rounded-3xl shadow-apple border border-black/5 hover:bg-[#F5F5F7] transition-all duration-300 group">
               <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Sourcing</h4>
               <p className="text-sm text-gray-500">Trouvez vos usines</p>
             </Link>
-            <Link href="/brands/analyze" className="bg-[#F5F5F7] p-6 rounded-3xl hover:bg-[#E8E8ED] transition-colors group">
+            <Link href="/brands/analyze" className="bg-white p-6 rounded-3xl shadow-apple border border-black/5 hover:bg-[#F5F5F7] transition-all duration-300 group">
               <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Spy Tool</h4>
               <p className="text-sm text-gray-500">Analysez vos concurrents</p>
             </Link>
-            <Link href="/launch-map" className="bg-[#F5F5F7] p-6 rounded-3xl hover:bg-[#E8E8ED] transition-colors group">
+            <Link href="/launch-map" className="bg-white p-6 rounded-3xl shadow-apple border border-black/5 hover:bg-[#F5F5F7] transition-all duration-300 group">
               <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Lancement</h4>
               <p className="text-sm text-gray-500">Guide complet</p>
             </Link>

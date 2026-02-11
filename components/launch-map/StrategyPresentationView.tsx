@@ -361,14 +361,14 @@ export function StrategyPresentationView({
         <div className="rounded-3xl bg-white shadow-apple p-6 w-full h-full min-h-[260px] flex flex-col">
           <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Radar — Vision</p>
           <div className="flex-1 min-h-[220px]">
-          <ResponsiveContainer width="100%" height="100%" minHeight={220}>
-            <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
-              <PolarGrid stroke="hsl(var(--border))" strokeWidth={1} />
-              <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-              <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-              <Radar name="Vision" dataKey="value" stroke={ACCENT} fill={ACCENT} fillOpacity={0.35} strokeWidth={1} />
-            </RadarChart>
-          </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height="100%" minHeight={220}>
+              <RadarChart cx="50%" cy="50%" outerRadius="70%" data={radarData}>
+                <PolarGrid stroke="hsl(var(--border))" strokeWidth={1} />
+                <PolarAngleAxis dataKey="subject" tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                <Radar name="Vision" dataKey="value" stroke={ACCENT} fill={ACCENT} fillOpacity={0.35} strokeWidth={1} />
+              </RadarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       );
@@ -455,36 +455,36 @@ export function StrategyPresentationView({
       const pricing = extractPricingFromContent(sec.content);
       const tiers = pricing.length >= 2
         ? [
-            { label: 'Entry / Merch', value: pricing[0].value },
-            { label: 'Core collection', value: pricing[1].value },
-            { label: 'Statement / Limited', value: pricing[2]?.value ?? pricing[1].value * 1.8 },
-          ]
+          { label: 'Entry / Merch', value: pricing[0].value },
+          { label: 'Core collection', value: pricing[1].value },
+          { label: 'Statement / Limited', value: pricing[2]?.value ?? pricing[1].value * 1.8 },
+        ]
         : [
-            { label: 'Entry / Merch', value: 50 },
-            { label: 'Core collection', value: 120 },
-            { label: 'Statement / Limited', value: 250 },
-          ];
+          { label: 'Entry / Merch', value: 50 },
+          { label: 'Core collection', value: 120 },
+          { label: 'Statement / Limited', value: 250 },
+        ];
       const maxVal = Math.max(...tiers.map((t) => t.value), 1);
       return (
         <div className="rounded-3xl bg-white shadow-apple p-6 w-full h-full min-h-[260px] flex flex-col">
           <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Gamme de prix — Diagramme</p>
           <div className="flex-1 min-h-[180px] flex items-center justify-center">
-          <ResponsiveContainer width="100%" height={180}>
-            <BarChart data={tiers} layout="vertical" margin={{ top: 4, right: 24, left: 90, bottom: 4 }}>
-              <XAxis type="number" domain={[0, Math.ceil(maxVal * 1.15)]} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${v} €`} />
-              <YAxis type="category" dataKey="label" width={85} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
-              <Tooltip
-                contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: '4px' }}
-                formatter={(value: number | undefined) => [`${value ?? 0} €`, 'Prix']}
-                labelFormatter={(label) => label}
-              />
-              <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={22}>
-                {tiers.map((_, j) => (
-                  <Cell key={j} fill={j === 0 ? ACCENT : j === 1 ? `${ACCENT}CC` : `${ACCENT}99`} />
-                ))}
-              </Bar>
-            </BarChart>
-          </ResponsiveContainer>
+            <ResponsiveContainer width="100%" height={180}>
+              <BarChart data={tiers} layout="vertical" margin={{ top: 4, right: 24, left: 90, bottom: 4 }}>
+                <XAxis type="number" domain={[0, Math.ceil(maxVal * 1.15)]} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" tickFormatter={(v) => `${v} €`} />
+                <YAxis type="category" dataKey="label" width={85} tick={{ fontSize: 10 }} stroke="hsl(var(--muted-foreground))" />
+                <Tooltip
+                  contentStyle={{ backgroundColor: 'hsl(var(--background))', border: '1px solid hsl(var(--border))', borderRadius: '4px' }}
+                  formatter={(value: number | undefined) => [`${value ?? 0} €`, 'Prix']}
+                  labelFormatter={(label) => label}
+                />
+                <Bar dataKey="value" radius={[0, 4, 4, 0]} barSize={22}>
+                  {tiers.map((_, j) => (
+                    <Cell key={j} fill={j === 0 ? ACCENT : j === 1 ? `${ACCENT}CC` : `${ACCENT}99`} />
+                  ))}
+                </Bar>
+              </BarChart>
+            </ResponsiveContainer>
           </div>
         </div>
       );
@@ -597,20 +597,20 @@ export function StrategyPresentationView({
   }, [onClose]);
 
   const content = (
-    <div className={embedded ? 'w-full' : 'min-h-full px-12 py-16 pb-24 max-w-[96rem] mx-auto bg-[#F5F5F7]'}>
+    <div className={embedded ? 'w-full' : 'min-h-full px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 pb-24 max-w-[96rem] mx-auto bg-[#F5F5F7]'}>
       {/* Header sticky : masqué en mode embedded (le titre est déjà dans l'onglet) */}
       {!embedded && (
-        <header className="sticky top-0 z-10 -mx-12 -mt-16 px-12 pt-16 pb-6 mb-8 backdrop-blur-xl bg-white/80 border-b border-black/5">
-          <div className="flex items-center justify-between gap-6">
-            <div className="min-w-0">
-              <h1 className="text-5xl font-semibold tracking-tight text-[#1D1D1F] truncate mb-2">
+        <header className="sticky top-0 z-40 -mx-4 sm:-mx-6 lg:-mx-12 -mt-8 sm:-mt-12 lg:-mt-16 px-4 sm:px-6 lg:px-12 pt-8 sm:pt-12 lg:pt-16 pb-6 mb-8 backdrop-blur-xl bg-white/80 border-b border-black/5">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+            <div className="min-w-0 w-full">
+              <h1 className="text-2xl sm:text-3xl lg:text-5xl font-semibold tracking-tight text-[#1D1D1F] mb-2 break-words">
                 {titleMode === 'analysis'
                   ? `Analyse · ${brandName || 'Marque de référence'}`
                   : isTemplateView
                     ? `Stratégie · ${brandName || 'Marque de référence'}`
                     : `Stratégie · ${brandName || 'Ma marque'}`}
               </h1>
-              <p className="text-base text-[#1D1D1F]/60 truncate">
+              <p className="text-sm sm:text-base text-[#1D1D1F]/60 truncate">
                 {titleMode === 'analysis'
                   ? 'Présentation de la stratégie de la marque (analyse)'
                   : isTemplateView
@@ -620,14 +620,13 @@ export function StrategyPresentationView({
                       : 'Présentation de votre stratégie'}
               </p>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto overflow-x-auto sm:overflow-visible pb-2 sm:pb-0">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => router.refresh()}
-                className="gap-1.5 h-11 px-4 text-sm text-[#1D1D1F]/60 hover:text-[#007AFF]"
+                className="gap-1.5 h-10 sm:h-11 px-3 sm:px-4 text-xs sm:text-sm text-[#1D1D1F]/60 hover:text-[#007AFF] shrink-0"
                 aria-label="Actualiser l'affichage"
-                title="Après une mise à jour de la mise en page, actualisez pour voir le nouveau rendu."
               >
                 <RefreshCw className="w-4 h-4" />
                 <span className="hidden sm:inline">Actualiser</span>
@@ -645,13 +644,12 @@ export function StrategyPresentationView({
                       setRegenerating(false);
                     }
                   }}
-                  className="gap-1.5 h-11 px-4 text-sm"
-                  title="Régénérer la stratégie pour mettre à jour le contenu après un changement de présentation."
+                  className="gap-1.5 h-10 sm:h-11 px-3 sm:px-4 text-xs sm:text-sm shrink-0"
                 >
                   {regenerating ? (
-                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    <RefreshCw className="w-3.5 h-3.5 animate-spin" />
                   ) : (
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshCw className="w-3.5 h-3.5" />
                   )}
                   <span className="hidden sm:inline">Régénérer</span>
                 </Button>
@@ -661,7 +659,7 @@ export function StrategyPresentationView({
                   variant="secondary"
                   onClick={optionalPrimaryAction.onClick}
                   disabled={optionalPrimaryAction.disabled}
-                  className="gap-2 h-11 px-6 text-base"
+                  className="gap-2 h-10 sm:h-11 px-4 sm:px-6 text-sm sm:text-base shrink-0"
                 >
                   {optionalPrimaryAction.label}
                 </Button>
@@ -671,19 +669,19 @@ export function StrategyPresentationView({
                   variant="default"
                   onClick={optionalValidateAction.onClick}
                   disabled={optionalValidateAction.disabled}
-                  className="gap-2 h-11 px-6 text-base"
+                  className="gap-2 h-10 sm:h-11 px-4 sm:px-6 text-sm sm:text-base shrink-0"
                 >
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-3.5 h-3.5 sm:w-4 h-4" />
                   {optionalValidateAction.label}
                 </Button>
               )}
               <Button
                 variant="ghost"
                 onClick={onClose}
-                className="shrink-0 gap-2 h-11 px-4 text-base text-[#1D1D1F]/60 hover:text-[#007AFF]"
+                className="shrink-0 gap-2 h-10 sm:h-11 px-3 sm:px-4 text-sm sm:text-base text-[#1D1D1F]/60 hover:text-[#007AFF]"
                 aria-label="Fermer la présentation"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5 sm:w-4 h-4" />
                 <span className="hidden sm:inline">Fermer</span>
               </Button>
             </div>
@@ -691,210 +689,210 @@ export function StrategyPresentationView({
         </header>
       )}
 
-        {/* Progress Tracker : ancres de navigation vers chaque section */}
-        <nav className="mb-8 rounded-3xl bg-white shadow-apple px-6 py-4" aria-label="Sections de la stratégie">
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            {sectionPreviews.map((sec, i) => (
-              <div key={i} className="flex items-center">
-                <button
-                  type="button"
-                  onClick={() => scrollToSection(i)}
-                  className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-white min-w-0 hover:bg-black/5 transition-colors text-left group"
-                  aria-label={`Aller à la section ${sec.meta.label}`}
-                >
-                  <sec.meta.Icon className="w-4 h-4 text-[#007AFF] shrink-0 group-hover:text-[#0056CC]" aria-hidden />
-                  <span className="text-sm font-medium text-[#1D1D1F]/60 group-hover:text-[#007AFF] truncate max-w-[140px] sm:max-w-[200px]">{sec.meta.label}</span>
-                </button>
-                {i < sectionPreviews.length - 1 && (
-                  <div className="w-3 h-px bg-[#1D1D1F]/10 mx-1 shrink-0 hidden sm:block" aria-hidden />
-                )}
-              </div>
-            ))}
-          </div>
-        </nav>
-
-        {/* Ma marque / Marque de référence — pastilles */}
-        <div className="flex flex-wrap gap-3 mb-8">
-          {isTemplateView ? (
-            brandName && (
-              <span className="px-4 py-2 rounded-full bg-[#007AFF]/10 text-sm font-medium text-[#007AFF]">
-                Marque de référence : {brandName}
-              </span>
-            )
-          ) : (
-            <>
-              {brandName && (
-                <span className="px-4 py-2 rounded-full bg-[#007AFF]/10 text-sm font-medium text-[#007AFF]">{brandName}</span>
+      {/* Progress Tracker : ancres de navigation vers chaque section */}
+      <nav className="mb-8 rounded-3xl bg-white shadow-apple overflow-hidden" aria-label="Sections de la stratégie">
+        <div className="flex items-center gap-1 p-2 overflow-x-auto no-scrollbar sm:flex-wrap sm:justify-between sm:p-4">
+          {sectionPreviews.map((sec, i) => (
+            <div key={i} className="flex items-center shrink-0">
+              <button
+                type="button"
+                onClick={() => scrollToSection(i)}
+                className="flex items-center gap-2 px-3 py-2 rounded-2xl bg-white min-w-0 hover:bg-black/5 transition-colors text-left group whitespace-nowrap"
+                aria-label={`Aller à la section ${sec.meta.label}`}
+              >
+                <sec.meta.Icon className="w-3.5 h-3.5 text-[#007AFF] shrink-0 group-hover:text-[#0056CC]" aria-hidden />
+                <span className="text-xs sm:text-sm font-medium text-[#1D1D1F]/60 group-hover:text-[#007AFF]">{sec.meta.label}</span>
+              </button>
+              {i < sectionPreviews.length - 1 && (
+                <div className="w-3 h-px bg-[#1D1D1F]/10 mx-1 shrink-0 hidden lg:block" aria-hidden />
               )}
-              {positioning && (
-                <span className="px-4 py-2 rounded-full bg-[#1D1D1F]/5 text-sm text-[#1D1D1F]/60">{positioning}</span>
-              )}
-              {targetAudience && (
-                <span className="px-4 py-2 rounded-full bg-[#1D1D1F]/5 text-sm text-[#1D1D1F]/60">{targetAudience}</span>
-              )}
-              {templateBrandName && (
-                <span className="px-4 py-2 rounded-full bg-[#1D1D1F]/5 text-sm text-[#1D1D1F]/60">Inspiré de {templateBrandName}</span>
-              )}
-            </>
-          )}
+            </div>
+          ))}
         </div>
+      </nav>
 
-        {/* Identité visuelle — logo (template) + explication + couleurs + polices */}
-        {(visualIdentityProp?.colorPalette || visualIdentityProp?.typography || visualIdentityProp?.logoRecommendation || visualIdentityProp?.logoRationale || (isTemplateView && brandName)) && (
-          <Card className="mb-8 rounded-3xl bg-white shadow-apple">
-            <CardContent className="pt-8 pb-8 px-8">
-              <h2 className="text-2xl font-semibold tracking-tight text-[#1D1D1F] mb-6">
-                {isTemplateView ? 'Identité visuelle (marque de référence)' : 'Recommandations identité visuelle'}
-              </h2>
-              {isTemplateView && brandName && (
-                <div className="mb-6 flex flex-col sm:flex-row gap-6 items-start">
-                  <div className="w-32 h-32 rounded-3xl bg-white shadow-apple overflow-hidden shrink-0 flex items-center justify-center p-4">
-                    <BrandLogo logoUrl={logoUrlProp ?? getBrandLogoUrl(brandName)} brandName={brandName} className="w-full h-full object-contain" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-2">Pourquoi cette identité</p>
-                    <p className="text-base text-[#1D1D1F] leading-relaxed">
-                      {visualIdentityProp?.logoRationale || visualIdentityProp?.logoRecommendation || 'Identité visuelle alignée avec le positionnement et la cible de la marque.'}
-                    </p>
-                  </div>
-                </div>
-              )}
-              <p className="text-sm text-[#1D1D1F]/60 mb-6">
-                {visualIdentityLocked
-                  ? 'Couleurs et polices de votre stratégie (identité visuelle verrouillée).'
-                  : isTemplateView
-                    ? 'Couleurs et polices de la marque. Au calquage, l\'IA proposera une identité inspirée (même style, couleurs et polices différentes) et une recommandation pour votre logo.'
-                    : 'Couleurs et polices inspirées de la marque de référence (même style, pas de copie). Vous pouvez les modifier et les appliquer à votre identité.'}
-              </p>
-              {(visualIdentityProp?.colorPalette || visualIdentityProp?.typography) && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-6">
-                  <div>
-                    <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Palette couleurs</p>
-                    <div className="space-y-3">
-                      {[
-                        { label: 'Primaire', value: primaryColor, set: setPrimaryColor },
-                        { label: 'Secondaire', value: secondaryColor, set: setSecondaryColor },
-                        { label: 'Accent', value: accentColor, set: setAccentColor },
-                      ].map(({ label, value, set }) => (
-                        <div key={label} className="flex items-center gap-3">
-                          <div
-                            className="w-12 h-12 rounded-3xl shadow-apple shrink-0"
-                            style={{ backgroundColor: value }}
-                            title={value}
-                          />
-                          {visualIdentityLocked ? (
-                            <span className="font-mono text-sm text-[#1D1D1F]/60" aria-label={`Couleur ${label}`}>{value}</span>
-                          ) : (
-                            <Input
-                              value={value}
-                              onChange={(e) => set(e.target.value)}
-                              className="font-mono text-sm h-11 max-w-[140px]"
-                              placeholder="#000000"
-                              aria-label={`Couleur ${label}`}
-                            />
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Typographie</p>
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-sm text-[#1D1D1F]/60 block mb-2">Titres</label>
-                        {visualIdentityLocked ? (
-                          <p className="text-base text-[#1D1D1F] py-2">{headingFont || '—'}</p>
-                        ) : (
-                          <Input
-                            value={headingFont}
-                            onChange={(e) => setHeadingFont(e.target.value)}
-                            className="text-base h-11"
-                            placeholder="Ex. Inter, Playfair Display"
-                            aria-label="Police titres"
-                          />
-                        )}
-                      </div>
-                      <div>
-                        <label className="text-sm text-[#1D1D1F]/60 block mb-2">Corps</label>
-                        {visualIdentityLocked ? (
-                          <p className="text-base text-[#1D1D1F] py-2">{bodyFont || '—'}</p>
-                        ) : (
-                          <Input
-                            value={bodyFont}
-                            onChange={(e) => setBodyFont(e.target.value)}
-                            className="text-base h-11"
-                            placeholder="Ex. Inter, Open Sans"
-                            aria-label="Police corps"
-                          />
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              )}
-              {visualIdentityProp?.logoRecommendation && (
-                <div className="rounded-3xl bg-white shadow-apple p-6">
-                  <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-3">Recommandation logo</p>
-                  <p className="text-base text-[#1D1D1F] leading-relaxed">{visualIdentityProp.logoRecommendation}</p>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+      {/* Ma marque / Marque de référence — pastilles */}
+      <div className="flex flex-wrap gap-3 mb-8">
+        {isTemplateView ? (
+          brandName && (
+            <span className="px-4 py-2 rounded-full bg-[#007AFF]/10 text-sm font-medium text-[#007AFF]">
+              Marque de référence : {brandName}
+            </span>
+          )
+        ) : (
+          <>
+            {brandName && (
+              <span className="px-4 py-2 rounded-full bg-[#007AFF]/10 text-sm font-medium text-[#007AFF]">{brandName}</span>
+            )}
+            {positioning && (
+              <span className="px-4 py-2 rounded-full bg-[#1D1D1F]/5 text-sm text-[#1D1D1F]/60">{positioning}</span>
+            )}
+            {targetAudience && (
+              <span className="px-4 py-2 rounded-full bg-[#1D1D1F]/5 text-sm text-[#1D1D1F]/60">{targetAudience}</span>
+            )}
+            {templateBrandName && (
+              <span className="px-4 py-2 rounded-full bg-[#1D1D1F]/5 text-sm text-[#1D1D1F]/60">Inspiré de {templateBrandName}</span>
+            )}
+          </>
         )}
+      </div>
 
-        <h2 className="text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-8">Stratégie par thème</h2>
-        <div className="space-y-8">
-          {sectionPreviews.map((sec, i) => {
-            const schematic = renderSectionSchematic(sec, i);
-            return (
-              <Card key={i} id={`strategy-section-${i}`} className="rounded-3xl bg-white shadow-apple overflow-hidden scroll-mt-4">
-                <div className="flex items-center gap-4 px-8 py-6 border-b border-black/5">
-                  <div className="w-12 h-12 rounded-2xl bg-[#007AFF]/10 flex items-center justify-center shrink-0">
-                    <sec.meta.Icon className="w-6 h-6 text-[#007AFF]" />
-                  </div>
-                  <CardTitle className="text-xl font-semibold tracking-tight text-[#1D1D1F] truncate">{sec.title}</CardTitle>
+      {/* Identité visuelle — logo (template) + explication + couleurs + polices */}
+      {(visualIdentityProp?.colorPalette || visualIdentityProp?.typography || visualIdentityProp?.logoRecommendation || visualIdentityProp?.logoRationale || (isTemplateView && brandName)) && (
+        <Card className="mb-8 rounded-3xl bg-white shadow-apple">
+          <CardContent className="pt-8 pb-8 px-8">
+            <h2 className="text-2xl font-semibold tracking-tight text-[#1D1D1F] mb-6">
+              {isTemplateView ? 'Identité visuelle (marque de référence)' : 'Recommandations identité visuelle'}
+            </h2>
+            {isTemplateView && brandName && (
+              <div className="mb-6 flex flex-col sm:flex-row gap-6 items-start">
+                <div className="w-32 h-32 rounded-3xl bg-white shadow-apple overflow-hidden shrink-0 flex items-center justify-center p-4">
+                  <BrandLogo logoUrl={logoUrlProp ?? getBrandLogoUrl(brandName)} brandName={brandName} className="w-full h-full object-contain" />
                 </div>
-                <CardContent className="px-8 py-8">
-                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-                    <div className="rounded-3xl bg-white shadow-apple p-6 min-h-[280px] lg:min-h-[320px] flex flex-col">
-                      <div className="flex-1 min-h-[260px] lg:min-h-[300px] flex items-center justify-center w-full min-w-0 overflow-auto">
-                        {schematic || (
-                          <div className="w-full p-6 text-center">
-                            <p className="text-sm text-[#1D1D1F]/60 leading-relaxed break-words px-2">{sec.preview}</p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                    <div className="rounded-3xl bg-white shadow-apple p-6 min-h-[140px]">
-                      <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Contenu détaillé</p>
-                      <div className="text-sm leading-relaxed space-y-3 max-h-[300px] overflow-y-auto">
-                        {sec.isTimingSection && sec.bullets.length > 0 ? (
-                          <>
-                            <ol className="relative border-l border-[#007AFF]/40 pl-6 space-y-3">
-                              {sec.bullets.map((step, j) => (
-                                <li key={j} className="relative flex gap-3">
-                                  <span className="absolute -left-7 w-6 h-6 rounded-full bg-[#007AFF] flex items-center justify-center font-mono text-xs font-semibold text-white">
-                                    {j + 1}
-                                  </span>
-                                  <span className="text-[#1D1D1F]">{sanitizeDisplayText(step)}</span>
-                                </li>
-                              ))}
-                            </ol>
-                            {sec.content.replace(new RegExp('\n[-*]\\s+', 'g'), '\n').trim().length > sec.bullets.join(' ').length && (
-                              <div className="mt-4 pt-4 border-t border-black/5">{renderContent(sec.content)}</div>
-                            )}
-                          </>
+                <div className="min-w-0 flex-1">
+                  <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-2">Pourquoi cette identité</p>
+                  <p className="text-base text-[#1D1D1F] leading-relaxed">
+                    {visualIdentityProp?.logoRationale || visualIdentityProp?.logoRecommendation || 'Identité visuelle alignée avec le positionnement et la cible de la marque.'}
+                  </p>
+                </div>
+              </div>
+            )}
+            <p className="text-sm text-[#1D1D1F]/60 mb-6">
+              {visualIdentityLocked
+                ? 'Couleurs et polices de votre stratégie (identité visuelle verrouillée).'
+                : isTemplateView
+                  ? 'Couleurs et polices de la marque. Au calquage, l\'IA proposera une identité inspirée (même style, couleurs et polices différentes) et une recommandation pour votre logo.'
+                  : 'Couleurs et polices inspirées de la marque de référence (même style, pas de copie). Vous pouvez les modifier et les appliquer à votre identité.'}
+            </p>
+            {(visualIdentityProp?.colorPalette || visualIdentityProp?.typography) && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-6">
+                <div>
+                  <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Palette couleurs</p>
+                  <div className="space-y-3">
+                    {[
+                      { label: 'Primaire', value: primaryColor, set: setPrimaryColor },
+                      { label: 'Secondaire', value: secondaryColor, set: setSecondaryColor },
+                      { label: 'Accent', value: accentColor, set: setAccentColor },
+                    ].map(({ label, value, set }) => (
+                      <div key={label} className="flex items-center gap-3">
+                        <div
+                          className="w-12 h-12 rounded-3xl shadow-apple shrink-0"
+                          style={{ backgroundColor: value }}
+                          title={value}
+                        />
+                        {visualIdentityLocked ? (
+                          <span className="font-mono text-sm text-[#1D1D1F]/60" aria-label={`Couleur ${label}`}>{value}</span>
                         ) : (
-                          renderContent(sec.content)
+                          <Input
+                            value={value}
+                            onChange={(e) => set(e.target.value)}
+                            className="font-mono text-sm h-11 max-w-[140px]"
+                            placeholder="#000000"
+                            aria-label={`Couleur ${label}`}
+                          />
                         )}
                       </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Typographie</p>
+                  <div className="space-y-3">
+                    <div>
+                      <label className="text-sm text-[#1D1D1F]/60 block mb-2">Titres</label>
+                      {visualIdentityLocked ? (
+                        <p className="text-base text-[#1D1D1F] py-2">{headingFont || '—'}</p>
+                      ) : (
+                        <Input
+                          value={headingFont}
+                          onChange={(e) => setHeadingFont(e.target.value)}
+                          className="text-base h-11"
+                          placeholder="Ex. Inter, Playfair Display"
+                          aria-label="Police titres"
+                        />
+                      )}
+                    </div>
+                    <div>
+                      <label className="text-sm text-[#1D1D1F]/60 block mb-2">Corps</label>
+                      {visualIdentityLocked ? (
+                        <p className="text-base text-[#1D1D1F] py-2">{bodyFont || '—'}</p>
+                      ) : (
+                        <Input
+                          value={bodyFont}
+                          onChange={(e) => setBodyFont(e.target.value)}
+                          className="text-base h-11"
+                          placeholder="Ex. Inter, Open Sans"
+                          aria-label="Police corps"
+                        />
+                      )}
                     </div>
                   </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
+                </div>
+              </div>
+            )}
+            {visualIdentityProp?.logoRecommendation && (
+              <div className="rounded-3xl bg-white shadow-apple p-6">
+                <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-3">Recommandation logo</p>
+                <p className="text-base text-[#1D1D1F] leading-relaxed">{visualIdentityProp.logoRecommendation}</p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      <h2 className="text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-8">Stratégie par thème</h2>
+      <div className="space-y-8">
+        {sectionPreviews.map((sec, i) => {
+          const schematic = renderSectionSchematic(sec, i);
+          return (
+            <Card key={i} id={`strategy-section-${i}`} className="rounded-3xl bg-white shadow-apple overflow-hidden scroll-mt-4">
+              <div className="flex items-center gap-4 px-6 sm:px-8 py-4 sm:py-6 border-b border-black/5">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#007AFF]/10 flex items-center justify-center shrink-0">
+                  <sec.meta.Icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#007AFF]" />
+                </div>
+                <CardTitle className="text-lg sm:text-xl font-semibold tracking-tight text-[#1D1D1F] break-words">{sec.title}</CardTitle>
+              </div>
+              <CardContent className="px-5 sm:px-8 py-6 sm:py-8">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+                  <div className="rounded-3xl bg-white shadow-apple p-6 min-h-[280px] lg:min-h-[320px] flex flex-col">
+                    <div className="flex-1 min-h-[260px] lg:min-h-[300px] flex items-center justify-center w-full min-w-0 overflow-auto">
+                      {schematic || (
+                        <div className="w-full p-6 text-center">
+                          <p className="text-sm text-[#1D1D1F]/60 leading-relaxed break-words px-2">{sec.preview}</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                  <div className="rounded-3xl bg-white shadow-apple p-6 min-h-[140px]">
+                    <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Contenu détaillé</p>
+                    <div className="text-sm leading-relaxed space-y-3 max-h-[300px] overflow-y-auto">
+                      {sec.isTimingSection && sec.bullets.length > 0 ? (
+                        <>
+                          <ol className="relative border-l border-[#007AFF]/40 pl-6 space-y-3">
+                            {sec.bullets.map((step, j) => (
+                              <li key={j} className="relative flex gap-3">
+                                <span className="absolute -left-7 w-6 h-6 rounded-full bg-[#007AFF] flex items-center justify-center font-mono text-xs font-semibold text-white">
+                                  {j + 1}
+                                </span>
+                                <span className="text-[#1D1D1F]">{sanitizeDisplayText(step)}</span>
+                              </li>
+                            ))}
+                          </ol>
+                          {sec.content.replace(new RegExp('\n[-*]\\s+', 'g'), '\n').trim().length > sec.bullets.join(' ').length && (
+                            <div className="mt-4 pt-4 border-t border-black/5">{renderContent(sec.content)}</div>
+                          )}
+                        </>
+                      ) : (
+                        renderContent(sec.content)
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
     </div>
   );
 

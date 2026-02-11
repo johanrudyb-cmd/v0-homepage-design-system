@@ -25,6 +25,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**.hm.com' },
       { protocol: 'https', hostname: 'lp2.hm.com' },
       { protocol: 'https', hostname: 'image.uniqlo.com' },
+      { protocol: 'https', hostname: 'upload.wikimedia.org' },
+      { protocol: 'https', hostname: 'www.google.com' }, // Pour les favicons via google.com/s2/favicons
 
       // Authentification (Avatars)
       { protocol: 'https', hostname: 'lh3.googleusercontent.com' }, // Google

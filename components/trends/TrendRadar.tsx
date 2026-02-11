@@ -84,7 +84,7 @@ export function TrendRadar({ userId }: TrendRadarProps) {
       if (debouncedProductType) params.append('productType', debouncedProductType);
       if (debouncedSegment) params.append('segment', debouncedSegment);
       params.append('limit', '50');
-      
+
       const response = await fetch(`/api/trends/confirmed?${params.toString()}`);
       const data = await response.json();
       setTrends(data.trends || []);
@@ -125,7 +125,7 @@ export function TrendRadar({ userId }: TrendRadarProps) {
         method: 'POST',
       });
       const data = await response.json();
-      
+
       if (response.ok) {
         // Recharger les tendances
         await loadTrends();
@@ -181,7 +181,7 @@ export function TrendRadar({ userId }: TrendRadarProps) {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         // Rediriger vers le Design Studio avec les données pré-remplies
         const params = new URLSearchParams({
@@ -190,7 +190,7 @@ export function TrendRadar({ userId }: TrendRadarProps) {
           material: data.designData.material || '',
           prompt: encodeURIComponent(data.designData.customPrompt),
         });
-        
+
         window.location.href = `/design-studio?${params.toString()}`;
       } else {
         throw new Error(data.error || 'Erreur lors de la création');
@@ -220,7 +220,7 @@ export function TrendRadar({ userId }: TrendRadarProps) {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         // Rediriger vers Sourcing Hub avec les données et filtres automatiques
         const params = new URLSearchParams({
@@ -401,7 +401,7 @@ export function TrendRadar({ userId }: TrendRadarProps) {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {trends.map((trend, index) => {
             const rank = index + 1;
             const isRecommended = trend.recommendation === 'recommended';

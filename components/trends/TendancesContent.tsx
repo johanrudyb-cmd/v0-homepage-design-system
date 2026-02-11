@@ -8,7 +8,7 @@ import { getProductBrand } from '@/lib/brand-utils';
 import { proxyImageUrl } from '@/lib/image-proxy';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Loader2, Eye, ChevronDown, ChevronUp, Globe, AlertTriangle, Flame, MapPin, CheckCircle } from 'lucide-react';
+import { TrendingUp, Loader2, Eye, ChevronDown, ChevronUp, Globe, AlertTriangle, Flame, MapPin, CheckCircle, Lock } from 'lucide-react';
 
 interface HybridTrend {
   id: string;
@@ -596,22 +596,12 @@ export function TendancesContent() {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
               {trends.map((t) => {
                 const isFree = user?.plan === 'free';
                 const isVisible = !isFree || homepageIds.has(t.id);
                 const canAnalyze = !isFree || (analysesCount !== null && analysesCount < 3);
                 const handleAnalyzeClick = (e: React.MouseEvent) => {
-                  if (isFree && !canAnalyze) {
-                    e.preventDefault();
-                    router.push('/auth/choose-plan');
-                    return;
-                  }
-                  if (isFree && !isVisible) {
-                    e.preventDefault();
-                    router.push('/auth/choose-plan');
-                    return;
-                  }
                   try {
                     sessionStorage.setItem('trends-list-scroll', String(window.scrollY ?? document.documentElement.scrollTop ?? 0));
                     sessionStorage.setItem('trends-list-segment', segment || 'homme');
@@ -619,74 +609,77 @@ export function TendancesContent() {
                   } catch (_) { }
                 };
                 return (
-                  <Card key={t.id} className={`overflow-hidden flex flex-col relative ${isFree && !isVisible ? 'blur-sm' : ''}`}>
+                  <Card key={t.id} className="overflow-hidden flex flex-col relative">
                     {isFree && !isVisible && (
-                      <div className="absolute inset-0 z-10 flex items-center justify-center bg-black/30 rounded-lg">
+                      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md rounded-lg p-4 text-center">
+                        <Lock className="w-8 h-8 text-white mb-4 animate-pulse" />
                         <Link
                           href="/auth/choose-plan"
-                          className="px-4 py-2 bg-white text-black rounded-full text-sm font-semibold hover:bg-gray-100"
+                          className="px-6 py-2.5 bg-white text-black rounded-full text-sm font-bold hover:bg-gray-100 shadow-xl transition-all active:scale-95"
                         >
-                          Passer au plan Créateur pour voir
+                          Débloquer avec le plan Créateur
                         </Link>
                       </div>
                     )}
-                    <div className="aspect-[3/4] bg-muted relative shrink-0">
-                      {t.imageUrl ? (
-                        <img
-                          src={proxyImageUrl(t.imageUrl) || t.imageUrl}
-                          alt={t.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            // En cas d'erreur, afficher l'icône par défaut
-                            e.currentTarget.style.display = 'none';
-                            const parent = e.currentTarget.parentElement;
-                            if (parent) {
-                              parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-12 h-12 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                          <Globe className="w-12 h-12 opacity-40" />
+                    <div className={`flex flex-col flex-1 ${isFree && !isVisible ? 'opacity-0' : ''}`}>
+                      <div className="aspect-[3/4] bg-muted relative shrink-0">
+                        {t.imageUrl ? (
+                          <img
+                            src={proxyImageUrl(t.imageUrl) || t.imageUrl}
+                            alt={t.name}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              // En cas d'erreur, afficher l'icône par défaut
+                              e.currentTarget.style.display = 'none';
+                              const parent = e.currentTarget.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-12 h-12 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                            <Globe className="w-12 h-12 opacity-40" />
+                          </div>
+                        )}
+                        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                          {t.segment && (
+                            <span className="px-2 py-0.5 rounded-md bg-primary/90 text-primary-foreground text-xs font-medium capitalize">
+                              {t.segment}
+                            </span>
+                          )}
+                          <span className="px-2 py-0.5 rounded-md bg-background/90 text-xs font-medium">
+                            {t.marketZone || '—'}
+                          </span>
+                          {t.isGlobalTrendAlert && (
+                            <span className="px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-xs font-medium">
+                              Global Trend Alert
+                            </span>
+                          )}
                         </div>
-                      )}
-                      <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                        {t.segment && (
-                          <span className="px-2 py-0.5 rounded-md bg-primary/90 text-primary-foreground text-xs font-medium capitalize">
-                            {t.segment}
-                          </span>
-                        )}
-                        <span className="px-2 py-0.5 rounded-md bg-background/90 text-xs font-medium">
-                          {t.marketZone || '—'}
-                        </span>
-                        {t.isGlobalTrendAlert && (
-                          <span className="px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-xs font-medium">
-                            Global Trend Alert
-                          </span>
-                        )}
                       </div>
-                    </div>
-                    <CardContent className="p-4 flex-1 flex flex-col">
-                      <h3 className="text-sm font-semibold line-clamp-4 leading-snug">{t.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {t.category} · {t.cut || '—'} · {(() => { const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand); return b; })()}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {(t.material && t.material.trim() && t.material !== 'Non spécifié') ? t.material : '—'}
-                      </p>
-                      <Link
-                        href={isFree && (!canAnalyze || !isVisible) ? '/auth/choose-plan' : `/trends/${t.id}`}
-                        className="inline-flex h-9 w-full items-center justify-center rounded-lg border border-border bg-background px-4 text-xs font-semibold transition-all hover:bg-muted hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-3"
-                        onClick={handleAnalyzeClick}
-                      >
-                        {isFree && !canAnalyze ? 'Limite atteinte — Passer au plan Créateur' : 'Analyser la tendance'}
-                      </Link>
-                      {t.businessAnalysis ? (
-                        <p className="text-xs text-muted-foreground mt-2 line-clamp-3 border-t pt-2">
-                          {t.businessAnalysis}
+                      <CardContent className="p-4 flex-1 flex flex-col">
+                        <h3 className="text-sm font-semibold line-clamp-4 leading-snug">{t.name}</h3>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {t.category} · {t.cut || '—'} · {(() => { const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand); return b; })()}
                         </p>
-                      ) : null}
-                    </CardContent>
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {(t.material && t.material.trim() && t.material !== 'Non spécifié') ? t.material : '—'}
+                        </p>
+                        <Link
+                          href={`/trends/${t.id}`}
+                          className="inline-flex h-9 w-full items-center justify-center rounded-lg border border-border bg-background px-4 text-xs font-semibold transition-all hover:bg-muted hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-3"
+                          onClick={handleAnalyzeClick}
+                        >
+                          Analyser la tendance
+                        </Link>
+                        {t.businessAnalysis ? (
+                          <p className="text-xs text-muted-foreground mt-2 line-clamp-3 border-t pt-2">
+                            {t.businessAnalysis}
+                          </p>
+                        ) : null}
+                      </CardContent>
+                    </div>
                   </Card>
                 );
               })}

@@ -6,7 +6,7 @@ import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
-import { X } from 'lucide-react';
+import { X, Settings, LogOut, Zap } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', description: 'Vue d\'ensemble', href: '/dashboard', tourId: 'tour-dashboard' },
@@ -34,10 +34,10 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 h-screen w-72 max-w-[85vw] backdrop-blur-xl bg-white/95 flex flex-col z-50',
+        'fixed left-0 top-0 h-[100dvh] lg:h-screen w-72 max-w-[85vw] backdrop-blur-xl bg-white/95 flex flex-col z-50 overflow-y-auto lg:overflow-y-hidden',
         'transform transition-transform duration-300 ease-out',
         'lg:translate-x-0',
-        open ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
+        open ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
       )}
     >
       {/* Header avec logo centré (desktop) / logo + fermer (mobile) */}
@@ -56,7 +56,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
       </div>
 
       {/* Navigation Apple - Glassmorphism */}
-      <nav className="flex-1 overflow-y-auto pt-6 pb-6 px-6 space-y-8">
+      <nav className="flex-1 lg:overflow-y-auto pt-6 pb-6 px-6 space-y-8 flex flex-col">
         {/* Section Navigation */}
         <div>
           <h2 className="px-4 mb-3 text-xs font-semibold text-[#1D1D1F]/40 uppercase tracking-wider">
@@ -119,46 +119,48 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
             })}
           </div>
         </div>
-      </nav>
 
-      {/* Bottom Section */}
-      <div className="p-4 sm:p-6 space-y-1 border-t border-black/5">
-        <Link
-          href="/usage"
-          onClick={handleNav}
-          className={cn(
-            'block min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center',
-            pathname === '/usage'
-              ? 'bg-black/5 text-[#007AFF]'
-              : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
-          )}
-          title="Gérer mes quotas et crédits"
-        >
-          Mes quotas
-        </Link>
-        <Link
-          href="/settings"
-          onClick={handleNav}
-          className={cn(
-            'block min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center',
-            pathname === '/settings'
-              ? 'bg-black/5 text-[#007AFF]'
-              : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
-          )}
-        >
-          Paramètres
-        </Link>
-        <button
-          type="button"
-          className="min-h-[44px] w-full text-left px-4 py-3 rounded-2xl text-base font-medium text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF] transition-all duration-200 flex items-center active:bg-black/10"
-          onClick={() => {
-            onClose?.();
-            signOut({ callbackUrl: '/' });
-          }}
-        >
-          Déconnexion
-        </button>
-      </div>
+        <div className="lg:mt-auto pt-8 border-t border-black/5 space-y-1 pb-4">
+          <Link
+            href="/usage"
+            onClick={handleNav}
+            className={cn(
+              'min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center gap-3',
+              pathname === '/usage'
+                ? 'bg-black/5 text-[#007AFF]'
+                : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
+            )}
+            title="Gérer mes quotas et crédits"
+          >
+            <Zap className="w-5 h-5" />
+            <span>Mes quotas</span>
+          </Link>
+          <Link
+            href="/settings"
+            onClick={handleNav}
+            className={cn(
+              'min-h-[44px] px-4 py-3 rounded-2xl text-base font-medium transition-all duration-200 flex items-center gap-3',
+              pathname === '/settings'
+                ? 'bg-black/5 text-[#007AFF]'
+                : 'text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF]'
+            )}
+          >
+            <Settings className="w-5 h-5" />
+            <span>Paramètres</span>
+          </Link>
+          <button
+            type="button"
+            className="min-h-[44px] w-full text-left px-4 py-3 rounded-2xl text-base font-medium text-[#1D1D1F]/60 hover:bg-black/5 hover:text-[#007AFF] transition-all duration-200 flex items-center gap-3 active:bg-black/10"
+            onClick={() => {
+              onClose?.();
+              signOut({ callbackUrl: '/' });
+            }}
+          >
+            <LogOut className="w-5 h-5" />
+            <span>Déconnexion</span>
+          </button>
+        </div>
+      </nav>
     </aside>
   );
 }

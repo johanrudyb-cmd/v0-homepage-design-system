@@ -11,6 +11,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
+import { useToast } from '@/components/ui/toast';
 import { Loader2, Copy, Edit2, Save, X, FileText, Sparkles, FolderPlus } from 'lucide-react';
 import { UGCContentHistory } from './UGCContentHistory';
 
@@ -27,6 +28,7 @@ interface Script {
 
 export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
   const scriptsQuota = useQuota('ugc_scripts');
+  const { toast } = useToast();
   const openSurplusModal = useSurplusModal();
   const [productDescription, setProductDescription] = useState('');
   const [count, setCount] = useState(5);
@@ -80,6 +82,11 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
         id: s.id,
         content: typeof s === 'string' ? s : s.content,
       })));
+      toast({
+        title: 'Scripts générés !',
+        message: `${data.scripts.length} scripts UGC sont prêts.`,
+        type: 'success',
+      });
       setShowHistory(false);
       window.dispatchEvent(new CustomEvent(USAGE_REFRESH_EVENT));
     } catch (err: any) {
@@ -91,6 +98,11 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
 
   const handleCopy = (script: string) => {
     navigator.clipboard.writeText(script);
+    toast({
+      message: 'Script copié dans le presse-papier',
+      type: 'info',
+      duration: 2000,
+    });
   };
 
   const handleEdit = (script: Script) => {
@@ -113,10 +125,18 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
         setScripts(scripts.map((s) =>
           s.id === editingScript.id ? { ...s, content: editingScript.content } : s
         ));
+        toast({
+          message: 'Modification enregistrée',
+          type: 'success',
+        });
         setEditingScript(null);
       }
     } catch (error) {
       console.error('Erreur sauvegarde:', error);
+      toast({
+        message: 'Erreur lors de la sauvegarde',
+        type: 'error',
+      });
     }
   };
 
@@ -162,6 +182,11 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
       });
       if (!res.ok) throw new Error('Impossible d\'ajouter l\'article');
       setFileDone(true);
+      toast({
+        title: 'Ajouté au fichier',
+        message: 'Le script a été ajouté avec succès.',
+        type: 'success',
+      });
       setFileNewName('');
       setFileArticleLabel('');
       setFileCollectionId(collections[0]?.id ?? '');

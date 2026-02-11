@@ -7,7 +7,7 @@ interface Phase4MarketingProps {
   brandId: string;
   brandName: string;
   brand?: { id: string; name: string; logo?: string | null; colorPalette?: unknown; typography?: unknown; styleGuide?: unknown } | null;
-  onComplete: () => void;
+  onComplete?: () => void;
   isCompleted: boolean;
 }
 
@@ -36,7 +36,7 @@ export function Phase4Marketing({ brandId, brandName, brand, onComplete, isCompl
           ).length;
           setScriptsCount(structuredCount);
           if (structuredCount >= 1 && !isCompleted) {
-            onComplete();
+            if (onComplete) onComplete();
           }
         }
       } catch (error) {

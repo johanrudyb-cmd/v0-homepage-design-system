@@ -19,6 +19,7 @@ import { StrategyPresentationView } from './StrategyPresentationView';
 import type { BrandIdentity } from './LaunchMapStepper';
 import { cn } from '@/lib/utils';
 import { GenerationLoadingPopup } from '@/components/ui/generation-loading-popup';
+import { useToast } from '@/components/ui/toast';
 import { GenerationCostBadge } from '@/components/ui/generation-cost-badge';
 import { ConfirmGenerateModal } from '@/components/ui/confirm-generate-modal';
 import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
@@ -98,6 +99,7 @@ function formatStrategyForPresentation(raw: string): ({ type: 'section'; title: 
 
 export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, userPlan = 'free' }: Phase1StrategyProps) {
   const router = useRouter();
+  const { toast } = useToast();
   const sg = brand?.styleGuide && typeof brand.styleGuide === 'object' ? brand.styleGuide as Record<string, unknown> : null;
   const strategyQuota = useQuota('brand_strategy');
   const strategyViewQuota = useQuota('strategy_view');
@@ -259,6 +261,11 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
       if (!strategyRes.ok) throw new Error(strategyData.error || 'Erreur génération');
       const strategyText = strategyData.strategy || '';
       setStrategyResult(strategyText);
+      toast({
+        title: 'Stratégie calquée !',
+        message: `La stratégie de ${templateName} a été adaptée à votre marque.`,
+        type: 'success',
+      });
       setViewingTemplate(null);
       setStrategyModalOpen(false);
       window.dispatchEvent(new CustomEvent(USAGE_REFRESH_EVENT));
@@ -467,6 +474,11 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
       if (!res.ok) throw new Error(data.error || 'Erreur génération logo');
       if (Array.isArray(data.proposals) && data.proposals.length > 0) {
         setLogoProposals(data.proposals);
+        toast({
+          title: 'Logos générés !',
+          message: 'Découvrez vos 4 propositions de logo.',
+          type: 'success',
+        });
       }
       router.refresh();
     } catch (e) {
@@ -522,6 +534,11 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Erreur');
+      toast({
+        title: 'Stratégie validée !',
+        message: 'Passons à l\'étape suivante.',
+        type: 'success',
+      });
       router.refresh();
       if (sg?.noLogo === true && !brand?.logo) {
         setShowLogoStep(true);

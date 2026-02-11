@@ -69,7 +69,6 @@ export default async function ContentCreationPage() {
                         brandId={brand.id}
                         brandName={brand.name}
                         brand={brandData}
-                        onComplete={() => { }}
                         isCompleted={brand.launchMap?.phase6 ?? false}
                     />
                 </div>

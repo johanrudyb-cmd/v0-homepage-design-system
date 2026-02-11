@@ -230,6 +230,15 @@
 
   /* Les liens dans le texte normal ne doivent PAS être bleus automatiquement */
   /* Seuls les éléments explicitement marqués comme interactifs le seront */
+  /* Masquer la barre de défilement mais garder le scroll */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* Animations Apple - Transitions douces et élégantes */
