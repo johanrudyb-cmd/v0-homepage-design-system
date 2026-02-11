@@ -456,240 +456,237 @@ export function TendancesContent() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
-          <TrendingUp className="w-7 h-7" />
-          Tendances de la semaine
-        </h1>
-        <p className="text-muted-foreground mt-1 text-sm max-w-2xl">
-          Les tendances sont mises à jour chaque semaine. Consultez les tendances par marché ci-dessous.
-        </p>
-        <p className="text-muted-foreground mt-1 text-xs">
-          Filtre par cible : 18-24 ans ou 25-34 ans.
-        </p>
-      </div>
-
-      {/* Tendances par marché — contenu principal en premier */}
-      <div>
-        {brandFromUrl && (
-          <div className="mb-4 p-3 rounded-lg border bg-muted/30 flex items-center gap-3">
-            <span className="text-sm font-medium">Filtre :</span>
-            <span className="px-2 py-1 rounded-md bg-primary/10 text-primary font-semibold">{brandFromUrl}</span>
-            <Link href="/trends" className="text-sm text-muted-foreground hover:text-foreground underline">
-              Voir toutes les tendances
-            </Link>
-          </div>
-        )}
-        <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="text-lg font-semibold">{brandFromUrl ? `Tendances ${brandFromUrl}` : 'Tendances par marché'}</h2>
-            <span className="text-xs font-medium text-muted-foreground px-2 py-1 rounded-md bg-primary/10 text-primary border border-primary/20" title="Cible âge">
-              {AGE_LABELS[ageRange]}
-            </span>
-          </div>
-          <div className="flex flex-wrap gap-3 items-center">
-            <div className="flex rounded-lg border border-input bg-muted/30 p-0.5" role="group" aria-label="Tranche d'âge">
-              <button
-                type="button"
-                onClick={() => setAgeRange('18-24')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${ageRange === '18-24' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                18-24 ans
-              </button>
-              <button
-                type="button"
-                onClick={() => setAgeRange('25-34')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${ageRange === '25-34' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                25-34 ans
-              </button>
-            </div>
-            <div className="flex rounded-lg border border-input bg-muted/30 p-0.5">
-              <button
-                type="button"
-                onClick={() => setSegment('homme')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${segment === 'homme' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                Homme
-              </button>
-              <button
-                type="button"
-                onClick={() => setSegment('femme')}
-                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-colors ${segment === 'femme' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'}`}
-              >
-                Femme
-              </button>
-            </div>
-            <span className="text-xs font-medium text-muted-foreground px-2 py-1 rounded-md bg-muted/60">Zone EU</span>
-            <label className="text-sm font-medium">Tri</label>
-            <select
-              value={sortBy === 'priceAsc' || sortBy === 'priceDesc' ? 'best' : sortBy}
-              onChange={(e) => setSortBy(e.target.value)}
-              className="h-9 px-3 rounded-md border border-input bg-background text-sm"
-            >
-              <option value="best">Meilleures tendances (score)</option>
-              <option value="recent">Plus récents</option>
-            </select>
+      {brandFromUrl && (
+        <div className="mb-4 p-3 rounded-lg border bg-muted/30 flex items-center gap-3">
+          <span className="text-sm font-medium">Filtre :</span>
+          <span className="px-2 py-1 rounded-md bg-primary/10 text-primary font-semibold">{brandFromUrl}</span>
+          <Link href="/trends" className="text-sm text-muted-foreground hover:text-foreground underline">
+            Voir toutes les tendances
+          </Link>
+        </div>
+      )}
+      <div className="sticky top-14 sm:top-16 z-30 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-black/5 space-y-3">
+        <div className="flex items-center justify-between gap-4">
+          <h2 className="text-lg font-bold tracking-tight text-[#1D1D1F]">
+            Radar tendances
+          </h2>
+          <div className="flex items-center gap-2">
+            <span className="text-[10px] font-bold text-muted-foreground px-2 py-0.5 rounded-full bg-muted border border-black/5 uppercase tracking-tighter"> Zone EU</span>
             <Button
               variant="ghost"
               size="sm"
-              className="text-muted-foreground h-9 text-sm"
+              className="text-primary hover:bg-primary/5 h-8 text-xs font-bold"
               onClick={() => setAdvancedFiltersOpen((v) => !v)}
             >
-              Filtres avancés
+              {advancedFiltersOpen ? 'Fermer filtres' : 'Filtres avancés'}
             </Button>
           </div>
         </div>
-        {advancedFiltersOpen && (
-          <div className="mb-4 p-3 rounded-lg border bg-muted/30 flex items-center gap-2">
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
-              <input
-                type="checkbox"
-                checked={globalOnly}
-                onChange={(e) => setGlobalOnly(e.target.checked)}
-              />
-              Global Trend Alert uniquement
-            </label>
-          </div>
-        )}
-        <p className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
-          <Flame className="w-3.5 h-3.5 text-orange-500" />
-          <span>Indicateur tendance basé sur plus de 15 000 références.</span>
-        </p>
-        {limitReached && user?.plan === 'free' && (
-          <div className="mb-4 p-4 rounded-lg border-2 border-amber-500/50 bg-amber-50 flex items-center justify-between gap-4">
-            <p className="text-sm font-medium text-amber-900">
-              Vous avez atteint la limite de 3 analyses par mois. Passez au plan Créateur pour analyser plus de tendances.
-            </p>
-            <Link
-              href="/auth/choose-plan"
-              className="shrink-0 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-700"
+
+        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+          {/* Age selector */}
+          <div className="flex rounded-xl border border-black/5 bg-black/[0.03] p-1 shrink-0">
+            <button
+              type="button"
+              onClick={() => setAgeRange('18-24')}
+              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${ageRange === '18-24' ? 'bg-white text-primary shadow-apple-sm' : 'text-muted-foreground hover:text-foreground'}`}
             >
-              Passer au plan Créateur
-            </Link>
+              18-24 ans
+            </button>
+            <button
+              type="button"
+              onClick={() => setAgeRange('25-34')}
+              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${ageRange === '25-34' ? 'bg-white text-primary shadow-apple-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              25-34 ans
+            </button>
           </div>
-        )}
-        {trendsLoading ? (
-          <div className="flex items-center gap-2 text-muted-foreground py-12">
-            <Loader2 className="w-5 h-5 animate-spin" />
-            Chargement des tendances…
+
+          {/* Segment selector */}
+          <div className="flex rounded-xl border border-black/5 bg-black/[0.03] p-1 shrink-0">
+            <button
+              type="button"
+              onClick={() => setSegment('homme')}
+              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${segment === 'homme' ? 'bg-white text-primary shadow-apple-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Homme
+            </button>
+            <button
+              type="button"
+              onClick={() => setSegment('femme')}
+              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${segment === 'femme' ? 'bg-white text-primary shadow-apple-sm' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Femme
+            </button>
           </div>
-        ) : trends.length === 0 ? (
-          <Card>
-            <CardContent className="py-12 text-center text-muted-foreground">
-              <AlertTriangle className="w-12 h-12 mx-auto mb-2 opacity-50" />
-              <p>
-                {brandFromUrl
-                  ? `Aucune tendance pour la marque « ${brandFromUrl} ».`
-                  : 'Aucune tendance enregistrée pour le moment.'}
-              </p>
-              <p className="text-sm mt-1">
-                {brandFromUrl ? (
-                  <Link href="/trends" className="underline hover:text-foreground">
-                    Voir toutes les tendances
-                  </Link>
-                ) : (
-                  'Utilisez la section « Récupérer les tendances » ci-dessous pour alimenter le radar.'
-                )}
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
-              {trends.map((t) => {
-                const isFree = user?.plan === 'free';
-                const isVisible = !isFree || homepageIds.has(t.id);
-                const canAnalyze = !isFree || (analysesCount !== null && analysesCount < 3);
-                const handleAnalyzeClick = (e: React.MouseEvent) => {
-                  try {
-                    sessionStorage.setItem('trends-list-scroll', String(window.scrollY ?? document.documentElement.scrollTop ?? 0));
-                    sessionStorage.setItem('trends-list-segment', segment || 'homme');
-                    sessionStorage.setItem('trends-list-ageRange', ageRange || '25-34');
-                  } catch (_) { }
-                };
-                return (
-                  <Card key={t.id} className="overflow-hidden flex flex-col relative">
-                    {isFree && !isVisible && (
-                      <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md rounded-lg p-4 text-center">
-                        <Lock className="w-8 h-8 text-white mb-4 animate-pulse" />
-                        <Link
-                          href="/auth/choose-plan"
-                          className="px-6 py-2.5 bg-white text-black rounded-full text-sm font-bold hover:bg-gray-100 shadow-xl transition-all active:scale-95"
-                        >
-                          Débloquer avec le plan Créateur
-                        </Link>
-                      </div>
-                    )}
-                    <div className={`flex flex-col flex-1 ${isFree && !isVisible ? 'opacity-0' : ''}`}>
-                      <div className="aspect-[3/4] bg-muted relative shrink-0">
-                        {t.imageUrl ? (
-                          <img
-                            src={proxyImageUrl(t.imageUrl) || t.imageUrl}
-                            alt={t.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              // En cas d'erreur, afficher l'icône par défaut
-                              e.currentTarget.style.display = 'none';
-                              const parent = e.currentTarget.parentElement;
-                              if (parent) {
-                                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-12 h-12 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
-                              }
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                            <Globe className="w-12 h-12 opacity-40" />
-                          </div>
-                        )}
-                        <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                          {t.segment && (
-                            <span className="px-2 py-0.5 rounded-md bg-primary/90 text-primary-foreground text-xs font-medium capitalize">
-                              {t.segment}
-                            </span>
-                          )}
-                          <span className="px-2 py-0.5 rounded-md bg-background/90 text-xs font-medium">
-                            {t.marketZone || '—'}
-                          </span>
-                          {t.isGlobalTrendAlert && (
-                            <span className="px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-xs font-medium">
-                              Global Trend Alert
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                      <CardContent className="p-4 flex-1 flex flex-col">
-                        <h3 className="text-sm font-semibold line-clamp-4 leading-snug">{t.name}</h3>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {t.category} · {t.cut || '—'} · {(() => { const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand); return b; })()}
-                        </p>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          {(t.material && t.material.trim() && t.material !== 'Non spécifié') ? t.material : '—'}
-                        </p>
-                        <Link
-                          href={`/trends/${t.id}`}
-                          className="inline-flex h-9 w-full items-center justify-center rounded-lg border border-border bg-background px-4 text-xs font-semibold transition-all hover:bg-muted hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-3"
-                          onClick={handleAnalyzeClick}
-                        >
-                          Analyser la tendance
-                        </Link>
-                        {t.businessAnalysis ? (
-                          <p className="text-xs text-muted-foreground mt-2 line-clamp-3 border-t pt-2">
-                            {t.businessAnalysis}
-                          </p>
-                        ) : null}
-                      </CardContent>
-                    </div>
-                  </Card>
-                );
-              })}
+
+          {/* Sort selector simplified for mobile */}
+          <select
+            value={sortBy === 'priceAsc' || sortBy === 'priceDesc' ? 'best' : sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="h-8 px-3 rounded-xl border border-black/5 bg-black/[0.03] text-[11px] font-bold text-muted-foreground outline-none focus:ring-1 focus:ring-primary/20"
+          >
+            <option value="best">Meilleurs scores</option>
+            <option value="recent">Plus récents</option>
+          </select>
+        </div>
+
+        {advancedFiltersOpen && (
+          <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-200">
+            <div className="p-3 rounded-2xl border border-black/5 bg-black/[0.02] flex items-center justify-between">
+              <label className="flex items-center gap-3 text-xs font-semibold text-[#1D1D1F]/70 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={globalOnly}
+                  onChange={(e) => setGlobalOnly(e.target.checked)}
+                  className="w-4 h-4 rounded border-black/10 text-primary focus:ring-primary"
+                />
+                Global Trend Alert uniquement
+              </label>
+              <Link href="/trends" className="text-[10px] font-bold text-primary hover:underline">
+                Réinitialiser
+              </Link>
             </div>
-            <p className="text-xs text-muted-foreground mt-4 text-center">
-              Ces tendances sont mises à jour chaque semaine.
-            </p>
-          </>
+          </div>
         )}
       </div>
+      <p className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
+        <Flame className="w-3.5 h-3.5 text-orange-500" />
+        <span>Indicateur tendance basé sur plus de 15 000 références.</span>
+      </p>
+      {limitReached && user?.plan === 'free' && (
+        <div className="mb-4 p-4 rounded-lg border-2 border-amber-500/50 bg-amber-50 flex items-center justify-between gap-4">
+          <p className="text-sm font-medium text-amber-900">
+            Vous avez atteint la limite de 3 analyses par mois. Passez au plan Créateur pour analyser plus de tendances.
+          </p>
+          <Link
+            href="/auth/choose-plan"
+            className="shrink-0 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-700"
+          >
+            Passer au plan Créateur
+          </Link>
+        </div>
+      )}
+      {trendsLoading ? (
+        <div className="flex items-center gap-2 text-muted-foreground py-12">
+          <Loader2 className="w-5 h-5 animate-spin" />
+          Chargement des tendances…
+        </div>
+      ) : trends.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center text-muted-foreground">
+            <AlertTriangle className="w-12 h-12 mx-auto mb-2 opacity-50" />
+            <p>
+              {brandFromUrl
+                ? `Aucune tendance pour la marque « ${brandFromUrl} ».`
+                : 'Aucune tendance enregistrée pour le moment.'}
+            </p>
+            <p className="text-sm mt-1">
+              {brandFromUrl ? (
+                <Link href="/trends" className="underline hover:text-foreground">
+                  Voir toutes les tendances
+                </Link>
+              ) : (
+                'Utilisez la section « Récupérer les tendances » ci-dessous pour alimenter le radar.'
+              )}
+            </p>
+          </CardContent>
+        </Card>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+            {trends.map((t) => {
+              const isFree = user?.plan === 'free';
+              const isVisible = !isFree || homepageIds.has(t.id);
+              const canAnalyze = !isFree || (analysesCount !== null && analysesCount < 3);
+              const handleAnalyzeClick = (e: React.MouseEvent) => {
+                try {
+                  sessionStorage.setItem('trends-list-scroll', String(window.scrollY ?? document.documentElement.scrollTop ?? 0));
+                  sessionStorage.setItem('trends-list-segment', segment || 'homme');
+                  sessionStorage.setItem('trends-list-ageRange', ageRange || '25-34');
+                } catch (_) { }
+              };
+              return (
+                <Card key={t.id} className="overflow-hidden flex flex-col relative">
+                  {isFree && !isVisible && (
+                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md rounded-lg p-4 text-center">
+                      <Lock className="w-8 h-8 text-white mb-4 animate-pulse" />
+                      <Link
+                        href="/auth/choose-plan"
+                        className="px-6 py-2.5 bg-white text-black rounded-full text-sm font-bold hover:bg-gray-100 shadow-xl transition-all active:scale-95"
+                      >
+                        Débloquer avec le plan Créateur
+                      </Link>
+                    </div>
+                  )}
+                  <div className={`flex flex-col flex-1 ${isFree && !isVisible ? 'opacity-0' : ''}`}>
+                    <div className="aspect-[3/4] bg-muted relative shrink-0">
+                      {t.imageUrl ? (
+                        <img
+                          src={proxyImageUrl(t.imageUrl) || t.imageUrl}
+                          alt={t.name}
+                          className="w-full h-full object-cover"
+                          onError={(e) => {
+                            // En cas d'erreur, afficher l'icône par défaut
+                            e.currentTarget.style.display = 'none';
+                            const parent = e.currentTarget.parentElement;
+                            if (parent) {
+                              parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-12 h-12 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
+                            }
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                          <Globe className="w-12 h-12 opacity-40" />
+                        </div>
+                      )}
+                      <div className="absolute top-2 left-2 flex flex-wrap gap-1">
+                        {t.segment && (
+                          <span className="px-2 py-0.5 rounded-md bg-primary/90 text-primary-foreground text-xs font-medium capitalize">
+                            {t.segment}
+                          </span>
+                        )}
+                        <span className="px-2 py-0.5 rounded-md bg-background/90 text-xs font-medium">
+                          {t.marketZone || '—'}
+                        </span>
+                        {t.isGlobalTrendAlert && (
+                          <span className="px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-xs font-medium">
+                            Global Trend Alert
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    <CardContent className="p-4 flex-1 flex flex-col">
+                      <h3 className="text-sm font-semibold line-clamp-4 leading-snug">{t.name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {t.category} · {t.cut || '—'} · {(() => { const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand); return b; })()}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">
+                        {(t.material && t.material.trim() && t.material !== 'Non spécifié') ? t.material : '—'}
+                      </p>
+                      <Link
+                        href={`/trends/${t.id}`}
+                        className="inline-flex h-9 w-full items-center justify-center rounded-lg border border-border bg-background px-4 text-xs font-semibold transition-all hover:bg-muted hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-3"
+                        onClick={handleAnalyzeClick}
+                      >
+                        Analyser la tendance
+                      </Link>
+                      {t.businessAnalysis ? (
+                        <p className="text-xs text-muted-foreground mt-2 line-clamp-3 border-t pt-2">
+                          {t.businessAnalysis}
+                        </p>
+                      ) : null}
+                    </CardContent>
+                  </div>
+                </Card>
+              );
+            })}
+          </div>
+          <p className="text-xs text-muted-foreground mt-4 text-center">
+            Ces tendances sont mises à jour chaque semaine.
+          </p>
+        </>
+      )}
 
       {/* Carte : Récupérer les tendances (Scrape + Prévisualiser) */}
       <Card className="flex flex-col border-2 border-muted">
@@ -1050,85 +1047,87 @@ export function TendancesContent() {
       </Card>
 
       {/* Résultat récupération */}
-      {scrapeOnlyResult && (
-        <Card>
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg flex items-center gap-2">
-              <Eye className="w-5 h-5" />
-              Produits récupérés ({scrapeOnlyResult.totalItems} produits)
-            </CardTitle>
-            <p className="text-sm text-muted-foreground">
-              Cliquez sur une source pour afficher les produits.
-            </p>
-            {scrapeOnlyResult.savedToTrends != null && scrapeOnlyResult.savedToTrends > 0 && (
-              <p className="text-sm text-primary font-medium mt-1">
-                {scrapeOnlyResult.savedToTrends} tendance(s) enregistrée(s) — affichées dans « Tendances par marché » ci-dessus.
+      {
+        scrapeOnlyResult && (
+          <Card>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Eye className="w-5 h-5" />
+                Produits récupérés ({scrapeOnlyResult.totalItems} produits)
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Cliquez sur une source pour afficher les produits.
               </p>
-            )}
-          </CardHeader>
-          <CardContent className="space-y-2">
-            {scrapeOnlyResult.results.map((source) => {
-              const isExpanded = scrapeOnlyExpanded === source.sourceId;
-              return (
-                <div key={source.sourceId} className="border rounded-lg overflow-hidden">
-                  <button
-                    type="button"
-                    onClick={() => setScrapeOnlyExpanded(isExpanded ? null : source.sourceId)}
-                    className="w-full flex items-center justify-between px-4 py-3 bg-muted/50 hover:bg-muted text-left text-sm font-medium"
-                  >
-                    <span>
-                      {source.marketZone} — {source.itemCount} produit{source.itemCount !== 1 ? 's' : ''}
-                    </span>
-                    {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                  </button>
-                  {isExpanded && (
-                    <div className="p-4 border-t bg-background">
-                      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                        {source.items.map((item, idx) => {
-                          const hasTechPack = Boolean(item.composition || item.careInstructions || item.color || item.sizes || item.countryOfOrigin || item.articleNumber);
-                          return (
-                            <div
-                              key={idx}
-                              className="rounded-lg border overflow-hidden bg-muted/30 flex flex-col"
-                            >
-                              <div className="aspect-square bg-muted relative">
-                                {item.imageUrl ? (
-                                  <img
-                                    src={proxyImageUrl(item.imageUrl) || item.imageUrl}
-                                    alt={item.name}
-                                    className="w-full h-full object-cover"
-                                  />
-                                ) : (
-                                  <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                                    Pas d&apos;image
-                                  </div>
-                                )}
+              {scrapeOnlyResult.savedToTrends != null && scrapeOnlyResult.savedToTrends > 0 && (
+                <p className="text-sm text-primary font-medium mt-1">
+                  {scrapeOnlyResult.savedToTrends} tendance(s) enregistrée(s) — affichées dans « Tendances par marché » ci-dessus.
+                </p>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-2">
+              {scrapeOnlyResult.results.map((source) => {
+                const isExpanded = scrapeOnlyExpanded === source.sourceId;
+                return (
+                  <div key={source.sourceId} className="border rounded-lg overflow-hidden">
+                    <button
+                      type="button"
+                      onClick={() => setScrapeOnlyExpanded(isExpanded ? null : source.sourceId)}
+                      className="w-full flex items-center justify-between px-4 py-3 bg-muted/50 hover:bg-muted text-left text-sm font-medium"
+                    >
+                      <span>
+                        {source.marketZone} — {source.itemCount} produit{source.itemCount !== 1 ? 's' : ''}
+                      </span>
+                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+                    {isExpanded && (
+                      <div className="p-4 border-t bg-background">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                          {source.items.map((item, idx) => {
+                            const hasTechPack = Boolean(item.composition || item.careInstructions || item.color || item.sizes || item.countryOfOrigin || item.articleNumber);
+                            return (
+                              <div
+                                key={idx}
+                                className="rounded-lg border overflow-hidden bg-muted/30 flex flex-col"
+                              >
+                                <div className="aspect-square bg-muted relative">
+                                  {item.imageUrl ? (
+                                    <img
+                                      src={proxyImageUrl(item.imageUrl) || item.imageUrl}
+                                      alt={item.name}
+                                      className="w-full h-full object-cover"
+                                    />
+                                  ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
+                                      Pas d&apos;image
+                                    </div>
+                                  )}
+                                </div>
+                                <div className="p-2 text-xs flex-1 flex flex-col min-w-0">
+                                  <p className="text-sm font-medium line-clamp-3 leading-snug">{item.name || '—'}</p>
+                                  {hasTechPack && (
+                                    <>
+                                      {item.articleNumber && <p className="mt-1 text-muted-foreground line-clamp-1">Ref: {item.articleNumber}</p>}
+                                      {item.color && <p className="text-muted-foreground line-clamp-1">Couleur: {item.color}</p>}
+                                      {item.composition && <p className="text-muted-foreground line-clamp-2 mt-0.5">Compo: {item.composition}</p>}
+                                      {item.careInstructions && <p className="text-muted-foreground line-clamp-1">Entretien: {item.careInstructions}</p>}
+                                      {item.sizes && <p className="text-muted-foreground line-clamp-1">Tailles: {item.sizes}</p>}
+                                      {item.countryOfOrigin && <p className="text-muted-foreground line-clamp-1">Origine: {item.countryOfOrigin}</p>}
+                                    </>
+                                  )}
+                                </div>
                               </div>
-                              <div className="p-2 text-xs flex-1 flex flex-col min-w-0">
-                                <p className="text-sm font-medium line-clamp-3 leading-snug">{item.name || '—'}</p>
-                                {hasTechPack && (
-                                  <>
-                                    {item.articleNumber && <p className="mt-1 text-muted-foreground line-clamp-1">Ref: {item.articleNumber}</p>}
-                                    {item.color && <p className="text-muted-foreground line-clamp-1">Couleur: {item.color}</p>}
-                                    {item.composition && <p className="text-muted-foreground line-clamp-2 mt-0.5">Compo: {item.composition}</p>}
-                                    {item.careInstructions && <p className="text-muted-foreground line-clamp-1">Entretien: {item.careInstructions}</p>}
-                                    {item.sizes && <p className="text-muted-foreground line-clamp-1">Tailles: {item.sizes}</p>}
-                                    {item.countryOfOrigin && <p className="text-muted-foreground line-clamp-1">Origine: {item.countryOfOrigin}</p>}
-                                  </>
-                                )}
-                              </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          })}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-      )}
-    </div>
+                    )}
+                  </div>
+                );
+              })}
+            </CardContent>
+          </Card>
+        )
+      }
+    </div >
   );
 }

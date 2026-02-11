@@ -20,9 +20,10 @@ export default auth((req) => {
   ].some(route => nextUrl.pathname.startsWith(route));
 
   if (isAuthPage) {
-    if (isAuthenticated) {
-      return NextResponse.redirect(new URL('/dashboard', nextUrl));
-    }
+    // Commenté temporairement pour éviter les boucles après reset de DB
+    // if (isAuthenticated) {
+    //   return NextResponse.redirect(new URL('/dashboard', nextUrl));
+    // }
     return NextResponse.next();
   }
 

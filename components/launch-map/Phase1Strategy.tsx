@@ -377,11 +377,8 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
         setShowConfirmViewStrategy(true);
         return;
       }
-      if (userPlan === 'free') {
-        openSurplusModal();
-        return;
-      }
-      if (strategyViewQuota?.isExhausted && !demoMode) {
+      // Free users allowed to view (blurred)
+      if (strategyViewQuota?.isExhausted && !demoMode && userPlan !== 'free') {
         setTemplateStrategyError('Quota de consultation épuisé. Prochaine consultation à la date de renouvellement.');
         openSurplusModal();
         return;
@@ -502,7 +499,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
       setValidateError("Choisissez une marque d'inspiration avant de valider.");
       return;
     }
-    if (strategyHistory.length === 0 && !strategyResult) {
+    if (strategyHistory.length === 0 && !strategyResult && userPlan !== 'free') {
       setValidateError('Calquez d\'abord la stratégie pour votre marque avant de valider.');
       return;
     }
@@ -646,6 +643,11 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
               </>
             )}
             {logoError && <p className="text-sm text-destructive mt-3" role="alert">{logoError}</p>}
+            <div className="mt-6 flex justify-center border-t border-border pt-4">
+              <Button variant="ghost" size="sm" onClick={() => onComplete()} className="text-muted-foreground hover:text-foreground">
+                Passer cette étape sans générer de logo
+              </Button>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -817,7 +819,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
                             'h-8 text-xs gap-1.5 shrink-0',
                             !isSelected && 'border-[#8B5CF6]/50 text-[#8B5CF6] hover:bg-[#8B5CF6]/10 hover:border-[#8B5CF6]'
                           )}
-                          disabled={templateStrategyLoading || userPlan === 'free' || (strategyViewQuota?.isExhausted && !demoMode) || (demoMode && (strategyViewQuota?.remaining ?? 10) <= 10 - STRATEGY_VIEW_ONBOARDING_LIMIT)}
+                          disabled={templateStrategyLoading || (strategyViewQuota?.isExhausted && !demoMode && userPlan !== 'free') || (demoMode && (strategyViewQuota?.remaining ?? 10) <= 10 - STRATEGY_VIEW_ONBOARDING_LIMIT)}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleVoirStrategie(b.slug, brandName || b.brandName);
@@ -1033,6 +1035,8 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
           onRegenerate={
             !viewingTemplate && !viewingFromHistory && selectedSlug ? handleRegenerateStrategy : undefined
           }
+          lastAIUpdate={sg?.lastAIUpdate as string | undefined}
+          isFree={userPlan === 'free' && !!viewingTemplate && !demoMode}
         />
       )}
 

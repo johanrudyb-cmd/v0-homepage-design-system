@@ -56,9 +56,12 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'slug requis' }, { status: 400 });
     }
 
-    const { allowed, message } = await checkAndRecordStrategyView(user.id, user.plan ?? 'free', isOnboarding);
-    if (!allowed) {
-      return NextResponse.json({ error: message ?? 'Quota consultation stratégie épuisé.' }, { status: 403 });
+    // Free users: unlimited access (blurred on client), no usage recorded.
+    if (user.plan !== 'free') {
+      const { allowed, message } = await checkAndRecordStrategyView(user.id, user.plan ?? 'free', isOnboarding);
+      if (!allowed) {
+        return NextResponse.json({ error: message ?? 'Quota consultation stratégie épuisé.' }, { status: 403 });
+      }
     }
 
     const template = await prisma.templateStrategy.findUnique({
@@ -125,9 +128,12 @@ export async function POST(request: Request) {
       );
     }
 
-    const { allowed, message } = await checkAndRecordStrategyView(user.id, user.plan ?? 'free', isOnboarding);
-    if (!allowed) {
-      return NextResponse.json({ error: message ?? 'Quota consultation stratégie épuisé.' }, { status: 403 });
+    // Free users: allow generation (blurred on client), no usage recorded.
+    if (user.plan !== 'free') {
+      const { allowed, message } = await checkAndRecordStrategyView(user.id, user.plan ?? 'free', isOnboarding);
+      if (!allowed) {
+        return NextResponse.json({ error: message ?? 'Quota consultation stratégie épuisé.' }, { status: 403 });
+      }
     }
 
     // Si déjà en base, retourner

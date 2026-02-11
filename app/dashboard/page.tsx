@@ -3,6 +3,7 @@ import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { DashboardRefresh } from '@/components/dashboard/DashboardRefresh';
 import { DashboardNotifications } from '@/components/dashboard/DashboardNotifications';
 import { DashboardStats, DashboardStatsSkeleton } from '@/components/dashboard/DashboardStats';
+import { StrategyUpdateBanner } from '@/components/dashboard/StrategyUpdateBanner';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
@@ -72,6 +73,9 @@ export default async function DashboardPage() {
           <Suspense fallback={<DashboardStatsSkeleton />}>
             <DashboardStats brandId={brand.id} />
           </Suspense>
+
+          {/* Strategy Update Banner - Only for premium users */}
+          {user.plan !== 'free' && <StrategyUpdateBanner />}
 
           {/* Shopify Creation Panel */}
           {!launchMap?.shopifyShopDomain && (

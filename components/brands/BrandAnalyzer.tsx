@@ -44,20 +44,22 @@ export function BrandAnalyzer({ initialBrand = '' }: BrandAnalyzerProps) {
   const [showConfirmAnalyze, setShowConfirmAnalyze] = useState(false);
   const analyzeQuota = useQuota('brand_analyze');
 
-  const curatedBrand = CURATED_TOP_BRANDS.find(
-    (b) => b.brand.toLowerCase() === brandName.trim().toLowerCase()
-  );
+  const curatedBrand = (brandName && typeof brandName === 'string')
+    ? CURATED_TOP_BRANDS.find(
+      (b) => b.brand.toLowerCase() === brandName.trim().toLowerCase()
+    )
+    : undefined;
 
   const context = curatedBrand
     ? {
-        signaturePiece: curatedBrand.signaturePiece,
-        dominantStyle: curatedBrand.dominantStyle,
-        cyclePhase: CYCLE_PHASE_LABELS[curatedBrand.cyclePhase],
-        launchPotential: LAUNCH_POTENTIAL_LABELS[curatedBrand.launchPotential],
-        indicativePrice: curatedBrand.indicativePrice,
-        rank: curatedBrand.rank,
-        score: curatedBrand.score,
-      }
+      signaturePiece: curatedBrand.signaturePiece,
+      dominantStyle: curatedBrand.dominantStyle,
+      cyclePhase: CYCLE_PHASE_LABELS[curatedBrand.cyclePhase],
+      launchPotential: LAUNCH_POTENTIAL_LABELS[curatedBrand.launchPotential],
+      indicativePrice: curatedBrand.indicativePrice,
+      rank: curatedBrand.rank,
+      score: curatedBrand.score,
+    }
     : undefined;
 
   const handleAnalyze = async () => {
@@ -255,6 +257,7 @@ export function BrandAnalyzer({ initialBrand = '' }: BrandAnalyzerProps) {
             titleMode="analysis"
             visualIdentity={visualIdentity ? { colorPalette: visualIdentity.colorPalette, typography: visualIdentity.typography } : null}
             visualIdentityLocked
+            embedded={true}
             onClose={() => { setAnalysis(null); setVisualIdentity(null); setModalOpen(false); }}
             optionalPrimaryAction={{
               label: 'Dupliquer pour ma marque',

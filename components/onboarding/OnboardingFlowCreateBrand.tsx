@@ -253,6 +253,7 @@ export function OnboardingFlowCreateBrand({ onBack, demoMode = false, userPlan =
               brandId={brandId}
               brand={brand}
               onComplete={handleStrategyComplete}
+              userPlan={userPlan}
             />
           </CardContent>
         </Card>

@@ -4,7 +4,6 @@ import { Suspense, useState, useEffect } from 'react';
 import { usePathname, useSearchParams } from 'next/navigation';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
-import { MobileNav } from './MobileNav';
 import { DashboardTutorial } from '@/components/dashboard/DashboardTutorial';
 import { PageTransition } from './PageTransition';
 import { PaywallGate } from '@/components/paywall/PaywallGate';
@@ -51,7 +50,7 @@ export function DashboardLayout({
       />
       <div className="pl-0 lg:pl-72 min-h-screen flex flex-col transition-[padding] duration-200">
         <Header onMenuClick={() => setSidebarOpen(true)} />
-        <main className="flex-1 min-h-[calc(100vh-4rem)] flex flex-col pb-16 lg:pb-0">
+        <main className="flex-1 min-h-[calc(100vh-4rem)] flex flex-col">
           <ErrorBoundary>
             <PageTransition className="flex-1 min-h-0 flex flex-col">
               <PaywallGate>{children}</PaywallGate>
@@ -59,7 +58,6 @@ export function DashboardLayout({
           </ErrorBoundary>
         </main>
       </div>
-      <MobileNav />
       <Suspense fallback={null}>
         <DashboardTutorialGate />
       </Suspense>

@@ -5,6 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { Check, ArrowRight, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { SubscriptionWarning } from '@/components/subscription/SubscriptionWarning';
 
 const FREE_FEATURES = [
   '3 analyses de tendances par mois',
@@ -88,7 +89,7 @@ export function ChoosePlanClient() {
               <p className="text-3xl font-bold text-[#1D1D1F] mt-2">0€</p>
               <p className="text-sm text-[#6e6e73] mt-1">Sans carte bancaire</p>
             </div>
-            <ul className="space-y-3 mb-8">
+            <ul className="space-y-3 mb-6">
               {FREE_FEATURES.map((f, i) => (
                 <li key={i} className="flex items-center gap-3 text-[#6e6e73] text-sm">
                   <Check className="w-5 h-5 text-[#34C759] shrink-0" />
@@ -96,6 +97,10 @@ export function ChoosePlanClient() {
                 </li>
               ))}
             </ul>
+
+            <div className="mb-6">
+              <SubscriptionWarning context="upgrade" />
+            </div>
             <Link
               href="/dashboard"
               className={cn(

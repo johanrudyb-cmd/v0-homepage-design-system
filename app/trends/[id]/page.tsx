@@ -170,14 +170,14 @@ export default async function ProductDetailPage({
       {user.plan === 'free' && <TrendViewRecorder trendId={product.id} />}
       <ProductDetailEnricher productId={product.id} product={product}>
         <div className="p-6 lg:p-8 max-w-6xl mx-auto space-y-6">
-          {/* Header */}
-          <div className="flex items-center gap-4">
+          {/* Header - Sticky on mobile */}
+          <div className="sticky top-14 sm:top-16 z-30 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-3 bg-background/80 backdrop-blur-md border-b border-black/5 flex items-center gap-4">
             <BackToTrendsButton />
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground truncate">
+              <h1 className="text-lg sm:text-2xl font-bold tracking-tight text-[#1D1D1F] truncate">
                 {product.name}
               </h1>
-              <p className="text-sm text-muted-foreground mt-0.5">
+              <p className="text-[10px] sm:text-sm text-muted-foreground font-medium">
                 Détail produit · KPIs marketing
               </p>
             </div>
@@ -219,8 +219,8 @@ export default async function ProductDetailPage({
                   Produit
                 </CardTitle>
               </CardHeader>
-              <CardContent className="flex gap-4">
-                <div className="w-36 min-w-[9rem] aspect-[3/4] rounded-lg bg-muted shrink-0 overflow-hidden relative">
+              <CardContent className="flex flex-col sm:flex-row gap-4">
+                <div className="w-full sm:w-36 aspect-[3/4] rounded-xl bg-muted shrink-0 overflow-hidden relative shadow-apple-sm">
                   {shouldLockTrend && (
                     <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md rounded-lg p-2 text-center">
                       <Lock className="w-6 h-6 text-white mb-1 animate-pulse" />
@@ -234,22 +234,22 @@ export default async function ProductDetailPage({
                     />
                   </div>
                 </div>
-                <div className="min-w-0 flex-1 grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                <div className="min-w-0 flex-1 grid grid-cols-2 gap-x-4 gap-y-3 text-sm py-1">
                   <div>
-                    <p className="text-muted-foreground">Catégorie</p>
-                    <p className="font-medium capitalize">{product.category}</p>
+                    <p className="text-[#1D1D1F]/40 text-[11px] font-bold uppercase tracking-wider mb-0.5">Catégorie</p>
+                    <p className="font-semibold text-[#1D1D1F] capitalize">{product.category}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Style</p>
-                    <p className="font-medium capitalize truncate">{product.style || '—'}</p>
+                    <p className="text-[#1D1D1F]/40 text-[11px] font-bold uppercase tracking-wider mb-0.5">Style</p>
+                    <p className="font-semibold text-[#1D1D1F] capitalize truncate">{product.style || '—'}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Segment</p>
-                    <p className="font-medium capitalize">{product.segment || '—'}</p>
+                    <p className="text-[#1D1D1F]/40 text-[11px] font-bold uppercase tracking-wider mb-0.5">Segment</p>
+                    <p className="font-semibold text-[#1D1D1F] capitalize">{product.segment || '—'}</p>
                   </div>
                   <div>
-                    <p className="text-muted-foreground">Zone</p>
-                    <p className="font-medium">{product.marketZone || '—'}</p>
+                    <p className="text-[#1D1D1F]/40 text-[11px] font-bold uppercase tracking-wider mb-0.5">Zone</p>
+                    <p className="font-semibold text-[#1D1D1F]">{product.marketZone || '—'}</p>
                   </div>
                 </div>
               </CardContent>

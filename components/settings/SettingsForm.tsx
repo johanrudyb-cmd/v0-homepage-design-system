@@ -7,6 +7,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { User, Mail, Lock, Image as ImageIcon, Save, CheckCircle2 } from 'lucide-react';
+import { SubscriptionWarning } from '@/components/subscription/SubscriptionWarning';
 
 interface SettingsFormProps {
   user: {
@@ -254,7 +255,8 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="space-y-6">
+          <SubscriptionWarning context="cancel" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-muted/30 rounded-lg border border-border gap-4">
             <div>
               <p className="font-bold text-lg text-foreground">{user.plan === 'base' ? 'Créateur' : (user.plan === 'free' ? 'Gratuit' : user.plan)}</p>
