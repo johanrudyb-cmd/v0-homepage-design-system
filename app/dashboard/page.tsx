@@ -39,11 +39,9 @@ export default async function DashboardPage() {
   const steps = [
     { id: 0, title: 'Définissez l\'identité de votre marque', description: 'Nom de la marque, produit principal et style guide.', completed: hasIdentity, href: '/launch-map' },
     { id: 1, title: 'Calquez votre stratégie marketing', description: 'Calquez les meilleures marques de votre style.', completed: !!launchMap?.phase1, href: '/launch-map' },
-    { id: 2, title: 'Calculez la rentabilité', description: 'Définissez votre prix et calculez votre marge.', completed: !!launchMap?.phase2, href: '/launch-map' },
     { id: 3, title: 'Créez votre mockup avec l\'IA', description: 'Téléchargez votre pack de mockup professionnel.', completed: !!launchMap?.phase3, href: '/launch-map' },
     { id: 4, title: 'Générez votre Tech Pack', description: 'Transformez votre mockup en dossier technique.', completed: !!launchMap?.phase4, href: '/launch-map' },
     { id: 5, title: 'Sourcing usines', description: 'Trouvez des fournisseurs et obtenez des devis.', completed: !!launchMap?.phase5, href: '/launch-map' },
-    { id: 6, title: 'Contenu marketing', description: 'Générez et planifiez vos posts stratégiques.', completed: !!launchMap?.phase6, href: '/launch-map' },
     { id: 7, title: 'Lancez votre boutique Shopify', description: 'Connectez votre boutique pour vendre.', completed: !!launchMap?.phase7, href: '/launch-map' },
   ];
 
@@ -75,47 +73,89 @@ export default async function DashboardPage() {
             <DashboardStats brandId={brand.id} />
           </Suspense>
 
+          {/* Shopify Connection Panel - RESTORED */}
+          {!launchMap?.shopifyShopDomain && (
+            <div className="bg-gradient-to-br from-[#95BF47] to-[#5E8E3E] rounded-3xl shadow-apple-lg p-6 sm:p-10 text-white relative overflow-hidden group">
+              {/* Cercle décoratif */}
+              <div className="absolute top-0 right-0 -mr-12 -mt-12 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-500" />
+
+              <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6 sm:gap-8">
+                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6 text-center sm:text-left">
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-apple p-3">
+                    <Image
+                      src="https://upload.wikimedia.org/wikipedia/commons/0/0e/Shopify_logo_icon.svg"
+                      alt="Shopify"
+                      width={48}
+                      height={48}
+                      className="object-contain"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight">
+                      Prêt à vendre sur Shopify ?
+                    </h3>
+                    <p className="text-base sm:text-lg text-white/90 max-w-xl">
+                      Connectez votre boutique pour synchroniser vos designs, suivre vos ventes et finaliser votre lancement.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 shrink-0 mt-4 lg:mt-0">
+                  <Link href="/launch-map/phase/7" className="w-full sm:w-auto">
+                    <Button className="w-full bg-white text-[#1D1D1F] hover:bg-white/90 font-semibold h-12 px-8 text-base shadow-apple">
+                      Connecter ma boutique
+                    </Button>
+                  </Link>
+                  <Link href="https://www.shopify.com/fr-fr/start" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+                    <Button variant="ghost" className="w-full text-white hover:bg-white/10 h-12 px-6">
+                      Découvrir Shopify
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Instagram Group */}
           {process.env.NEXT_PUBLIC_INSTAGRAM_GROUP_URL && (
-            <div className="bg-white rounded-3xl shadow-apple p-8 sm:p-10 border border-black/5">
+            <div className="bg-white rounded-3xl shadow-apple p-6 sm:p-10 border border-black/5 overflow-hidden">
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-                <div className="space-y-2">
+                <div className="space-y-2 text-center sm:text-left">
                   <h3 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1D1D1F]">Le Cercle OUTFITY</h3>
                   <p className="text-base sm:text-lg text-[#1D1D1F]/70">
                     Rejoignez les autres créateurs sur Instagram pour des conseils exclusifs.
                   </p>
                 </div>
-                <Link href={process.env.NEXT_PUBLIC_INSTAGRAM_GROUP_URL} target="_blank">
-                  <Button variant="secondary" className="h-12 px-8">Rejoindre le groupe</Button>
+                <Link href={process.env.NEXT_PUBLIC_INSTAGRAM_GROUP_URL} target="_blank" className="w-full sm:w-auto">
+                  <Button variant="secondary" className="w-full h-12 px-8">Rejoindre le groupe</Button>
                 </Link>
               </div>
             </div>
           )}
 
           {/* Journey Progress */}
-          <div className="bg-white rounded-3xl shadow-apple p-8 sm:p-10 border border-black/5">
-            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-8 sm:mb-10 pb-6 sm:pb-8 border-b border-black/5">
-              <div>
+          <div className="bg-white rounded-3xl shadow-apple p-6 sm:p-10 border border-black/5">
+            <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8 sm:mb-10 pb-6 sm:pb-8 border-b border-black/5">
+              <div className="text-center sm:text-left">
                 <h2 className="text-2xl sm:text-3xl font-semibold tracking-tight text-[#1D1D1F] mb-1">Votre Parcours</h2>
                 <p className="text-base sm:text-lg text-[#1D1D1F]/70">
                   {completedSteps} phases sur {steps.length} complétées
                 </p>
               </div>
-              <span className="text-4xl sm:text-5xl font-semibold tracking-tight text-[#1D1D1F]">
+              <span className="text-4xl sm:text-5xl font-semibold tracking-tight text-[#1D1D1F] text-center">
                 {Math.round((completedSteps / steps.length) * 100)}%
               </span>
             </div>
-            <div className="grid sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {steps.map((step) => (
-                <Link key={step.id} href={step.href} className="group p-6 rounded-2xl hover:bg-black/5 transition-colors border border-black/5">
+                <Link key={step.id} href={step.href} className="group p-5 sm:p-6 rounded-2xl hover:bg-black/5 transition-colors border border-black/5 flex flex-col">
                   <div className="flex items-center justify-between mb-2">
-                    <span className={`text-xs font-bold uppercase tracking-wider ${step.completed ? 'text-primary' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider ${step.completed ? 'text-[#007AFF]' : 'text-gray-400'}`}>
                       {step.completed ? 'Complété' : 'À Faire'}
                     </span>
-                    {step.completed && <div className="w-2 h-2 bg-primary rounded-full" />}
+                    {step.completed && <div className="w-2 h-2 bg-[#007AFF] rounded-full shadow-[0_0_8px_rgba(0,122,255,0.5)]" />}
                   </div>
-                  <h3 className="text-lg font-semibold text-[#1D1D1F] transition-colors">{step.title}</h3>
-                  <p className="text-sm text-[#1D1D1F]/60 mt-1">{step.description}</p>
+                  <h3 className="text-base sm:text-lg font-semibold text-[#1D1D1F] group-hover:text-[#007AFF] transition-colors line-clamp-1">{step.title}</h3>
+                  <p className="text-xs sm:text-sm text-[#1D1D1F]/60 mt-1 line-clamp-2">{step.description}</p>
                 </Link>
               ))}
             </div>

@@ -37,6 +37,11 @@ export function AnalyzeTabs() {
             >
               <Icon className="w-4 h-4" />
               {t.label}
+              {t.id === 'tendances' && (
+                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 font-bold uppercase tracking-wider">
+                  SOON
+                </span>
+              )}
             </Link>
           );
         })}

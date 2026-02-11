@@ -65,11 +65,12 @@ export default async function UGCPage() {
           </div>
         </div>
 
-        <UGCLab 
-          brandId={brand.id} 
-          brandName={brand.name} 
+        <UGCLab
+          brandId={brand.id}
+          brandName={brand.name}
           designs={designs}
           brand={brandWithIdentity || undefined}
+          userPlan={user.plan}
         />
       </div>
     </DashboardLayout>

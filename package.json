@@ -11,6 +11,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
+    "stripe:listen": "stripe_cli\\stripe.exe listen --forward-to localhost:3000/api/stripe/webhook",
+    "stripe:trigger": "stripe_cli\\stripe.exe trigger checkout.session.completed",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:migrate": "prisma migrate dev",

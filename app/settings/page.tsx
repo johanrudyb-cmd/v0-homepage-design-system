@@ -7,7 +7,6 @@ import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
 import { Settings as SettingsIcon, User, Mail, Lock, Image as ImageIcon } from 'lucide-react';
 import { SettingsForm } from '@/components/settings/SettingsForm';
-import { PreferencesForm } from '@/components/settings/PreferencesForm';
 
 export default async function SettingsPage() {
   const currentUser = await getCurrentUser();
@@ -24,6 +23,7 @@ export default async function SettingsPage() {
       name: true,
       image: true,
       plan: true,
+      stripeCustomerId: true,
     },
   });
 
@@ -33,7 +33,7 @@ export default async function SettingsPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-8 max-w-4xl mx-auto space-y-8">
+      <div className="px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 max-w-4xl mx-auto space-y-8 sm:space-y-12 lg:space-y-16">
         {/* Header */}
         <div className="space-y-3">
           <div className="flex items-center gap-3">
@@ -53,11 +53,6 @@ export default async function SettingsPage() {
 
         {/* Settings Form */}
         <SettingsForm user={user} />
-
-        {/* Preferences Form */}
-        <div className="mt-8">
-          <PreferencesForm />
-        </div>
       </div>
     </DashboardLayout>
   );

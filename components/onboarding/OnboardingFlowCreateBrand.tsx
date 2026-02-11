@@ -23,9 +23,10 @@ interface OnboardingFlowCreateBrandProps {
   onBack: () => void;
   /** Mode test : aucune donnée n'est enregistrée (parcours uniquement). */
   demoMode?: boolean;
+  userPlan?: string;
 }
 
-export function OnboardingFlowCreateBrand({ onBack, demoMode = false }: OnboardingFlowCreateBrandProps) {
+export function OnboardingFlowCreateBrand({ onBack, demoMode = false, userPlan = 'free' }: OnboardingFlowCreateBrandProps) {
   const [step, setStep] = useState<Step>(0);
 
   const [brandId, setBrandId] = useState<string | null>(null);
@@ -143,7 +144,7 @@ export function OnboardingFlowCreateBrand({ onBack, demoMode = false }: Onboardi
 
   // Générer les noms par IA à partir de la stratégie
   const fetchNameSuggestions = useCallback(async () => {
-    if (!strategyContext?.concept) return;
+    if (!strategyContext?.concept || userPlan === 'free') return;
     setNameSuggestionsLoading(true);
     try {
       if (demoMode) {
@@ -214,7 +215,10 @@ export function OnboardingFlowCreateBrand({ onBack, demoMode = false }: Onboardi
           <CardHeader>
             <CardTitle className="text-lg">Commencer</CardTitle>
             <CardDescription>
-              Vous n&apos;avez pas encore de nom de marque. Dans ce parcours, vous choisissez d&apos;abord une marque d&apos;inspiration et sa stratégie marketing, puis l&apos;IA vous propose un nom et votre identité (logo, produit principal). Ensuite, accès au tableau de bord et au Guide de lancement.
+              {userPlan === 'free'
+                ? "Définissez votre positionnement et votre public cible manuellement. Nous vous accompagnerons ensuite pour créer votre logo et votre fiche produit."
+                : "Vous n'avez pas encore de nom de marque. Dans ce parcours, vous choisissez d'abord une marque d'inspiration et sa stratégie marketing, puis l'IA vous propose un nom et votre identité (logo, produit principal). Ensuite, accès au tableau de bord et au Guide de lancement."
+              }
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -268,8 +272,8 @@ export function OnboardingFlowCreateBrand({ onBack, demoMode = false }: Onboardi
             <Card className="border-2 border-primary/20 bg-primary/5">
               <CardContent className="pt-6">
                 <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-                  <Sparkles className="w-4 h-4 text-primary" />
-                  Nom de la marque (générés par IA à partir de votre stratégie)
+                  {userPlan === 'free' ? null : <Sparkles className="w-4 h-4 text-primary" />}
+                  Nom de la marque {userPlan === 'free' ? '' : '(générés par IA à partir de votre stratégie)'}
                 </h4>
                 {nameSuggestionsLoading ? (
                   <p className="text-sm text-muted-foreground flex items-center gap-2">

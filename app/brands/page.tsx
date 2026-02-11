@@ -16,7 +16,7 @@ export default async function BrandsPage() {
 
   return (
     <DashboardLayout>
-      <div className="px-12 py-16 max-w-7xl mx-auto space-y-16">
+      <div className="px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 max-w-7xl mx-auto space-y-8 sm:space-y-12 lg:space-y-16">
         <BrandsContent />
       </div>
     </DashboardLayout>

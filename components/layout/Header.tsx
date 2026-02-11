@@ -5,6 +5,7 @@ import { Menu } from 'lucide-react';
 import { NotificationsDropdown } from '@/components/notifications/NotificationsDropdown';
 import { SearchBar } from './SearchBar';
 import { TokenDisplay } from './TokenDisplay';
+import Link from 'next/link';
 
 interface HeaderProps {
   onMenuClick?: () => void;
@@ -42,9 +43,22 @@ export function Header({ onMenuClick }: HeaderProps) {
             {user && (
               <div className="flex items-center gap-4">
                 <div className="hidden md:flex flex-col">
-                  <span className="text-sm font-semibold text-[#1D1D1F] leading-tight truncate max-w-[120px] lg:max-w-none">
-                    {user.name || 'Utilisateur'}
-                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-semibold text-[#1D1D1F] leading-tight truncate max-w-[120px] lg:max-w-none">
+                      {user.name || 'Utilisateur'}
+                    </span>
+                    {(user as any).plan === 'free' ? (
+                      <Link href="/auth/choose-plan">
+                        <span className="px-2 py-0.5 rounded-full bg-stone-100 text-stone-500 text-[10px] font-bold uppercase tracking-wider hover:bg-primary/10 hover:text-primary transition-colors cursor-pointer border border-stone-200">
+                          Gratuit
+                        </span>
+                      </Link>
+                    ) : (
+                      <span className="px-2 py-0.5 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider border border-primary/20">
+                        Créateur
+                      </span>
+                    )}
+                  </div>
                   <span className="text-xs text-[#1D1D1F]/60 leading-tight truncate max-w-[120px] lg:max-w-none hidden lg:block">
                     {user.email}
                   </span>

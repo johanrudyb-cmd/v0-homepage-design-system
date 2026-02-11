@@ -50,9 +50,10 @@ interface SourcingHubProps {
     productDetails: any;
   } | null;
   autoFilterData?: { productType: string | null; material: string | null } | null;
+  userPlan?: string;
 }
 
-export function SourcingHub({ brandId, sentQuotes, favoriteFactoryIds = [], preferences, trendEmailData, autoFilterData }: SourcingHubProps) {
+export function SourcingHub({ brandId, sentQuotes, favoriteFactoryIds = [], preferences, trendEmailData, autoFilterData, userPlan = 'free' }: SourcingHubProps) {
   const [factories, setFactories] = useState<Factory[]>([]);
   const [filteredFactories, setFilteredFactories] = useState<Factory[]>([]);
   const [loading, setLoading] = useState(true);
@@ -110,7 +111,7 @@ export function SourcingHub({ brandId, sentQuotes, favoriteFactoryIds = [], pref
       window.alert(msg);
     }
   };
-  
+
   // Afficher une alerte si on vient d'une tendance
   useEffect(() => {
     if (trendEmailData) {
@@ -318,6 +319,7 @@ export function SourcingHub({ brandId, sentQuotes, favoriteFactoryIds = [], pref
                   isFavorite={true}
                   onToggleFavorite={() => toggleFavorite(factory.id)}
                   onViewDetail={() => setDetailFactory(factory)}
+                  userPlan={userPlan}
                 />
               ))}
             </div>
@@ -384,6 +386,7 @@ export function SourcingHub({ brandId, sentQuotes, favoriteFactoryIds = [], pref
                 isFavorite={favoriteIds.includes(factory.id)}
                 onToggleFavorite={() => toggleFavorite(factory.id)}
                 onViewDetail={() => setDetailFactory(factory)}
+                userPlan={userPlan}
               />
             ))}
           </div>
@@ -392,7 +395,7 @@ export function SourcingHub({ brandId, sentQuotes, favoriteFactoryIds = [], pref
 
       {/* Devis envoyés */}
       {sentQuotes.length > 0 && (
-        <QuoteList quotes={sentQuotes} />
+        <QuoteList quotes={sentQuotes} userPlan={userPlan} />
       )}
 
       {/* Modal détail fournisseur */}
@@ -402,6 +405,7 @@ export function SourcingHub({ brandId, sentQuotes, favoriteFactoryIds = [], pref
           isFavorite={favoriteIds.includes(detailFactory.id)}
           onToggleFavorite={() => toggleFavorite(detailFactory.id)}
           onClose={() => setDetailFactory(null)}
+          userPlan={userPlan}
         />
       )}
     </div>

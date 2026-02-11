@@ -18,6 +18,46 @@ export default async function DesignStudioPage({
     redirect('/auth/signin');
   }
 
+  if (user.plan === 'free') {
+    return (
+      <DashboardLayout>
+        <div className="p-8 max-w-4xl mx-auto min-h-[calc(100vh-8rem)] flex flex-col justify-center">
+          <Card className="border-2 border-primary/20 bg-primary/5 py-16">
+            <CardContent className="flex flex-col items-center text-center space-y-8 max-w-2xl mx-auto">
+              <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center">
+                <Palette className="w-10 h-10 text-primary" />
+              </div>
+              <div className="space-y-4">
+                <h1 className="text-3xl font-bold text-foreground">Design Studio</h1>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  La création de <strong>Tech Packs</strong> professionnels et la génération de <strong>Mockups IA</strong> sont des fonctionnalités exclusives du plan <strong>Créateur</strong>.
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-6 w-full max-w-md">
+                <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background border border-border shadow-sm">
+                  <FileText className="w-6 h-6 text-primary" />
+                  <span className="text-sm font-semibold">Tech Packs PDF</span>
+                </div>
+                <div className="flex flex-col items-center gap-2 p-4 rounded-xl bg-background border border-border shadow-sm">
+                  <Sparkles className="w-6 h-6 text-primary" />
+                  <span className="text-sm font-semibold">Mockups IA</span>
+                </div>
+              </div>
+              <div className="pt-4">
+                <Link
+                  href="/auth/choose-plan"
+                  className="inline-flex items-center justify-center rounded-full font-medium transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#007AFF] bg-black text-white hover:opacity-90 active:scale-[0.98] h-14 px-10 text-lg gap-3 shadow-xl shadow-primary/20"
+                >
+                  🚀 Passer au plan Créateur
+                </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
   const params = await searchParams;
   const showMockupForm = params.mode === 'mockup';
 

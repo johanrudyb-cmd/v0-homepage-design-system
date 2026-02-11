@@ -18,7 +18,7 @@ export default async function SourcingPage({
   const params = await searchParams;
   let trendData = null;
   let autoFilterData = null;
-  
+
   if (params.trend) {
     try {
       trendData = JSON.parse(decodeURIComponent(params.trend));
@@ -96,13 +96,14 @@ export default async function SourcingPage({
           </div>
         </div>
 
-        <SourcingHub 
-          brandId={brand.id} 
-          sentQuotes={quotes} 
+        <SourcingHub
+          brandId={brand.id}
+          sentQuotes={quotes}
           favoriteFactoryIds={favoriteFactoryIds}
           preferences={preferences}
           trendEmailData={trendData}
           autoFilterData={autoFilterData}
+          userPlan={user.plan}
         />
       </div>
     </DashboardLayout>

@@ -23,9 +23,10 @@ interface FactoryCardProps {
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   onViewDetail?: () => void;
+  userPlan?: string;
 }
 
-export function FactoryCard({ factory, isFavorite = false, onToggleFavorite, onViewDetail }: FactoryCardProps) {
+export function FactoryCard({ factory, isFavorite = false, onToggleFavorite, onViewDetail, userPlan = 'free' }: FactoryCardProps) {
 
   return (
     <>
@@ -36,7 +37,7 @@ export function FactoryCard({ factory, isFavorite = false, onToggleFavorite, onV
             <div>
               <div className="flex items-start justify-between mb-2 gap-2">
                 <h3 className="text-lg font-semibold text-foreground flex-1 min-w-0">
-                  {factory.name}
+                  {userPlan === 'free' ? `Usine Partenaire #${factory.id.slice(-4).toUpperCase()}` : factory.name}
                 </h3>
                 <div className="flex items-center gap-1 flex-shrink-0">
                   {onToggleFavorite && (
@@ -121,16 +122,31 @@ export function FactoryCard({ factory, isFavorite = false, onToggleFavorite, onV
                 </Button>
               )}
               {factory.website && (
-                <Button
-                  variant="default"
-                  size="sm"
-                  onClick={() => window.open(factory.website!, '_blank')}
-                  className="flex-1 min-w-[120px] gap-1.5"
-                  title="Voir le site web"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Voir le site web
-                </Button>
+                userPlan === 'free' ? (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="flex-1 min-w-[120px] gap-1.5 opacity-50 cursor-pointer text-muted-foreground border-dashed border-2"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.location.href = '/auth/choose-plan';
+                    }}
+                    title="Accès réservé au plan Créateur"
+                  >
+                    <span>🔒 Site Web (Créateur)</span>
+                  </Button>
+                ) : (
+                  <Button
+                    variant="default"
+                    size="sm"
+                    onClick={() => window.open(factory.website!, '_blank')}
+                    className="flex-1 min-w-[120px] gap-1.5"
+                    title="Voir le site web"
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Voir le site web
+                  </Button>
+                )
               )}
             </div>
           </div>

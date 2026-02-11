@@ -595,7 +595,7 @@ export function TendancesContent() {
           </Card>
         ) : (
           <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
               {trends.map((t) => {
                 const isFree = user?.plan === 'free';
                 const isVisible = !isFree || homepageIds.has(t.id);

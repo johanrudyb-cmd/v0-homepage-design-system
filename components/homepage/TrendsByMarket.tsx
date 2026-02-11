@@ -223,7 +223,7 @@ export function TrendsByMarket() {
         ) : (
           <div
             className={cn(
-              'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6',
+              'grid grid-cols-3 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6',
               'transition-all duration-1000',
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             )}

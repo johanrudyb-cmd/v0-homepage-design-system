@@ -1,13 +1,17 @@
 'use client';
 
-type Tab = 'classement' | 'rapport' | 'phases';
+import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
+
+type Tab = 'classement' | 'rapport' | 'phases' | 'analyseur';
 
 interface TrendsSubNavProps {
   active: Tab;
 }
 
-const tabs: { id: Tab; label: string; href: string }[] = [
+const tabs: { id: string; label: string; href: string; badge?: string }[] = [
   { id: 'classement', label: 'Classement', href: '/trends' },
+  { id: 'analyseur', label: 'Analyseur de tendances', href: '#', badge: 'SOON' },
 ];
 
 export function TrendsSubNav({ active }: TrendsSubNavProps) {
@@ -25,10 +29,18 @@ export function TrendsSubNav({ active }: TrendsSubNavProps) {
           <button
             key={tab.id}
             type="button"
-            onClick={() => (window.location.href = tab.href)}
-            className="px-4 py-2 rounded-md text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-background/80 transition-colors"
+            onClick={() => tab.href !== '#' && (window.location.href = tab.href)}
+            className={cn(
+              "px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2",
+              tab.href === '#' ? "text-muted-foreground/40 cursor-default" : "text-muted-foreground hover:text-foreground hover:bg-background/80"
+            )}
           >
             {tab.label}
+            {tab.badge && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 font-bold uppercase tracking-wider">
+                {tab.badge}
+              </span>
+            )}
           </button>
         )
       )}

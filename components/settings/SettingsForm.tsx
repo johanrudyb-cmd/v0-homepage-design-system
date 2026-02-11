@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,6 +15,7 @@ interface SettingsFormProps {
     name?: string | null;
     image?: string | null;
     plan: string;
+    stripeCustomerId?: string | null;
   };
 }
 
@@ -21,6 +23,7 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
   const router = useRouter();
   const [user, setUser] = useState(initialUser);
   const [loading, setLoading] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +35,23 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
     newPassword: '',
     confirmPassword: '',
   });
+
+  const handlePortal = async () => {
+    setPortalLoading(true);
+    try {
+      const res = await fetch('/api/stripe/create-portal-session', { method: 'POST' });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        setError(data.error || 'Impossible d\'ouvrir le portail de facturation');
+      }
+    } catch (err) {
+      setError('Erreur réseau');
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,7 +103,7 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
 
       // Mettre à jour l'état utilisateur avec les nouvelles données
       setUser(data);
-      
+
       // Mettre à jour les champs du formulaire avec les nouvelles valeurs
       setFormData((prev) => ({
         ...prev,
@@ -94,9 +114,9 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
         newPassword: '',
         confirmPassword: '',
       }));
-      
+
       setSuccess(true);
-      
+
       // Rafraîchir la page pour mettre à jour les données côté serveur
       setTimeout(() => {
         router.refresh();
@@ -235,7 +255,7 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center justify-between p-4 bg-muted/30 rounded-lg border border-border">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-muted/30 rounded-lg border border-border gap-4">
             <div>
               <p className="font-bold text-lg text-foreground">{user.plan === 'base' ? 'Créateur' : (user.plan === 'free' ? 'Gratuit' : user.plan)}</p>
               <p className="text-sm text-muted-foreground font-medium mt-1">
@@ -244,9 +264,23 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
                 {user.plan === 'enterprise' && 'Accès complet + support prioritaire'}
               </p>
             </div>
-            <Button variant="outline" className="border-2">
-              Changer de plan
-            </Button>
+            <div className="flex flex-wrap gap-2">
+              <Link href="/auth/choose-plan">
+                <Button variant="outline" className="border-2">
+                  Changer de plan
+                </Button>
+              </Link>
+              {user.stripeCustomerId && (
+                <Button
+                  variant="outline"
+                  className="border-2"
+                  onClick={handlePortal}
+                  disabled={portalLoading}
+                >
+                  {portalLoading ? 'Ouverture...' : 'Gérer l\'abonnement et mes factures'}
+                </Button>
+              )}
+            </div>
           </div>
         </CardContent>
       </Card>

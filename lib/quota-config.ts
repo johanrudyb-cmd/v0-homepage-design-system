@@ -45,6 +45,18 @@ export const QUOTA_CONFIG = {
     site_texts_limit: 999, // Illimité pour l'usage pratique
     factories_match: -1, // Illimité (base de données statique)
   },
+  free: {
+    brand_analyze_limit: 0,
+    brand_strategy_limit: 0,
+    strategy_view_limit: 0,
+    ugc_scripts_limit: 0,
+    brand_logo_limit: 0,
+    trends_check_limit: 3,
+    ugc_shooting_photo_limit: 0,
+    ugc_shooting_product_limit: 0,
+    site_texts_limit: 0,
+    factories_match: 0,
+  },
 } as const;
 
 /** Limite consultation stratégie en onboarding (3 vues max) */

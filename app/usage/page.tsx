@@ -35,7 +35,7 @@ function UsagePageContent() {
   }, [searchParams]);
 
   return (
-    <div className="px-12 py-16 max-w-4xl mx-auto space-y-16">
+    <div className="px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 max-w-4xl mx-auto space-y-8 sm:space-y-12 lg:space-y-16">
       {showSuccess && (
         <div className="flex items-center gap-4 border-b border-[#E5E5E1] border-b-[1px] pb-6">
           <div>
@@ -47,7 +47,7 @@ function UsagePageContent() {
 
       {/* Header */}
       <div className="space-y-4 border-b border-[#E5E5E1] border-b-[1px] pb-12">
-        <h1 className="font-serif text-5xl font-normal text-[#1A1A1A]">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-normal text-[#1A1A1A]">
           Mes quotas
         </h1>
         <p className="font-light text-sm text-[#1A1A1A] opacity-70">
@@ -83,7 +83,7 @@ function UsagePageContent() {
 export default function UsagePage() {
   return (
     <DashboardLayout>
-      <Suspense fallback={<div className="px-12 py-16 max-w-4xl mx-auto">Chargement…</div>}>
+      <Suspense fallback={<div className="px-4 sm:px-6 lg:px-12 py-8 sm:py-12 lg:py-16 max-w-4xl mx-auto">Chargement…</div>}>
         <UsagePageContent />
       </Suspense>
     </DashboardLayout>

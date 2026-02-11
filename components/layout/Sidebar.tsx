@@ -12,13 +12,13 @@ const navigation = [
   { name: 'Dashboard', description: 'Vue d\'ensemble', href: '/dashboard', tourId: 'tour-dashboard' },
   { name: 'Tendances de la semaine', description: 'Nouveautés chaque semaine — ne vous désabonnez pas', href: '/trends', tourId: 'tour-trends' },
   { name: 'Marques tendances', description: 'Les marques les plus tendances de la semaine', href: '/brands', tourId: 'tour-brands' },
-  { name: 'Analyse de marque & tendances', description: 'Analyse IA de marques et analyseur de tendances', href: '/brands/analyze', badge: 'NEW', tourId: 'tour-analyze-brand' },
+  { name: 'Analyse de marque & tendances', description: 'Analyse IA de marques et analyseur de tendances', href: '#', badge: 'SOON', tourId: 'tour-analyze-brand' },
 ];
 
 const tools = [
   { name: 'Gérer ma marque', description: 'Guide de lancement — identité, stratégie, design, sourcing', href: '/launch-map', tourId: 'tour-launch-map', featured: true },
-  { name: 'Calculateur de marge', description: 'Calculez votre marge bénéficiaire par vêtement', href: '/launch-map/phase/2', tourId: 'tour-calculator' },
-  { name: 'Création de contenu', description: 'Générez des posts structurés par IA et planifiez-les', href: '/launch-map/phase/6', tourId: 'tour-content-creation' },
+  { name: 'Calculateur de marge', description: 'Calculez votre marge bénéficiaire par vêtement', href: '/calculator', tourId: 'tour-calculator' },
+  { name: 'Création de contenu', description: 'Générez des posts structurés par IA et planifiez-les', href: '/content-creation', tourId: 'tour-content-creation' },
   { name: 'Formation', description: 'Personal branding — mini formation gratuite + coaching 59€/mois', href: '/launch-map/formation', tourId: 'tour-formation' },
 ];
 

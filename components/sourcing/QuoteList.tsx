@@ -15,9 +15,10 @@ interface Quote {
 
 interface QuoteListProps {
   quotes: Quote[];
+  userPlan?: string;
 }
 
-export function QuoteList({ quotes }: QuoteListProps) {
+export function QuoteList({ quotes, userPlan = 'free' }: QuoteListProps) {
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'sent':
@@ -68,7 +69,7 @@ export function QuoteList({ quotes }: QuoteListProps) {
               >
                 <div>
                   <div className="font-medium text-stone-900">
-                    {quote.factory.name}
+                    {userPlan === 'free' ? `Usine Partenaire #${quote.factoryId.slice(-4).toUpperCase()}` : quote.factory.name}
                   </div>
                   <div className="text-sm text-stone-600 font-light">
                     {quote.factory.country} •{' '}

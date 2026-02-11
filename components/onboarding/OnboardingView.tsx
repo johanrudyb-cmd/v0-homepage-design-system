@@ -11,15 +11,19 @@ import { OnboardingFlowExistingBrand } from './OnboardingFlowExistingBrand';
 
 type Path = 'choice' | 'create' | 'existing';
 
-export function OnboardingView() {
+interface OnboardingViewProps {
+  userPlan: string;
+}
+
+export function OnboardingView({ userPlan }: OnboardingViewProps) {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Chargement…</div>}>
-      <OnboardingContent />
+      <OnboardingContent userPlan={userPlan} />
     </Suspense>
   );
 }
 
-function OnboardingContent() {
+function OnboardingContent({ userPlan }: OnboardingViewProps) {
   const searchParams = useSearchParams();
   const subscribed = searchParams.get('subscribed') === 'true';
   const [path, setPath] = useState<Path>('choice');
@@ -36,14 +40,14 @@ function OnboardingContent() {
             setPath('existing');
           }
         })
-        .catch(() => {});
+        .catch(() => { });
     }
   }, [subscribed]);
 
   if (path === 'create') {
     return (
       <div className="p-4 md:p-8 max-w-4xl mx-auto">
-        <OnboardingFlowCreateBrand onBack={() => setPath('choice')} demoMode />
+        <OnboardingFlowCreateBrand onBack={() => setPath('choice')} demoMode={false} userPlan={userPlan} />
       </div>
     );
   }
@@ -96,7 +100,10 @@ function OnboardingContent() {
             </div>
             <CardTitle className="text-xl">Je crée ma marque de zéro</CardTitle>
             <CardDescription>
-              Inspirez-vous d&apos;une marque tendance, copiez sa stratégie, puis l&apos;IA vous propose un nom et une identité. Vous poursuivez dans le Guide de lancement (mockup, tech pack, sourcing, UGC).
+              {userPlan === 'free'
+                ? "Définissez votre positionnement et votre cible manuellement. Nous vous aidons à structurer votre projet étape par étape pour un lancement réussi."
+                : "Inspirez-vous d'une marque tendance, copiez sa stratégie, puis l'IA vous propose un nom et une identité. Vous poursuivez dans le Guide de lancement."
+              }
             </CardDescription>
           </CardHeader>
           <CardContent>

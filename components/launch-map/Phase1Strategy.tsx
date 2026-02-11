@@ -32,6 +32,7 @@ interface Phase1StrategyProps {
   onComplete: () => void;
   /** Mode test (onboarding) : aucun enregistrement, simulation uniquement */
   demoMode?: boolean;
+  userPlan?: string;
 }
 
 function styleGuideField(sg: Record<string, unknown> | null | undefined, key: string): string {
@@ -95,7 +96,7 @@ function formatStrategyForPresentation(raw: string): ({ type: 'section'; title: 
   return blocks;
 }
 
-export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false }: Phase1StrategyProps) {
+export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, userPlan = 'free' }: Phase1StrategyProps) {
   const router = useRouter();
   const sg = brand?.styleGuide && typeof brand.styleGuide === 'object' ? brand.styleGuide as Record<string, unknown> : null;
   const strategyQuota = useQuota('brand_strategy');
@@ -219,6 +220,10 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false }:
   const strategyLocked = !!(strategyResult || brand?.templateBrandSlug);
 
   const handleCalquerStrategie = async (overrideSlug?: string) => {
+    if (userPlan === 'free') {
+      openSurplusModal();
+      return;
+    }
     const slugToUse = overrideSlug ?? selectedSlug;
     const templateName = referenceBrands.find((b) => b.slug === slugToUse)?.brandName || slugToUse;
     const creatorName = brand?.name?.trim();
@@ -300,7 +305,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false }:
           }),
         })
           .then(() => fetchStrategyHistory())
-          .catch(() => {});
+          .catch(() => { });
       }
     } catch (e) {
       setStrategyError(e instanceof Error ? e.message : 'Erreur lors du calquage');
@@ -363,6 +368,10 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false }:
       if (demoMode) {
         setPendingViewStrategy({ slug, brandName });
         setShowConfirmViewStrategy(true);
+        return;
+      }
+      if (userPlan === 'free') {
+        openSurplusModal();
         return;
       }
       if (strategyViewQuota?.isExhausted && !demoMode) {
@@ -791,7 +800,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false }:
                             'h-8 text-xs gap-1.5 shrink-0',
                             !isSelected && 'border-[#8B5CF6]/50 text-[#8B5CF6] hover:bg-[#8B5CF6]/10 hover:border-[#8B5CF6]'
                           )}
-                          disabled={templateStrategyLoading || (strategyViewQuota?.isExhausted && !demoMode) || (demoMode && (strategyViewQuota?.remaining ?? 10) <= 10 - STRATEGY_VIEW_ONBOARDING_LIMIT)}
+                          disabled={templateStrategyLoading || userPlan === 'free' || (strategyViewQuota?.isExhausted && !demoMode) || (demoMode && (strategyViewQuota?.remaining ?? 10) <= 10 - STRATEGY_VIEW_ONBOARDING_LIMIT)}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleVoirStrategie(b.slug, brandName || b.brandName);
@@ -970,8 +979,8 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false }:
             viewingTemplate
               ? viewingTemplate.templateBrandName
               : viewingFromHistory?.templateBrandName ??
-                referenceBrands.find((b) => b.slug === selectedSlug)?.brandName ??
-                ''
+              referenceBrands.find((b) => b.slug === selectedSlug)?.brandName ??
+              ''
           }
           isTemplateView={!!viewingTemplate}
           visualIdentity={viewingTemplate?.visualIdentity ?? viewingFromHistory?.visualIdentity ?? lastCalquedVisualIdentity ?? undefined}
@@ -982,26 +991,26 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false }:
               ? strategyQuota?.isExhausted && !demoMode
                 ? { label: 'Recharger ce module', onClick: openSurplusModal, disabled: false }
                 : {
-                    label: strategyLoading ? 'Calquage en cours…' : 'Calquer la stratégie',
-                    onClick: () => { setConfirmCalquerSlug(viewingTemplate.templateBrandSlug); setShowConfirmCalquer(true); },
-                    disabled: strategyLoading || !brand?.name?.trim(),
-                  }
+                  label: strategyLoading ? 'Calquage en cours…' : 'Calquer la stratégie',
+                  onClick: () => { setConfirmCalquerSlug(viewingTemplate.templateBrandSlug); setShowConfirmCalquer(true); },
+                  disabled: strategyLoading || !brand?.name?.trim(),
+                }
               : undefined
           }
           optionalValidateAction={
             !viewingTemplate && strategyResult
               ? (() => {
-                  const slugForValidate = viewingFromHistory?.templateBrandSlug ?? selectedSlug;
-                  return {
-                    label: 'Valider et continuer',
-                    disabled: !positioning?.trim() || !targetAudience?.trim() || !slugForValidate,
-                    onClick: () => {
-                      if (!window.confirm('Êtes-vous sûr de valider cette stratégie et de passer à l\'étape suivante ?')) return;
-                      handleClosePresentation(false);
-                      handleValidate(slugForValidate ?? undefined);
-                    },
-                  };
-                })()
+                const slugForValidate = viewingFromHistory?.templateBrandSlug ?? selectedSlug;
+                return {
+                  label: 'Valider et continuer',
+                  disabled: !positioning?.trim() || !targetAudience?.trim() || !slugForValidate,
+                  onClick: () => {
+                    if (!window.confirm('Êtes-vous sûr de valider cette stratégie et de passer à l\'étape suivante ?')) return;
+                    handleClosePresentation(false);
+                    handleValidate(slugForValidate ?? undefined);
+                  },
+                };
+              })()
               : undefined
           }
           onRegenerate={

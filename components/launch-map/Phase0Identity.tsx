@@ -26,6 +26,7 @@ interface Phase0IdentityProps {
   hideNameField?: boolean;
   /** Mode test (onboarding) : aucun enregistrement, simulation uniquement */
   demoMode?: boolean;
+  userPlan?: string;
 }
 
 function styleGuideField(sg: Record<string, unknown> | null | undefined, key: string): string {
@@ -39,7 +40,7 @@ function styleGuideBool(sg: Record<string, unknown> | null | undefined, key: str
   return sg[key] === true || sg[key] === 'true';
 }
 
-export function Phase0Identity({ brandId, brand, onComplete, hideNameField = false, demoMode = false }: Phase0IdentityProps) {
+export function Phase0Identity({ brandId, brand, onComplete, hideNameField = false, demoMode = false, userPlan = 'free' }: Phase0IdentityProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -313,7 +314,11 @@ export function Phase0Identity({ brandId, brand, onComplete, hideNameField = fal
               </>
             ) : (
               <>
-                <span className="text-sm text-muted-foreground">Pas de logo pour l&apos;instant. Vous pourrez en générer un par IA dans la phase Stratégie.</span>
+                <span className="text-sm text-muted-foreground">
+                  {userPlan === 'free'
+                    ? "Pas de logo pour l&apos;instant. Vous pouvez en ajouter un manuellement plus tard."
+                    : "Pas de logo pour l&apos;instant. Vous pourrez en générer un par IA dans la phase Stratégie."}
+                </span>
                 <Button type="button" variant="outline" size="sm" className="w-fit" onClick={() => setNoLogo(false)}>
                   J&apos;ai un logo à ajouter
                 </Button>

@@ -63,6 +63,7 @@ export interface LaunchMapOverviewProps {
   progressPercentage: number;
   suppliers?: SupplierRecap[];
   weekEvents?: WeekCalendarEvent[];
+  userPlan?: string;
 }
 
 export function LaunchMapOverview({
@@ -76,6 +77,7 @@ export function LaunchMapOverview({
   progressPercentage,
   suppliers = [],
   weekEvents = [],
+  userPlan = 'free',
 }: LaunchMapOverviewProps) {
   const [aiRecommendations, setAiRecommendations] = useState<string[]>([]);
   const [recommendationsLoading, setRecommendationsLoading] = useState(true);
@@ -110,7 +112,7 @@ export function LaunchMapOverview({
     progress.phase7,
   ].filter(Boolean).length;
 
-  const canGetRecommendations = hasIdentity && (launchMap?.phase1 ?? false);
+  const canGetRecommendations = hasIdentity && (launchMap?.phase1 ?? false) && userPlan !== 'free';
 
   useEffect(() => {
     if (!canGetRecommendations) {
@@ -151,8 +153,8 @@ export function LaunchMapOverview({
   }, [brand.id, canGetRecommendations]);
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <div className="px-4 py-5 max-w-[96rem] mx-auto space-y-5">
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <div className="px-4 sm:px-6 lg:px-12 py-6 sm:py-10 lg:py-12 max-w-[96rem] mx-auto space-y-6 sm:space-y-10">
         {/* En-tête avec logo en coin */}
         <section className="rounded-xl border border-border bg-card overflow-hidden animate-slide-in-down">
           <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -192,7 +194,7 @@ export function LaunchMapOverview({
             </div>
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
               <BarChart3 className="w-4 h-4" />
-              <span>{progressPercentage}% du parcours — {completedPhases} / 7 phases</span>
+              <span>{progressPercentage}% du parcours — {completedPhases} / {LAUNCH_MAP_PHASES.length} phases</span>
             </div>
           </div>
         </section>
@@ -219,7 +221,7 @@ export function LaunchMapOverview({
                 <span className="text-xs font-medium">Progression</span>
               </div>
               <p className="text-2xl font-bold text-foreground mt-2">{progressPercentage}%</p>
-              <p className="text-xs text-muted-foreground mt-1">{completedPhases} / 7 phases complétées</p>
+              <p className="text-xs text-muted-foreground mt-1">{completedPhases} / {LAUNCH_MAP_PHASES.length} phases complétées</p>
             </div>
             <div className="rounded-lg border border-border bg-muted/20 p-4">
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -284,22 +286,35 @@ export function LaunchMapOverview({
               <div className="rounded-lg border-2 border-primary/20 bg-background/80 p-5">
                 <p className="text-base font-semibold text-foreground">Conseils personnalisés</p>
                 <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  Complétez l&apos;identité et la stratégie de votre marque pour recevoir vos conseils, adaptés à votre secteur et à votre marque d&apos;inspiration. Mise à jour une fois par jour.
+                  {userPlan === 'free'
+                    ? "Les conseils personnalisés par IA sont réservés aux membres Créateur. Passez au plan supérieur pour débloquer vos recommandations de croissance."
+                    : "Complétez l'identité et la stratégie de votre marque pour recevoir vos conseils, adaptés à votre secteur et à votre marque d'inspiration. Mise à jour une fois par jour."}
                 </p>
                 <div className="flex flex-wrap gap-2 mt-4">
-                  <Link
-                    href="/launch-map/phase/0"
-                    className="text-sm text-primary hover:underline font-semibold"
-                  >
-                    Compléter l&apos;identité →
-                  </Link>
-                  <span className="text-muted-foreground">·</span>
-                  <Link
-                    href="/launch-map/phase/1"
-                    className="text-sm text-primary hover:underline font-semibold"
-                  >
-                    Compléter la stratégie →
-                  </Link>
+                  {userPlan === 'free' ? (
+                    <Link
+                      href="/auth/choose-plan"
+                      className="text-sm text-primary hover:underline font-semibold"
+                    >
+                      🚀 Passer au plan Créateur →
+                    </Link>
+                  ) : (
+                    <>
+                      <Link
+                        href="/launch-map/phase/0"
+                        className="text-sm text-primary hover:underline font-semibold"
+                      >
+                        Compléter l&apos;identité →
+                      </Link>
+                      <span className="text-muted-foreground">·</span>
+                      <Link
+                        href="/launch-map/phase/1"
+                        className="text-sm text-primary hover:underline font-semibold"
+                      >
+                        Compléter la stratégie →
+                      </Link>
+                    </>
+                  )}
                 </div>
               </div>
             ) : recommendationsLoading ? (
@@ -349,28 +364,40 @@ export function LaunchMapOverview({
             <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">Phases du parcours</h2>
           </div>
           <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-            {LAUNCH_MAP_PHASES.filter((p) => p.id !== 2 && p.id !== 6).map((p) => {
+            {LAUNCH_MAP_PHASES.map((p) => {
               const completed = progress[`phase${p.id}` as keyof typeof progress];
-              const href = `/launch-map/phase/${p.id}`; // Tous les onglets débloqués
+              const isLocked = userPlan === 'free' && ![0, 2].includes(p.id);
+              const href = isLocked ? '/auth/choose-plan' : (p.id === 4 ? '/launch-map/tech-packs' : p.id === 5 ? '/launch-map/sourcing' : `/launch-map/phase/${p.id}`);
               const Icon = p.id === 0 ? Palette : p.id === 1 ? Target : p.id === 3 ? PenTool : p.id === 4 ? FileText : p.id === 5 ? Truck : p.id === 7 ? Store : Palette;
+
               return (
                 <Link
                   key={p.id}
                   href={href}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg border p-4 transition-colors',
-                    'border-border bg-muted/20 hover:bg-muted/40 hover:border-primary/30'
+                    'flex items-center gap-3 rounded-lg border p-4 transition-colors relative',
+                    'border-border bg-muted/20 hover:bg-muted/40 hover:border-primary/30',
+                    isLocked && 'opacity-80 grayscale-[0.5]'
                   )}
                 >
                   <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                     <Icon className="w-5 h-5 text-primary" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="font-medium text-foreground text-sm">{p.title}</p>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <p className="font-medium text-foreground text-sm">{p.title}</p>
+                      {isLocked && (
+                        <span className="text-[10px] font-bold uppercase tracking-tight bg-amber-500/10 text-amber-600 px-1.5 py-0.5 rounded border border-amber-500/20">
+                          Créateur
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-muted-foreground truncate">{p.subtitle}</p>
                   </div>
-                  {completed && (
+                  {completed ? (
                     <span className="text-xs font-medium text-green-600 flex-shrink-0">Complété</span>
+                  ) : isLocked && (
+                    <span className="text-xs font-medium text-muted-foreground flex-shrink-0">🔒</span>
                   )}
                 </Link>
               );

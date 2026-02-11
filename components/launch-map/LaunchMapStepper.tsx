@@ -58,7 +58,7 @@ export interface BrandIdentity {
   templateBrandSlug?: string | null;
 }
 
-interface Brand extends BrandIdentity {}
+interface Brand extends BrandIdentity { }
 
 interface LaunchMapStepperProps {
   brandId: string;
@@ -67,6 +67,7 @@ interface LaunchMapStepperProps {
   hasIdentity?: boolean;
   /** Quand défini, n'affiche que le contenu de cette phase (sans barre de progression ni stepper). */
   focusedPhase?: number;
+  userPlan?: string;
 }
 
 /** Fusionne phase1Data (Calculator) avec le choix Phase 0 (styleGuide) pour pré-remplir produit principal et grammage */
@@ -85,7 +86,7 @@ function mergePhase1DataWithPhase0(phase1Data: any, styleGuide: BrandIdentity['s
 
 const phases = LAUNCH_MAP_PHASES;
 
-export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = false, focusedPhase }: LaunchMapStepperProps) {
+export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = false, focusedPhase, userPlan = 'free' }: LaunchMapStepperProps) {
   // Calculer la phase initiale : toujours privilégier focusedPhase s'il est défini
   const initialPhase = useMemo(() => {
     if (typeof focusedPhase === 'number') {
@@ -94,16 +95,16 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
     // Calculer depuis progress : phase3 = Création du mockup (nouvelle phase)
     return !hasIdentity ? 0 :
       !launchMap?.phase1 ? 1 :
-      !launchMap?.phase2 ? 2 :
-      !launchMap?.phase3 ? 3 :  // Création du mockup
-      !launchMap?.phase4 ? 4 :  // Tech Pack
-      !launchMap?.phase5 ? 5 :  // Sourcing
-      !launchMap?.phase6 ? 6 :  // Création de contenu
-      7;  // Création du site
+        !launchMap?.phase2 ? 2 :
+          !launchMap?.phase3 ? 3 :  // Création du mockup
+            !launchMap?.phase4 ? 4 :  // Tech Pack
+              !launchMap?.phase5 ? 5 :  // Sourcing
+                !launchMap?.phase6 ? 6 :  // Création de contenu
+                  7;  // Création du site
   }, [focusedPhase, hasIdentity, launchMap]);
-  
+
   const [currentPhase, setCurrentPhase] = useState(initialPhase);
-  
+
   // La phase effective à utiliser pour le rendu : toujours privilégier focusedPhase s'il est défini
   const phaseToRender = useMemo(() => {
     // Si focusedPhase est défini, l'utiliser directement (ignore currentPhase)
@@ -113,7 +114,7 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
     // Sinon, utiliser currentPhase (qui sera mis à jour par le useEffect basé sur progress)
     return currentPhase;
   }, [focusedPhase, currentPhase]);
-  
+
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [progress, setProgress] = useState({
     phase0: hasIdentity,
@@ -172,12 +173,12 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
     // Déterminer la phase en fonction du progrès
     const nextPhase = !progress.phase0 ? 0 :
       !progress.phase1 ? 1 :
-      !progress.phase2 ? 2 :
-      !progress.phase3 ? 3 :  // Création du mockup
-      !progress.phase4 ? 4 :  // Tech Pack
-      !progress.phase5 ? 5 :  // Sourcing
-      !progress.phase6 ? 6 :  // Création de contenu
-      7;  // Création du site
+        !progress.phase2 ? 2 :
+          !progress.phase3 ? 3 :  // Création du mockup
+            !progress.phase4 ? 4 :  // Tech Pack
+              !progress.phase5 ? 5 :  // Sourcing
+                !progress.phase6 ? 6 :  // Création de contenu
+                  7;  // Création du site
     setCurrentPhase(nextPhase);
   }, [progress, focusedPhase]);
 
@@ -217,157 +218,154 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
     <div className="space-y-5">
       {!onlyPhaseContent && (
         <>
-      {/* Barre de progression */}
-      <Card className="border-2">
-        <CardContent className="pt-4 pb-4 px-5">
-          <div className="flex items-center justify-between mb-3">
-            <div>
-              <h3 className="text-lg font-bold text-foreground">
-                Progression globale
-              </h3>
-              <p className="text-sm text-muted-foreground font-medium">
-                {completedPhases} sur 7 phases complétées
-              </p>
-            </div>
-            <div className="text-right">
-              <div className="text-2xl font-bold text-foreground">
-                {Math.round(progressPercentage)}%
-              </div>
-            </div>
-          </div>
-          <div className="w-full bg-muted rounded-full h-2.5">
-            <div
-              className="gradient-primary h-2.5 rounded-full transition-all duration-500"
-              style={{ width: `${progressPercentage}%` }}
-            />
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Stepper visuel */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-        {phases.map((phase, index) => {
-          const isCompleted = progress[`phase${phase.id}` as keyof typeof progress];
-          const isCurrent = phaseToRender === phase.id;
-          const isAccessible = true; // Tous les onglets débloqués : identité et stratégie déjà remplies à l'accès dashboard.
-
-          return (
-            <button
-              key={phase.id}
-              onClick={() => setCurrentPhase(phase.id)}
-              disabled={false}
-              className={`relative p-4 rounded-xl border-2 transition-all ${
-                isCurrent
-                  ? 'border-primary bg-primary/10 shadow-modern'
-                  : isCompleted
-                  ? 'border-success bg-success/10'
-                  : isAccessible
-                  ? 'border-border bg-card hover:border-primary/50 hover:shadow-modern'
-                  : 'border-border bg-muted opacity-50 cursor-not-allowed'
-              }`}
-            >
-              <div className="flex items-center gap-3 mb-2">
-                <div
-                  className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${
-                    isCompleted
-                      ? 'gradient-primary text-white shadow-modern'
-                      : isCurrent
-                      ? 'bg-primary/20 text-primary'
-                      : 'bg-muted text-muted-foreground'
-                  }`}
-                >
-                  {isCompleted ? '✓' : phase.id}
+          {/* Barre de progression */}
+          <Card className="border-2">
+            <CardContent className="pt-4 pb-4 px-5">
+              <div className="flex items-center justify-between mb-3">
+                <div>
+                  <h3 className="text-lg font-bold text-foreground">
+                    Progression globale
+                  </h3>
+                  <p className="text-sm text-muted-foreground font-medium">
+                    {completedPhases} sur 7 phases complétées
+                  </p>
                 </div>
-                <div className="text-left">
-                  <div className="text-sm font-bold text-foreground">
-                    {phase.title}
-                  </div>
-                  <div className="text-xs text-muted-foreground font-medium">
-                    {phase.subtitle}
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-foreground">
+                    {Math.round(progressPercentage)}%
                   </div>
                 </div>
               </div>
-              {index < phases.length - 1 && (
+              <div className="w-full bg-muted rounded-full h-2.5">
                 <div
-                  className={`absolute top-1/2 -right-2 w-4 h-0.5 ${
-                    isCompleted ? 'bg-primary' : 'bg-border'
-                  }`}
-                  style={{ transform: 'translateY(-50%)' }}
+                  className="gradient-primary h-2.5 rounded-full transition-all duration-500"
+                  style={{ width: `${progressPercentage}%` }}
                 />
-              )}
-            </button>
-          );
-        })}
-      </div>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Espace dashboard : résumés modifiables + accès aux outils */}
-      <Card className="border-2 border-primary/10">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold">Espace dashboard</CardTitle>
-          <CardDescription className="text-sm">
-            Résumés modifiables par phase et accès rapide aux outils (calculateur, design, sourcing, go-to-market).
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="pt-0">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-            {phases.map((phase) => {
-              const key = String(phase.id);
+          {/* Stepper visuel */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+            {phases.map((phase, index) => {
+              const isCompleted = progress[`phase${phase.id}` as keyof typeof progress];
+              const isCurrent = phaseToRender === phase.id;
+              const isAccessible = true; // Tous les onglets débloqués : identité et stratégie déjà remplies à l'accès dashboard.
+
               return (
-                <Card key={phase.id} className="border-2">
-                  <CardHeader className="pb-1 pt-3 px-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <div className="min-w-0">
-                        <CardTitle className="text-sm">{phase.title}</CardTitle>
-                        <CardDescription className="text-xs truncate">{phase.subtitle}</CardDescription>
-                      </div>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openPhase(phase.id)}
-                        className="shrink-0 h-8"
-                      >
-                        Ouvrir
-                        <ChevronRight className="w-3 h-3 ml-0.5" />
-                      </Button>
+                <button
+                  key={phase.id}
+                  onClick={() => setCurrentPhase(phase.id)}
+                  disabled={false}
+                  className={`relative p-4 rounded-xl border-2 transition-all ${isCurrent
+                    ? 'border-primary bg-primary/10 shadow-modern'
+                    : isCompleted
+                      ? 'border-success bg-success/10'
+                      : isAccessible
+                        ? 'border-border bg-card hover:border-primary/50 hover:shadow-modern'
+                        : 'border-border bg-muted opacity-50 cursor-not-allowed'
+                    }`}
+                >
+                  <div className="flex items-center gap-3 mb-2">
+                    <div
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold ${isCompleted
+                        ? 'gradient-primary text-white shadow-modern'
+                        : isCurrent
+                          ? 'bg-primary/20 text-primary'
+                          : 'bg-muted text-muted-foreground'
+                        }`}
+                    >
+                      {isCompleted ? '✓' : phase.id}
                     </div>
-                  </CardHeader>
-                  <CardContent className="space-y-1 pt-0 px-4 pb-4">
-                    <label className="text-xs font-medium text-muted-foreground">Résumé (modifiable)</label>
-                    <textarea
-                      value={summaries[key] ?? ''}
-                      onChange={(e) => setSummaries((prev) => ({ ...prev, [key]: e.target.value }))}
-                      onBlur={() => saveSummary(phase.id)}
-                      placeholder={`Résumé pour ${phase.title}…`}
-                      className="w-full min-h-[60px] rounded-md border-2 border-input bg-background px-2.5 py-1.5 text-sm resize-y"
-                      rows={2}
+                    <div className="text-left">
+                      <div className="text-sm font-bold text-foreground">
+                        {phase.title}
+                      </div>
+                      <div className="text-xs text-muted-foreground font-medium">
+                        {phase.subtitle}
+                      </div>
+                    </div>
+                  </div>
+                  {index < phases.length - 1 && (
+                    <div
+                      className={`absolute top-1/2 -right-2 w-4 h-0.5 ${isCompleted ? 'bg-primary' : 'bg-border'
+                        }`}
+                      style={{ transform: 'translateY(-50%)' }}
                     />
-                    {savingSummary === key && (
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        <Loader2 className="w-3 h-3 animate-spin" />
-                        Enregistrement…
-                      </span>
-                    )}
-                  </CardContent>
-                </Card>
+                  )}
+                </button>
               );
             })}
           </div>
-        </CardContent>
-      </Card>
+
+          {/* Espace dashboard : résumés modifiables + accès aux outils */}
+          <Card className="border-2 border-primary/10">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-lg font-bold">Espace dashboard</CardTitle>
+              <CardDescription className="text-sm">
+                Résumés modifiables par phase et accès rapide aux outils (calculateur, design, sourcing, go-to-market).
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+                {phases.map((phase) => {
+                  const key = String(phase.id);
+                  return (
+                    <Card key={phase.id} className="border-2">
+                      <CardHeader className="pb-1 pt-3 px-4">
+                        <div className="flex items-center justify-between gap-2">
+                          <div className="min-w-0">
+                            <CardTitle className="text-sm">{phase.title}</CardTitle>
+                            <CardDescription className="text-xs truncate">{phase.subtitle}</CardDescription>
+                          </div>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openPhase(phase.id)}
+                            className="shrink-0 h-8"
+                          >
+                            Ouvrir
+                            <ChevronRight className="w-3 h-3 ml-0.5" />
+                          </Button>
+                        </div>
+                      </CardHeader>
+                      <CardContent className="space-y-1 pt-0 px-4 pb-4">
+                        <label className="text-xs font-medium text-muted-foreground">Résumé (modifiable)</label>
+                        <textarea
+                          value={summaries[key] ?? ''}
+                          onChange={(e) => setSummaries((prev) => ({ ...prev, [key]: e.target.value }))}
+                          onBlur={() => saveSummary(phase.id)}
+                          placeholder={`Résumé pour ${phase.title}…`}
+                          className="w-full min-h-[60px] rounded-md border-2 border-input bg-background px-2.5 py-1.5 text-sm resize-y"
+                          rows={2}
+                        />
+                        {savingSummary === key && (
+                          <span className="text-xs text-muted-foreground flex items-center gap-1">
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                            Enregistrement…
+                          </span>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            </CardContent>
+          </Card>
         </>
       )}
 
       {/* Contenu de la phase actuelle (outils) */}
       <Card className="border-2" ref={phaseContentRef}>
         {!onlyPhaseContent && (
-        <CardHeader className="pb-3">
-          <CardTitle className="text-lg font-bold">
-            Phase {phaseToRender === 0 ? '0' : phaseToRender} : {phases.find(p => p.id === phaseToRender)?.title || 'Identité'}
-          </CardTitle>
-          <CardDescription className="font-medium text-sm">
-            {phases.find(p => p.id === phaseToRender)?.description || 'Créez l\'identité de votre marque'}
-          </CardDescription>
-        </CardHeader>
+          <CardHeader className="pb-3">
+            <CardTitle className="text-lg font-bold">
+              Phase {phaseToRender === 0 ? '0' : phaseToRender} : {phases.find(p => p.id === phaseToRender)?.title || 'Identité'}
+            </CardTitle>
+            <CardDescription className="font-medium text-sm">
+              {phases.find(p => p.id === phaseToRender)?.description || 'Créez l\'identité de votre marque'}
+            </CardDescription>
+          </CardHeader>
         )}
         <CardContent className={onlyPhaseContent ? 'pt-4 pb-5 px-5' : 'pt-0 px-5 pb-5'}>
           {isTransitioning && (
@@ -383,6 +381,7 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
                 setProgress((prev) => ({ ...prev, phase0: true }));
                 setCurrentPhase(1);
               }}
+              userPlan={userPlan}
             />
           )}
           {!isTransitioning && phaseToRender === 1 && (
@@ -390,6 +389,7 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
               brandId={brandId}
               brand={brand}
               onComplete={() => handlePhaseComplete(1)}
+              userPlan={userPlan}
             />
           )}
           {!isTransitioning && phaseToRender === 2 && (

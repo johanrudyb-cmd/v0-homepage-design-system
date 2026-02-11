@@ -51,7 +51,7 @@ export default async function LaunchMapPage() {
   ]);
 
   const suppliersMap = new Map<string, { id: string; name: string; country: string; moq?: number; leadTime?: number; quoteCount: number }>();
-  
+
   // D'abord ajouter les fournisseurs qui ont reçu des devis
   for (const q of quotesWithFactory) {
     const f = q.factory;
@@ -69,7 +69,7 @@ export default async function LaunchMapPage() {
       });
     }
   }
-  
+
   // Ensuite ajouter les favoris (s'ils ne sont pas déjà dans la map)
   for (const fav of favoriteFactories) {
     const f = fav.factory;
@@ -86,7 +86,7 @@ export default async function LaunchMapPage() {
       });
     }
   }
-  
+
   const suppliers = Array.from(suppliersMap.values());
 
   const lm = brand.launchMap;
@@ -103,20 +103,20 @@ export default async function LaunchMapPage() {
 
   const launchMapForClient = lm
     ? {
-        id: lm.id,
-        phase1: lm.phase1,
-        phase2: lm.phase2,
-        phase3: lm.phase3,
-        phase4: lm.phase4,
-        phase5: lm.phase5,
-        phase6: lm.phase6,
-        phase7: lm.phase7,
-        shopifyShopDomain: lm.shopifyShopDomain,
-        phase1Data: lm.phase1Data,
-        baseMockupByProductType: lm.baseMockupByProductType,
-        phaseSummaries: lm.phaseSummaries,
-        siteCreationTodo: lm.siteCreationTodo,
-      }
+      id: lm.id,
+      phase1: lm.phase1,
+      phase2: lm.phase2,
+      phase3: lm.phase3,
+      phase4: lm.phase4,
+      phase5: lm.phase5,
+      phase6: lm.phase6,
+      phase7: lm.phase7,
+      shopifyShopDomain: lm.shopifyShopDomain,
+      phase1Data: lm.phase1Data,
+      baseMockupByProductType: lm.baseMockupByProductType,
+      phaseSummaries: lm.phaseSummaries,
+      siteCreationTodo: lm.siteCreationTodo,
+    }
     : null;
 
   const weekEvents = getWeekEvents(lm?.contentCalendar ?? null);
@@ -133,6 +133,7 @@ export default async function LaunchMapPage() {
       progressPercentage={progressPercentage}
       suppliers={suppliers}
       weekEvents={weekEvents}
+      userPlan={user.plan}
     />
   );
 }

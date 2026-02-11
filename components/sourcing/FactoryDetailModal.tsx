@@ -22,6 +22,7 @@ interface FactoryDetailModalProps {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   onClose: () => void;
+  userPlan?: string;
 }
 
 export function FactoryDetailModal({
@@ -29,6 +30,7 @@ export function FactoryDetailModal({
   isFavorite,
   onToggleFavorite,
   onClose,
+  userPlan = 'free',
 }: FactoryDetailModalProps) {
 
   return (
@@ -36,7 +38,9 @@ export function FactoryDetailModal({
       <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95">
         <div className="bg-background rounded-xl shadow-modern-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-border">
           <div className="sticky top-0 bg-background border-b border-border p-4 flex items-center justify-between z-10">
-            <h2 className="text-xl font-bold text-foreground truncate pr-4">{factory.name}</h2>
+            <h2 className="text-xl font-bold text-foreground truncate pr-4">
+              {userPlan === 'free' ? `Usine Partenaire #${factory.id.slice(-4).toUpperCase()}` : factory.name}
+            </h2>
             <div className="flex items-center gap-2 flex-shrink-0">
               <button
                 type="button"
@@ -97,38 +101,63 @@ export function FactoryDetailModal({
             {(factory.contactEmail || factory.contactPhone) && (
               <div>
                 <p className="text-muted-foreground font-medium text-sm mb-2">Coordonnées</p>
-                <div className="flex flex-wrap gap-3">
-                  {factory.contactEmail && (
-                    <a
-                      href={`mailto:${factory.contactEmail}`}
-                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                {userPlan === 'free' ? (
+                  <div className="rounded-lg border-2 border-dashed border-primary/20 bg-primary/5 p-4 flex flex-col items-center text-center gap-2">
+                    <p className="text-xs font-semibold text-primary uppercase tracking-tight">🔒 Contenu Réservé</p>
+                    <p className="text-xs text-muted-foreground">Les coordonnées directes des usines sont réservées aux membres Créateur.</p>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="mt-1 h-8 text-[11px]"
+                      onClick={() => window.location.href = '/auth/choose-plan'}
                     >
-                      <Mail className="w-4 h-4" />
-                      {factory.contactEmail}
-                    </a>
-                  )}
-                  {factory.contactPhone && (
-                    <a
-                      href={`tel:${factory.contactPhone}`}
-                      className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
-                    >
-                      <Phone className="w-4 h-4" />
-                      {factory.contactPhone}
-                    </a>
-                  )}
-                </div>
+                      Débloquer le Sourcing Hub
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-3">
+                    {factory.contactEmail && (
+                      <a
+                        href={`mailto:${factory.contactEmail}`}
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                      >
+                        <Mail className="w-4 h-4" />
+                        {factory.contactEmail}
+                      </a>
+                    )}
+                    {factory.contactPhone && (
+                      <a
+                        href={`tel:${factory.contactPhone}`}
+                        className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                      >
+                        <Phone className="w-4 h-4" />
+                        {factory.contactPhone}
+                      </a>
+                    )}
+                  </div>
+                )}
               </div>
             )}
 
             {factory.website && (
               <div className="flex gap-2 pt-2 border-t border-border">
-                <Button
-                  className="flex-1 gap-2"
-                  onClick={() => window.open(factory.website!, '_blank')}
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Voir le site web
-                </Button>
+                {userPlan === 'free' ? (
+                  <Button
+                    className="flex-1 gap-2 grayscale-[0.5] opacity-80"
+                    variant="secondary"
+                    onClick={() => window.location.href = '/auth/choose-plan'}
+                  >
+                    <span>🔒 Voir le site web (Plan Créateur)</span>
+                  </Button>
+                ) : (
+                  <Button
+                    className="flex-1 gap-2"
+                    onClick={() => window.open(factory.website!, '_blank')}
+                  >
+                    <ExternalLink className="w-4 h-4" />
+                    Voir le site web
+                  </Button>
+                )}
               </div>
             )}
           </div>

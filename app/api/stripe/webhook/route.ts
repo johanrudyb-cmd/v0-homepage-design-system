@@ -40,13 +40,19 @@ export async function POST(request: Request) {
           break;
         }
 
+        const customerId = session.customer as string;
+
         // Abonnement plan Créateur (34€/mois)
         if (session.mode === 'subscription' && planId === SUBSCRIPTION_PLAN_ID) {
           const now = new Date();
           // Mettre à jour le plan et la date d'abonnement (reset des quotas mensuels)
           await prisma.user.update({
             where: { id: userId },
-            data: { plan: SUBSCRIPTION_PLAN_ID, subscribedAt: now },
+            data: {
+              plan: SUBSCRIPTION_PLAN_ID,
+              subscribedAt: now,
+              stripeCustomerId: customerId // Sauvegarder l'ID client
+            },
           });
           // Supprimer les consommations IA de ce mois pour reset immédiat des quotas
           const periodStart = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -56,8 +62,16 @@ export async function POST(request: Request) {
               createdAt: { gte: periodStart },
             },
           });
-          console.log('[Stripe webhook] Subscription activated + quotas reset:', { userId, planId });
+          console.log('[Stripe webhook] Subscription activated + quotas reset:', { userId, planId, customerId });
           break;
+        }
+
+        // Cas général : mettre à jour le stripeCustomerId s'il n'existe pas
+        if (customerId) {
+          await prisma.user.update({
+            where: { id: userId },
+            data: { stripeCustomerId: customerId }
+          }).catch(() => { }); // Ignorer si erreur (déjà fait ou concurrent)
         }
 
         if (!packId) {

@@ -37,6 +37,7 @@ export interface PhasePageViewProps {
   quoteCount: number;
   ugcCount: number;
   suppliers?: SupplierRecap[];
+  userPlan?: string;
 }
 
 export function PhasePageView({
@@ -49,6 +50,7 @@ export function PhasePageView({
   quoteCount,
   ugcCount,
   suppliers = [],
+  userPlan = 'free',
 }: PhasePageViewProps) {
   const [isShowingDetail, setShowingDetail] = useState(phaseId === 2);
   const [strategyText, setStrategyText] = useState<string | null>(null);
@@ -89,6 +91,8 @@ export function PhasePageView({
     }
   }, [isShowingDetail]);
 
+  const isLocked = userPlan === 'free' && ![0, 2].includes(phaseId);
+
   if (!phase || !presentation) {
     return (
       <div className="p-4">
@@ -104,9 +108,9 @@ export function PhasePageView({
   }
 
   return (
-    <div className="min-h-screen bg-muted/30">
-      <div className="px-4 py-5 max-w-[96rem] mx-auto space-y-4">
-        <div className="flex items-center gap-4">
+    <div className="min-h-screen bg-[#F5F5F7]">
+      <div className="px-4 sm:px-6 lg:px-12 py-6 sm:py-10 lg:py-12 max-w-[96rem] mx-auto space-y-4 sm:space-y-6 lg:space-y-8">
+        <div className="flex items-center justify-between gap-4">
           <Link
             href="/launch-map"
             className="inline-flex items-center justify-center gap-2 rounded-md px-3 py-2 text-sm font-medium hover:bg-muted hover:text-foreground transition-colors"
@@ -114,6 +118,13 @@ export function PhasePageView({
             <ArrowLeft className="w-4 h-4" />
             Retour à la vue d&apos;ensemble
           </Link>
+
+          {isLocked && (
+            <div className="px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-600 text-xs font-bold border border-amber-500/20 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+              Contenu Réservé - Plan Créateur
+            </div>
+          )}
         </div>
 
         <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -166,7 +177,7 @@ export function PhasePageView({
                   brandName={brand.name}
                   titleMode="strategy"
                   visualIdentityLocked
-                  onClose={() => {}}
+                  onClose={() => { }}
                   embedded
                 />
               ) : (
@@ -252,16 +263,62 @@ export function PhasePageView({
             </div>
           )}
 
-          {([0, 2, 3, 4, 5, 6, 7].includes(phase.id) || (phase.id === 1 && isShowingDetail)) && (
-            <div ref={detailSectionRef} className="p-4 sm:p-6 bg-background">
-              <LaunchMapStepper
-                brandId={brand.id}
-                launchMap={launchMap}
-                brand={brandFull}
-                hasIdentity={hasIdentity}
-                focusedPhase={phase.id}
-              />
+          {isLocked ? (
+            <div className="p-8 sm:p-12 bg-background flex flex-col items-center text-center space-y-6">
+              <div className="w-20 h-20 rounded-full bg-primary/10 flex items-center justify-center">
+                <PhaseIcon className="w-10 h-10 text-primary opacity-40" />
+              </div>
+              <div className="max-w-md space-y-2">
+                <h3 className="text-xl font-bold text-foreground">Accès limité au plan Créateur</h3>
+                <p className="text-muted-foreground text-sm leading-relaxed">
+                  La phase <strong>{phase.title}</strong> utilise nos outils d&apos;intelligence artificielle avancés pour {presentation.intro.toLowerCase().slice(0, 100)}...
+                </p>
+                <p className="text-sm font-medium text-foreground">
+                  Passez au plan Créateur pour débloquer l&apos;intégralité du Guide de Lancement.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm">
+                <Link href="/auth/choose-plan" className="flex-1">
+                  <Button className="w-full gap-2" size="lg">
+                    🚀 Passer au plan Créateur
+                  </Button>
+                </Link>
+                <Link href="/launch-map" className="flex-1">
+                  <Button variant="outline" className="w-full" size="lg">
+                    Plus tard
+                  </Button>
+                </Link>
+              </div>
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t w-full max-w-md">
+                <div className="text-left">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Inclus dans Créateur</p>
+                  <ul className="mt-2 space-y-1">
+                    <li className="text-xs flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-primary" /> IA & Design</li>
+                    <li className="text-xs flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-primary" /> Sourcing Hub</li>
+                  </ul>
+                </div>
+                <div className="text-left">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Support</p>
+                  <ul className="mt-2 space-y-1">
+                    <li className="text-xs flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-primary" /> Formation</li>
+                    <li className="text-xs flex items-center gap-1.5"><CheckCircle2 className="w-3 h-3 text-primary" /> Communauté</li>
+                  </ul>
+                </div>
+              </div>
             </div>
+          ) : (
+            ([0, 2, 3, 4, 5, 6, 7].includes(phase.id) || (phase.id === 1 && isShowingDetail)) && (
+              <div ref={detailSectionRef} className="p-4 sm:p-6 bg-background">
+                <LaunchMapStepper
+                  brandId={brand.id}
+                  launchMap={launchMap}
+                  brand={brandFull}
+                  hasIdentity={hasIdentity}
+                  focusedPhase={phase.id}
+                  userPlan={userPlan}
+                />
+              </div>
+            )
           )}
         </div>
       </div>
