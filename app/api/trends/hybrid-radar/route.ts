@@ -97,7 +97,7 @@ export async function GET(request: Request) {
     }
 
     const now = Date.now();
-    const trends = filtered.slice(0, limit).map((p) => {
+    const enriched = filtered.map((p) => {
       const daysInRadar = Math.floor((now - new Date(p.createdAt).getTime()) / 86400000);
       const recurrenceInCategory = recurrenceByKey.get(`${p.category ?? ''}|${p.segment ?? ''}`) ?? 0;
       const effectiveTrendGrowthPercent =
@@ -109,13 +109,60 @@ export async function GET(request: Request) {
           daysInRadar,
           recurrenceInCategory,
         });
+
       return {
         ...p,
         name: p.name ?? '',
         effectiveTrendGrowthPercent,
         effectiveTrendLabel: p.trendGrowthPercent == null && effectiveTrendGrowthPercent > 0 ? 'Estimé' : p.trendLabel,
+        // Helper pour le regroupement par marque (nécessaire pour le shuffle)
+        displayBrand: getProductBrand(p.name, p.sourceBrand) || p.sourceBrand || 'Unknown',
+        // Signature pour dédoublonnage multi-sources
+        signature: p.productSignature || p.name.toLowerCase().replace(/\s+/g, '-').slice(0, 50),
       };
     });
+
+    /**
+     * DÉDOUBLONNAGE PAR SIGNATURE
+     * Si le même produit est présent via plusieurs sources, on ne garde que le meilleur.
+     */
+    const seenSignatures = new Set<string>();
+    const uniqueEnriched = enriched.filter(p => {
+      if (p.signature && seenSignatures.has(p.signature)) return false;
+      seenSignatures.add(p.signature);
+      return true;
+    });
+
+    /** 
+     * ALGORITHME DE DIVERSITÉ (Round Robin)
+     * On regroupe par marque pour éviter d'avoir 10 fois la même marque d'affilée.
+     */
+    const groupedByBrand = new Map<string, typeof uniqueEnriched>();
+    for (const p of uniqueEnriched) {
+      const b = p.displayBrand;
+      if (!groupedByBrand.has(b)) groupedByBrand.set(b, []);
+      groupedByBrand.get(b)!.push(p);
+    }
+
+    const diversified: typeof enriched = [];
+    const brands = Array.from(groupedByBrand.keys());
+    let hasMore = true;
+    let index = 0;
+
+    while (hasMore && diversified.length < limit) {
+      hasMore = false;
+      for (const b of brands) {
+        const list = groupedByBrand.get(b)!;
+        if (index < list.length) {
+          diversified.push(list[index]);
+          hasMore = true;
+          if (diversified.length >= limit) break;
+        }
+      }
+      index++;
+    }
+
+    const trends = diversified;
 
     const summary = {
       total: filtered.length,
