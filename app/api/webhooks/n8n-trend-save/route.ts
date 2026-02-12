@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { inferCategory } from '@/lib/infer-trend-category';
 import { cleanProductTitle } from '@/lib/utils';
 import { computeSaturability, computeTrendScore } from '@/lib/trend-product-kpis';
+import { getProductBrand } from '@/lib/brand-utils';
 
 /**
  * Webhook sécurisé pour n8n afin d'enregistrer des nouvelles tendances.
@@ -78,17 +79,8 @@ export async function POST(req: Request) {
             cleanName = cleanName.replace(anonymizeRegex, '').replace(/\s{2,}/g, ' ').trim();
 
             // 3. Identification de la marque "propre"
-            let finalBrand = item.productBrand?.trim();
-            const forbiddenBrands = ['zalando', 'asos', 'zara', 'global partner', 'partner'];
-
-            if (!finalBrand || forbiddenBrands.includes(finalBrand.toLowerCase()) || anonymizeRegex.test(finalBrand)) {
-                const firstWords = cleanName.split(' ')[0];
-                if (firstWords && firstWords.length > 2 && !forbiddenBrands.includes(firstWords.toLowerCase())) {
-                    finalBrand = firstWords;
-                } else {
-                    finalBrand = null;
-                }
-            }
+            // On utilise getProductBrand qui gère les exclusions distributeurs et les termes génériques
+            let finalBrand = getProductBrand(item.productBrand || cleanName, item.sourceBrand);
 
             const initialCategory = inferCategory(item.name);
 

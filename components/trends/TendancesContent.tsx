@@ -96,6 +96,7 @@ export function TendancesContent() {
   const [savingPreview, setSavingPreview] = useState(false);
 
   const [trends, setTrends] = useState<HybridTrend[]>([]);
+  const [totalTrends, setTotalTrends] = useState<number>(0);
   const [trendsLoading, setTrendsLoading] = useState(true);
   const { data: session } = useSession();
   const user = session?.user as any;
@@ -165,6 +166,7 @@ export function TendancesContent() {
       const res = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
       const data = res.ok ? await res.json().catch(() => ({})) : {};
       setTrends(Array.isArray(data.trends) ? data.trends : []);
+      setTotalTrends(data.summary?.total || 0);
     } catch (e) {
       console.error(e);
       setTrends([]);
@@ -467,8 +469,13 @@ export function TendancesContent() {
       )}
       <div className="sticky top-14 sm:top-16 z-30 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-black/5 space-y-3">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-bold tracking-tight text-[#1D1D1F]">
+          <h2 className="text-lg font-bold tracking-tight text-[#1D1D1F] flex items-center gap-2">
             Tendances de la semaine
+            {!trendsLoading && totalTrends > 0 && (
+              <span className="text-[10px] bg-black/5 text-muted-foreground px-1.5 py-0.5 rounded-full font-bold">
+                {totalTrends}
+              </span>
+            )}
           </h2>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-muted-foreground px-2 py-0.5 rounded-full bg-muted border border-black/5 uppercase tracking-tighter"> Zone EU</span>
