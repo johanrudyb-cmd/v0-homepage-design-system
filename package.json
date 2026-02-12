@@ -40,7 +40,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.72.1",
     "@auth/prisma-adapter": "^2.11.1",
-    "@prisma/client": "^5.22.0",
+    "@prisma/client": "5.22.0",
     "@react-three/drei": "^10.7.7",
     "@react-three/fiber": "^9.5.0",
     "@types/archiver": "^7.0.0",
@@ -70,7 +70,7 @@
     "pdfkit": "^0.17.2",
     "pg": "^8.17.2",
     "postcss": "^8.5.6",
-    "prisma": "^5.19.1",
+    "prisma": "5.22.0",
     "puppeteer": "^24.36.0",
     "puppeteer-extra": "^3.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",

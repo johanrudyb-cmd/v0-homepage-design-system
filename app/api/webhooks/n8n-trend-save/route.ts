@@ -167,6 +167,7 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error('[N8N Webhook Error]', error);
-        return NextResponse.json({ error: error.message }, { status: 500 });
+        if (error.stack) console.error(error.stack);
+        return NextResponse.json({ error: error.message || 'Internal Server Error' }, { status: 500 });
     }
 }

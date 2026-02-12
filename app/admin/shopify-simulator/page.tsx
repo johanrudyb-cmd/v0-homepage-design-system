@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { ExternalLink, ShoppingBag, Store, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
-export default async function ShopifySimulatorPage({ searchParams }: { searchParams: { brandId?: string } }) {
+export default async function ShopifySimulatorPage({ searchParams }: { searchParams: Promise<{ brandId?: string }> }) {
     const user = await getCurrentUser();
     if (!user) redirect('/auth/login');
 

@@ -47,43 +47,57 @@ async function main() {
             console.log(`✅ ${items.length} produits extraits.`);
 
             if (items.length > 0) {
-                console.log(`📤 Envoi de ${items.length} produits au Webhook IA...`);
+                console.log(`📤 Envoi de ${items.length} produits au Webhook IA (par lots de 5)...`);
 
-                // Préparation des données pour le webhook
-                const webhookData = {
-                    items: items.map(item => ({
-                        name: item.name,
-                        price: typeof item.price === 'number' ? item.price : parseFloat(String(item.price)) || 0,
-                        imageUrl: item.imageUrl,
-                        sourceUrl: item.sourceUrl,
-                        sourceBrand: source.brand,
-                        marketZone: source.marketZone,
-                        segment: source.segment,
-                        trendGrowthPercent: item.trendGrowthPercent,
-                        trendLabel: item.trendLabel,
-                        productBrand: item.name.split(' ')[0], // Extraction naïve de la marque
-                        composition: item.composition,
-                        color: item.color,
-                        articleNumber: item.articleNumber
-                    }))
-                };
+                const batchSize = 5;
+                let totalSaved = 0;
+                let totalSkipped = 0;
 
-                // Envoi au Webhook (avec l'IA Bouncer et l'Enrichissement)
-                const response = await fetch(WEBHOOK_URL, {
-                    method: 'POST',
-                    headers: {
-                        'x-api-key': API_KEY,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(webhookData)
-                });
+                for (let i = 0; i < items.length; i += batchSize) {
+                    const batch = items.slice(i, i + batchSize);
 
-                if (!response.ok) {
-                    throw new Error(`Erreur HTTP: ${response.status}`);
+                    // Préparation des données pour le webhook
+                    const webhookData = {
+                        items: batch.map(item => ({
+                            name: item.name,
+                            price: typeof item.price === 'number' ? item.price : parseFloat(String(item.price)) || 0,
+                            imageUrl: item.imageUrl,
+                            sourceUrl: item.sourceUrl,
+                            sourceBrand: source.brand,
+                            marketZone: source.marketZone,
+                            segment: source.segment,
+                            trendGrowthPercent: item.trendGrowthPercent,
+                            trendLabel: item.trendLabel,
+                            productBrand: item.name.split(' ')[0], // Extraction naïve de la marque
+                            composition: item.composition,
+                            color: item.color,
+                            articleNumber: item.articleNumber
+                        }))
+                    };
+
+                    console.log(`📡 Envoye lot ${Math.floor(i / batchSize) + 1}/${Math.ceil(items.length / batchSize)}...`);
+
+                    // Envoi au Webhook (avec l'IA Bouncer et l'Enrichissement)
+                    const response = await fetch(WEBHOOK_URL, {
+                        method: 'POST',
+                        headers: {
+                            'x-api-key': API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(webhookData)
+                    });
+
+                    if (!response.ok) {
+                        console.error(`❌ Échec du lot à l'index ${i}: Erreur HTTP ${response.status}`);
+                        continue;
+                    }
+
+                    const result = await response.json() as any;
+                    totalSaved += result.saved || 0;
+                    totalSkipped += (result.skipped || 0) + (result.banned || 0);
                 }
 
-                const result = await response.json() as any;
-                console.log(`✨ Résultats Webhook : ${result.saved} sauvés, ${result.skipped || 0} ignorés.`);
+                console.log(`✨ Résultats cumulés : ${totalSaved} sauvés, ${totalSkipped} ignorés.`);
             }
 
         } catch (error: any) {

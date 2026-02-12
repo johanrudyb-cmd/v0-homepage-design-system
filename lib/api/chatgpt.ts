@@ -690,6 +690,11 @@ export async function enrichProductDetails(
     cut?: string | null;
     averagePrice: number;
     imageUrl?: string | null;
+    estimatedCogsPercent?: number | null;
+    complexityScore?: string | null;
+    sustainabilityScore?: number | null;
+    visualAttractivenessScore?: number | null;
+    dominantAttribute?: string | null;
   }
 ): Promise<EnrichedProductFields> {
   if (process.env.ANTHROPIC_API_KEY) {

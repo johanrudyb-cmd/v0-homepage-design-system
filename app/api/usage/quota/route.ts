@@ -43,6 +43,7 @@ export async function GET() {
       ugc_shooting_product: planLimits.ugc_shooting_product_limit,
       launch_map_site_texts: planLimits.site_texts_limit,
       factories_match: planLimits.factories_match,
+      trends_hybrid_scan: planLimits.trends_hybrid_scan_limit,
       ugc_virtual_tryon: -1,
     };
 
