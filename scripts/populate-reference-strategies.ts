@@ -1,6 +1,5 @@
 import 'dotenv/config';
 import { AUDIENCE_REFERENCE_BRANDS } from '../lib/constants/audience-reference-brands';
-import fetch from 'node-fetch';
 
 const ADMIN_API_KEY = process.env.N8N_WEBHOOK_SECRET || 'bmad_n8n_secret_default_2024';
 
