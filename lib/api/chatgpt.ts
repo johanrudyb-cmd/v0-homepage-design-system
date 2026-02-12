@@ -695,6 +695,7 @@ export async function enrichProductDetails(
     sustainabilityScore?: number | null;
     visualAttractivenessScore?: number | null;
     dominantAttribute?: string | null;
+    skipImageAnalysis?: boolean;
   }
 ): Promise<EnrichedProductFields> {
   if (process.env.ANTHROPIC_API_KEY) {
@@ -723,7 +724,8 @@ Règles JSON strictes:
 - "estimatedCogsPercent": Coût de prod estimé (15-50%).
 - "sustainabilityScore": Note ESG (0-100).
 - "visualAttractivenessScore": Note 0-100.
-- "category": Type exact (Hoodie, Cargo, Veste, etc.). Jamais "Autre".`;
+- "category": Type exact (Hoodie, Cargo, Veste, etc.). Jamais "Autre".
+- "shorten": Si vrai, rédige une analyse business très concise (1 paragraphe).`;
 
   const userContent = [
     `Produit: ${product.name}`,
@@ -731,6 +733,7 @@ Règles JSON strictes:
     `Prix public: ${product.averagePrice}€`,
     existing ? `Données existantes: ${existing}` : '',
     '',
+    product.skipImageAnalysis ? 'REMARQUE: Analyse business CONCISE (1 paragraphe) car traitement par lot.' : '',
     'Analyse ce vêtement et renvoie le JSON complet avec : businessAnalysis, dominantAttribute, style, material, color, careInstructions, description, cut, productBrand (la vraie marque, pas Zalando), estimatedCogsPercent, complexityScore, sustainabilityScore, visualAttractivenessScore, category.',
   ].filter(Boolean).join('\n');
 
@@ -739,7 +742,11 @@ Règles JSON strictes:
     { role: 'user', content: userContent },
   ];
 
-  if (product.imageUrl && product.imageUrl.startsWith('http')) {
+  const canAnalyzeImage = product.imageUrl &&
+    product.imageUrl.startsWith('http') &&
+    !product.skipImageAnalysis;
+
+  if (canAnalyzeImage) {
     messages[1] = {
       role: 'user',
       content: [
@@ -961,7 +968,7 @@ export async function isProductValidClothing(
 
   try {
     const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
+      model: 'gpt-4o-mini',
       messages: [
         {
           role: 'system',

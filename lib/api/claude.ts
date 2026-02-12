@@ -986,6 +986,7 @@ export async function enrichProductDetails(product: {
   sustainabilityScore?: number | null;
   visualAttractivenessScore?: number | null;
   dominantAttribute?: string | null;
+  skipImageAnalysis?: boolean;
 }): Promise<Record<string, unknown>> {
   const existing = [
     product.material ? `Matière: ${product.material}` : null,
@@ -997,16 +998,24 @@ export async function enrichProductDetails(product: {
   ].filter(Boolean).join('; ');
 
   const system = `Tu es un expert mode et retail. Complète les informations manquantes pour ce produit (vêtement e-commerce).
-Règles: Réponds UNIQUEMENT en JSON. category: T-shirt, Hoodie, Pantalon, Jean, Veste, Blouson, Pull, Polo, Short, Robe, Cargo, Jogging, Legging — jamais "Autre". complexityScore: "Facile"|"Moyen"|"Complexe". sustainabilityScore, visualAttractivenessScore: 0-100. estimatedCogsPercent: 15-50. dominantAttribute: phrase courte. productBrand: marque du vêtement (ex. Nike, Les Deux) — jamais Zalando/ASOS/Zara. N'inclus que les champs à compléter si vides ou "Non spécifié".`;
+Règles: Réponds UNIQUEMENT en JSON. category: T-shirt, Hoodie, Pantalon, Jean, Veste, Blouson, Pull, Polo, Short, Robe, Cargo, Jogging, Legging — jamais "Autre". complexityScore: "Facile"|"Moyen"|"Complexe". sustainabilityScore, visualAttractivenessScore: 0-100. estimatedCogsPercent: 15-50. dominantAttribute: phrase courte. productBrand: marque du vêtement (ex. Nike, Les Deux) — jamais Zalando/ASOS/Zara. N'inclus que les champs à compléter si vides ou "Non spécifié".
+Si skipImageAnalysis est vrai, rédige une description et une analyse business très COURTE (1-2 phrases).`;
 
   const user = [
     `Produit: ${product.name}. Catégorie: ${product.category}. Prix: ${product.averagePrice}€`,
     existing ? `Données existantes: ${existing}` : '',
+    product.skipImageAnalysis ? 'NOTE: Analyse ultra-concise demandée.' : '',
     'Retourne JSON avec: category, style, material, color, careInstructions, description, cut, productBrand, estimatedCogsPercent, complexityScore, sustainabilityScore, visualAttractivenessScore, dominantAttribute. Exclure champs déjà remplis. UNIQUEMENT JSON valide.',
   ].filter(Boolean).join('\n');
 
+  if (!user.trim()) return {}; // Sécurité contre message vide
+
+  const canAnalyzeImage = product.imageUrl &&
+    product.imageUrl.startsWith('http') &&
+    !product.skipImageAnalysis;
+
   const text = await generateTextWithOptionalImage(system, user, {
-    imageUrl: product.imageUrl && product.imageUrl.startsWith('http') ? product.imageUrl : undefined,
+    imageUrl: canAnalyzeImage ? product.imageUrl! : undefined,
     maxTokens: 500,
     temperature: 0.3,
   });

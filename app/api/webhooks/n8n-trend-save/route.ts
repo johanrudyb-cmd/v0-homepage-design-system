@@ -107,6 +107,7 @@ export async function POST(req: Request) {
                         averagePrice: item.price || 0,
                         imageUrl: item.imageUrl,
                         productBrand: finalBrand,
+                        skipImageAnalysis: true,
                     });
                 } catch (e) {
                     console.error('[IA Enrichment Error]', e);
