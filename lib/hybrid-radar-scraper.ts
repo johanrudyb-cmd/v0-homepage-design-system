@@ -196,6 +196,8 @@ function zalandoExtractFromPage(
     function isOkHref(h) {
       if (!h || h.indexOf('faq') !== -1 || h.indexOf('corporate') !== -1 || h.indexOf('apps.') !== -1) return false;
       if (h.indexOf('trending-items') !== -1 || h.indexOf('trend-details') !== -1) return false;
+      // BAN SECTIONS BEAUTE / COSMETIQUES
+      if (h.indexOf('/beaute') !== -1 || h.indexOf('/beauty') !== -1 || h.indexOf('/cosmetique') !== -1 || h.indexOf('/parfum') !== -1 || h.indexOf('/soin') !== -1) return false;
       if (h.indexOf('/p/') === -1 && (h.indexOf('.html') === -1 || h.indexOf('zalando') === -1)) return false;
       return h.indexOf('zalando') !== -1 || h.indexOf('zalando.fr') !== -1 || h.charAt(0) === '/' && h.indexOf('/p/') !== -1;
     }
@@ -583,7 +585,7 @@ async function scrapeZalandoTrendSpotter(source: HybridRadarSource): Promise<Hyb
                   continue;
                 }
                 await Promise.race([
-                  page.waitForNavigation({ waitUntil: 'load', timeout: 22000 }).catch(() => {}),
+                  page.waitForNavigation({ waitUntil: 'load', timeout: 22000 }).catch(() => { }),
                   new Promise((r) => setTimeout(r, 12000)),
                 ]);
                 await new Promise((r) => setTimeout(r, 2500));
@@ -767,7 +769,7 @@ async function scrapeZalandoTrendSpotter(source: HybridRadarSource): Promise<Hyb
                 try {
                   await page.goto(listUrl, { waitUntil: 'load', timeout: 25000 });
                   await new Promise((r) => setTimeout(r, 2000));
-                } catch (_) {}
+                } catch (_) { }
               }
             }
             extracted = enriched;
@@ -1086,153 +1088,153 @@ async function scrapeZalandoTrendSpotter(source: HybridRadarSource): Promise<Hyb
               await page.goto(productUrl, { waitUntil: 'domcontentloaded', timeout: 20000 });
               await new Promise((r) => setTimeout(r, 2500));
               const enriched = await page.evaluate(
-            (marketZone: string, brand: string, seg: string) => {
-              const body = (document.body && document.body.textContent) || '';
-              const getText = (sel: string) => {
-                const el = document.querySelector(sel);
-                return (el && (el as HTMLElement).textContent ? (el as HTMLElement).textContent.trim() : '') || '';
-              };
-              const priceRe = /\b(\d{1,3}[,.]\d{2})\s*[€$£]?/;
-              let price = 0;
-              let originalPrice: number | null = null;
-              const priceCandidates: { val: number; el: Element; isStrike?: boolean }[] = [];
-              const priceEls = document.querySelectorAll('[class*="price"], [class*="Price"], [data-testid*="price"], [data-id*="price"], [class*="strike"], [class*="line-through"], s');
-              for (let i = 0; i < priceEls.length; i++) {
-                const el = priceEls[i];
-                const text = (el as HTMLElement).textContent || '';
-                const isStrike = (el as HTMLElement).closest?.('s, [class*="strike"], [class*="line-through"], [class*="was"]') != null
-                  || /line-through|strikethrough/.test((el as HTMLElement).className?.toString() || '');
-                if (/livraison|shipping/i.test(text)) continue;
-                const m = text.match(priceRe);
-                if (m) {
-                  const val = parseFloat(m[1].replace(',', '.'));
-                  if (val >= 1 && val <= 5000) priceCandidates.push({ val, el, isStrike });
-                }
-              }
-              const strikePrices = priceCandidates.filter((p) => p.isStrike);
-              const normalPrices = priceCandidates.filter((p) => !p.isStrike);
-              if (strikePrices.length > 0) {
-                originalPrice = Math.max(...strikePrices.map((p) => p.val));
-              }
-              if (normalPrices.length > 0) {
-                price = normalPrices[normalPrices.length - 1].val;
-              }
-              if (price <= 0 && priceCandidates.length > 0) {
-                const sorted = [...priceCandidates].sort((a, b) => a.val - b.val);
-                price = sorted[sorted.length - 1].val;
-                if (sorted.length >= 2 && sorted[sorted.length - 2].val > price) {
-                  originalPrice = sorted[sorted.length - 2].val;
-                }
-              }
-              if (price <= 0) {
-                const metaPrice = (document.querySelector('meta[property="product:price:amount"]') as HTMLMetaElement)?.content;
-                if (metaPrice) price = parseFloat(metaPrice.replace(',', '.'));
-              }
-              if (price <= 0) {
-                const priceMatch = body.match(priceRe);
-                price = priceMatch ? parseFloat(priceMatch[1].replace(',', '.')) : 0;
-              }
-              let markdownPercent: number | null = null;
-              if (originalPrice != null && originalPrice > price && price > 0) {
-                markdownPercent = Math.round((1 - price / originalPrice) * 100);
-              }
-              const stockText = (document.body?.innerText || '').toLowerCase();
-              let stockOutRisk: string | null = null;
-              if (/rupture|out of stock|indisponible|sold out|épuisé|epuise/i.test(stockText)) {
-                stockOutRisk = 'Rupture';
-              } else if (/plus que \d|only \d+ left|dernières pièces|last items|stock limité/i.test(stockText)) {
-                stockOutRisk = 'Faible';
-              } else if (/en stock|in stock|disponible|available/i.test(stockText)) {
-                stockOutRisk = 'OK';
-              }
-              const name = getText('h1') || getText('[data-id="product-title"]') || getText('[class*="product-title"]') || (document.querySelector('meta[property="og:title"]') as HTMLMetaElement)?.content || (document.title || '').trim().slice(0, 200);
-              const img = document.querySelector('img[src*="ztat.net"], img[src*="img01"]') as HTMLImageElement | null;
-              const imageUrl = img ? (img.src || img.getAttribute('data-src') || '') : '';
-              const findLabel = (labels: string[]) => {
-                for (const label of labels) {
-                  const re = new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[:\\-]?\\s*([^\\n<]+)', 'i');
-                  const m = body.match(re);
-                  if (m) return m[1].trim().slice(0, 500);
-                }
-                return '';
-              };
-              const fromDtDd = (dtText: string) => {
-                const dts = Array.from(document.querySelectorAll('dt, [class*="detail"], [class*="label"]'));
-                for (const dt of dts) {
-                  const t = (dt as HTMLElement).textContent || '';
-                  if (new RegExp(dtText, 'i').test(t)) {
-                    const next = dt.nextElementSibling;
-                    if (next) return (next as HTMLElement).textContent?.trim().slice(0, 500) || '';
-                  }
-                }
-                return '';
-              };
-              const composition = fromDtDd('composition|matière|material') || findLabel(['Composition', 'Composizione', 'Zusammensetzung', 'Materiaal', 'Material']);
-              const care = fromDtDd('entretien|care|pflege') || findLabel(['Entretien', 'Consigli per la cura', 'Pflegehinweise', 'Verzorging', 'Care']);
-              const color = fromDtDd('couleur|color|farbe') || findLabel(['Couleur', 'Colore', 'Farbe', 'Kleur', 'Color']);
-              const sizes = fromDtDd('taille|size|größe') || findLabel(['Tailles?', 'Taglie', 'Größen', 'Maat', 'Size']);
-              const origin = fromDtDd('origine|origin|herkunft') || findLabel(['Pays d\'origine', 'Origine', 'Herkunftsland', 'Country of origin']);
-              const artNum = fromDtDd('article|nummer|style') || findLabel(['Numéro d\'article', 'Article', 'Artikelnummer', 'Artikelnr', 'Style']);
-              // Marque de l'article (pas le retailer) — Zalando affiche souvent la marque dans breadcrumb, meta ou titre
-              let productBrand: string | null = null;
-              if (brand === 'Zalando') {
-                const metaBrand = (document.querySelector('meta[property="product:brand"], meta[name="product:brand"], meta[itemprop="brand"]') as HTMLMetaElement)?.content?.trim();
-                if (metaBrand) productBrand = metaBrand.slice(0, 100);
-                if (!productBrand) {
-                  const breadcrumbLinks = Array.from(document.querySelectorAll('a[href*="/brand/"], nav a[href*="/"], [class*="breadcrumb"] a'));
-                  for (const a of breadcrumbLinks) {
-                    const href = (a as HTMLAnchorElement).href || '';
-                    const text = (a as HTMLElement).textContent?.trim() || '';
-                    if (href.includes('/brand/') && text && text.length < 50 && !/accueil|home|zalando|homme|femme|nouveautés/i.test(text)) {
-                      productBrand = text.slice(0, 100);
-                      break;
+                (marketZone: string, brand: string, seg: string) => {
+                  const body = (document.body && document.body.textContent) || '';
+                  const getText = (sel: string) => {
+                    const el = document.querySelector(sel);
+                    return (el && (el as HTMLElement).textContent ? (el as HTMLElement).textContent.trim() : '') || '';
+                  };
+                  const priceRe = /\b(\d{1,3}[,.]\d{2})\s*[€$£]?/;
+                  let price = 0;
+                  let originalPrice: number | null = null;
+                  const priceCandidates: { val: number; el: Element; isStrike?: boolean }[] = [];
+                  const priceEls = document.querySelectorAll('[class*="price"], [class*="Price"], [data-testid*="price"], [data-id*="price"], [class*="strike"], [class*="line-through"], s');
+                  for (let i = 0; i < priceEls.length; i++) {
+                    const el = priceEls[i];
+                    const text = (el as HTMLElement).textContent || '';
+                    const isStrike = (el as HTMLElement).closest?.('s, [class*="strike"], [class*="line-through"], [class*="was"]') != null
+                      || /line-through|strikethrough/.test((el as HTMLElement).className?.toString() || '');
+                    if (/livraison|shipping/i.test(text)) continue;
+                    const m = text.match(priceRe);
+                    if (m) {
+                      const val = parseFloat(m[1].replace(',', '.'));
+                      if (val >= 1 && val <= 5000) priceCandidates.push({ val, el, isStrike });
                     }
                   }
-                }
-                if (!productBrand && name) {
-                  const titleParts = name.split(/\s*[-|–]\s*/);
-                  if (titleParts[0] && titleParts[0].length >= 2 && titleParts[0].length <= 30 && !/sweat|t-shirt|pull|veste|pantalon|short|robe/i.test(titleParts[0].toLowerCase())) {
-                    productBrand = titleParts[0].trim().slice(0, 100);
+                  const strikePrices = priceCandidates.filter((p) => p.isStrike);
+                  const normalPrices = priceCandidates.filter((p) => !p.isStrike);
+                  if (strikePrices.length > 0) {
+                    originalPrice = Math.max(...strikePrices.map((p) => p.val));
                   }
+                  if (normalPrices.length > 0) {
+                    price = normalPrices[normalPrices.length - 1].val;
+                  }
+                  if (price <= 0 && priceCandidates.length > 0) {
+                    const sorted = [...priceCandidates].sort((a, b) => a.val - b.val);
+                    price = sorted[sorted.length - 1].val;
+                    if (sorted.length >= 2 && sorted[sorted.length - 2].val > price) {
+                      originalPrice = sorted[sorted.length - 2].val;
+                    }
+                  }
+                  if (price <= 0) {
+                    const metaPrice = (document.querySelector('meta[property="product:price:amount"]') as HTMLMetaElement)?.content;
+                    if (metaPrice) price = parseFloat(metaPrice.replace(',', '.'));
+                  }
+                  if (price <= 0) {
+                    const priceMatch = body.match(priceRe);
+                    price = priceMatch ? parseFloat(priceMatch[1].replace(',', '.')) : 0;
+                  }
+                  let markdownPercent: number | null = null;
+                  if (originalPrice != null && originalPrice > price && price > 0) {
+                    markdownPercent = Math.round((1 - price / originalPrice) * 100);
+                  }
+                  const stockText = (document.body?.innerText || '').toLowerCase();
+                  let stockOutRisk: string | null = null;
+                  if (/rupture|out of stock|indisponible|sold out|épuisé|epuise/i.test(stockText)) {
+                    stockOutRisk = 'Rupture';
+                  } else if (/plus que \d|only \d+ left|dernières pièces|last items|stock limité/i.test(stockText)) {
+                    stockOutRisk = 'Faible';
+                  } else if (/en stock|in stock|disponible|available/i.test(stockText)) {
+                    stockOutRisk = 'OK';
+                  }
+                  const name = getText('h1') || getText('[data-id="product-title"]') || getText('[class*="product-title"]') || (document.querySelector('meta[property="og:title"]') as HTMLMetaElement)?.content || (document.title || '').trim().slice(0, 200);
+                  const img = document.querySelector('img[src*="ztat.net"], img[src*="img01"]') as HTMLImageElement | null;
+                  const imageUrl = img ? (img.src || img.getAttribute('data-src') || '') : '';
+                  const findLabel = (labels: string[]) => {
+                    for (const label of labels) {
+                      const re = new RegExp(label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '\\s*[:\\-]?\\s*([^\\n<]+)', 'i');
+                      const m = body.match(re);
+                      if (m) return m[1].trim().slice(0, 500);
+                    }
+                    return '';
+                  };
+                  const fromDtDd = (dtText: string) => {
+                    const dts = Array.from(document.querySelectorAll('dt, [class*="detail"], [class*="label"]'));
+                    for (const dt of dts) {
+                      const t = (dt as HTMLElement).textContent || '';
+                      if (new RegExp(dtText, 'i').test(t)) {
+                        const next = dt.nextElementSibling;
+                        if (next) return (next as HTMLElement).textContent?.trim().slice(0, 500) || '';
+                      }
+                    }
+                    return '';
+                  };
+                  const composition = fromDtDd('composition|matière|material') || findLabel(['Composition', 'Composizione', 'Zusammensetzung', 'Materiaal', 'Material']);
+                  const care = fromDtDd('entretien|care|pflege') || findLabel(['Entretien', 'Consigli per la cura', 'Pflegehinweise', 'Verzorging', 'Care']);
+                  const color = fromDtDd('couleur|color|farbe') || findLabel(['Couleur', 'Colore', 'Farbe', 'Kleur', 'Color']);
+                  const sizes = fromDtDd('taille|size|größe') || findLabel(['Tailles?', 'Taglie', 'Größen', 'Maat', 'Size']);
+                  const origin = fromDtDd('origine|origin|herkunft') || findLabel(['Pays d\'origine', 'Origine', 'Herkunftsland', 'Country of origin']);
+                  const artNum = fromDtDd('article|nummer|style') || findLabel(['Numéro d\'article', 'Article', 'Artikelnummer', 'Artikelnr', 'Style']);
+                  // Marque de l'article (pas le retailer) — Zalando affiche souvent la marque dans breadcrumb, meta ou titre
+                  let productBrand: string | null = null;
+                  if (brand === 'Zalando') {
+                    const metaBrand = (document.querySelector('meta[property="product:brand"], meta[name="product:brand"], meta[itemprop="brand"]') as HTMLMetaElement)?.content?.trim();
+                    if (metaBrand) productBrand = metaBrand.slice(0, 100);
+                    if (!productBrand) {
+                      const breadcrumbLinks = Array.from(document.querySelectorAll('a[href*="/brand/"], nav a[href*="/"], [class*="breadcrumb"] a'));
+                      for (const a of breadcrumbLinks) {
+                        const href = (a as HTMLAnchorElement).href || '';
+                        const text = (a as HTMLElement).textContent?.trim() || '';
+                        if (href.includes('/brand/') && text && text.length < 50 && !/accueil|home|zalando|homme|femme|nouveautés/i.test(text)) {
+                          productBrand = text.slice(0, 100);
+                          break;
+                        }
+                      }
+                    }
+                    if (!productBrand && name) {
+                      const titleParts = name.split(/\s*[-|–]\s*/);
+                      if (titleParts[0] && titleParts[0].length >= 2 && titleParts[0].length <= 30 && !/sweat|t-shirt|pull|veste|pantalon|short|robe/i.test(titleParts[0].toLowerCase())) {
+                        productBrand = titleParts[0].trim().slice(0, 100);
+                      }
+                    }
+                  }
+                  return {
+                    name: name.slice(0, 200),
+                    price,
+                    imageUrl: imageUrl && imageUrl.startsWith('http') ? imageUrl : imageUrl ? 'https:' + imageUrl : null,
+                    sourceUrl: window.location.href,
+                    marketZone,
+                    brand,
+                    segment: seg,
+                    composition: composition || null,
+                    careInstructions: care || null,
+                    color: color || null,
+                    sizes: sizes || null,
+                    countryOfOrigin: origin || null,
+                    articleNumber: artNum || null,
+                    originalPrice: originalPrice ?? null,
+                    markdownPercent: markdownPercent ?? null,
+                    stockOutRisk: stockOutRisk ?? null,
+                    productBrand: productBrand || null,
+                  };
+                },
+                source.marketZone,
+                source.brand,
+                source.segment ?? 'femme'
+              ) as HybridScrapedItem;
+              if (enriched.name && enriched.name.length > 2 && !isExcludedProduct(enriched.name, source.excludeKeywords)) {
+                if (enriched.price <= 0) {
+                  const priceRe = /\b(\d{1,3}[,.]\d{2})\s*[€$£]?/;
+                  const pm = await page.evaluate(() => (document.body && document.body.textContent) || '').then((t) => t.match(priceRe));
+                  if (pm) enriched.price = parseFloat(pm[1].replace(',', '.'));
                 }
+                allItems.push({
+                  ...enriched,
+                  sourceUrl: productUrl,
+                  trendGrowthPercent: cardTrendPercent ?? null,
+                  trendLabel: cardTrendLabel ?? null,
+                });
               }
-              return {
-                name: name.slice(0, 200),
-                price,
-                imageUrl: imageUrl && imageUrl.startsWith('http') ? imageUrl : imageUrl ? 'https:' + imageUrl : null,
-                sourceUrl: window.location.href,
-                marketZone,
-                brand,
-                segment: seg,
-                composition: composition || null,
-                careInstructions: care || null,
-                color: color || null,
-                sizes: sizes || null,
-                countryOfOrigin: origin || null,
-                articleNumber: artNum || null,
-                originalPrice: originalPrice ?? null,
-                markdownPercent: markdownPercent ?? null,
-                stockOutRisk: stockOutRisk ?? null,
-                productBrand: productBrand || null,
-              };
-            },
-            source.marketZone,
-            source.brand,
-            source.segment ?? 'femme'
-          ) as HybridScrapedItem;
-          if (enriched.name && enriched.name.length > 2 && !isExcludedProduct(enriched.name, source.excludeKeywords)) {
-            if (enriched.price <= 0) {
-              const priceRe = /\b(\d{1,3}[,.]\d{2})\s*[€$£]?/;
-              const pm = await page.evaluate(() => (document.body && document.body.textContent) || '').then((t) => t.match(priceRe));
-              if (pm) enriched.price = parseFloat(pm[1].replace(',', '.'));
-            }
-            allItems.push({
-              ...enriched,
-              sourceUrl: productUrl,
-              trendGrowthPercent: cardTrendPercent ?? null,
-              trendLabel: cardTrendLabel ?? null,
-            });
-          }
             } catch (_) {
               /* skip failed product */
             }

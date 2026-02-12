@@ -383,7 +383,7 @@ export function HybridRadarDashboard() {
 
       {/* Liste des tendances */}
       <div>
-        <h2 className="text-lg font-semibold mb-4">Tendances par marché</h2>
+        <h2 className="text-lg font-semibold mb-4">Tendances de la semaine</h2>
         {loading ? (
           <div className="flex items-center gap-2 text-muted-foreground py-8">
             <Loader2 className="w-5 h-5 animate-spin" />

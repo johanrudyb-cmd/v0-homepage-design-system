@@ -41,3 +41,10 @@ next-env.d.ts
 
 # prisma
 /prisma/migrations
+
+# n8n standalone and sensitive env
+n8n-standalone/
+.env.telegramAndN8n
+scenarios-n8n/*.json
+!scenarios-n8n/notify-admin-telegram.json
+!scenarios-n8n/notify-admin-whatsapp.json

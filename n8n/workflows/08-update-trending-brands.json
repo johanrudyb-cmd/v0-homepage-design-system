@@ -1,0 +1,77 @@
+[
+    {
+        "name": "📈 OUTFITY - Mise à jour Mensuelle Marques Tendances",
+        "nodes": [
+            {
+                "parameters": {
+                    "rule": {
+                        "interval": [
+                            {
+                                "field": "cronExpression",
+                                "expression": "0 0 1 * *"
+                            }
+                        ]
+                    }
+                },
+                "id": "schedule-trigger",
+                "name": "1er du mois à 00:00",
+                "type": "n8n-nodes-base.scheduleTrigger",
+                "typeVersion": 1.2,
+                "position": [
+                    250,
+                    300
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "={{ $env.OUTFITY_APP_URL || 'http://localhost:3000' }}/api/cron/update-trending-brands",
+                    "sendQueryParameters": true,
+                    "queryParameters": {
+                        "parameters": [
+                            {
+                                "name": "secret",
+                                "value": "={{ $env.OUTFITY_CRON_SECRET || 'changez_moi_en_production' }}"
+                            }
+                        ]
+                    },
+                    "options": {
+                        "timeout": 600000
+                    }
+                },
+                "id": "http-request",
+                "name": "API Update Trending Brands",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.2,
+                "position": [
+                    500,
+                    300
+                ]
+            }
+        ],
+        "connections": {
+            "1er du mois à 00:00": {
+                "main": [
+                    [
+                        {
+                            "node": "API Update Trending Brands",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        },
+        "settings": {
+            "executionOrder": "v1"
+        },
+        "tags": [
+            {
+                "name": "automation"
+            },
+            {
+                "name": "trends"
+            }
+        ]
+    }
+]

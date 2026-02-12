@@ -132,6 +132,7 @@ model Brand {
   mannequins           Mannequin[]
   strategyGenerations  StrategyGeneration[]
   favoriteFactories    BrandFavoriteFactory[]
+  mockShopifyProducts  MockShopifyProduct[]
 
   @@index([userId])
 }
@@ -199,10 +200,30 @@ model LaunchMap {
   recommendationsCachedAt DateTime? // Dernière génération des recommandations
   contentCalendar         Json?     // { events: ContentCalendarEvent[] } — calendrier contenu : tournage, post, scripts, CTA UGC
   siteCreationTodo        Json?     // { steps: { id: string, label: string, done?: boolean }[] } — to-do création site Shopify générée par IA au calquage
+  shopifyAccessToken      String?   // Token d'accès Shopify (Custom App) pour push produit
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+}
+
+model MockShopifyProduct {
+  id          String   @id @default(cuid())
+  brandId     String
+  shopifyId   String   @unique
+  title       String
+  description String   @db.Text
+  vendor      String
+  type        String
+  price       Float
+  imageUrl    String?  @db.Text
+  status      String   @default("draft")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  brand       Brand    @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
 }
 
 model Collection {
@@ -394,14 +415,23 @@ model BrandSpyAnalysis {
 
 // Analyse IA de marque partagee entre tous les utilisateurs
 model BrandAnalysis {
-  id             String   @id @default(cuid())
-  brandKey       String   @unique // Clé normalisée (lowercase) pour déduplication
-  brandName      String   // Nom affiché (ex. "Arc'teryx")
-  analysis       String   @db.Text
-  visualIdentity Json?    // Identité visuelle : { colorPalette: { primary?, secondary?, accent? }, typography: { heading?, body? } }
-  logoUrl        String?  // URL du logo (Brandfetch, favicon, etc.) pour affichage
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  id              String   @id @default(cuid())
+  brandKey        String   @unique // Clé normalisée (lowercase) pour déduplication
+  brandName       String   // Nom affiché (ex. "Arc'teryx")
+  analysis        String   @db.Text
+  visualIdentity  Json?    // Identité visuelle : { colorPalette: { primary?, secondary?, accent? }, typography: { heading?, body? } }
+  logoUrl         String?  // URL du logo (Brandfetch, favicon, etc.) pour affichage
+  
+  // Métadonnées enrichies (pour transformer toute marque en référence)
+  signaturePiece  String?
+  dominantStyle   String?
+  cyclePhase      String?
+  launchPotential String?
+  indicativePrice String?
+  websiteUrl      String?
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
 
   @@index([brandKey])
 }
@@ -451,6 +481,26 @@ model UGCContent {
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
   @@index([brandId])
+}
+
+model TrendingBrand {
+  id              String   @id @default(cuid())
+  rank            Int
+  brand           String
+  score           String   // ex. "98/100"
+  scoreValue      Int      // ex. 98
+  signaturePiece  String
+  dominantStyle   String
+  cyclePhase      String   // emergent, croissance, pic, declin
+  launchPotential String   // opportunite, a_surveiller, sature
+  indicativePrice String
+  websiteUrl      String?  // URL officielle de la marque
+  month           String   // Ex: "2026-02"
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([rank, month])
+  @@index([month])
 }
 
 model TrendProduct {

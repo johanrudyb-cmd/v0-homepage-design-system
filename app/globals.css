@@ -380,26 +380,37 @@
   animation: marquee 30s linear infinite;
 }
 
-/* Marquee très lent style Apple */
-@keyframes marquee-slow {
-  0% {
+@keyframes marquee-infinite {
+  from {
     transform: translateX(0);
   }
 
-  100% {
-    transform: translateX(-33.333%);
+  to {
+    transform: translateX(-50%);
   }
 }
 
-.animate-marquee-slow {
-  animation: marquee-slow 20s linear infinite;
+.animate-marquee-infinite {
+  animation: marquee-infinite 40s linear infinite;
 }
 
-/* Défilement plus rapide sur téléphone et tablette */
+.animate-marquee-infinite-fast {
+  animation: marquee-infinite 20s linear infinite;
+}
+
 @media (max-width: 1024px) {
-  .animate-marquee-slow {
-    animation-duration: 12s;
+  .animate-marquee-infinite {
+    animation-duration: 30s;
   }
+
+  .animate-marquee-infinite-fast {
+    animation-duration: 15s;
+  }
+}
+
+.mask-marquee {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
 }
 
 /* Animations pour header - Art & Mode */

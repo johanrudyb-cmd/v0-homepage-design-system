@@ -10,8 +10,8 @@ interface TrendsSubNavProps {
 }
 
 const tabs: { id: string; label: string; href: string; badge?: string }[] = [
-  { id: 'classement', label: 'Classement', href: '/trends' },
-  { id: 'analyseur', label: 'Analyseur de tendances', href: '#', badge: 'SOON' },
+  { id: 'classement', label: 'Tendances', href: '/trends' },
+  { id: 'analyseur', label: 'Analyseur Visuel', href: '/trends/visual' },
 ];
 
 export function TrendsSubNav({ active }: TrendsSubNavProps) {

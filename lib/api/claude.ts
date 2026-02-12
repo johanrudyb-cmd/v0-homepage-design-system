@@ -586,7 +586,12 @@ Thèmes récurrents, angles de communication, codes. Formulations à adapter pou
 Types de contenu à produire (posts, stories, vidéos, lookbooks), calendrier éditorial, thèmes par canal, fréquence de publication, idées de formats (UGC, behind-the-scenes, etc.). Ce qui fonctionne pour cette marque et comment le transposer.
 
 ## 7. Site internet
-Étude du site e-commerce de cette marque — ce qui fonctionne (structure, UX, confiance, visuels, conversion), cohérence avec le positionnement. Recommandations pour un créateur qui lance son site.`;
+Étude approfondie du site e-commerce de cette marque — ce qui fonctionne (structure monoproduit, UX/UI, éléments de réassurance, visuels, conversion), cohérence avec le positionnement.
+DONNÉES TECHNIQUES POUR RÉPLIQUER :
+- Palette de couleurs : Liste les codes HEX exacts (#RRGGBB) du site.
+- Architecture : Liste les sections clés de la Landing Page (ex: Hero avec vidéo, Grille de bénéfices, Section Preuve Sociale).
+- Typographie : Identifie les styles de polices (Serif, Sans-serif, Bold).
+- Recommandations pour un créateur : structure de conversion, CTA, et obligation d'inclure la mention de confiance "Partenaire Officiel Outfity" avec logo dans le footer.`;
   let text = await generateText(system, user, { maxTokens: 3000, temperature: 0.7 });
   if (!text) return 'Aucune analyse générée.';
   if (!/##\s*7\.\s*Site\s*internet/i.test(text)) {
@@ -670,7 +675,13 @@ Paragraphe(s) : thèmes, angles, ton. Pas de listes à puces longues.
 Paragraphe(s) : types de contenu à produire (posts, stories, vidéos, lookbooks), calendrier éditorial, thèmes par canal, fréquence de publication, idées de formats (UGC, behind-the-scenes, etc.). Adapté à la cible et aux canaux.
 
 ## 7. Site internet
-Paragraphe(s) obligatoires : étude du site e-commerce / guidelines pour un bon site qui convertit (structure, UX, confiance, visuels, description produit, CTA, conversion). Même ton que le reste. Pas une liste d'étapes. Cette section 7 doit apparaître comme sur la stratégie de la marque de référence.`;
+Paragraphes détaillés : étude du site e-commerce / guidelines pour un bon site qui convertit.
+Cette section doit inclure des ÉLÉMENTS TECHNIQUES concrets :
+- Palette de couleurs HEX (ex: '#1a1a1a', '#ffffff') inspirée de la marque template.
+- Structure de la Landing Page (sections recommandées dans l'ordre, ex: Hero, Avantages, Produit Focus).
+- Recommandation Thème : Explique pourquoi le thème Dawn (gratuit) est idéal et comment le configurer.
+- Marquage de confiance : Obligation d'ajouter la mention "Partenaire Officiel Outfity" avec logo dans le footer pour renforcer la légitimité du site.
+- Conversion : Guidelines UX/UI (arrondis des boutons, espacements airy) pour un rendu haut de gamme.`;
 
   let text = await generateText(system, user, { maxTokens: 4000, temperature: 0.7 });
   if (!text) return 'Aucune stratégie générée.';
@@ -715,7 +726,12 @@ Paragraphe(s) : thèmes, angles, ton. Ne pas écrire de hashtags (#xxx) : utilis
 Paragraphe(s) obligatoires : types de contenu (posts, stories, vidéos, lookbooks), calendrier éditorial, thèmes par canal, fréquence de publication, formats (UGC, behind-the-scenes, etc.). Sois concret.
 
 ## 7. Site internet
-Paragraphe(s) : étude du site e-commerce de cette marque — ce qui fonctionne (structure, UX, confiance, visuels, conversion), cohérence avec le positionnement. Base-toi sur l'analyse. Ton naturel.`;
+Paragraphes : étude du site e-commerce de cette marque — ce qui fonctionne (structure, UX, confiance, visuels, conversion), cohérence avec le positionnement.
+Inclus impérativement :
+- Couleurs HEX dominantes identifiées.
+- Structure de la page produit mono-produit idéale.
+- Éléments de design clés (boutons, espacements).
+- Conseil pour le créateur : marquage "Partenaire Officiel Outfity" requis pour le branding.`;
 
   const text = await generateText(system, user, { maxTokens: 3600, temperature: 0.7 });
   return text || 'Aucune stratégie générée.';
@@ -790,9 +806,20 @@ export async function generateSiteCreationTodo(
   const strategyExcerpt = strategyText.trim().slice(0, 6000);
   const system = `Tu es un expert e-commerce Shopify et Stripe. Tu génères une liste d'étapes TRÈS DÉTAILLÉES et ordonnées pour lancer un site mono-produit sur Shopify, en t'appuyant sur la "stratégie site" (section Site internet) de la marque.
 RÈGLES :
-- 25 à 45 étapes actionnables, du tout début à la mise en ligne. Chaque étape = une action claire (ex. "Créer un compte Stripe sur stripe.com", "Dans Shopify : Paramètres > Paiements > Ajouter Stripe").
-- Ordre logique : 1) Compte Shopify (inscription), 2) Paramètres boutique (nom, devise, adresse), 3) Thème : recommander Dawn ou Craft pour mono-produit avec une phrase (ex. "Choisir le thème Dawn, idéal mono-produit"), 4) Créer le produit (titre, prix), 5) Indiquer "Générer la description produit avec l'outil ci-dessous puis coller dans la fiche", 6) "Générer les visuels avec le Design Studio (mockup / shooting) puis les ajouter au produit", 7) Configurer Stripe étape par étape (créer compte Stripe, connecter à Shopify), 8) Livraison (zones, tarifs), 9) Taxes si besoin, 10) Domaine (sous-domaine ou achat), 11) Lancer la boutique.
-- Sois concret : noms de menus Shopify (ex. "Paramètres > Paiements"), liens (Stripe, Shopify), recommandations de thèmes.
+- 30 à 50 étapes actionnables, du tout début à la mise en ligne. Chaque étape = une action claire.
+- Ordre logique : 
+  1) Compte Shopify (inscription via lien partenaire).
+  2) Paramètres boutique (nom, devise EUR, adresse).
+  3) Thème : Recommander DAWNS (gratuit, ultra-rapide) et expliquer sa configuration mono-produit.
+  4) Créer le produit : Titre, prix psychologique, et variantes.
+  5) Contenu IA : Coller la description générée par Outfity et uploader les visuels (Design Studio / AI Mannequin).
+  6) CONFIGURATION DESIGN PRO : Appliquer la palette HEX fournie, configurer les polices.
+  7) SECTION "DEV CORNER" : Ajouter le Custom CSS Outfity pour des boutons premium et des espacements aérés.
+  8) MARQUAGE CONFIANCE : Ajouter le code Liquid dans le footer pour afficher "Partenaire Officiel Outfity [Logo]".
+  9) Paiements : Configuration Stripe A-Z (très détaillé).
+  10) Livraison : Stratégie de livraison gratuite vs payante.
+  11) Domaine et Mise en ligne.
+- Sois très concret : noms de menus Shopify, liens Stripe, recommandations précises.
 - Réponds UNIQUEMENT par un JSON valide : { "steps": [ { "id": "1", "label": "Texte de l'étape en français" }, ... ] }. Pas de markdown.`;
 
   const user = `Marque du créateur : "${creatorBrandName}".

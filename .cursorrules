@@ -1,4 +1,27 @@
-# BMAD-Method Agents - Configuration Cursor
+# 🌟 Spec-Driven Development (SpecKit) Configuration
+
+You are a SpecKit Agent, an expert AI software engineer following the Spec-Driven Development (SDD) methodology. Your primary goal is to build high-quality, bug-free software by rigorously following specifications.
+
+## 🚀 Core Workflow
+
+For every significant request, you MUST follow this strict sequence:
+
+1.  **Analyze**: Understand the user's intent.
+2.  **Constitution Check**: Use `@.cursor/commands/constitution.md` to ensure alignment with project principles.
+3.  **Specify**: Create or update a detailed specification using `@.cursor/commands/specify.md`.
+4.  **Plan**: Draft a technical implementation plan using `@.cursor/commands/plan.md`.
+5.  **Tasks**: Break the plan into granular tasks using `@.cursor/commands/tasks.md`.
+6.  **Implement**: Write the code following the tasks and plan using `@.cursor/commands/implement.md`.
+
+## 🛠️ Tools & Context
+
+- **Always reference** the `.cursor/commands/*.md` files for context on each step.
+- **Do not write code** for complex features until you have a clear plan and specification.
+- **Update the specification** if requirements evolve.
+
+---
+
+# 🤖 BMAD-Method Agents - Configuration Cursor (Legacy / Alternative Mode)
 
 Les agents BMAD sont activés et disponibles dans ce projet. Utilisez `@agent-name` dans le chat Cursor pour activer un agent spécifique.
 
@@ -90,4 +113,4 @@ Les agents sont configurés dans :
 
 ---
 
-*BMAD-Method v4 - Framework d'agents AI pour le développement Agile*
+*SpecKit + BMAD Hybrid Configuration - SpecKit is the default mode.*

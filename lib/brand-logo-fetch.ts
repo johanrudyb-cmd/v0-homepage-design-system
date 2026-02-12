@@ -42,7 +42,7 @@ async function fetchLogoFromBrandfetch(brandName: string): Promise<string | null
     if (first?.domain && typeof first.domain === 'string') {
       try {
         const host = new URL(first.domain.startsWith('http') ? first.domain : `https://${first.domain}`).hostname.replace(/^www\./, '');
-        return `https://www.google.com/s2/favicons?domain=${host}&sz=128`;
+        return `https://cdn.brandfetch.io/${host}/w/400/h/400/logo`;
       } catch {
         return null;
       }
@@ -54,8 +54,8 @@ async function fetchLogoFromBrandfetch(brandName: string): Promise<string | null
 }
 
 /**
- * Heuristique : domaine probable à partir du nom + favicon Google.
- */
+* Heuristique : domaine probable à partir du nom + Brandfetch CDN.
+*/
 function fetchLogoFromDomainHeuristic(brandName: string): string | null {
   const slug = brandName
     .toLowerCase()
@@ -66,7 +66,7 @@ function fetchLogoFromDomainHeuristic(brandName: string): string | null {
     .replace(/[^a-z0-9-]/g, '');
   if (slug.length < 2) return null;
   const domain = slugToDomain(slug);
-  return `https://www.google.com/s2/favicons?domain=${domain}&sz=128`;
+  return `https://cdn.brandfetch.io/${domain}/w/400/h/400/logo`;
 }
 
 /**

@@ -11,6 +11,7 @@ import {
   FileText,
   Target,
   Megaphone,
+  Camera,
 } from 'lucide-react';
 
 const features = [
@@ -27,9 +28,9 @@ const features = [
     color: '#34C759',
   },
   {
-    icon: TrendingUp,
-    title: 'Analyse de tendances',
-    description: 'Découvrez les tendances émergentes et analysez vos concurrents en temps réel.',
+    icon: Camera,
+    title: 'Scanner visuel IA',
+    description: 'Analysez instantanément le potentiel d\'un produit avec une simple photo.',
     color: '#FF9500',
   },
   {

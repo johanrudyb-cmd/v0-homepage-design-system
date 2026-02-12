@@ -7,6 +7,14 @@ import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { proxyImageUrl } from '@/lib/image-proxy';
 import { Flame, ChevronDown, Lock } from 'lucide-react';
+import { BrandLogo } from '@/components/brands/BrandLogo';
+import { getBrandLogoUrl, getBrandKey } from '@/lib/curated-brands';
+import { REFERENCE_BRAND_WEBSITES } from '@/lib/constants/audience-reference-brands';
+
+const getRefWebsite = (brandName: string) => {
+  const k = getBrandKey(brandName || '');
+  return Object.entries(REFERENCE_BRAND_WEBSITES).find(([name]) => getBrandKey(name) === k)?.[1];
+};
 
 interface TrendProduct {
   id: string;
@@ -29,7 +37,7 @@ export function TrendsByMarket() {
   const [isVisible, setIsVisible] = useState(false);
   const [trends, setTrends] = useState<TrendProduct[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedAge, setSelectedAge] = useState<string | null>(null);
+  const [selectedAge, setSelectedAge] = useState<string>('18-24 ans');
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [selectedZone] = useState('Zone EU');
   const [sortBy] = useState('Meilleures tendances (score)');
@@ -94,29 +102,23 @@ export function TrendsByMarket() {
   }, []);
 
   // Filtrer les tendances selon les sélections
-  const displayedTrends = trends.filter((trend) => {
-    // Filtre par âge
-    if (selectedAge) {
-      const ageRange = selectedAge === '18-24 ans' ? '18-24' : '25-34';
-      if (trend.ageRange !== ageRange) {
-        return false;
-      }
+  const ageRange = selectedAge === '18-24 ans' ? '18-24' : '25-34';
+
+  const displayedTrends = (() => {
+    const ageMatch = trends.filter(t => t.ageRange === ageRange);
+
+    if (selectedGender === 'Homme') {
+      return ageMatch.filter(t => t.segment === 'homme').slice(0, 8);
+    }
+    if (selectedGender === 'Femme') {
+      return ageMatch.filter(t => t.segment === 'femme').slice(0, 8);
     }
 
-    // Filtre par genre
-    if (selectedGender) {
-      const genderLower = selectedGender.toLowerCase();
-      const segmentLower = trend.segment?.toLowerCase() || '';
-      if (genderLower === 'homme' && segmentLower !== 'homme') {
-        return false;
-      }
-      if (genderLower === 'femme' && segmentLower !== 'femme') {
-        return false;
-      }
-    }
-
-    return true;
-  });
+    // Par défaut : 4 Hommes + 4 Femmes
+    const men = ageMatch.filter(t => t.segment === 'homme').slice(0, 4);
+    const women = ageMatch.filter(t => t.segment === 'femme').slice(0, 4);
+    return [...men, ...women];
+  })();
 
   const handleAnalyzeClick = (e: React.MouseEvent, trendId: string) => {
     e.preventDefault();
@@ -143,7 +145,7 @@ export function TrendsByMarket() {
         {/* En-tête avec titre et indicateur */}
         <div className="mb-6 sm:mb-8">
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#000000] mb-3 sm:mb-4">
-            Tendances par marché
+            Tendances de la semaine
           </h2>
           <div className="flex flex-wrap items-center gap-2 text-sm text-[#6e6e73]">
             <Flame className="w-4 h-4 text-[#007AFF] shrink-0" />
@@ -151,19 +153,19 @@ export function TrendsByMarket() {
           </div>
         </div>
 
-        {/* Filtres simplifiés */}
-        <div className="mb-8 sm:mb-12 flex flex-wrap items-center gap-2 sm:gap-3">
-          {/* Filtres d'âge */}
+        {/* Filtres */}
+        <div className="mb-8 sm:mb-12 flex flex-wrap items-center gap-4 sm:gap-6">
+          {/* Groupe Âge */}
           <div className="flex flex-wrap gap-2">
             {['18-24 ans', '25-34 ans'].map((age) => (
               <button
                 key={age}
                 type="button"
-                onClick={() => setSelectedAge(selectedAge === age ? null : age)}
+                onClick={() => setSelectedAge(age)}
                 className={cn(
-                  'min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium transition-all touch-manipulation',
+                  'min-h-[44px] px-6 py-2.5 rounded-full text-sm font-bold transition-all touch-manipulation',
                   selectedAge === age
-                    ? 'bg-[#000000] text-white'
+                    ? 'bg-[#000000] text-white shadow-lg scale-105'
                     : 'bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] active:bg-[#E0E0E0]'
                 )}
               >
@@ -172,17 +174,17 @@ export function TrendsByMarket() {
             ))}
           </div>
 
-          {/* Filtres de genre */}
-          <div className="flex flex-wrap gap-2">
+          {/* Groupe Genre */}
+          <div className="flex flex-wrap gap-2 border-l border-[#F2F2F2] pl-4 sm:pl-6">
             {['Homme', 'Femme'].map((gender) => (
               <button
                 key={gender}
                 type="button"
                 onClick={() => setSelectedGender(selectedGender === gender ? null : gender)}
                 className={cn(
-                  'min-h-[44px] px-4 py-2.5 rounded-full text-sm font-medium transition-all touch-manipulation',
+                  'min-h-[44px] px-6 py-2.5 rounded-full text-sm font-bold transition-all touch-manipulation',
                   selectedGender === gender
-                    ? 'bg-[#000000] text-white'
+                    ? 'bg-[#000000] text-white shadow-lg'
                     : 'bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] active:bg-[#E0E0E0]'
                 )}
               >
@@ -209,7 +211,7 @@ export function TrendsByMarket() {
               isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
             )}
           >
-            {displayedTrends.slice(0, 4).map((product) => {
+            {displayedTrends.map((product) => {
               const segmentLabel = product.segment === 'homme' ? 'Homme' : product.segment === 'femme' ? 'Femme' : product.segment;
               const isFree = user?.plan === 'free';
               const isPubliclyVisible = !isFree || homepageIds.has(product.id);
@@ -256,12 +258,19 @@ export function TrendsByMarket() {
 
                       {/* Informations du produit */}
                       <div className="p-3 sm:p-6 space-y-2 sm:space-y-3">
-                        <div>
-                          <h3 className="text-sm sm:text-lg font-semibold text-[#000000] mb-0.5 sm:mb-1 line-clamp-2 leading-tight">
-                            {product.name}
-                          </h3>
-                          <p className="text-[10px] sm:text-sm text-[#6e6e73] truncate">{product.category}</p>
-                          <p className="text-[10px] sm:text-sm text-[#6e6e73] font-medium truncate">{product.brand}</p>
+                        <div className="flex items-center gap-2">
+                          <BrandLogo
+                            logoUrl={getBrandLogoUrl(product.brand, getRefWebsite(product.brand))}
+                            brandName={product.brand}
+                            className="w-8 h-8"
+                          />
+                          <div className="min-w-0">
+                            <h3 className="text-sm sm:text-lg font-semibold text-[#000000] mb-0.5 sm:mb-1 line-clamp-1 leading-tight">
+                              {product.name}
+                            </h3>
+                            <p className="text-[10px] sm:text-sm text-[#6e6e73] truncate">{product.category}</p>
+                            <p className="text-[10px] sm:text-sm text-[#6e6e73] font-medium truncate">{product.brand}</p>
+                          </div>
                         </div>
 
                         {/* Bouton Analyser la tendance */}

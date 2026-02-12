@@ -12,7 +12,7 @@ const navigation = [
   { name: 'Dashboard', description: 'Vue d\'ensemble', href: '/dashboard', tourId: 'tour-dashboard', badge: undefined as string | undefined },
   { name: 'Tendances de la semaine', description: 'Nouveautés chaque semaine — ne vous désabonnez pas', href: '/trends', tourId: 'tour-trends', badge: undefined as string | undefined },
   { name: 'Marques tendances', description: 'Les marques les plus tendances de la semaine', href: '/brands', tourId: 'tour-brands', badge: undefined as string | undefined },
-  { name: 'Analyse de marque & tendances', description: 'Analyse IA de marques et analyseur de tendances', href: '/brands/analyze', tourId: 'tour-analyze-brand', badge: undefined as string | undefined },
+  { name: 'Scanner Visuel IA', description: 'Analysez une photo pour prédire une tendance', href: '/trends/visual', tourId: 'tour-spy', badge: 'NOUVEAU' },
 ];
 
 const tools = [

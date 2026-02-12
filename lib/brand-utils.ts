@@ -5,8 +5,8 @@ import { isRetailerBrand, safeDisplayBrand } from '@/lib/constants/retailer-excl
  * Ne jamais afficher Zalando, Zara ou ASOS (distributeurs).
  */
 
-/** Extrait la marque du nom produit (ex. "Nike Sportswear - T-Shirt" → "Nike"). Retourne "—" si distributeur. */
-export function getProductBrand(name: string | null, sourceBrand: string | null): string {
+/** Extrait la marque du nom produit (ex. "Nike Sportswear - T-Shirt" → "Nike"). Retourne null si distributeur. */
+export function getProductBrand(name: string | null, sourceBrand: string | null): string | null {
   if (!name || !name.trim()) return safeDisplayBrand(sourceBrand);
   const n = name.trim();
   const parts = n.split(/\s*[–\-|]\s*/).map((p) => p.trim()).filter(Boolean);

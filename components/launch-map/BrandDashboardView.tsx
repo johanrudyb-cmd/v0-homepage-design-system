@@ -430,9 +430,9 @@ export function BrandDashboardView({
   }, [editingPhaseIndex, activePhaseIndex]);
 
   const phase = LAUNCH_MAP_PHASES[activePhaseIndex];
-  const presentation = PHASE_PRESENTATIONS[activePhaseIndex];
-  const PhaseIcon = PHASE_ICONS[activePhaseIndex];
-  const isShowingDetail = editingPhaseIndex === activePhaseIndex;
+  const presentation = PHASE_PRESENTATIONS[phase.id];
+  const PhaseIcon = PHASE_ICONS[phase.id];
+  const isShowingDetail = editingPhaseIndex === phase.id;
 
   const progress = {
     phase0: hasIdentity,
@@ -710,7 +710,7 @@ export function BrandDashboardView({
                 ) : (
                   <Button
                     size="sm"
-                    onClick={() => setEditingPhaseIndex(activePhaseIndex)}
+                    onClick={() => setEditingPhaseIndex(phase.id)}
                     className="gap-2"
                   >
                     <Pencil className="w-4 h-4" />

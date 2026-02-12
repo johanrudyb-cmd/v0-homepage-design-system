@@ -7,7 +7,7 @@
 import { NextResponse } from 'next/server';
 import { sanitizeErrorMessage } from '@/lib/utils';
 import { getCurrentUser } from '@/lib/auth-helpers';
-import { generateBrandAnalysis } from '@/lib/api/chatgpt';
+import { generateBrandAnalysis, getBrandQuickMetadata } from '@/lib/api/chatgpt';
 import { generateBrandStrategyTemplate, generateVisualIdentityFromBrand, isClaudeConfigured } from '@/lib/api/claude';
 import { prisma } from '@/lib/prisma';
 import { CURATED_TOP_BRANDS } from '@/lib/curated-brands';
@@ -58,10 +58,10 @@ export async function GET(request: Request) {
       }));
       const filteredByStyle = styleParam
         ? curatedWithStyle.filter(
-            (b) =>
-              b.dominantStyle?.toLowerCase().includes(styleParam) ||
-              styleParam.split(/\s+/).some((s) => b.dominantStyle?.toLowerCase().includes(s))
-          )
+          (b) =>
+            b.dominantStyle?.toLowerCase().includes(styleParam) ||
+            styleParam.split(/\s+/).some((s) => b.dominantStyle?.toLowerCase().includes(s))
+        )
         : curatedWithStyle;
       const inDb = await prisma.brandAnalysis.findMany({
         orderBy: { brandName: 'asc' },
@@ -171,11 +171,18 @@ export async function POST(request: Request) {
       );
     }
 
+    let metadata: any = null;
+    try {
+      metadata = await getBrandQuickMetadata(brandName);
+    } catch (e) {
+      console.warn('[Brand Analysis] Metadata fetch failed', e);
+    }
+
     const analysis = await withAIUsageLimit(
       user.id,
       user.plan ?? 'free',
       'brand_analyze',
-      () => generateBrandAnalysis(brandName, context),
+      () => generateBrandAnalysis(brandName, metadata || context),
       { brandKey }
     );
 
@@ -196,18 +203,35 @@ export async function POST(request: Request) {
     }
 
     try {
-      await prisma.brandAnalysis.create({
-        data: {
+      await prisma.brandAnalysis.upsert({
+        where: { brandKey },
+        create: {
           brandKey,
           brandName,
           analysis,
           visualIdentity: visualIdentity ?? undefined,
           logoUrl: logoUrl ?? undefined,
+          signaturePiece: metadata?.signaturePiece,
+          dominantStyle: metadata?.dominantStyle,
+          cyclePhase: metadata?.cyclePhase,
+          launchPotential: metadata?.launchPotential,
+          indicativePrice: metadata?.indicativePrice,
+          websiteUrl: metadata?.websiteUrl,
         },
+        update: {
+          analysis,
+          visualIdentity: visualIdentity ?? undefined,
+          logoUrl: logoUrl ?? undefined,
+          signaturePiece: metadata?.signaturePiece,
+          dominantStyle: metadata?.dominantStyle,
+          cyclePhase: metadata?.cyclePhase,
+          launchPotential: metadata?.launchPotential,
+          indicativePrice: metadata?.indicativePrice,
+          websiteUrl: metadata?.websiteUrl,
+        }
       });
     } catch (dbErr) {
       console.error('[Brand Analysis] Erreur enregistrement en base:', dbErr);
-      // On retourne quand même l'analyse au client
     }
 
     // Créer TemplateStrategy pour que la marque soit proposée dans les choix de positionnement
@@ -236,6 +260,7 @@ export async function POST(request: Request) {
       analysis,
       visualIdentity: visualIdentity ?? undefined,
       logoUrl: logoUrl ?? undefined,
+      metadata: metadata || context,
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : 'Erreur lors de l\'analyse';

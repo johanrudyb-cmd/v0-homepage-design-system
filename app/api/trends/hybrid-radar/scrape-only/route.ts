@@ -254,7 +254,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       message: saveToTrends && savedCount > 0
-        ? `Scrape terminé. ${savedCount} tendance(s) enregistrée(s) — affichées dans Tendances par marché.`
+        ? `Scrape terminé. ${savedCount} tendance(s) enregistrée(s) — affichées dans Tendances de la semaine.`
         : 'Scrape terminé (aucune IA)' + (saveToTrends ? ', aucune nouvelle tendance à enregistrer.' : ''),
       totalItems,
       savedToTrends: saveToTrends ? savedCount : undefined,

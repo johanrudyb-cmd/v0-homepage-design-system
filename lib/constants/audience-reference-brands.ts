@@ -47,12 +47,14 @@ export const REFERENCE_BRAND_WEBSITES: Record<string, string> = {
   'Nike': 'https://www.nike.com',
   'H&M': 'https://www.hm.com',
   'Mango': 'https://www.mango.com',
+  'Mango Man': 'https://www.mango.com',
   "Arc'teryx": 'https://www.arcteryx.com',
   'Stone Island': 'https://www.stoneisland.com',
   'Carhartt WIP': 'https://www.carhartt-wip.com',
   'Ami Paris': 'https://www.amiparis.com',
   'Salomon': 'https://www.salomon.com',
   'Massimo Dutti': 'https://www.massimodutti.com',
+  'H&M Edition': 'https://www.hm.com',
   'Uniqlo': 'https://www.uniqlo.com',
   'Converse': 'https://www.converse.com',
   'Vans': 'https://www.vans.com',
@@ -169,7 +171,7 @@ export const REFERENCE_BRAND_WEBSITES: Record<string, string> = {
   'Affix': 'https://affix-works.com',
 };
 
-function toSlug(name: string): string {
+export function toSlug(name: string): string {
   return name
     .toLowerCase()
     .trim()

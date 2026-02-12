@@ -111,7 +111,18 @@ export async function POST(
     const styleGuide = brand.styleGuide && typeof brand.styleGuide === 'object' ? (brand.styleGuide as Record<string, unknown>) : null;
     const positioning = (styleGuide?.preferredStyle || styleGuide?.positioning || '') as string;
 
-    const baseContext = `Fashion brand "${brandName}". ${positioning ? `Style: ${positioning}.` : ''} ${recommendationText ? `Creative direction: ${recommendationText}` : ''}`;
+    // Get inspiration brand from latest strategy
+    const latestStrategy = await prisma.strategyGeneration.findFirst({
+      where: { brandId },
+      orderBy: { createdAt: 'desc' },
+    });
+    const templateBrandName = latestStrategy?.templateBrandName;
+
+    // Use technical style keywords based on the inspiration brand
+    const { getTechnicalStyleKeywords } = await import('@/lib/brand-style-keywords');
+    const technicalStyle = getTechnicalStyleKeywords(templateBrandName || positioning || undefined);
+
+    const baseContext = `Fashion brand "${brandName}". Style: ${technicalStyle}. ${positioning ? `Context: ${positioning}.` : ''} ${recommendationText ? `Creative direction: ${recommendationText}` : ''}`;
 
     const proposals: { url: string; urlTransparent: string }[] = [];
 

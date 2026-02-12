@@ -20,9 +20,9 @@ interface HybridTrend {
   trendScoreVisual: number | null;
   trendScore: number;
   averagePrice: number;
-  /** % croissance Zalando (ex. 15 pour "+15%") ou manuel */
+  /** % croissance (ex. 15 pour "+15%") ou manuel */
   trendGrowthPercent: number | null;
-  /** Libellé Zalando (ex. "Tendance", "En hausse") */
+  /** Libellé (ex. "Tendance", "En hausse") */
   trendLabel: string | null;
   /** % tendance calculé en interne quand trendGrowthPercent est null (récurrence, ancienneté, multi-zones) */
   effectiveTrendGrowthPercent?: number;
@@ -104,10 +104,10 @@ export function TendancesContent() {
   const [analysesCount, setAnalysesCount] = useState<number | null>(null);
   const limitReached = searchParams.get('limit') === 'reached';
   const [ageRange, setAgeRange] = useState<'18-24' | '25-34'>(() => {
-    if (typeof window === 'undefined') return '25-34';
+    if (typeof window === 'undefined') return '18-24';
     const a = sessionStorage.getItem('trends-list-ageRange');
     if (a === '18-24' || a === '25-34') return a;
-    return '25-34';
+    return '18-24';
   });
   const [segment, setSegment] = useState<string>(() => {
     if (typeof window === 'undefined') return 'homme';
@@ -468,7 +468,7 @@ export function TendancesContent() {
       <div className="sticky top-14 sm:top-16 z-30 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-black/5 space-y-3">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-lg font-bold tracking-tight text-[#1D1D1F]">
-            Radar tendances
+            Tendances de la semaine
           </h2>
           <div className="flex items-center gap-2">
             <span className="text-[10px] font-bold text-muted-foreground px-2 py-0.5 rounded-full bg-muted border border-black/5 uppercase tracking-tighter"> Zone EU</span>
@@ -659,10 +659,13 @@ export function TendancesContent() {
                     <CardContent className="p-4 flex-1 flex flex-col">
                       <h3 className="text-sm font-semibold line-clamp-4 leading-snug">{t.name}</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {t.category} · {t.cut || '—'} · {(() => { const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand); return b; })()}
+                        {t.category} {t.cut ? `· ${t.cut}` : ''} {(() => {
+                          const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand);
+                          return b ? `· ${b}` : '';
+                        })()}
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">
-                        {(t.material && t.material.trim() && t.material !== 'Non spécifié') ? t.material : '—'}
+                        {(t.material && t.material.trim() && t.material !== 'Non spécifié') ? t.material : ''}
                       </p>
                       <Link
                         href={`/trends/${t.id}`}
@@ -682,452 +685,12 @@ export function TendancesContent() {
               );
             })}
           </div>
-          <p className="text-xs text-muted-foreground mt-4 text-center">
-            Ces tendances sont mises à jour chaque semaine.
-          </p>
         </>
       )}
 
-      {/* Carte : Récupérer les tendances (Scrape + Prévisualiser) */}
-      <Card className="flex flex-col border-2 border-muted">
-        <CardHeader className="pb-3">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
-              <TrendingUp className="h-6 w-6" />
-            </div>
-            <div>
-              <div className="flex flex-wrap items-center gap-2">
-                <CardTitle className="text-lg">Récupérer les tendances</CardTitle>
-                <span className="text-xs font-medium text-muted-foreground px-2 py-1 rounded-md bg-primary/10 text-primary border border-primary/20" title="Cible âge">
-                  {AGE_LABELS[ageRange]}
-                </span>
-              </div>
-              <p className="text-sm text-muted-foreground mt-0.5">
-                Récupérer et enregistrer directement, ou prévisualiser avant d&apos;enregistrer.
-              </p>
-            </div>
-          </div>
-          <div className="flex gap-2 mt-3 border-b">
-            <Button
-              variant={recoveryTab === 'scrape' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setRecoveryTab('scrape')}
-            >
-              Récupérer et enregistrer
-            </Button>
-            <Button
-              variant={recoveryTab === 'preview' ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => setRecoveryTab('preview')}
-            >
-              Prévisualiser avant d&apos;enregistrer
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="pt-0 space-y-4">
-          {recoveryTab === 'scrape' && (
-            <>
-              {ageRange === '18-24' ? (
-                <>
-                  <p className="text-sm text-muted-foreground">
-                    Récupère les tendances 18-24 ans ({segment === 'femme' ? 'femme' : 'homme'}) et enregistre directement dans les tendances ci-dessus (~1 à 2 min).
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      type="button"
-                      onClick={() => handleScrapeOnly(ASOS_18_24_SOURCE_ID)}
-                      disabled={scrapingOnly}
-                      variant="default"
-                      size="sm"
-                      className="gap-2"
-                      title={segment === 'femme' ? 'Récupérer les tendances 18-24 ans Femme' : 'Récupérer les tendances 18-24 ans Homme'}
-                    >
-                      {scrapingOnly ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Récupération en cours…
-                        </>
-                      ) : (
-                        <>
-                          <Flame className="w-4 h-4" />
-                          Récupérer les tendances 18-24 ans {segment === 'femme' ? 'Femme' : 'Homme'}
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                      onClick={() => setRecoveryTab('preview')}
-                    >
-                      <Eye className="w-4 h-4" />
-                      Ou prévisualiser d&apos;abord
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm text-muted-foreground">
-                    Choisissez une ville pour récupérer et enregistrer les tendances (~1 min par ville). « Toutes les villes » récupère toutes les tendances (~10 min).
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {MAIN_CITY_IDS.map((id: string) => (
-                      <Button
-                        key={id}
-                        type="button"
-                        onClick={() => handleScrapeOnly(id)}
-                        disabled={scrapingOnly}
-                        variant="default"
-                        size="sm"
-                        className="gap-2"
-                        title={`${getCityLabel(id)} ${segment === 'femme' ? 'Femme' : 'Homme'} — ~1 min`}
-                      >
-                        {scrapingOnly ? (
-                          <>
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Récupération…
-                          </>
-                        ) : (
-                          <>
-                            <MapPin className="w-4 h-4" />
-                            {getCityLabel(id)}
-                          </>
-                        )}
-                      </Button>
-                    ))}
-                    <Button
-                      onClick={() => setMoreCitiesOpen((v) => !v)}
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                    >
-                      <ChevronDown className={`w-4 h-4 transition-transform ${moreCitiesOpen ? 'rotate-180' : ''}`} />
-                      + autres villes
-                    </Button>
-                    {moreCitiesOpen && (
-                      <div className="w-full flex flex-wrap gap-2">
-                        {OTHER_CITY_IDS.map((id) => (
-                          <Button
-                            key={id}
-                            onClick={() => handleScrapeOnly(id)}
-                            disabled={scrapingOnly}
-                            variant="outline"
-                            size="sm"
-                            className="gap-2"
-                            title={`${getCityLabel(id)} ${segment === 'femme' ? 'Femme' : 'Homme'} — ~1 min`}
-                          >
-                            <MapPin className="w-4 h-4" />
-                            {getCityLabel(id)}
-                          </Button>
-                        ))}
-                      </div>
-                    )}
-                    <Button
-                      type="button"
-                      onClick={() => handleScrapeOnly(false)}
-                      disabled={scrapingOnly}
-                      variant="secondary"
-                      size="sm"
-                      className="gap-2"
-                      title={`Toutes les villes ${segment === 'femme' ? 'Femme' : 'Homme'} — ~10 min`}
-                    >
-                      <Globe className="w-4 h-4" />
-                      Toutes les villes
-                    </Button>
-                  </div>
-                </>
-              )}
-            </>
-          )}
-          {recoveryTab === 'preview' && (
-            <>
-              {ageRange === '18-24' ? (
-                <>
-                  <p className="text-sm text-muted-foreground">
-                    Prévisualisez les tendances 18-24 ans ({segment === 'femme' ? 'femme' : 'homme'}) (ou collez une URL), puis validez pour enregistrer dans les tendances.
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium">URL de la page (optionnel — prioritaire)</label>
-                    <input
-                      type="url"
-                      value={customPreviewUrl}
-                      onChange={(e) => setCustomPreviewUrl(e.target.value)}
-                      placeholder="https://…"
-                      className="h-9 px-3 rounded-md border border-input bg-background text-sm w-full max-w-xl font-mono text-xs"
-                      disabled={previewLoading}
-                    />
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <Button
-                      onClick={() => handlePreviewByCity(ASOS_18_24_SOURCE_ID)}
-                      disabled={previewLoading}
-                      variant="default"
-                      size="sm"
-                      className="gap-2"
-                      title={segment === 'femme' ? 'Prévisualiser les tendances 18-24 ans Femme' : 'Prévisualiser les tendances 18-24 ans Homme'}
-                    >
-                      {previewLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Prévisualisation…
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="w-4 h-4" />
-                          Prévisualiser les tendances 18-24 ans {segment === 'femme' ? 'Femme' : 'Homme'}
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      onClick={() => handlePreviewByCity()}
-                      disabled={previewLoading || !customPreviewUrl.trim()}
-                      variant="outline"
-                      size="sm"
-                      className="gap-2"
-                      title="Prévisualiser l’URL collée"
-                    >
-                      <Eye className="w-4 h-4" />
-                      Prévisualiser l’URL
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm text-muted-foreground">
-                    Collez l&apos;URL ou choisissez une ville pour voir un aperçu avant d&apos;enregistrer. Puis validez pour enregistrer dans les tendances.
-                  </p>
-                  <div className="flex flex-col gap-2">
-                    <label className="text-sm font-medium">URL de la page (optionnel — prioritaire)</label>
-                    <input
-                      type="url"
-                      value={customPreviewUrl}
-                      onChange={(e) => setCustomPreviewUrl(e.target.value)}
-                      placeholder="https://…"
-                      className="h-9 px-3 rounded-md border border-input bg-background text-sm w-full max-w-xl font-mono text-xs"
-                      disabled={previewLoading}
-                    />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-2">
-                    <label className="text-sm font-medium">Ou ville</label>
-                    <select
-                      value={selectedSourceId}
-                      onChange={(e) => setSelectedSourceId(e.target.value)}
-                      className="h-9 px-3 rounded-md border border-input bg-background text-sm min-w-[180px]"
-                      disabled={previewLoading}
-                    >
-                      <option value="">— Choisir —</option>
-                      {sourcesForZone.map((s) => (
-                        <option key={s.id} value={s.id}>
-                          {s.label} ({s.marketZone})
-                        </option>
-                      ))}
-                    </select>
-                    {MAIN_CITY_IDS.map((id: string) => (
-                      <Button
-                        key={id}
-                        onClick={() => handlePreviewByCity(id)}
-                        disabled={previewLoading}
-                        variant="outline"
-                        size="sm"
-                        className="gap-2"
-                        title={`Prévisualiser ${getCityLabel(id)}`}
-                      >
-                        <MapPin className="w-4 h-4" />
-                        {getCityLabel(id)}
-                      </Button>
-                    ))}
-                    <Button
-                      onClick={() => setMoreCitiesOpen((v) => !v)}
-                      variant="ghost"
-                      size="sm"
-                      className="gap-2 text-muted-foreground"
-                    >
-                      <ChevronDown className={`w-4 h-4 transition-transform ${moreCitiesOpen ? 'rotate-180' : ''}`} />
-                      + autres villes
-                    </Button>
-                    {moreCitiesOpen && (
-                      <div className="w-full flex flex-wrap gap-2">
-                        {OTHER_CITY_IDS.map((id) => (
-                          <Button
-                            key={id}
-                            onClick={() => handlePreviewByCity(id)}
-                            disabled={previewLoading}
-                            variant="outline"
-                            size="sm"
-                            className="gap-2"
-                            title={`Prévisualiser ${getCityLabel(id)}`}
-                          >
-                            <MapPin className="w-4 h-4" />
-                            {getCityLabel(id)}
-                          </Button>
-                        ))}
-                      </div>
-                    )}
-                    <Button
-                      onClick={() => handlePreviewByCity()}
-                      disabled={previewLoading || (!selectedSourceId && !customPreviewUrl.trim())}
-                      variant="default"
-                      size="sm"
-                      className="gap-2"
-                    >
-                      {previewLoading ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Prévisualisation…
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="w-4 h-4" />
-                          Prévisualiser
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </>
-              )}
-              {previewResult && (
-                <div className="rounded-lg border bg-muted/30 p-4 space-y-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-sm font-medium">
-                      {previewResult.sourceId} — {previewResult.itemCount} produit{previewResult.itemCount !== 1 ? 's' : ''}
-                    </p>
-                    <div className="flex flex-wrap items-center gap-2">
-                      <label className="text-xs text-muted-foreground whitespace-nowrap">
-                        Pourcentage tendance par défaut (0–100) :
-                      </label>
-                      <input
-                        type="number"
-                        min={0}
-                        max={100}
-                        placeholder="ex. 15"
-                        value={defaultTrendPercent}
-                        onChange={(e) => setDefaultTrendPercent(e.target.value)}
-                        className="w-20 h-9 rounded-lg border border-input bg-background px-2 text-sm"
-                        title="Appliqué aux articles sans indicateur de croissance"
-                      />
-                      <Button
-                        type="button"
-                        onClick={handleValidatePreview}
-                        disabled={savingPreview}
-                        variant="default"
-                        size="sm"
-                        className="gap-2"
-                      >
-                        {savingPreview ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <CheckCircle className="w-4 h-4" />
-                        )}
-                        Valider et enregistrer
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                    {previewResult.items.map((item, idx) => (
-                      <div key={idx} className="rounded-lg border overflow-hidden bg-background flex flex-col">
-                        <div className="aspect-square bg-muted relative">
-                          {item.imageUrl ? (
-                            <img src={proxyImageUrl(item.imageUrl) || item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                          ) : (
-                            <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">Pas d&apos;image</div>
-                          )}
-                        </div>
-                        <div className="p-2 text-xs min-w-0">
-                          <p className="text-sm font-medium line-clamp-3 leading-snug">{item.name || '—'}</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Résultat récupération */}
-      {
-        scrapeOnlyResult && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <Eye className="w-5 h-5" />
-                Produits récupérés ({scrapeOnlyResult.totalItems} produits)
-              </CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Cliquez sur une source pour afficher les produits.
-              </p>
-              {scrapeOnlyResult.savedToTrends != null && scrapeOnlyResult.savedToTrends > 0 && (
-                <p className="text-sm text-primary font-medium mt-1">
-                  {scrapeOnlyResult.savedToTrends} tendance(s) enregistrée(s) — affichées dans « Tendances par marché » ci-dessus.
-                </p>
-              )}
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {scrapeOnlyResult.results.map((source) => {
-                const isExpanded = scrapeOnlyExpanded === source.sourceId;
-                return (
-                  <div key={source.sourceId} className="border rounded-lg overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setScrapeOnlyExpanded(isExpanded ? null : source.sourceId)}
-                      className="w-full flex items-center justify-between px-4 py-3 bg-muted/50 hover:bg-muted text-left text-sm font-medium"
-                    >
-                      <span>
-                        {source.marketZone} — {source.itemCount} produit{source.itemCount !== 1 ? 's' : ''}
-                      </span>
-                      {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-                    </button>
-                    {isExpanded && (
-                      <div className="p-4 border-t bg-background">
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                          {source.items.map((item, idx) => {
-                            const hasTechPack = Boolean(item.composition || item.careInstructions || item.color || item.sizes || item.countryOfOrigin || item.articleNumber);
-                            return (
-                              <div
-                                key={idx}
-                                className="rounded-lg border overflow-hidden bg-muted/30 flex flex-col"
-                              >
-                                <div className="aspect-square bg-muted relative">
-                                  {item.imageUrl ? (
-                                    <img
-                                      src={proxyImageUrl(item.imageUrl) || item.imageUrl}
-                                      alt={item.name}
-                                      className="w-full h-full object-cover"
-                                    />
-                                  ) : (
-                                    <div className="w-full h-full flex items-center justify-center text-muted-foreground text-xs">
-                                      Pas d&apos;image
-                                    </div>
-                                  )}
-                                </div>
-                                <div className="p-2 text-xs flex-1 flex flex-col min-w-0">
-                                  <p className="text-sm font-medium line-clamp-3 leading-snug">{item.name || '—'}</p>
-                                  {hasTechPack && (
-                                    <>
-                                      {item.articleNumber && <p className="mt-1 text-muted-foreground line-clamp-1">Ref: {item.articleNumber}</p>}
-                                      {item.color && <p className="text-muted-foreground line-clamp-1">Couleur: {item.color}</p>}
-                                      {item.composition && <p className="text-muted-foreground line-clamp-2 mt-0.5">Compo: {item.composition}</p>}
-                                      {item.careInstructions && <p className="text-muted-foreground line-clamp-1">Entretien: {item.careInstructions}</p>}
-                                      {item.sizes && <p className="text-muted-foreground line-clamp-1">Tailles: {item.sizes}</p>}
-                                      {item.countryOfOrigin && <p className="text-muted-foreground line-clamp-1">Origine: {item.countryOfOrigin}</p>}
-                                    </>
-                                  )}
-                                </div>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </CardContent>
-          </Card>
-        )
-      }
-    </div >
+      <p className="text-xs text-muted-foreground mt-4 text-center">
+        Ces tendances sont mises à jour chaque semaine.
+      </p>
+    </div>
   );
 }

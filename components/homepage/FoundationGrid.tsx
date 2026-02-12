@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
-import { ArrowRight, Globe, TrendingUp, Star, ExternalLink } from 'lucide-react';
+import { ArrowRight, Globe, TrendingUp, Star, ExternalLink, FileText } from 'lucide-react';
 import { getBrandLogoUrl, brandNameToSlug, CURATED_TOP_BRANDS } from '@/lib/curated-brands';
 import { REFERENCE_BRAND_WEBSITES } from '@/lib/constants/audience-reference-brands';
 import { BrandLogo } from '@/components/brands/BrandLogo';
@@ -12,12 +12,21 @@ import { HOMEPAGE_FEATURED_FACTORIES } from '@/lib/homepage-featured-factories';
 
 
 // Marques populaires à afficher (top 6)
-const featuredBrands = CURATED_TOP_BRANDS.slice(0, 6).map((brand) => ({
-  name: brand.brand,
-  slug: brandNameToSlug(brand.brand),
-  logoUrl: getBrandLogoUrl(brand.brand),
-  siteUrl: REFERENCE_BRAND_WEBSITES[brand.brand] || null,
-}));
+// Marques populaires à afficher (top 4 exemples - 2x2)
+const featuredBrands = [
+  { name: 'ZARA', slug: 'zara' },
+  { name: 'NIKE', slug: 'nike' },
+  { name: 'ADIDAS', slug: 'adidas' },
+  { name: 'H&M', slug: 'hm' },
+].map(b => {
+  const k = b.name.toLowerCase().trim();
+  const siteUrl = Object.entries(REFERENCE_BRAND_WEBSITES).find(([name]) => name.toLowerCase().trim() === k)?.[1] || null;
+  return {
+    ...b,
+    logoUrl: getBrandLogoUrl(b.name, siteUrl),
+    siteUrl: siteUrl
+  };
+});
 
 export function FoundationGrid() {
   const router = useRouter();
@@ -204,7 +213,7 @@ export function FoundationGrid() {
             </p>
 
             {/* Grille de marques de référence */}
-            <div className="grid grid-cols-3 gap-3 mb-8">
+            <div className="grid grid-cols-2 gap-4 mb-8">
               {featuredBrands.map((brand) => {
                 const logoUrl = brand.logoUrl;
                 return (
@@ -216,32 +225,26 @@ export function FoundationGrid() {
                         element.scrollIntoView({ behavior: 'smooth' });
                       }
                     }}
-                    className="group p-4 bg-[#F5F5F7] rounded-2xl border border-[#E5E5E7] transition-all duration-300 hover:bg-[#E5E5E7] hover:border-[#007AFF]/40 hover:shadow-sm text-left"
+                    className="group flex flex-col rounded-xl border-2 border-[#E5E5E7] overflow-hidden transition-all hover:border-[#007AFF]/40 hover:bg-muted/5 text-left"
                   >
-                    <div className="aspect-square w-full overflow-hidden bg-white rounded-xl flex items-center justify-center mb-3">
+                    <div className="aspect-square w-full bg-[#F5F5F7] flex items-center justify-center p-4">
                       {logoUrl ? (
                         <BrandLogo logoUrl={logoUrl} brandName={brand.name} className="w-12 h-12" />
                       ) : (
-                        <span className="text-lg font-bold text-[#6e6e73]">
+                        <span className="text-xl font-bold text-[#6e6e73]">
                           {brand.name.slice(0, 2).toUpperCase()}
                         </span>
                       )}
                     </div>
-                    <p className="text-xs font-semibold text-[#000000] truncate group-hover:text-[#007AFF] transition-colors">
-                      {brand.name}
-                    </p>
-                    {brand.siteUrl && (
-                      <a
-                        href={brand.siteUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        className="mt-1 inline-flex items-center gap-1 text-[10px] text-[#6e6e73] hover:text-[#007AFF] transition-colors"
-                      >
-                        <ExternalLink className="w-3 h-3" />
-                        Site
-                      </a>
-                    )}
+                    <div className="p-3 bg-white w-full border-t border-[#E5E5E7]">
+                      <p className="font-bold text-[#000000] text-xs truncate mb-1">
+                        {brand.name}
+                      </p>
+                      <div className="flex items-center gap-1.5 text-[10px] text-[#007AFF] font-semibold">
+                        <FileText className="w-3.5 h-3.5" />
+                        Voir la stratégie
+                      </div>
+                    </div>
                   </button>
                 );
               })}

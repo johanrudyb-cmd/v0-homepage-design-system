@@ -68,7 +68,7 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
   // FR — ASOS Homme
   {
     id: 'asos-homme-fr',
-    brand: 'ASOS',
+    brand: 'Global Partner',
     marketZone: 'FR',
     segment: 'homme',
     baseUrl: 'https://www.asos.com',
@@ -80,7 +80,7 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
   // FR — ASOS Femme
   {
     id: 'asos-femme-fr',
-    brand: 'ASOS',
+    brand: 'Global Partner',
     marketZone: 'FR',
     segment: 'femme',
     baseUrl: 'https://www.asos.com',
@@ -89,10 +89,22 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
     selectors: ASOS_SELECTORS,
     limit: 100,
   },
+  // FR — ASOS Fille
+  {
+    id: 'asos-fille-fr',
+    brand: 'Global Partner',
+    marketZone: 'FR',
+    segment: 'fille',
+    baseUrl: 'https://www.asos.com',
+    newInPath: '/fr/fille/nouveau/cat/?cid=27111',
+    section: 'new_in',
+    selectors: ASOS_SELECTORS,
+    limit: 50,
+  },
   // EU — ASOS 18-24 ans Homme (une page, pas de ville)
   {
     id: 'asos-18-24-homme',
-    brand: 'ASOS',
+    brand: 'Global Partner',
     marketZone: 'EU',
     segment: 'homme',
     baseUrl: 'https://www.asos.com',
@@ -223,7 +235,7 @@ export function createSourceFromUrl(customUrl: string): HybridRadarSource | null
       const id = 'asos-custom-' + slug.slice(0, 40);
       return {
         id,
-        brand: 'ASOS',
+        brand: 'Global Partner',
         marketZone: 'EU',
         segment,
         baseUrl: u.origin,

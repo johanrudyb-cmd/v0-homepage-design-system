@@ -1,0 +1,338 @@
+{
+    "name": "OUTFITY - Scraper Tendances Mode",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "cronExpression",
+                            "expression": "0 2 * * 1"
+                        }
+                    ]
+                }
+            },
+            "id": "schedule-trigger",
+            "name": "Planification Hebdomadaire",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                250,
+                300
+            ],
+            "notes": "Lancement automatique chaque lundi à 2h du matin"
+        },
+        {
+            "parameters": {
+                "url": "https://www.zalando.fr/trend-spotter/trending-items/",
+                "options": {
+                    "timeout": 30000
+                }
+            },
+            "id": "scrape-zalando",
+            "name": "Scraper Zalando Trend Spotter",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                450,
+                200
+            ],
+            "notes": "Récupère la page HTML de Zalando Trend Spotter"
+        },
+        {
+            "parameters": {
+                "url": "https://www.asos.com/fr/homme/nouveautes/cat/?cid=27110",
+                "options": {
+                    "timeout": 30000
+                }
+            },
+            "id": "scrape-asos",
+            "name": "Scraper ASOS Nouveautés",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                450,
+                400
+            ],
+            "notes": "Récupère la page HTML ASOS nouveautés homme"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Extraction des produits Zalando depuis le HTML\nconst html = $input.item.json.body;\nconst products = [];\n\n// Parser simple (à adapter selon la structure réelle de Zalando)\nconst productRegex = /<article[^>]*data-product[^>]*>([\\s\\S]*?)<\\/article>/gi;\nlet match;\n\nwhile ((match = productRegex.exec(html)) !== null) {\n  const productHtml = match[1];\n  \n  // Extraire le nom\n  const nameMatch = productHtml.match(/<h3[^>]*>([^<]+)<\\/h3>/i);\n  const name = nameMatch ? nameMatch[1].trim() : null;\n  \n  // Extraire le prix\n  const priceMatch = productHtml.match(/([0-9]+[,\\.]?[0-9]*)[\\s]*€/i);\n  const price = priceMatch ? parseFloat(priceMatch[1].replace(',', '.')) : null;\n  \n  // Extraire l'image\n  const imgMatch = productHtml.match(/src=\"([^\"]+)\"/i);\n  const imageUrl = imgMatch ? imgMatch[1] : null;\n  \n  // Extraire l'URL produit\n  const urlMatch = productHtml.match(/href=\"([^\"]+)\"/i);\n  const sourceUrl = urlMatch ? 'https://www.zalando.fr' + urlMatch[1] : null;\n  \n  if (name && price && sourceUrl) {\n    products.push({\n      name,\n      price,\n      imageUrl,\n      sourceUrl,\n      sourceBrand: 'Zalando',\n      marketZone: 'FR',\n      segment: 'homme',\n      trendGrowthPercent: 20,\n      trendLabel: 'En hausse'\n    });\n  }\n}\n\nreturn products.slice(0, 50).map(p => ({ json: p }));"
+            },
+            "id": "parse-zalando",
+            "name": "Parser Produits Zalando",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                650,
+                200
+            ],
+            "notes": "Extrait les données produits du HTML Zalando"
+        },
+        {
+            "parameters": {
+                "jsCode": "// Extraction des produits ASOS depuis le HTML\nconst html = $input.item.json.body;\nconst products = [];\n\n// Parser simple (à adapter selon la structure réelle d'ASOS)\nconst productRegex = /<article[^>]*>([\\s\\S]*?)<\\/article>/gi;\nlet match;\n\nwhile ((match = productRegex.exec(html)) !== null) {\n  const productHtml = match[1];\n  \n  // Extraire le nom\n  const nameMatch = productHtml.match(/<h2[^>]*>([^<]+)<\\/h2>/i) || productHtml.match(/data-product-name=\"([^\"]+)\"/i);\n  const name = nameMatch ? nameMatch[1].trim() : null;\n  \n  // Extraire le prix\n  const priceMatch = productHtml.match(/([0-9]+[,\\.]?[0-9]*)[\\s]*€/i);\n  const price = priceMatch ? parseFloat(priceMatch[1].replace(',', '.')) : null;\n  \n  // Extraire l'image\n  const imgMatch = productHtml.match(/src=\"([^\"]+)\"/i);\n  const imageUrl = imgMatch ? imgMatch[1] : null;\n  \n  // Extraire l'URL produit\n  const urlMatch = productHtml.match(/href=\"([^\"]+prd[^\"]+)\"/i);\n  const sourceUrl = urlMatch ? 'https://www.asos.com' + urlMatch[1] : null;\n  \n  if (name && price) {\n    products.push({\n      name,\n      price,\n      imageUrl,\n      sourceUrl: sourceUrl || `https://www.asos.com/preview/${encodeURIComponent(name.slice(0, 80))}`,\n      sourceBrand: 'ASOS',\n      marketZone: 'FR',\n      segment: 'homme',\n      trendGrowthPercent: 15,\n      trendLabel: 'Tendance'\n    });\n  }\n}\n\nreturn products.slice(0, 50).map(p => ({ json: p }));"
+            },
+            "id": "parse-asos",
+            "name": "Parser Produits ASOS",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                650,
+                400
+            ],
+            "notes": "Extrait les données produits du HTML ASOS"
+        },
+        {
+            "parameters": {},
+            "id": "merge-products",
+            "name": "Fusionner les Produits",
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 2.1,
+            "position": [
+                850,
+                300
+            ],
+            "notes": "Combine les produits de toutes les sources"
+        },
+        {
+            "parameters": {
+                "batchSize": 20,
+                "options": {}
+            },
+            "id": "batch-products",
+            "name": "Grouper par Lots",
+            "type": "n8n-nodes-base.splitInBatches",
+            "typeVersion": 3,
+            "position": [
+                1050,
+                300
+            ],
+            "notes": "Envoie les produits par lots de 20 pour éviter la surcharge"
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:3000/api/webhooks/n8n-trend-save",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "x-api-key",
+                            "value": "={{ $env.OUTFITY_WEBHOOK_SECRET }}"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "items",
+                            "value": "={{ $json }}"
+                        }
+                    ]
+                },
+                "options": {
+                    "timeout": 60000
+                }
+            },
+            "id": "send-to-outfity",
+            "name": "Envoyer vers OUTFITY",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1250,
+                300
+            ],
+            "notes": "Envoie les produits vers votre application OUTFITY"
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "options": {
+                        "caseSensitive": true,
+                        "leftValue": "",
+                        "typeValidation": "strict"
+                    },
+                    "conditions": [
+                        {
+                            "id": "success-check",
+                            "leftValue": "={{ $json.success }}",
+                            "rightValue": true,
+                            "operator": {
+                                "type": "boolean",
+                                "operation": "equals"
+                            }
+                        }
+                    ],
+                    "combinator": "and"
+                },
+                "options": {}
+            },
+            "id": "check-success",
+            "name": "Vérifier Succès",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 2,
+            "position": [
+                1450,
+                300
+            ],
+            "notes": "Vérifie si l'envoi a réussi"
+        },
+        {
+            "parameters": {
+                "content": "✅ **Scraping OUTFITY Terminé**\n\nProduits envoyés: {{ $json.saved }}\nProduits ignorés: {{ $json.skipped }}\n\nLes nouvelles tendances sont maintenant disponibles sur votre application.",
+                "options": {}
+            },
+            "id": "notification-success",
+            "name": "Notification Succès",
+            "type": "n8n-nodes-base.stickyNote",
+            "typeVersion": 1,
+            "position": [
+                1650,
+                200
+            ],
+            "notes": "Notification de succès (à remplacer par email/Slack si besoin)"
+        },
+        {
+            "parameters": {
+                "content": "❌ **Erreur Scraping OUTFITY**\n\nUne erreur s'est produite lors de l'envoi des données.\nVérifiez les logs pour plus de détails.",
+                "options": {}
+            },
+            "id": "notification-error",
+            "name": "Notification Erreur",
+            "type": "n8n-nodes-base.stickyNote",
+            "typeVersion": 1,
+            "position": [
+                1650,
+                400
+            ],
+            "notes": "Notification d'erreur (à remplacer par email/Slack si besoin)"
+        }
+    ],
+    "connections": {
+        "Planification Hebdomadaire": {
+            "main": [
+                [
+                    {
+                        "node": "Scraper Zalando Trend Spotter",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Scraper ASOS Nouveautés",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Scraper Zalando Trend Spotter": {
+            "main": [
+                [
+                    {
+                        "node": "Parser Produits Zalando",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Scraper ASOS Nouveautés": {
+            "main": [
+                [
+                    {
+                        "node": "Parser Produits ASOS",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parser Produits Zalando": {
+            "main": [
+                [
+                    {
+                        "node": "Fusionner les Produits",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Parser Produits ASOS": {
+            "main": [
+                [
+                    {
+                        "node": "Fusionner les Produits",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Fusionner les Produits": {
+            "main": [
+                [
+                    {
+                        "node": "Grouper par Lots",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Grouper par Lots": {
+            "main": [
+                [
+                    {
+                        "node": "Envoyer vers OUTFITY",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Envoyer vers OUTFITY": {
+            "main": [
+                [
+                    {
+                        "node": "Vérifier Succès",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Vérifier Succès": {
+            "main": [
+                [
+                    {
+                        "node": "Notification Succès",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "Notification Erreur",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "pinData": {},
+    "settings": {
+        "executionOrder": "v1"
+    },
+    "staticData": null,
+    "tags": [],
+    "triggerCount": 1,
+    "updatedAt": "2026-02-11T18:06:20.000Z",
+    "versionId": "1"
+}

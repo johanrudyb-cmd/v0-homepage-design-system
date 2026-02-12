@@ -8,13 +8,13 @@
                         "interval": [
                             {
                                 "field": "cronExpression",
-                                "expression": "0 2 * * *"
+                                "expression": "0 12 * * 2"
                             }
                         ]
                     }
                 },
                 "id": "cron-daily",
-                "name": "Tous les jours à 2h",
+                "name": "Tous les mardis à 12h",
                 "type": "n8n-nodes-base.scheduleTrigger",
                 "typeVersion": 1.2,
                 "position": [

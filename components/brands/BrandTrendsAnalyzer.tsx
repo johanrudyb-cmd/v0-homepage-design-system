@@ -25,6 +25,7 @@ import {
   brandNameToSlug,
   type CuratedBrand,
 } from '@/lib/curated-brands';
+import { REFERENCE_BRAND_WEBSITES } from '@/lib/constants/audience-reference-brands';
 import { GenerationCostBadge } from '@/components/ui/generation-cost-badge';
 import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
 import { useQuota } from '@/lib/hooks/useQuota';
@@ -235,20 +236,20 @@ export function BrandTrendsAnalyzer() {
           title={calquerLoading ? 'Calquage de la stratégie…' : 'Génération de la stratégie…'}
         />
         <StrategyPresentationView
-        strategyText={analysis}
-        brandName={selectedBrand.brand}
-        templateBrandName={selectedBrand.brand}
-        isTemplateView
-        titleMode="analysis"
-        onClose={() => {
-          setAnalysis(null);
-          setSelectedBrand(null);
-        }}
-        optionalPrimaryAction={{
-          label: 'Calquer la stratégie',
-          onClick: openStrategyModal,
-        }}
-      />
+          strategyText={analysis}
+          brandName={selectedBrand.brand}
+          templateBrandName={selectedBrand.brand}
+          isTemplateView
+          titleMode="analysis"
+          onClose={() => {
+            setAnalysis(null);
+            setSelectedBrand(null);
+          }}
+          optionalPrimaryAction={{
+            label: 'Calquer la stratégie',
+            onClick: openStrategyModal,
+          }}
+        />
       </>
     );
   }
@@ -282,14 +283,13 @@ export function BrandTrendsAnalyzer() {
                 type="button"
                 onClick={() => { setBrandToAnalyze(brand); setShowConfirmAnalyze(true); }}
                 disabled={loading}
-                className={`w-full text-left rounded-lg p-3 flex items-center gap-3 transition-colors border mb-1.5 ${
-                  isSelected
-                    ? 'border-primary bg-primary/10 ring-1 ring-primary/20'
-                    : 'border-transparent hover:bg-muted/50'
-                }`}
+                className={`w-full text-left rounded-lg p-3 flex items-center gap-3 transition-colors border mb-1.5 ${isSelected
+                  ? 'border-primary bg-primary/10 ring-1 ring-primary/20'
+                  : 'border-transparent hover:bg-muted/50'
+                  }`}
               >
                 <BrandLogo
-                  logoUrl={getBrandLogoUrl(brand.brand)}
+                  logoUrl={getBrandLogoUrl(brand.brand, Object.entries(REFERENCE_BRAND_WEBSITES).find(([name]) => name.toLowerCase().trim() === brand.brand.toLowerCase().trim())?.[1])}
                   brandName={brand.brand}
                   className="w-10 h-10 shrink-0 rounded-lg overflow-hidden bg-muted"
                 />
@@ -301,15 +301,14 @@ export function BrandTrendsAnalyzer() {
                   <div className="flex items-center gap-2 mt-0.5">
                     <span className="text-xs text-green-600 font-medium">{brand.score}</span>
                     <span
-                      className={`text-xs px-1.5 py-0.5 rounded ${
-                        brand.cyclePhase === 'emergent'
-                          ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
-                          : brand.cyclePhase === 'croissance'
-                            ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                            : brand.cyclePhase === 'pic'
-                              ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
-                              : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
-                      }`}
+                      className={`text-xs px-1.5 py-0.5 rounded ${brand.cyclePhase === 'emergent'
+                        ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300'
+                        : brand.cyclePhase === 'croissance'
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
+                          : brand.cyclePhase === 'pic'
+                            ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
+                            : 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300'
+                        }`}
                     >
                       {CYCLE_PHASE_LABELS[brand.cyclePhase]}
                     </span>

@@ -23,7 +23,7 @@ export function SalesHero() {
           )}
         >
           <h1 className="text-6xl lg:text-7xl font-bold tracking-tight text-[#000000] leading-[1.1]">
-            Créez votre marque avec les données des géants
+            Créez votre marque de vêtement avec les données des géants
           </h1>
           <p className="text-xl lg:text-2xl text-[#6e6e73] font-normal max-w-3xl mx-auto">
             Donnez à votre marque indépendante la puissance des leaders mondiaux. Mêmes données. Mêmes usines. Mêmes stratégies.

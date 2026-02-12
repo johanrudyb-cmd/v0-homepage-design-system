@@ -43,6 +43,18 @@ export function BrandAnalyzer({ initialBrand = '' }: BrandAnalyzerProps) {
   const [strategyTargetAudience, setStrategyTargetAudience] = useState('');
   const [showConfirmAnalyze, setShowConfirmAnalyze] = useState(false);
   const analyzeQuota = useQuota('brand_analyze');
+  const [recentBrands, setRecentBrands] = useState<{ brandName: string }[]>([]);
+
+  useEffect(() => {
+    fetch('/api/brands/analyze?list=1')
+      .then(res => res.json())
+      .then(data => {
+        if (data.analyzedBrands) {
+          setRecentBrands(data.analyzedBrands.slice(0, 10));
+        }
+      })
+      .catch(() => { });
+  }, []);
 
   const curatedBrand = (brandName && typeof brandName === 'string')
     ? CURATED_TOP_BRANDS.find(
@@ -416,35 +428,64 @@ export function BrandAnalyzer({ initialBrand = '' }: BrandAnalyzerProps) {
         </div>
       )}
 
-      {/* Suggestion : marques du top */}
+      {/* Suggestion : marques du top + récentes */}
       {!analysis && !loading && (
-        <Card className="border-dashed">
-          <CardContent className="py-6">
-            <p className="text-sm font-medium text-muted-foreground mb-2">
-              Marques tendances à analyser :
-            </p>
-            <div className="flex flex-wrap gap-2">
-              {CURATED_TOP_BRANDS.slice(0, 6).map((b) => (
-                <Button
-                  key={b.brand}
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setBrandName(b.brand);
-                    setError('');
-                  }}
-                >
-                  {b.brand}
-                </Button>
-              ))}
-              <Link href="/brands">
-                <Button variant="ghost" size="sm">
-                  Voir toutes les marques →
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="space-y-4">
+          <Card className="border-dashed">
+            <CardContent className="py-6">
+              <p className="text-sm font-medium text-muted-foreground mb-3">
+                Marques du moment (Top Tendances) :
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {CURATED_TOP_BRANDS.slice(0, 6).map((b) => (
+                  <Button
+                    key={b.brand}
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      setBrandName(b.brand);
+                      setError('');
+                    }}
+                  >
+                    {b.brand}
+                  </Button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {recentBrands.length > 0 && (
+            <Card className="border-none bg-muted/30">
+              <CardContent className="py-6">
+                <p className="text-sm font-medium text-muted-foreground mb-3">
+                  Dernières analyses de la communauté :
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {recentBrands.map((b) => (
+                    <Button
+                      key={b.brandName}
+                      variant="ghost"
+                      size="sm"
+                      className="bg-white hover:bg-white hover:text-primary shadow-sm"
+                      onClick={() => {
+                        setBrandName(b.brandName);
+                        setError('');
+                      }}
+                    >
+                      {b.brandName}
+                    </Button>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
+          <Link href="/brands">
+            <Button variant="ghost" className="text-xs text-muted-foreground h-auto p-0 hover:bg-transparent hover:text-primary">
+              Voir le classement complet →
+            </Button>
+          </Link>
+        </div>
       )}
     </div>
   );

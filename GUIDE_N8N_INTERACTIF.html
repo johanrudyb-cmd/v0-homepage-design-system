@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide d'Installation n8n pour OUTFITY</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .step {
+            background: #f8f9fa;
+            border-left: 5px solid #667eea;
+            padding: 30px;
+            margin-bottom: 30px;
+            border-radius: 10px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .step:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            line-height: 40px;
+            text-align: center;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 15px;
+            font-size: 1.2em;
+        }
+        
+        .step h2 {
+            display: inline-block;
+            color: #2d3748;
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+        
+        .step p {
+            color: #4a5568;
+            line-height: 1.8;
+            margin-top: 15px;
+        }
+        
+        .code-block {
+            background: #2d3748;
+            color: #68d391;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 30px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: background 0.3s ease;
+        }
+        
+        .button:hover {
+            background: #5568d3;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .success {
+            background: #d4edda;
+            border-left: 5px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .checklist {
+            list-style: none;
+            margin: 15px 0;
+        }
+        
+        .checklist li {
+            padding: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .checklist li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Installation n8n pour OUTFITY</h1>
+            <p>Guide étape par étape pour automatiser vos tendances</p>
+        </div>
+        
+        <div class="content">
+            <!-- Étape 1 -->
+            <div class="step">
+                <span class="step-number">1</span>
+                <h2>Créer un compte n8n Cloud</h2>
+                <p>Si vous n'avez pas encore de compte n8n, commencez par en créer un gratuitement.</p>
+                <a href="https://app.n8n.cloud/register" target="_blank" class="button">Créer mon compte n8n →</a>
+                <div class="warning">
+                    <strong>⚠️ Important :</strong> Utilisez votre email professionnel pour faciliter la gestion.
+                </div>
+            </div>
+            
+            <!-- Étape 2 -->
+            <div class="step">
+                <span class="step-number">2</span>
+                <h2>Se connecter à n8n</h2>
+                <p>Une fois votre compte créé, connectez-vous à votre instance n8n.</p>
+                <a href="https://app.n8n.cloud/login" target="_blank" class="button">Se connecter à n8n →</a>
+            </div>
+            
+            <!-- Étape 3 -->
+            <div class="step">
+                <span class="step-number">3</span>
+                <h2>Configurer la variable d'environnement</h2>
+                <p>Dans n8n, allez dans <strong>Settings → Variables</strong> et ajoutez :</p>
+                <div class="code-block">
+Nom : OUTFITY_WEBHOOK_SECRET
+Valeur : bmad_n8n_secret_2024_ultra_secure
+                </div>
+                <div class="warning">
+                    <strong>⚠️ Sécurité :</strong> Gardez cette valeur secrète ! Elle protège votre webhook.
+                </div>
+            </div>
+            
+            <!-- Étape 4 -->
+            <div class="step">
+                <span class="step-number">4</span>
+                <h2>Importer le workflow</h2>
+                <p>Suivez ces étapes dans n8n :</p>
+                <ul class="checklist">
+                    <li>Cliquez sur le bouton <strong>"+"</strong> (Nouveau workflow)</li>
+                    <li>Cliquez sur les <strong>3 points</strong> (menu) → <strong>"Import from File"</strong></li>
+                    <li>Sélectionnez le fichier <code>n8n-workflow-outfity-scraper.json</code></li>
+                    <li>Le workflow complet apparaît !</li>
+                </ul>
+            </div>
+            
+            <!-- Étape 5 -->
+            <div class="step">
+                <span class="step-number">5</span>
+                <h2>Configurer l'URL de votre application</h2>
+                <p>Double-cliquez sur le nœud <strong>"Envoyer vers OUTFITY"</strong> et modifiez l'URL :</p>
+                <div class="code-block">
+# Si vous êtes en local (développement) :
+http://localhost:3000/api/webhooks/n8n-trend-save
+
+# Si vous êtes en production :
+https://votre-domaine.com/api/webhooks/n8n-trend-save
+                </div>
+                <p>Cliquez sur <strong>"Save"</strong> pour enregistrer.</p>
+            </div>
+            
+            <!-- Étape 6 -->
+            <div class="step">
+                <span class="step-number">6</span>
+                <h2>Configurer votre fichier .env</h2>
+                <p>Dans votre application OUTFITY, ouvrez le fichier <code>.env</code> et ajoutez :</p>
+                <div class="code-block">
+N8N_WEBHOOK_SECRET=bmad_n8n_secret_2024_ultra_secure
+                </div>
+                <div class="warning">
+                    <strong>⚠️ Important :</strong> Cette valeur doit être EXACTEMENT la même que celle dans n8n !
+                </div>
+            </div>
+            
+            <!-- Étape 7 -->
+            <div class="step">
+                <span class="step-number">7</span>
+                <h2>Tester le workflow</h2>
+                <p>Avant d'activer l'automatisation, testez manuellement :</p>
+                <ul class="checklist">
+                    <li>Dans n8n, cliquez sur <strong>"Execute Workflow"</strong> en bas à droite</li>
+                    <li>Observez l'exécution nœud par nœud</li>
+                    <li>Vérifiez que le nœud "Envoyer vers OUTFITY" retourne <code>success: true</code></li>
+                    <li>Ouvrez votre application → <code>/trends</code></li>
+                    <li>Les nouveaux produits doivent apparaître !</li>
+                </ul>
+                <div class="success">
+                    <strong>✅ Succès :</strong> Si vous voyez les produits, tout fonctionne parfaitement !
+                </div>
+            </div>
+            
+            <!-- Étape 8 -->
+            <div class="step">
+                <span class="step-number">8</span>
+                <h2>Activer l'automatisation</h2>
+                <p>Une fois le test réussi, activez le workflow :</p>
+                <ul class="checklist">
+                    <li>Dans n8n, cliquez sur le <strong>toggle</strong> en haut à droite</li>
+                    <li>Le workflow devient actif (couleur verte)</li>
+                    <li>Il s'exécutera automatiquement chaque lundi à 2h du matin</li>
+                </ul>
+                <div class="success">
+                    <strong>🎉 Félicitations !</strong> Votre système est maintenant 100% automatisé !
+                </div>
+            </div>
+            
+            <!-- Personnalisation -->
+            <div class="step">
+                <span class="step-number">💡</span>
+                <h2>Personnalisation (Optionnel)</h2>
+                <p>Pour modifier la fréquence d'exécution :</p>
+                <ul class="checklist">
+                    <li>Double-cliquez sur <strong>"Planification Hebdomadaire"</strong></li>
+                    <li>Modifiez l'expression cron selon vos besoins :</li>
+                </ul>
+                <div class="code-block">
+0 2 * * 1    → Chaque lundi à 2h
+0 2 * * *    → Tous les jours à 2h
+0 */6 * * *  → Toutes les 6 heures
+                </div>
+            </div>
+            
+            <!-- Dépannage -->
+            <div class="step">
+                <span class="step-number">🐛</span>
+                <h2>Dépannage</h2>
+                <p><strong>Erreur 401 (Non autorisé) :</strong></p>
+                <p>→ Vérifiez que la clé secrète est identique dans n8n ET dans votre .env</p>
+                
+                <p style="margin-top: 20px;"><strong>Erreur 500 (Serveur) :</strong></p>
+                <p>→ Consultez les logs de votre application : <code>npm run dev</code></p>
+                
+                <p style="margin-top: 20px;"><strong>Aucun produit retourné :</strong></p>
+                <p>→ Les parsers HTML doivent être adaptés selon la structure réelle des sites</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Besoin d'aide ?</strong></p>
+            <p>Consultez le fichier <code>N8N_INSTALLATION_GUIDE.md</code> pour plus de détails</p>
+            <p style="margin-top: 20px; font-size: 0.9em;">
+                Documentation n8n : <a href="https://docs.n8n.io" target="_blank">docs.n8n.io</a>
+            </p>
+        </div>
+    </div>
+</body>
+</html>

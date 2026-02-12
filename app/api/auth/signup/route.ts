@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcryptjs';
+import { notifyAdmin } from '@/lib/admin-notifications';
 
 export async function POST(request: Request) {
     try {
@@ -46,6 +47,17 @@ export async function POST(request: Request) {
         });
 
         console.log('[Signup] Utilisateur créé avec succès:', user.id);
+
+        // Notification Admin
+        await notifyAdmin({
+            title: 'Nouvel Inscrit',
+            message: `${name} (${email}) vient de créer un compte.`,
+            emoji: '👋',
+            type: 'signup',
+            priority: 'low',
+            data: { id: user.id, email: user.email, plan: user.plan }
+        });
+
         return NextResponse.json(
             { message: 'Compte créé avec succès', userId: user.id },
             { status: 201 }

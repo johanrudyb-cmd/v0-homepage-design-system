@@ -195,8 +195,8 @@ export default async function DashboardPage() {
           {/* Quick Actions */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <Link href="/trends" className="bg-white p-6 rounded-3xl shadow-apple border border-black/5 hover:bg-[#F5F5F7] transition-all duration-300 group">
-              <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Tendances</h4>
-              <p className="text-sm text-gray-500">Nouveautés de la semaine</p>
+              <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Tendances de la semaine</h4>
+              <p className="text-sm text-gray-500">Nouveautés chaque semaine</p>
             </Link>
             <Link href="/sourcing" className="bg-white p-6 rounded-3xl shadow-apple border border-black/5 hover:bg-[#F5F5F7] transition-all duration-300 group">
               <h4 className="font-semibold mb-1 group-hover:text-primary transition-colors text-lg">Sourcing</h4>

@@ -1,0 +1,107 @@
+[
+    {
+        "id": "1",
+        "name": "Admin Notifications (WhatsApp)",
+        "nodes": [
+            {
+                "parameters": {
+                    "path": "admin-notifications",
+                    "responseMode": "lastNode",
+                    "options": {}
+                },
+                "name": "Webhook Inbound",
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 1,
+                "position": [
+                    100,
+                    300
+                ],
+                "webhookId": "admin-notify-wh-123",
+                "notes": "Reçoit les alertes du Next.js"
+            },
+            {
+                "parameters": {
+                    "keepOnlySet": true,
+                    "values": {
+                        "string": [
+                            {
+                                "name": "message_title",
+                                "value": "={{$json.emoji}} {{$json.title}}"
+                            },
+                            {
+                                "name": "message_body",
+                                "value": "={{$json.message}}"
+                            },
+                            {
+                                "name": "details",
+                                "value": "={{$json.data ? JSON.stringify($json.data, null, 2) : ''}}"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "name": "Format Message",
+                "type": "n8n-nodes-base.set",
+                "typeVersion": 1,
+                "position": [
+                    300,
+                    300
+                ]
+            },
+            {
+                "parameters": {
+                    "url": "https://api.callmebot.com/whatsapp.php",
+                    "options": {},
+                    "queryParametersUi": {
+                        "parameter": [
+                            {
+                                "name": "phone",
+                                "value": "+336XXXXXXX"
+                            },
+                            {
+                                "name": "text",
+                                "value": "={{$json.message_title}}\n\n{{$json.message_body}}\n\nDetails:\n{{$json.details}}"
+                            },
+                            {
+                                "name": "apikey",
+                                "value": "XXX"
+                            }
+                        ]
+                    }
+                },
+                "name": "Send WhatsApp (CallMeBot)",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 1,
+                "position": [
+                    500,
+                    300
+                ],
+                "notes": "Remplacez XXX par votre API Key CallMeBot"
+            }
+        ],
+        "connections": {
+            "Webhook Inbound": {
+                "main": [
+                    [
+                        {
+                            "node": "Format Message",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Format Message": {
+                "main": [
+                    [
+                        {
+                            "node": "Send WhatsApp (CallMeBot)",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        }
+    }
+]

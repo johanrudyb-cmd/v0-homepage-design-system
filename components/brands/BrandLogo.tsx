@@ -17,7 +17,10 @@ function getLogoSrc(url: string | null): string | null {
   const isDirect =
     url.includes('upload.wikimedia.org') ||
     url.includes('commons.wikimedia.org') ||
-    url.includes('google.com/s2/favicons');
+    url.includes('google.com/s2/favicons') ||
+    url.includes('cdn.simpleicons.org') ||
+    url.includes('logo.clearbit.com') ||
+    url.includes('brandfetch.io');
   if (isDirect) return url;
   return `/api/logo?url=${encodeURIComponent(url)}`;
 }

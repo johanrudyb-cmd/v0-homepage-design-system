@@ -1,0 +1,110 @@
+[
+    {
+        "id": "1",
+        "name": "Admin Notifications (Telegram)",
+        "active": true,
+        "nodes": [
+            {
+                "parameters": {
+                    "path": "admin-notifications",
+                    "responseMode": "lastNode",
+                    "options": {}
+                },
+                "name": "Webhook Inbound",
+                "type": "n8n-nodes-base.webhook",
+                "typeVersion": 1,
+                "position": [
+                    100,
+                    300
+                ],
+                "webhookId": "admin-notify-wh-123",
+                "notes": "Reçoit les alertes du Next.js"
+            },
+            {
+                "parameters": {
+                    "keepOnlySet": true,
+                    "values": {
+                        "string": [
+                            {
+                                "name": "formatted_message",
+                                "value": "=*{{$json.emoji || '📢'}} {{$json.title}}*\n\n{{$json.message}}\n\n`{{$json.data ? JSON.stringify($json.data, null, 2) : ''}}`"
+                            },
+                            {
+                                "name": "chat_id",
+                                "value": ""
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "name": "Format Telegram Message",
+                "type": "n8n-nodes-base.set",
+                "typeVersion": 1,
+                "position": [
+                    300,
+                    300
+                ]
+            },
+            {
+                "parameters": {
+                    "chatId": "=1094424282",
+                    "text": "={{$json.formatted_message}}",
+                    "additionalFields": {
+                        "parse_mode": "Markdown"
+                    }
+                },
+                "name": "Telegram",
+                "type": "n8n-nodes-base.telegram",
+                "typeVersion": 1,
+                "position": [
+                    500,
+                    300
+                ],
+                "credentials": {
+                    "telegramApi": {
+                        "id": "telegram-creds-1",
+                        "name": "MediaBiangoryBot"
+                    }
+                }
+            },
+            {
+                "parameters": {
+                    "url": "https://api.telegram.org/bot8535210237:AAEs_GGkYoNSwYviUZ_5BBd1FWB1wbN2IVw/getUpdates",
+                    "options": {}
+                },
+                "name": "Get Chat ID (First Run Only)",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 1,
+                "position": [
+                    300,
+                    100
+                ],
+                "notes": "Exécuter si on ne connait pas le Chat ID"
+            }
+        ],
+        "connections": {
+            "Webhook Inbound": {
+                "main": [
+                    [
+                        {
+                            "node": "Format Telegram Message",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Format Telegram Message": {
+                "main": [
+                    [
+                        {
+                            "node": "Telegram",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            }
+        }
+    }
+]

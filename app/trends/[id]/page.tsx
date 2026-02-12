@@ -17,10 +17,10 @@ import {
 import Link from 'next/link';
 import { ProductDetailImage } from '@/components/trends/ProductDetailImage';
 import { ProductDetailCharts } from '@/components/trends/ProductDetailCharts';
-import { TrendCheckCard } from '@/components/trends/TrendCheckCard';
 import { EditTrendKpis } from '@/components/trends/EditTrendKpis';
 import { ProductDetailEnricher } from '@/components/trends/ProductDetailEnricher';
 import { BackToTrendsButton } from '@/components/trends/BackToTrendsButton';
+import { VisualTrendScanner } from '@/components/trends/VisualTrendScanner';
 import {
   inferComplexityScore,
   inferSustainabilityScore,
@@ -28,6 +28,7 @@ import {
   computeTrendScore,
   estimateInternalTrendPercent,
 } from '@/lib/trend-product-kpis';
+import { isRetailerBrand } from '@/lib/constants/retailer-exclusion';
 
 export default async function ProductDetailPage({
   params,
@@ -119,17 +120,15 @@ export default async function ProductDetailPage({
   // Marque de l'article uniquement — ne jamais afficher Zalando, Zara ou ASOS (distributeurs)
   const displayBrand = (() => {
     if (product.productBrand?.trim()) {
-      const b = product.productBrand.trim().toLowerCase();
-      if (['zalando', 'zara', 'asos'].includes(b)) return '—';
+      if (isRetailerBrand(product.productBrand)) return '—';
       return product.productBrand.trim();
     }
     if (product.sourceBrand?.trim()) {
-      const b = product.sourceBrand.trim().toLowerCase();
-      if (['zalando', 'zara', 'asos'].includes(b)) return '—';
+      if (isRetailerBrand(product.sourceBrand)) return '—';
       return product.sourceBrand.trim();
     }
     const first = product.name.trim().split(/\s+/)[0];
-    if (first && first.length >= 2 && first.length <= 25 && !['zalando', 'zara', 'asos'].includes(first.toLowerCase()) && !/sweat|hoodie|t-shirt|tee|cargo|pantalon|veste|jacket|short|pull|robe|blouson|polo|jean|legging/i.test(first.toLowerCase())) {
+    if (first && first.length >= 2 && first.length <= 25 && !isRetailerBrand(first) && !/sweat|hoodie|t-shirt|tee|cargo|pantalon|veste|jacket|short|pull|robe|blouson|polo|jean|legging/i.test(first.toLowerCase())) {
       return first;
     }
     return '—';
@@ -178,7 +177,7 @@ export default async function ProductDetailPage({
                 {product.name}
               </h1>
               <p className="text-[10px] sm:text-sm text-muted-foreground font-medium">
-                Détail produit · KPIs marketing
+                Tendances de la semaine · KPIs marketing
               </p>
             </div>
           </div>
@@ -399,13 +398,11 @@ export default async function ProductDetailPage({
           </Card>
         </div>
 
-        {/* Analyseur de tendances — toute la largeur */}
-        <div className="w-full border-t bg-muted/20 px-6 lg:px-8 py-6 space-y-2">
-          <h2 className="text-lg font-semibold tracking-tight text-foreground">Analyseur de tendances</h2>
-          <p className="text-sm text-muted-foreground">
-            Analyse tendances & prévisions — uploadez une image pour vérifier si elle correspond à une tendance.
-          </p>
-          <TrendCheckCard fullWidth />
+        {/* Analyseur de tendances visuel — toute la largeur */}
+        <div className="w-full border-t bg-muted/10 px-6 lg:px-8 py-12 space-y-8">
+          <div className="max-w-4xl mx-auto">
+            <VisualTrendScanner />
+          </div>
         </div>
       </ProductDetailEnricher>
     </DashboardLayout>

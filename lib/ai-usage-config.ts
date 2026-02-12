@@ -104,22 +104,27 @@ export const MAX_PER_MONTH_BY_PLAN: Record<string, Partial<Record<AIFeatureKey, 
   free: {
     brand_strategy: 3,
     launch_map_recommendations: 12,
+    trends_hybrid_scan: 1,
   },
   starter: {
     brand_strategy: 3,
     launch_map_recommendations: 12,
+    trends_hybrid_scan: 1,
   },
   base: {
     brand_strategy: 10,
     launch_map_recommendations: 30,
+    trends_hybrid_scan: 10,
   },
   growth: {
     brand_strategy: 15,
     launch_map_recommendations: 60,
+    trends_hybrid_scan: 30,
   },
   pro: {
     brand_strategy: 50,
     launch_map_recommendations: 200,
+    trends_hybrid_scan: 100,
   },
   enterprise: {}, // illimité
 };

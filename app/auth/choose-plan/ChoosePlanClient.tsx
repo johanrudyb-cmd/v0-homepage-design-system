@@ -9,11 +9,13 @@ import { SubscriptionWarning } from '@/components/subscription/SubscriptionWarni
 
 const FREE_FEATURES = [
   '3 analyses de tendances par mois',
+  'Scanner visuel IA (1/mois)',
   'Calculateur de marge',
 ];
 
 const CREATOR_FEATURES = [
   'Accès à l\'intégralité des fonctionnalités',
+  'Scanner visuel IA illimité*',
   '10 analyses de tendances par mois',
   '10 stratégies de marque par mois',
   'Générateur de logo',

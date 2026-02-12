@@ -9,7 +9,7 @@ import { estimateInternalTrendPercent } from '@/lib/trend-product-kpis';
 export const runtime = 'nodejs';
 
 const AGE_SOURCE_BRANDS: Record<string, string[]> = {
-  '18-24': ['ASOS'],
+  '18-24': ['ASOS', 'Global Partner'],
   '25-34': ['Zalando'],
 };
 
@@ -66,7 +66,7 @@ export async function GET(request: Request) {
   // (défini en dehors du try pour être disponible dans les catch)
   const now = new Date();
   const monthSeed = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
-  
+
   try {
     // Return empty data gracefully when DATABASE_URL is not configured
     if (!isDatabaseAvailable()) {
@@ -75,17 +75,17 @@ export async function GET(request: Request) {
     }
 
     const combinations = [
-      { segment: 'homme', ageRange: '18-24', count: 2 },
-      { segment: 'femme', ageRange: '18-24', count: 2 },
-      { segment: 'homme', ageRange: '25-34', count: 2 },
-      { segment: 'femme', ageRange: '25-34', count: 2 },
+      { segment: 'homme', ageRange: '18-24', count: 4 },
+      { segment: 'femme', ageRange: '18-24', count: 4 },
+      { segment: 'homme', ageRange: '25-34', count: 4 },
+      { segment: 'femme', ageRange: '25-34', count: 4 },
     ];
 
     const featuredTrends = [];
 
     for (const combo of combinations) {
       const sourceBrands = AGE_SOURCE_BRANDS[combo.ageRange] || AGE_SOURCE_BRANDS['25-34'];
-      
+
       const where: Prisma.TrendProductWhereInput = {
         sourceBrand: { in: sourceBrands },
         sourceUrl: { not: null },
@@ -98,30 +98,15 @@ export async function GET(request: Request) {
         products = await prisma.trendProduct.findMany({
           where,
           orderBy: SORT_OPTIONS.best.orderBy,
-          take: 50,
+          take: 50, // On en prend un peu plus pour filtrer
         });
       } catch (prismaError: unknown) {
+        // ... (gestion d'erreur identique à l'originale si possible, ou simplifiée car on est dans un remplacement)
         const errorMessage = prismaError instanceof Error ? prismaError.message : String(prismaError);
-        const errorStack = prismaError instanceof Error ? prismaError.stack : undefined;
-        
-        // Si DATABASE_URL n'est pas configuré ou erreur de connexion Prisma
-        const isPrismaInitError = 
-          errorMessage.includes('Environment variable not found: DATABASE_URL') ||
-          errorMessage.includes('PrismaClientInitializationError') ||
-          errorMessage.includes('DATABASE_URL') ||
-          (errorStack && errorStack.includes('schema.prisma'));
-        
-        if (isPrismaInitError) {
-          console.warn('[Homepage Featured] DATABASE_URL non configuré ou erreur Prisma. Returning empty trends.');
+        if (errorMessage.includes('DATABASE_URL') || errorMessage.includes('PrismaClientInitializationError')) {
           return NextResponse.json({ trends: [], monthSeed });
         }
-        
-        // Autre erreur Prisma, logger et retourner vide plutôt que de propager
-        console.error('[Homepage Featured] Erreur Prisma:', {
-          error: errorMessage,
-          stack: errorStack?.substring(0, 200),
-        });
-        return NextResponse.json({ trends: [], monthSeed });
+        throw prismaError;
       }
 
       // Filtrer les produits exclus
@@ -135,13 +120,12 @@ export async function GET(request: Request) {
       }
 
       if (filtered.length > 0) {
-        // Sélectionner aléatoirement basé sur le mois
-        const seed = hash(`${monthSeed}-${combo.segment}-${combo.ageRange}`);
-        const shuffled = seededShuffle(filtered, seed);
-        
-        // Prendre les N premiers après shuffle et formater
+        // Prendre les 4 premiers produits (les "top trends") au lieu de mélanger
+        // Cela garantit que la home affiche les vrais leaders de l'app
+        const topFour = filtered.slice(0, combo.count);
+
         const now = Date.now();
-        const selected = shuffled.slice(0, combo.count).map((p) => {
+        const selected = topFour.map((p) => {
           const daysInRadar = p.createdAt
             ? Math.floor((now - p.createdAt.getTime()) / (24 * 60 * 60 * 1000))
             : 0;
@@ -157,13 +141,13 @@ export async function GET(request: Request) {
           return {
             id: p.id,
             name: p.name ?? '',
-            brand: getProductBrand(p.name, p.sourceBrand),
+            brand: getProductBrand(p.name, p.sourceBrand) ?? '',
             category: p.category ?? '',
             style: p.style ?? '',
             material: p.material ?? '',
             imageUrl: p.imageUrl,
             segment: p.segment ?? combo.segment,
-            ageRange: combo.ageRange, // Ajouter l'âge pour le filtrage
+            ageRange: combo.ageRange,
             zone: 'EU',
             trendScore: p.trendScore ?? 0,
             trendGrowthPercent,
@@ -182,7 +166,7 @@ export async function GET(request: Request) {
     });
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    
+
     // Si c'est une erreur liée à DATABASE_URL ou Prisma initialization, retourner vide
     if (
       errorMessage.includes('Environment variable not found: DATABASE_URL') ||
@@ -193,7 +177,7 @@ export async function GET(request: Request) {
       console.warn('[Homepage Featured] Erreur Prisma/DATABASE_URL. Returning empty trends.');
       return NextResponse.json({ trends: [], monthSeed: '' });
     }
-    
+
     console.error('[Homepage Featured] Erreur:', error);
     return NextResponse.json(
       { error: 'Une erreur est survenue', trends: [] },

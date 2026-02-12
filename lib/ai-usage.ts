@@ -89,6 +89,7 @@ const FEATURE_LABELS: Partial<Record<AIFeatureKey, string>> = {
   ugc_virtual_tryon: 'Virtual try-on',
   brand_strategy: 'Changement de stratégie',
   launch_map_recommendations: 'Recommandations conseil',
+  trends_hybrid_scan: 'Scanner visuel IA',
 };
 
 export async function checkAIUsageLimit(

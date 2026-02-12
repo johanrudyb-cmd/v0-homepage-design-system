@@ -7,61 +7,32 @@ import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const brands = [
-  {
-    name: 'ZARA',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/2/2c/Zara_logo_1980.svg',
-    fallback: 'ZARA'
-  },
-  {
-    name: 'NIKE',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/a/a6/Logo_NIKE.svg',
-    fallback: 'NIKE'
-  },
-  {
-    name: 'ASOS',
-    logo: 'https://www.google.com/s2/favicons?domain=asos.com&sz=256',
-    fallback: 'ASOS'
-  },
-  {
-    name: 'ADIDAS',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/2/20/Adidas_Logo.svg',
-    fallback: 'ADIDAS'
-  },
-  {
-    name: 'H&M',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/5/53/H%26M-Logo.svg',
-    fallback: 'H&M'
-  },
-  {
-    name: "LEVI'S",
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Levi%27s_logo.svg/256px-Levi%27s_logo.svg.png',
-    fallback: "LEVI'S"
-  },
-  {
-    name: 'MANGO',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1c/Logo_of_Mango_%28new%29.svg',
-    fallback: 'MANGO'
-  },
-  {
-    name: 'BERSHKA',
-    logo: 'https://www.google.com/s2/favicons?domain=bershka.com&sz=256',
-    fallback: 'BERSHKA'
-  },
-  {
-    name: 'THE NORTH FACE',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/The_North_Face_logo.svg/256px-The_North_Face_logo.svg.png',
-    fallback: 'THE NORTH FACE'
-  },
-  {
-    name: 'JACQUEMUS',
-    logo: 'https://www.google.com/s2/favicons?domain=jacquemus.com&sz=256',
-    fallback: 'JACQUEMUS'
-  },
-  {
-    name: 'RALPH LAUREN',
-    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Ralph_Lauren_logo.svg/256px-Ralph_Lauren_logo.svg.png',
-    fallback: 'RALPH LAUREN'
-  },
+  { name: 'NIKE', logo: 'https://cdn.simpleicons.org/nike/000000', domain: 'nike.com' },
+  { name: 'ADIDAS', logo: 'https://cdn.simpleicons.org/adidas/000000', domain: 'adidas.com' },
+  { name: 'ZARA', logo: 'https://cdn.simpleicons.org/zara/000000', domain: 'zara.com' },
+  { name: 'H&M', logo: 'https://cdn.simpleicons.org/handm/000000', domain: 'hm.com' },
+  { name: 'UNIQLO', logo: 'https://cdn.simpleicons.org/uniqlo/000000', domain: 'uniqlo.com' },
+  { name: 'PUMA', logo: 'https://cdn.simpleicons.org/puma/000000', domain: 'puma.com' },
+  { name: 'THE NORTH FACE', logo: 'https://cdn.simpleicons.org/thenorthface/000000', domain: 'thenorthface.com' },
+  { name: 'NEW BALANCE', logo: 'https://cdn.simpleicons.org/newbalance/000000', domain: 'newbalance.com' },
+  { name: 'ASOS', logo: 'https://logo.clearbit.com/asos.com', domain: 'asos.com' },
+  { name: 'LEVI\'S', logo: 'https://logo.clearbit.com/levi.com', domain: 'levi.com' },
+  { name: 'MANGO', logo: 'https://logo.clearbit.com/mango.com', domain: 'mango.com' },
+  { name: 'BERSHKA', logo: 'https://logo.clearbit.com/bershka.com', domain: 'bershka.com' },
+  { name: 'PULL&BEAR', logo: 'https://logo.clearbit.com/pullandbear.com', domain: 'pullandbear.com' },
+  { name: 'CONVERSE', logo: 'https://logo.clearbit.com/converse.com', domain: 'converse.com' },
+  { name: 'VANS', logo: 'https://logo.clearbit.com/vans.com', domain: 'vans.com' },
+  { name: 'SUPREME', logo: 'https://logo.clearbit.com/supremenewyork.com', domain: 'supremenewyork.com' },
+  { name: 'CARHARTT', logo: 'https://logo.clearbit.com/carhartt.com', domain: 'carhartt.com' },
+  { name: 'ARC\'TERYX', logo: 'https://logo.clearbit.com/arcteryx.com', domain: 'arcteryx.com' },
+  { name: 'STONE ISLAND', logo: 'https://logo.clearbit.com/stoneisland.com', domain: 'stoneisland.com' },
+  { name: 'SALOMON', logo: 'https://logo.clearbit.com/salomon.com', domain: 'salomon.com' },
+  { name: 'PATAGONIA', logo: 'https://logo.clearbit.com/patagonia.com', domain: 'patagonia.com' },
+  { name: 'RALPH LAUREN', logo: 'https://logo.clearbit.com/ralphlauren.com', domain: 'ralphlauren.com' },
+  { name: 'TOMMY HILFIGER', logo: 'https://logo.clearbit.com/tommy.com', domain: 'tommy.com' },
+  { name: 'CALVIN KLEIN', logo: 'https://logo.clearbit.com/calvinklein.com', domain: 'calvinklein.com' },
+  { name: 'CHAMPION', logo: 'https://logo.clearbit.com/champion.com', domain: 'champion.com' },
+  { name: 'DICKIES', logo: 'https://logo.clearbit.com/dickies.com', domain: 'dickies.com' },
 ];
 
 export function TrendsHero() {
@@ -85,125 +56,84 @@ export function TrendsHero() {
           {/* Titre principal */}
           <div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-[#000000] mb-4 sm:mb-6 px-2">
-              Créez votre marque avec les données des géants
+              Créez votre marque de vêtement avec les données des géants
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-[#6e6e73] font-light max-w-2xl mx-auto mb-6 sm:mb-8 px-2">
               Donnez à votre marque indépendante la puissance des leaders mondiaux. Mêmes données. Mêmes usines. Mêmes stratégies.
             </p>
-            <Link
-              href="/auth/signup"
-              className="inline-flex items-center gap-2 sm:gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-[#000000] text-white rounded-full text-base sm:text-lg font-semibold hover:bg-[#1a1a1a] transition-all duration-200 group"
-            >
-              Découvrir les tendances
-              <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Link>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Link
+                href="/auth/signup"
+                className="inline-flex items-center gap-2 sm:gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-[#000000] text-white rounded-full text-base sm:text-lg font-semibold hover:bg-[#1a1a1a] transition-all duration-200 group"
+              >
+                Découvrir les tendances
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Link>
+            </div>
           </div>
 
-          {/* Bandeau défilant avec logos de marques en couleur */}
-          <div className="relative overflow-hidden mt-10 sm:mt-14 lg:mt-16 py-6 sm:py-8">
-            <div className="flex items-center whitespace-nowrap animate-marquee-slow">
-              {/* Première série */}
-              {brands.map((brand, index) => (
-                <div
-                  key={`first-${index}`}
-                  className="inline-flex items-center justify-center shrink-0 px-2 sm:px-4"
-                >
-                  <div className="relative h-24 sm:h-28 lg:h-14 min-w-[140px] sm:min-w-[180px] max-w-[180px] sm:max-w-[220px] flex items-center justify-center">
-                    <Image
-                      src={brand.logo}
-                      alt={brand.name}
-                      width={220}
-                      height={112}
-                      className="object-contain h-24 sm:h-28 lg:h-14 w-auto max-w-[180px] sm:max-w-[220px]"
-                      unoptimized
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent && !parent.querySelector('.fallback-text')) {
-                          const fallback = document.createElement('span');
-                          fallback.className = 'fallback-text text-xl sm:text-2xl font-bold text-[#000000] uppercase tracking-tight whitespace-nowrap';
-                          fallback.textContent = brand.fallback || brand.name;
-                          parent.appendChild(fallback);
-                        }
-                      }}
-                    />
-                    {/* Fallback texte si l'image ne charge pas */}
-                    <span className="fallback-text-hidden absolute text-sm font-bold text-[#000000] uppercase tracking-tight opacity-0 pointer-events-none whitespace-nowrap">
-                      {brand.fallback || brand.name}
-                    </span>
-                  </div>
-                  <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
+          {/* Bandeau défilant avec logos de marques — Style Premium Apple */}
+          <div className="relative mt-16 sm:mt-24 lg:mt-32">
+            {/* Dégradé de fondu sur les côtés via mask-marquee (défini dans globals.css) */}
+            <div className="mask-marquee relative overflow-hidden py-12">
+              <div className="flex w-fit items-center gap-12 sm:gap-20 animate-marquee-infinite hover:[animation-play-state:paused]">
+                {/* Première série de marques */}
+                <div className="flex shrink-0 items-center gap-12 sm:gap-20">
+                  {brands.map((brand, index) => (
+                    <div
+                      key={`first-${index}`}
+                      className="group relative flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 hover:scale-110"
+                    >
+                      <div className="relative h-12 sm:h-16 w-32 sm:w-48 flex items-center justify-center">
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="object-contain max-h-full max-w-full"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const container = target.closest('.group');
+                            if (container) (container as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-              {/* Duplication pour effet infini */}
-              {brands.map((brand, index) => (
-                <div
-                  key={`second-${index}`}
-                  className="inline-flex items-center justify-center shrink-0 px-2 sm:px-4"
-                >
-                  <div className="relative h-24 sm:h-28 lg:h-14 min-w-[140px] sm:min-w-[180px] max-w-[180px] sm:max-w-[220px] flex items-center justify-center">
-                    <Image
-                      src={brand.logo}
-                      alt={brand.name}
-                      width={220}
-                      height={112}
-                      className="object-contain h-24 sm:h-28 lg:h-14 w-auto max-w-[180px] sm:max-w-[220px]"
-                      unoptimized
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent && !parent.querySelector('.fallback-text')) {
-                          const fallback = document.createElement('span');
-                          fallback.className = 'fallback-text text-xl sm:text-2xl font-bold text-[#000000] uppercase tracking-tight whitespace-nowrap';
-                          fallback.textContent = brand.fallback || brand.name;
-                          parent.appendChild(fallback);
-                        }
-                      }}
-                    />
-                    {/* Fallback texte si l'image ne charge pas */}
-                    <span className="fallback-text-hidden absolute text-sm font-bold text-[#000000] uppercase tracking-tight opacity-0 pointer-events-none whitespace-nowrap">
-                      {brand.fallback || brand.name}
-                    </span>
-                  </div>
-                  <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
+
+                {/* Duplication pour effet infini parfait */}
+                <div className="flex shrink-0 items-center gap-12 sm:gap-20">
+                  {brands.map((brand, index) => (
+                    <div
+                      key={`second-${index}`}
+                      className="group relative flex items-center justify-center grayscale hover:grayscale-0 transition-all duration-500 hover:scale-110"
+                    >
+                      <div className="relative h-12 sm:h-16 w-32 sm:w-48 flex items-center justify-center">
+                        <img
+                          src={brand.logo}
+                          alt={brand.name}
+                          className="object-contain max-h-full max-w-full"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.style.display = 'none';
+                            const container = target.closest('.group');
+                            if (container) (container as HTMLElement).style.display = 'none';
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
-              {/* Troisième duplication pour sécurité sur très grands écrans */}
-              {brands.map((brand, index) => (
-                <div
-                  key={`third-${index}`}
-                  className="inline-flex items-center justify-center shrink-0 px-2 sm:px-4"
-                >
-                  <div className="relative h-24 sm:h-28 lg:h-14 min-w-[140px] sm:min-w-[180px] max-w-[180px] sm:max-w-[220px] flex items-center justify-center">
-                    <Image
-                      src={brand.logo}
-                      alt={brand.name}
-                      width={220}
-                      height={112}
-                      className="object-contain h-24 sm:h-28 lg:h-14 w-auto max-w-[180px] sm:max-w-[220px]"
-                      unoptimized
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.style.display = 'none';
-                        const parent = target.parentElement;
-                        if (parent && !parent.querySelector('.fallback-text')) {
-                          const fallback = document.createElement('span');
-                          fallback.className = 'fallback-text text-xl sm:text-2xl font-bold text-[#000000] uppercase tracking-tight whitespace-nowrap';
-                          fallback.textContent = brand.fallback || brand.name;
-                          parent.appendChild(fallback);
-                        }
-                      }}
-                    />
-                    {/* Fallback texte si l'image ne charge pas */}
-                    <span className="fallback-text-hidden absolute text-sm font-bold text-[#000000] uppercase tracking-tight opacity-0 pointer-events-none whitespace-nowrap">
-                      {brand.fallback || brand.name}
-                    </span>
-                  </div>
-                  <span className="mx-2 sm:mx-4 text-[#6e6e73] text-base font-bold select-none shrink-0">•</span>
-                </div>
-              ))}
+              </div>
+            </div>
+
+            {/* Texte décoratif ou indicateur sous le slider — Traduit en français */}
+            <div className="flex justify-center mt-6">
+              <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6e6e73]/40 text-center px-4">
+                Collection Basée sur les Données • Stratégie 2026 • Tendances Mondiales
+              </span>
             </div>
           </div>
         </div>

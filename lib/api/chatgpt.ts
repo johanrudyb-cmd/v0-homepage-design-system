@@ -9,8 +9,8 @@ if (!openaiApiKey) {
 
 const openai = openaiApiKey
   ? new OpenAI({
-      apiKey: openaiApiKey,
-    })
+    apiKey: openaiApiKey,
+  })
   : null;
 
 export async function generateUGCScripts(
@@ -644,6 +644,7 @@ export interface EnrichedProductFields {
   sustainabilityScore?: number;
   visualAttractivenessScore?: number;
   dominantAttribute?: string;
+  businessAnalysis?: string;
 }
 
 /**
@@ -672,6 +673,7 @@ function normalizeEnrichedFields(parsed: Record<string, unknown>): EnrichedProdu
   if (typeof parsed.sustainabilityScore === 'number') out.sustainabilityScore = Math.min(100, Math.max(0, Math.round(parsed.sustainabilityScore)));
   if (typeof parsed.visualAttractivenessScore === 'number') out.visualAttractivenessScore = Math.min(100, Math.max(0, Math.round(parsed.visualAttractivenessScore)));
   if (typeof parsed.dominantAttribute === 'string' && parsed.dominantAttribute.trim()) out.dominantAttribute = parsed.dominantAttribute.trim().slice(0, 300);
+  if (typeof parsed.businessAnalysis === 'string' && parsed.businessAnalysis.trim()) out.businessAnalysis = parsed.businessAnalysis.trim().slice(0, 1500);
   return out;
 }
 
@@ -688,11 +690,6 @@ export async function enrichProductDetails(
     cut?: string | null;
     averagePrice: number;
     imageUrl?: string | null;
-    estimatedCogsPercent?: number | null;
-    complexityScore?: string | null;
-    sustainabilityScore?: number | null;
-    visualAttractivenessScore?: number | null;
-    dominantAttribute?: string | null;
   }
 ): Promise<EnrichedProductFields> {
   if (process.env.ANTHROPIC_API_KEY) {
@@ -708,28 +705,28 @@ export async function enrichProductDetails(
     product.material ? `Matière: ${product.material}` : null,
     product.style ? `Style: ${product.style}` : null,
     product.color ? `Couleur: ${product.color}` : null,
-    product.careInstructions ? `Entretien: ${product.careInstructions}` : null,
     product.cut ? `Coupe: ${product.cut}` : null,
-    product.description ? `Description: ${product.description.slice(0, 300)}` : null,
   ].filter(Boolean).join('; ');
 
-  const systemPrompt = `Tu es un expert mode et retail. Complète les informations manquantes pour ce produit (vêtement e-commerce).
+  const systemPrompt = `Tu es un expert mode, retail et sourcing textile. Ton but est de remplir la fiche technique (Tech Pack) et l'analyse business d'un produit.
 
-Règles:
-- Réponds UNIQUEMENT en JSON avec les champs demandés.
-- Pour complexityScore: "Facile" | "Moyen" | "Complexe" (fabrication simple, moyenne ou complexe).
-- Pour sustainabilityScore, visualAttractivenessScore: nombre entre 0 et 100.
-- Pour estimatedCogsPercent: nombre entre 15 et 50 (coût production en % du prix de vente).
-- Pour dominantAttribute: une phrase courte (ex: "Coupe Boxy : 80% responsable de la performance").
-- N'inclus que les champs à compléter s'ils sont vides ou "Non spécifié".`;
+Règles JSON strictes:
+- "businessAnalysis": Analyse ultra-stratégique (2-3 paragraphes). Pourquoi ce produit est tendance ? Quel segment il cible ? Opportunité de marge ? (en français).
+- "dominantAttribute": L'élément unique qui fait que ce produit se vend (ex: "Le col officier en velours qui crée un contraste premium").
+- "style": Style précis (Streetwear, Minimaliste, Luxury, Y2K, Gorpcore, Workwear, Old Money).
+- "complexityScore": "Facile" | "Moyen" | "Complexe".
+- "estimatedCogsPercent": Coût de prod estimé (15-50%).
+- "sustainabilityScore": Note ESG (0-100).
+- "visualAttractivenessScore": Note 0-100.
+- "category": Type exact (Hoodie, Cargo, Veste, etc.). Jamais "Autre".`;
 
   const userContent = [
     `Produit: ${product.name}`,
-    `Catégorie: ${product.category}`,
-    `Prix: ${product.averagePrice}€`,
+    `Catégorie initiale: ${product.category}`,
+    `Prix public: ${product.averagePrice}€`,
     existing ? `Données existantes: ${existing}` : '',
     '',
-    'Retourne un objet JSON avec les champs manquants à compléter: category (type de vêtement: T-shirt, Hoodie, Pantalon, Jean, Veste, Blouson, Pull, Polo, Short, Robe, Cargo, Jogging, Legging — jamais "Autre"), style, material, color, careInstructions, description, cut, productBrand (marque du vêtement, ex. Nike, Zara, Les Deux — jamais Zalando/ASOS), estimatedCogsPercent, complexityScore, sustainabilityScore, visualAttractivenessScore, dominantAttribute. Exclure les champs déjà remplis. Réponds UNIQUEMENT par JSON valide.',
+    'Analyse ce vêtement et renvoie le JSON complet avec : businessAnalysis, dominantAttribute, style, material, color, careInstructions, description, cut, productBrand (la vraie marque, pas Zalando), estimatedCogsPercent, complexityScore, sustainabilityScore, visualAttractivenessScore, category.',
   ].filter(Boolean).join('\n');
 
   const messages: OpenAI.ChatCompletionMessageParam[] = [
@@ -945,4 +942,240 @@ export async function testGptConnection(): Promise<{ ok: true } | { ok: false; e
     const message = e instanceof Error ? e.message : String(e);
     return { ok: false, error: message };
   }
+}
+
+/**
+ * Valide si un produit est bien un vêtement/article de mode textile (Keep)
+ * ou s'il doit être banni (Beauté, Cosmétique, Parfum, Soins, etc.)
+ */
+export async function isProductValidClothing(
+  imageUrl: string,
+  title: string
+): Promise<{ valid: boolean; reason: string }> {
+  if (!openai) return { valid: true, reason: 'AI disabled' };
+
+  try {
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o',
+      messages: [
+        {
+          role: 'system',
+          content: `Tu es un modérateur pour une plateforme de mode premium (vêtements et accessoires textiles uniquement).
+          Ta mission est de bannir tout ce qui n'est pas un vêtement, une chaussure ou un accessoire textile.
+          
+          DOIVENT ÊTRE BANNIS (valid: false) :
+          - Maquillage, rouges à lèvres, palettes.
+          - Parfums, eaux de toilette.
+          - Soins de la peau, crèmes, sérums, masques.
+          - Shampoings, brosses à cheveux.
+          - Électroménager (Dyson, etc.).
+          - Coques de téléphone, gadgets.
+          
+          DOIVENT ÊTRE GARDÉS (valid: true) :
+          - T-shirts, hoodies, pantalons, vestes.
+          - Robes, jupes, chemises.
+          - Chaussures, baskets, bottes.
+          - Sacs, ceintures, casquettes.
+          
+          Réponds UNIQUEMENT en JSON : {"valid": boolean, "reason": "courte explication"}.`,
+        },
+        {
+          role: 'user',
+          content: [
+            { type: 'text', text: `Produit: "${title}"` },
+            { type: 'image_url', image_url: { url: imageUrl } },
+          ],
+        },
+      ],
+      max_tokens: 100,
+      temperature: 0,
+      response_format: { type: 'json_object' },
+    });
+
+    const raw = completion.choices[0]?.message?.content?.trim();
+    if (!raw) return { valid: true, reason: 'Empty response' };
+
+    const parsed = JSON.parse(raw);
+    return {
+      valid: !!parsed.valid,
+      reason: parsed.reason || ''
+    };
+  } catch (error) {
+    console.error('Error in isProductValidClothing:', error);
+    return { valid: true, reason: 'Error fallback' };
+  }
+}
+
+/**
+ * Génère le Top 10 des marques tendances du mois via IA.
+ * Analyse le marché européen/français actuel.
+ */
+export async function generateMonthlyTrendingBrands(): Promise<Array<{
+  rank: number;
+  brand: string;
+  score: string;
+  scoreValue: number;
+  signaturePiece: string;
+  dominantStyle: string;
+  cyclePhase: string;
+  launchPotential: string;
+  indicativePrice: string;
+  websiteUrl: string;
+}>> {
+  if (!openai) throw new Error('AI not configured');
+
+  const now = new Date();
+  const monthStr = now.toLocaleString('fr-FR', { month: 'long', year: 'numeric' });
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: `Tu es un expert en tendances mode et retail global (Luxe, Streetwear et Mass Market) en Europe. 
+        Ta mission est de générer le classement TOP 10 des marques les plus influentes et "hot" du mois de ${monthStr}.
+        
+        IMPORTANT : Tu dois proposer un mix équilibré de segments pour que le classement reflète la réalité du marché :
+        - Inclus des marques de LUXE (ex: Loewe, Jacquemus).
+        - Inclus des marques STREETWEAR/NICHE (ex: Corteiz, Represent, Stüssy).
+        - Inclus des marques MASS MARKET influentes (ex: Zara, Uniqlo, Adidas).
+        
+        Pour chaque marque, tu dois fournir :
+        - brand: Nom de la marque.
+        - score: Score sur 100 (ex: "98/100").
+        - scoreValue: La valeur numérique du score (ex: 98).
+        - signaturePiece: La pièce maîtresse qui fait le buzz actuellement (ex: "Veste Alpha SV").
+        - dominantStyle: Le style associé (ex: "Gorpcore", "Quiet Luxury", "Streetwear").
+        - cyclePhase: "emergent", "croissance", "pic" ou "declin".
+        - launchPotential: "opportunite", "a_surveiller" ou "sature".
+        - indicativePrice: Fourchette de prix (ex: "40-100€").
+        - websiteUrl: URL officielle du site web de la marque (ex: "https://www.jacquemus.com").
+        
+        Réponds UNIQUEMENT par un objet JSON avec une clé "brands" contenant un tableau de 10 objets.`,
+      },
+      {
+        role: 'user',
+        content: `Génère le classement TOP 10 mixé (Luxe, Streetwear, Mass Market) des marques de mode tendances en Europe pour ${monthStr}.`,
+      },
+    ],
+    temperature: 0.7,
+    response_format: { type: 'json_object' },
+  });
+
+  const raw = completion.choices[0]?.message?.content?.trim();
+  if (!raw) throw new Error('Empty AI response');
+
+  const parsed = JSON.parse(raw);
+  const brands = parsed.brands || [];
+
+  return brands.map((b: any, index: number) => ({
+    rank: index + 1,
+    brand: b.brand,
+    score: b.score || `${b.scoreValue}/100`,
+    scoreValue: b.scoreValue,
+    signaturePiece: b.signaturePiece,
+    dominantStyle: b.dominantStyle,
+    cyclePhase: b.cyclePhase,
+    launchPotential: b.launchPotential,
+    indicativePrice: b.indicativePrice || '',
+    websiteUrl: b.websiteUrl || '',
+  }));
+}
+
+/**
+ * Analyse une image de mode pour en extraire les tendances (GPT-4o Vision).
+ */
+export async function analyzeVisualTrend(base64Image: string): Promise<{
+  category: string;
+  style: string;
+  tags: string[];
+  materials: string[];
+  colors: string[];
+  baseTrendScore: number;
+  analysis: string;
+  cyclePhase: 'emergent' | 'croissance' | 'pic' | 'declin';
+  marketAdvice: string;
+}> {
+  if (!openai) throw new Error('AI not configured');
+
+  // Nettoyer le préfixe base64 si présent
+  const base64Data = base64Image.replace(/^data:image\/\w+;base64,/, '');
+
+  const response = await openai.chat.completions.create({
+    model: "gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: `Tu es un expert en analyse de tendances mode (Fashion Trend Analyst). 
+        Analyse l'image fournie et réponds uniquement en JSON avec la structure suivante :
+        {
+          "category": "Type de vêtement principal",
+          "style": "Style identifié (ex: Gorpcore, Minimalisme, Y2K)",
+          "tags": ["tag1", "tag2", "tag3"],
+          "materials": ["matière1", "..."],
+          "colors": ["couleur1", "..."],
+          "baseTrendScore": 0-100,
+          "analysis": "Description courte de l'esthétique et de pourquoi c'est tendance",
+          "cyclePhase": "emergent" | "croissance" | "pic" | "declin",
+          "marketAdvice": "Conseil business actionnable pour une marque de mode"
+        }`
+      },
+      {
+        role: "user",
+        content: [
+          { type: "text", text: "Analyse cette pièce de mode et son potentiel de tendance." },
+          {
+            type: "image_url",
+            image_url: {
+              url: `data:image/jpeg;base64,${base64Data}`,
+            },
+          },
+        ],
+      },
+    ],
+    response_format: { type: "json_object" },
+  });
+
+  const raw = response.choices[0]?.message?.content?.trim();
+  if (!raw) throw new Error('Empty AI response');
+
+  return JSON.parse(raw);
+}
+/**
+ * Récupère les métadonnées rapides d'une marque (pour indexation).
+ */
+export async function getBrandQuickMetadata(brandName: string): Promise<{
+  websiteUrl: string;
+  signaturePiece: string;
+  dominantStyle: string;
+  cyclePhase: string;
+  launchPotential: string;
+  indicativePrice: string;
+}> {
+  if (!openai) throw new Error('AI not configured');
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: `Tu es un expert en mode. Donne les infos clés pour cette marque.
+        Réponds uniquement en JSON :
+        {
+          "websiteUrl": "URL officielle",
+          "signaturePiece": "Pièce emblématique actuelle",
+          "dominantStyle": "Style principal",
+          "cyclePhase": "emergent" | "croissance" | "pic" | "declin",
+          "launchPotential": "opportunite" | "a_surveiller" | "sature",
+          "indicativePrice": "Frange de prix (ex: 50-100€)"
+        }`
+      },
+      { role: 'user', content: `Marque : ${brandName}` }
+    ],
+    response_format: { type: 'json_object' }
+  });
+
+  const raw = completion.choices[0]?.message?.content?.trim();
+  if (!raw) throw new Error('Empty AI response');
+  return JSON.parse(raw);
 }

@@ -36,7 +36,7 @@ export function PhaseMockupCreation({ brandId, brand, onComplete }: PhaseMockupC
             Comment créer votre design
           </CardTitle>
           <CardDescription className="text-base">
-            Dans l&apos;onglet Tech Pack vous pourrez télécharger un pack de mockup et suivre les étapes (type de produit → dimensions → import).
+            Regardez le tutoriel vidéo, téléchargez votre pack de mockup et suivez les recommandations IA pour créer un design professionnel.
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6">

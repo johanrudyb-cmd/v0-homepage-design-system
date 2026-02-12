@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, ArrowRight, CheckCircle2, Sun, ImageOff, Upload } from 'lucide-react';
+import { Loader2, ArrowRight, CheckCircle2, Sun, ImageOff, Upload, Sparkles } from 'lucide-react';
 import { BrandLogo } from '@/components/brands/BrandLogo';
 import { cn } from '@/lib/utils';
 import {
@@ -307,21 +307,49 @@ export function Phase0Identity({ brandId, brand, onComplete, hideNameField = fal
                   className="border-2"
                 />
                 {logoUploadError && <p className="text-sm text-destructive" role="alert">{logoUploadError}</p>}
-                <Button type="button" variant="ghost" size="sm" className="text-muted-foreground w-fit gap-2" onClick={handleNoLogo}>
-                  <ImageOff className="w-4 h-4" />
-                  Je n&apos;ai pas de logo
-                </Button>
+                <div className="flex flex-wrap gap-2">
+                  <Button type="button" variant="ghost" size="sm" className="text-muted-foreground gap-2" onClick={handleNoLogo}>
+                    <ImageOff className="w-4 h-4" />
+                    Je n&apos;ai pas de logo
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="text-primary border-primary/30 hover:bg-primary/5 gap-2"
+                    onClick={() => {
+                      router.push('/launch-map/phase/1');
+                    }}
+                  >
+                    <Sparkles className="w-4 h-4" />
+                    Générer avec l&apos;IA (Ideogram)
+                  </Button>
+                </div>
               </>
             ) : (
               <>
-                <span className="text-sm text-muted-foreground">
-                  {userPlan === 'free'
-                    ? "Pas de logo pour l&apos;instant. Vous pouvez en ajouter un manuellement plus tard."
-                    : "Pas de logo pour l&apos;instant. Vous pourrez en générer un par IA dans la phase Stratégie."}
-                </span>
-                <Button type="button" variant="outline" size="sm" className="w-fit" onClick={() => setNoLogo(false)}>
-                  J&apos;ai un logo à ajouter
-                </Button>
+                <div className="flex flex-col gap-3">
+                  <span className="text-sm text-muted-foreground">
+                    Une stratégie calquée est nécessaire pour générer un logo cohérent avec votre positionnement.
+                  </span>
+                  <div className="flex flex-wrap gap-2">
+                    <Button type="button" variant="outline" size="sm" onClick={() => setNoLogo(false)}>
+                      J&apos;ai un logo à ajouter
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="default"
+                      size="sm"
+                      className="gap-2"
+                      onClick={() => {
+                        router.push('/launch-map/phase/1');
+                      }}
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Générer mon logo par IA
+                    </Button>
+                  </div>
+                </div>
               </>
             )}
           </div>

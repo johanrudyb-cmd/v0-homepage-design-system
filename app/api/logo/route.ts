@@ -9,6 +9,8 @@ const ALLOWED_ORIGINS = [
   'https://logo.clearbit.com',
   'https://upload.wikimedia.org',
   'https://commons.wikimedia.org',
+  'https://cdn.brandfetch.io',
+  'https://cdn.simpleicons.org',
 ];
 
 const FETCH_TIMEOUT_MS = 12_000;

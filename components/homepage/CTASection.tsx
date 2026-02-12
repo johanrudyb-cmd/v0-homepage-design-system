@@ -59,7 +59,7 @@ export function CTASection() {
           </div>
 
           <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-tight text-white mb-4 sm:mb-6">
-            Prêt à créer votre marque ?
+            Prêt à créer votre marque de vêtement ?
           </h2>
           <p className="text-base sm:text-lg lg:text-xl text-[#86868b] max-w-2xl mx-auto px-2">
             Rejoignez des centaines de créateurs qui utilisent OUTFITY pour lancer leur marque de vêtements.

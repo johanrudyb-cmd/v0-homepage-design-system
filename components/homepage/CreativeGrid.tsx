@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
-import { ArrowRight, Image, FileText, Palette, Calculator } from 'lucide-react';
+import { ArrowRight, Image, FileText, Palette, Calculator, Camera } from 'lucide-react';
 
 export function CreativeGrid() {
   const [isVisible, setIsVisible] = useState(false);
@@ -61,11 +61,11 @@ export function CreativeGrid() {
       iconColor: 'text-[#FF9500]',
     },
     {
-      title: 'Calculateur de marge',
-      description: 'Calculez rapidement votre marge bénéficiaire par vêtement. Prix de revient, prix de vente, marge nette et pourcentage.',
-      icon: Calculator,
-      href: '/auth/signup',
-      isFree: true,
+      title: 'Scanner visuel IA',
+      description: 'Uploadez une photo de vêtement et obtenez instantanément son potentiel de vente, son style et les produits similaires du marché.',
+      icon: Camera,
+      href: '/trends/visual',
+      isFree: false,
       color: 'bg-[#5856D6]/10',
       iconColor: 'text-[#5856D6]',
     },

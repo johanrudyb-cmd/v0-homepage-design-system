@@ -439,6 +439,7 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
           {!isTransitioning && phaseToRender === 7 && (
             <Phase6Shopify
               brandId={brandId}
+              brand={brand ? { id: brand.id, name: brand.name, logo: brand.logo, colorPalette: brand.colorPalette, typography: brand.typography } : null}
               shopifyShopDomain={launchMap?.shopifyShopDomain ?? null}
               siteCreationTodo={(launchMap?.siteCreationTodo as { steps: { id: string; label: string; done: boolean }[] } | null | undefined) ?? null}
               onComplete={() => handlePhaseComplete(7)}

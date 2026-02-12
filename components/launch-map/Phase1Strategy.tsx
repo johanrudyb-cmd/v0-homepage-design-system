@@ -14,6 +14,7 @@ import {
   REFERENCE_BRAND_WEBSITES,
 } from '@/lib/constants/audience-reference-brands';
 import { BrandLogo } from '@/components/brands/BrandLogo';
+import { getTechnicalStyleKeywords } from '@/lib/brand-style-keywords';
 import { PreviewWatermark } from '@/components/ui/preview-watermark';
 import { StrategyPresentationView } from './StrategyPresentationView';
 import type { BrandIdentity } from './LaunchMapStepper';
@@ -511,7 +512,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
     try {
       if (demoMode) {
         await new Promise((r) => setTimeout(r, 300));
-        if (sg?.noLogo === true && !brand?.logo) {
+        if (!brand?.logo) {
           setShowLogoStep(true);
         } else {
           onComplete();
@@ -537,7 +538,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
         type: 'success',
       });
       router.refresh();
-      if (sg?.noLogo === true && !brand?.logo) {
+      if (!brand?.logo) {
         setShowLogoStep(true);
       } else {
         onComplete();
@@ -549,28 +550,38 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
     }
   };
 
-  const noLogo = sg?.noLogo === true;
+  const needsLogo = !brand?.logo || sg?.noLogo === true;
+  const inspirationName = referenceBrands.find(b => b.slug === selectedSlug || b.slug === brand?.templateBrandSlug)?.brandName || brand?.templateBrandSlug || undefined;
+  const technicalStyle = getTechnicalStyleKeywords(inspirationName);
   const recommendation = strategyHistory[0]?.visualIdentity?.logoRecommendation ?? lastCalquedVisualIdentity?.logoRecommendation;
 
-  /* Page « Créez votre logo » : affichée uniquement après validation de la stratégie, chronologiquement à la suite. */
-  if (showLogoStep && noLogo) {
+  /* Page « Créez votre logo » : affichée après validation de la stratégie ou manuellement pour régénérer. */
+  if (showLogoStep) {
     return (
       <div className="space-y-6">
         <Card className="border-2 border-primary/30 bg-primary/10">
           <CardContent className="pt-6 pb-6">
             <h3 className="font-semibold text-foreground text-lg mb-1 flex items-center gap-2">
               <Sparkles className="w-5 h-5 text-primary" />
-              Créez votre logo
+              Studio Logo IA (Ideogram)
             </h3>
             <p className="text-sm text-muted-foreground mb-4">
-              Vous avez validé votre stratégie. Générez 4 propositions de logo par IA. Chaque logo aura sa version sur fond transparent. En validant, vous conservez les 4.
+              Votre stratégie est validée. Créons maintenant votre identité visuelle en s'inspirant de l'esthétique de <strong className="text-foreground">{inspirationName || 'votre marque de référence'}</strong>.
             </p>
-            {recommendation && (
-              <div className="mb-4 p-3 rounded-lg bg-muted/50 border border-border">
-                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Recommandation logo (issue de votre stratégie calquée)</p>
-                <p className="text-sm text-foreground leading-relaxed">{recommendation}</p>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="p-3 rounded-lg bg-background border border-border">
+                <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Style technique détecté</p>
+                <p className="text-sm font-semibold text-primary">{technicalStyle}</p>
               </div>
-            )}
+
+              {recommendation && (
+                <div className="p-3 rounded-lg bg-background border border-border">
+                  <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-wider mb-1">Concept créatif</p>
+                  <p className="text-xs text-foreground leading-relaxed line-clamp-2">{recommendation}</p>
+                </div>
+              )}
+            </div>
 
             {proposalsToShow.length > 0 ? (
               <>
@@ -643,9 +654,12 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
               </>
             )}
             {logoError && <p className="text-sm text-destructive mt-3" role="alert">{logoError}</p>}
-            <div className="mt-6 flex justify-center border-t border-border pt-4">
+            <div className="mt-6 flex justify-between items-center border-t border-border pt-4">
+              <Button variant="ghost" size="sm" onClick={() => setShowLogoStep(false)} className="text-muted-foreground">
+                Retour à la stratégie
+              </Button>
               <Button variant="ghost" size="sm" onClick={() => onComplete()} className="text-muted-foreground hover:text-foreground">
-                Passer cette étape sans générer de logo
+                Passer cette étape
               </Button>
             </div>
           </CardContent>
@@ -765,149 +779,153 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
               <p className="text-sm text-muted-foreground mb-4">
                 Liées à votre positionnement « {positioning} ». Cliquez sur une marque pour voir sa stratégie, puis calquez-la depuis la présentation si vous souhaitez l’appliquer à votre marque.
               </p>
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 mt-6">
                 {referenceBrands.map((b) => {
                   const isSelected = selectedSlug === b.slug;
                   const brandName = (b.brandName ?? '').trim();
                   const displayName = brandName || b.brandName;
-                  const siteUrl = REFERENCE_BRAND_WEBSITES[b.brandName] ?? REFERENCE_BRAND_WEBSITES[brandName] ?? null;
                   const logoUrl = getBrandLogoUrl(brandName) ?? getBrandLogoUrl(b.brandName);
                   const calquedEntry = strategyHistory.find((e) => e.templateBrandSlug === b.slug);
                   const hasCalquedStrategy = !!calquedEntry;
+
                   return (
                     <article
                       key={b.slug}
-                      role="group"
-                      aria-label={`Marque ${displayName}${isSelected ? ', calquée pour ma marque' : ''}`}
                       className={cn(
-                        'flex flex-col rounded-lg border-2 overflow-hidden transition-all',
+                        'flex flex-col rounded-lg border-2 overflow-hidden transition-all duration-300',
                         isSelected
-                          ? 'border-[#8B5CF6] bg-[#8B5CF6]/10 shadow-sm'
-                          : 'border-border hover:border-[#8B5CF6]/40 hover:bg-muted/20'
+                          ? 'border-[#8B5CF6] bg-[#8B5CF6]/5 shadow-sm scale-[1.02] z-10'
+                          : 'border-border bg-card hover:border-[#8B5CF6]/40 hover:bg-muted/50'
                       )}
                     >
                       <button
                         type="button"
                         onClick={() => handleVoirStrategie(b.slug, brandName || b.brandName)}
-                        className="w-full text-left focus:outline-none focus:ring-2 focus:ring-[#8B5CF6]/50 focus:ring-inset"
-                        aria-label={`Voir la stratégie de ${displayName}`}
+                        className="w-full text-left focus:outline-none"
                       >
-                        {/* Logo à taille normale, centré dans le cadre */}
-                        <div className="aspect-square w-full overflow-hidden bg-muted flex items-center justify-center">
+                        <div className="aspect-[16/9] w-full overflow-hidden bg-muted/30 flex items-center justify-center p-6 pb-2">
                           {logoUrl ? (
-                            <BrandLogo logoUrl={logoUrl} brandName={displayName} className="w-20 h-20" />
+                            <BrandLogo logoUrl={logoUrl} brandName={displayName} className="w-full h-full" />
                           ) : (
-                            <span className="text-2xl font-bold text-muted-foreground">
-                              {b.brandName.slice(0, 2).toUpperCase()}
-                            </span>
+                            <div className="w-16 h-16 rounded-full bg-primary/5 flex items-center justify-center border border-primary/10">
+                              <span className="text-xl font-bold text-primary/40">
+                                {displayName.charAt(0).toUpperCase()}
+                              </span>
+                            </div>
                           )}
                         </div>
-                        <div className="p-3 flex flex-col gap-2">
-                          <p className="font-semibold text-foreground text-sm truncate">{displayName}</p>
-                          {isSelected && (
-                            <span className="text-[10px] font-medium text-[#8B5CF6] uppercase tracking-wider">
-                              Calquée
+                        <div className="p-4 pt-2 flex flex-col gap-1">
+                          <p className="font-bold text-foreground text-sm truncate">{displayName}</p>
+                          <div className="flex items-center justify-between">
+                            <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider">
+                              Inspiration
                             </span>
-                          )}
+                            {isSelected && (
+                              <span className="flex items-center gap-1 text-[10px] font-bold text-[#8B5CF6] uppercase tracking-wider">
+                                <div className="w-1 h-1 rounded-full bg-[#8B5CF6] animate-pulse" />
+                                Calquée
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </button>
-                      <div className="px-3 pb-3 flex flex-wrap items-center gap-2">
+
+                      <div className="px-4 pb-4 flex items-center gap-2">
                         <Button
                           variant={isSelected ? 'default' : 'outline'}
                           size="sm"
                           className={cn(
-                            'h-8 text-xs gap-1.5 shrink-0',
-                            !isSelected && 'border-[#8B5CF6]/50 text-[#8B5CF6] hover:bg-[#8B5CF6]/10 hover:border-[#8B5CF6]'
+                            'h-8 px-3 text-[11px] font-semibold gap-1.5 flex-1 rounded-full transition-apple-fast',
+                            isSelected
+                              ? 'bg-[#8B5CF6] hover:bg-[#7C3AED] text-white shadow-sm'
+                              : 'border-[#8B5CF6]/30 text-[#8B5CF6] hover:bg-[#8B5CF6]/10'
                           )}
-                          disabled={templateStrategyLoading || (strategyViewQuota?.isExhausted && !demoMode && userPlan !== 'free') || (demoMode && (strategyViewQuota?.remaining ?? 10) <= 10 - STRATEGY_VIEW_ONBOARDING_LIMIT)}
                           onClick={(e) => {
                             e.stopPropagation();
                             handleVoirStrategie(b.slug, brandName || b.brandName);
                           }}
-                          aria-label={`Voir la stratégie de ${displayName}`}
                         >
-                          {templateStrategyLoading ? (
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden />
-                          ) : (
-                            <FileText className="w-3.5 h-3.5" aria-hidden />
-                          )}
-                          Voir la stratégie
+                          <FileText className="w-3 h-3" />
+                          Stratégie
                         </Button>
-                        {hasCalquedStrategy && (
+
+                        {hasCalquedStrategy && !isSelected && (
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="sm"
-                            className="h-8 text-xs gap-1.5 shrink-0 border-green-600/50 text-green-700 dark:text-green-400 hover:bg-green-600/10 hover:border-green-600"
+                            className="h-8 w-8 p-0 rounded-full text-green-600 hover:bg-green-600/10"
                             onClick={(e) => {
                               e.stopPropagation();
                               if (!calquedEntry) return;
                               setStrategyResult(calquedEntry.strategyText);
                               setSelectedSlug(b.slug);
-                              setViewingFromHistory(null);
-                              setViewingTemplate(null);
+                              toast({
+                                title: "Stratégie réactivée",
+                                message: `La stratégie de ${displayName} est maintenant active.`,
+                                type: "success"
+                              });
                             }}
-                            aria-label={`Sélectionner la stratégie déjà calquée pour ${displayName}`}
                           >
-                            Sélectionner cette stratégie
+                            <History className="w-4 h-4" />
                           </Button>
-                        )}
-                        {siteUrl && (
-                          <a
-                            href={siteUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                            aria-label={`Site officiel de ${displayName}`}
-                          >
-                            <ExternalLink className="w-3.5 h-3.5" aria-hidden />
-                            Site
-                          </a>
                         )}
                       </div>
                     </article>
                   );
                 })}
               </div>
+
               {(strategyError || templateStrategyError) && (
                 <p className="text-sm text-destructive font-medium mt-4" role="alert">
                   {templateStrategyError || strategyError}
                 </p>
               )}
+
               {(strategyResult || strategyHistory.length > 0) && !viewingTemplate && (
-                <div className="mt-6 p-4 rounded-[4px] border border-[#8B5CF6]/30 bg-[#8B5CF6]/5 flex flex-col gap-3">
+                <div className="mt-6 p-4 rounded-lg border border-[#8B5CF6]/30 bg-[#8B5CF6]/5 flex flex-col gap-3">
                   <p className="text-sm text-muted-foreground">
                     Stratégie enregistrée pour votre marque. Consultez la dernière générée par calque puis validez pour continuer.
                   </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setViewingTemplate(null);
-                      setViewingFromHistory(null);
-                      if (strategyHistory.length > 0) {
-                        const latest = strategyHistory[0];
-                        setStrategyResult(latest.strategyText);
-                        setSelectedSlug(latest.templateBrandSlug);
-                      }
-                      setStrategyModalOpen(true);
-                    }}
-                    className="w-fit gap-2 rounded-[4px] border-[#8B5CF6]/50 text-[#8B5CF6] hover:bg-[#8B5CF6]/10"
-                  >
-                    <FileText className="w-4 h-4" aria-hidden />
-                    Voir la présentation
-                  </Button>
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setViewingTemplate(null);
+                        setViewingFromHistory(null);
+                        if (strategyHistory.length > 0) {
+                          const latest = strategyHistory[0];
+                          setStrategyResult(latest.strategyText);
+                          setSelectedSlug(latest.templateBrandSlug);
+                        }
+                        setStrategyModalOpen(true);
+                      }}
+                      className="w-fit gap-2 border-[#8B5CF6]/50 text-[#8B5CF6] hover:bg-[#8B5CF6]/10"
+                    >
+                      <FileText className="w-4 h-4" />
+                      Voir la présentation
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      onClick={() => setShowLogoStep(true)}
+                      className="w-fit gap-2 text-primary hover:bg-primary/5"
+                    >
+                      <Sparkles className="w-4 h-4" />
+                      Régénérer le logo (IA)
+                    </Button>
+                  </div>
                 </div>
               )}
+
               {strategyHistory.length > 0 && (
                 <div className="mt-6 pt-6 border-t border-border">
-                  <h3 className="text-sm font-semibold text-foreground mb-2 flex items-center gap-1.5">
-                    <History className="w-3.5 h-3.5 text-[#8B5CF6]" aria-hidden />
+                  <h3 className="text-sm font-semibold text-foreground mb-3 flex items-center gap-1.5">
+                    <History className="w-3.5 h-3.5 text-[#8B5CF6]" />
                     Historique des stratégies ({strategyHistory.length})
                   </h3>
                   {historyLoading ? (
                     <p className="text-sm text-muted-foreground">Chargement…</p>
                   ) : (
-                    <ul className="space-y-2 max-h-44 overflow-y-auto" role="list">
+                    <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-44 overflow-y-auto pr-2 custom-scrollbar">
                       {strategyHistory.map((entry) => (
                         <li key={entry.id}>
                           <button
@@ -923,14 +941,13 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
                               });
                               setStrategyModalOpen(true);
                             }}
-                            className="w-full text-left px-3 py-2.5 rounded-[4px] border border-border hover:bg-[#8B5CF6]/5 hover:border-[#8B5CF6]/40 text-sm transition-colors flex items-center justify-between gap-2"
-                            aria-label={`Voir la stratégie ${brand?.name ?? 'Ma marque'} inspirée de ${entry.templateBrandName}`}
+                            className="w-full text-left px-3 py-2 rounded-lg border border-border hover:bg-[#8B5CF6]/5 hover:border-[#8B5CF6]/40 text-sm transition-all flex items-center justify-between gap-2"
                           >
                             <span className="font-medium text-foreground truncate">
-                              {brand?.name?.trim() || 'Ma marque'} · {entry.templateBrandName}
+                              {entry.templateBrandName}
                             </span>
-                            <span className="text-xs text-muted-foreground shrink-0">
-                              {new Date(entry.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            <span className="text-[10px] text-muted-foreground shrink-0 tabular-nums">
+                              {new Date(entry.createdAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                             </span>
                           </button>
                         </li>
@@ -942,9 +959,10 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
             </section>
           )}
         </CardContent>
-      </Card>
+      </Card >
 
-      {validateError && <p className="text-sm text-destructive font-medium">{validateError}</p>}
+      {validateError && <p className="text-sm text-destructive font-medium">{validateError}</p>
+      }
       <div className="flex flex-wrap gap-3">
         <Button
           onClick={() => handleValidate()}
@@ -961,7 +979,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
               Validation…
             </>
-          ) : noLogo ? (
+          ) : needsLogo ? (
             <>
               Valider la stratégie
               <ArrowRight className="w-4 h-4 ml-2" />
@@ -976,69 +994,71 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
       </div>
 
       {/* Page présentation stratégie (style analyse : schéma, graphique, onglets) */}
-      {strategyModalOpen && strategyResult && (
-        <StrategyPresentationView
-          strategyText={strategyResult}
-          brandName={
-            viewingTemplate
-              ? viewingTemplate.templateBrandName
-              : (brand?.name?.trim() ?? '')
-          }
-          positioning={
-            viewingTemplate
-              ? ''
-              : (viewingFromHistory?.positioning ?? positioning)?.trim() ?? ''
-          }
-          targetAudience={
-            viewingTemplate
-              ? ''
-              : (viewingFromHistory?.targetAudience ?? targetAudience)?.trim() ?? ''
-          }
-          templateBrandName={
-            viewingTemplate
-              ? viewingTemplate.templateBrandName
-              : viewingFromHistory?.templateBrandName ??
-              referenceBrands.find((b) => b.slug === selectedSlug)?.brandName ??
-              ''
-          }
-          isTemplateView={!!viewingTemplate}
-          visualIdentity={viewingTemplate?.visualIdentity ?? viewingFromHistory?.visualIdentity ?? lastCalquedVisualIdentity ?? undefined}
-          visualIdentityLocked={strategyLocked}
-          onClose={() => handleClosePresentation(!!viewingTemplate, !!viewingFromHistory)}
-          optionalPrimaryAction={
-            viewingTemplate && !strategyHistory.some((e) => e.templateBrandSlug === viewingTemplate.templateBrandSlug)
-              ? strategyQuota?.isExhausted && !demoMode
-                ? { label: 'Recharger ce module', onClick: openSurplusModal, disabled: false }
-                : {
-                  label: strategyLoading ? 'Calquage en cours…' : 'Calquer la stratégie',
-                  onClick: () => { setConfirmCalquerSlug(viewingTemplate.templateBrandSlug); setShowConfirmCalquer(true); },
-                  disabled: strategyLoading || !brand?.name?.trim(),
-                }
-              : undefined
-          }
-          optionalValidateAction={
-            !viewingTemplate && strategyResult
-              ? (() => {
-                const slugForValidate = viewingFromHistory?.templateBrandSlug ?? selectedSlug;
-                return {
-                  label: 'Valider et continuer',
-                  disabled: !positioning?.trim() || !targetAudience?.trim() || !slugForValidate,
-                  onClick: () => {
-                    if (!window.confirm('Êtes-vous sûr de valider cette stratégie et de passer à l\'étape suivante ?')) return;
-                    handleClosePresentation(false);
-                    handleValidate(slugForValidate ?? undefined);
-                  },
-                };
-              })()
-              : undefined
-          }
-          onRegenerate={
-            !viewingTemplate && !viewingFromHistory && selectedSlug ? handleRegenerateStrategy : undefined
-          }
-          lastAIUpdate={sg?.lastAIUpdate as string | undefined}
-          isFree={userPlan === 'free' && !!viewingTemplate && !demoMode}
-        />
-      )}
+      {
+        strategyModalOpen && strategyResult && (
+          <StrategyPresentationView
+            strategyText={strategyResult}
+            brandName={
+              viewingTemplate
+                ? viewingTemplate.templateBrandName
+                : (brand?.name?.trim() ?? '')
+            }
+            positioning={
+              viewingTemplate
+                ? ''
+                : (viewingFromHistory?.positioning ?? positioning)?.trim() ?? ''
+            }
+            targetAudience={
+              viewingTemplate
+                ? ''
+                : (viewingFromHistory?.targetAudience ?? targetAudience)?.trim() ?? ''
+            }
+            templateBrandName={
+              viewingTemplate
+                ? viewingTemplate.templateBrandName
+                : viewingFromHistory?.templateBrandName ??
+                referenceBrands.find((b) => b.slug === selectedSlug)?.brandName ??
+                ''
+            }
+            isTemplateView={!!viewingTemplate}
+            visualIdentity={viewingTemplate?.visualIdentity ?? viewingFromHistory?.visualIdentity ?? lastCalquedVisualIdentity ?? undefined}
+            visualIdentityLocked={strategyLocked}
+            onClose={() => handleClosePresentation(!!viewingTemplate, !!viewingFromHistory)}
+            optionalPrimaryAction={
+              viewingTemplate && !strategyHistory.some((e) => e.templateBrandSlug === viewingTemplate.templateBrandSlug)
+                ? strategyQuota?.isExhausted && !demoMode
+                  ? { label: 'Recharger ce module', onClick: openSurplusModal, disabled: false }
+                  : {
+                    label: strategyLoading ? 'Calquage en cours…' : 'Calquer la stratégie',
+                    onClick: () => { setConfirmCalquerSlug(viewingTemplate.templateBrandSlug); setShowConfirmCalquer(true); },
+                    disabled: strategyLoading || !brand?.name?.trim(),
+                  }
+                : undefined
+            }
+            optionalValidateAction={
+              !viewingTemplate && strategyResult
+                ? (() => {
+                  const slugForValidate = viewingFromHistory?.templateBrandSlug ?? selectedSlug;
+                  return {
+                    label: 'Valider et continuer',
+                    disabled: !positioning?.trim() || !targetAudience?.trim() || !slugForValidate,
+                    onClick: () => {
+                      if (!window.confirm('Êtes-vous sûr de valider cette stratégie et de passer à l\'étape suivante ?')) return;
+                      handleClosePresentation(false);
+                      handleValidate(slugForValidate ?? undefined);
+                    },
+                  };
+                })()
+                : undefined
+            }
+            onRegenerate={
+              !viewingTemplate && !viewingFromHistory && selectedSlug ? handleRegenerateStrategy : undefined
+            }
+            lastAIUpdate={sg?.lastAIUpdate as string | undefined}
+            isFree={userPlan === 'free' && !!viewingTemplate && !demoMode}
+          />
+        )
+      }
 
       <ConfirmGenerateModal
         open={showConfirmLogo}
@@ -1074,6 +1094,6 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
         extraMessage="Cela se déduit de vos quotas. La stratégie restera consultable pendant 1 mois."
         confirmLabel="Voir"
       />
-    </div>
+    </div >
   );
 }

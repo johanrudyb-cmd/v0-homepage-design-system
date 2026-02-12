@@ -14,6 +14,7 @@ export type QuotaFeatureKey =
   | 'ugc_shooting_product'
   | 'launch_map_site_texts'
   | 'factories_match'
+  | 'trends_hybrid_scan'
   | 'ugc_virtual_tryon'; // Module Premium (payant à l'essai)
 
 /** Clé AIUsage pour le mapping */
@@ -28,6 +29,7 @@ export const QUOTA_TO_AI_FEATURE: Record<QuotaFeatureKey, string> = {
   ugc_shooting_product: 'ugc_shooting_product',
   launch_map_site_texts: 'launch_map_site_texts',
   factories_match: 'factories_match',
+  trends_hybrid_scan: 'trends_hybrid_scan',
   ugc_virtual_tryon: 'ugc_virtual_tryon',
 };
 
@@ -40,6 +42,7 @@ export const QUOTA_CONFIG = {
     ugc_scripts_limit: 10, // lots de 5 scripts
     brand_logo_limit: 10,
     trends_check_limit: 3,
+    trends_hybrid_scan_limit: 10,
     ugc_shooting_photo_limit: 5,
     ugc_shooting_product_limit: 1,
     site_texts_limit: 999, // Illimité pour l'usage pratique
@@ -51,7 +54,8 @@ export const QUOTA_CONFIG = {
     strategy_view_limit: 0,
     ugc_scripts_limit: 0,
     brand_logo_limit: 0,
-    trends_check_limit: 3,
+    trends_check_limit: 1, // Limité à 1 pour free
+    trends_hybrid_scan_limit: 1, // 1 scan visuel pour free
     ugc_shooting_photo_limit: 0,
     ugc_shooting_product_limit: 0,
     site_texts_limit: 0,
@@ -71,6 +75,7 @@ export const QUOTA_LIMITS: Record<QuotaFeatureKey, number> = {
   ugc_scripts: QUOTA_CONFIG.fashion_launch.ugc_scripts_limit,
   brand_logo: QUOTA_CONFIG.fashion_launch.brand_logo_limit,
   trends_check_image: QUOTA_CONFIG.fashion_launch.trends_check_limit,
+  trends_hybrid_scan: QUOTA_CONFIG.fashion_launch.trends_hybrid_scan_limit,
   ugc_shooting_photo: QUOTA_CONFIG.fashion_launch.ugc_shooting_photo_limit,
   ugc_shooting_product: QUOTA_CONFIG.fashion_launch.ugc_shooting_product_limit,
   launch_map_site_texts: QUOTA_CONFIG.fashion_launch.site_texts_limit,
@@ -86,6 +91,7 @@ export const QUOTA_LABELS: Record<QuotaFeatureKey, string> = {
   ugc_scripts: 'Scripts UGC (lots de 5)',
   brand_logo: 'Génération logos',
   trends_check_image: 'Vérification tendance (image)',
+  trends_hybrid_scan: 'Scanner visuel IA',
   ugc_shooting_photo: 'Shooting photo',
   ugc_shooting_product: 'Shooting produit (4 images)',
   launch_map_site_texts: 'Textes site',
@@ -97,7 +103,7 @@ export const QUOTA_LABELS: Record<QuotaFeatureKey, string> = {
 export type QuotaCategory = 'intelligence' | 'identite' | 'marketing' | 'premium';
 
 export const QUOTA_CATEGORIES: Record<QuotaCategory, QuotaFeatureKey[]> = {
-  intelligence: ['brand_analyze', 'brand_strategy', 'strategy_view', 'trends_check_image'],
+  intelligence: ['brand_analyze', 'brand_strategy', 'strategy_view', 'trends_check_image', 'trends_hybrid_scan'],
   identite: ['brand_logo', 'launch_map_site_texts'],
   marketing: ['ugc_scripts', 'ugc_shooting_photo', 'ugc_shooting_product'],
   premium: ['ugc_virtual_tryon'],
