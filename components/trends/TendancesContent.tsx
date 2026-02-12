@@ -469,11 +469,11 @@ export function TendancesContent() {
       )}
       <div className="sticky top-14 sm:top-16 z-30 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-black/5 space-y-3">
         <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-bold tracking-tight text-[#1D1D1F] flex items-center gap-2">
-            Tendances de la semaine
+          <h2 className="text-lg font-extrabold tracking-tight text-[#1D1D1F] flex items-center gap-2">
+            Top 60 : Tendances de la semaine
             {!trendsLoading && totalTrends > 0 && (
-              <span className="text-[10px] bg-black/5 text-muted-foreground px-1.5 py-0.5 rounded-full font-bold">
-                {totalTrends}
+              <span className="text-[10px] bg-[#FF3B30] text-white px-2 py-0.5 rounded-full font-black animate-pulse">
+                Elite
               </span>
             )}
           </h2>
@@ -557,10 +557,10 @@ export function TendancesContent() {
           </div>
         )}
       </div>
-      <p className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
-        <Flame className="w-3.5 h-3.5 text-orange-500" />
-        <span>Outfity Intelligence : Analyse en temps réel des signaux de viralité sociale.</span>
-      </p>
+      <div className="flex flex-wrap items-center gap-2 text-sm text-[#6e6e73]">
+        <Flame className="w-4 h-4 text-[#FF3B30] shrink-0 fill-[#FF3B30]" />
+        <span className="font-bold">Radar Elite : Le Top 60 des tendances hebdomadaires validées sur TikTok et Instagram.</span>
+      </div>
       {limitReached && user?.plan === 'free' && (
         <div className="mb-4 p-4 rounded-lg border-2 border-amber-500/50 bg-amber-50 flex items-center justify-between gap-4">
           <p className="text-sm font-medium text-amber-900">

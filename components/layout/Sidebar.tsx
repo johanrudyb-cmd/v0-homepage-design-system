@@ -9,10 +9,10 @@ import { Badge } from '@/components/ui/badge';
 import { X, Settings, LogOut, Zap } from 'lucide-react';
 
 const navigation = [
-  { name: 'Dashboard', description: 'Vue d\'ensemble', href: '/dashboard', tourId: 'tour-dashboard', badge: undefined as string | undefined },
-  { name: 'Tendances de la semaine', description: 'Nouveautés chaque semaine — ne vous désabonnez pas', href: '/trends', tourId: 'tour-trends', badge: undefined as string | undefined },
-  { name: 'Marques tendances', description: 'Les marques les plus tendances de la semaine', href: '/brands', tourId: 'tour-brands', badge: undefined as string | undefined },
-  { name: 'Scanner Visuel IA', description: 'Analysez une photo pour prédire une tendance', href: '/trends/visual', tourId: 'tour-spy', badge: 'NOUVEAU' },
+  { name: 'Dashboard', description: 'Vue d\'ensemble Outfity', href: '/dashboard', tourId: 'tour-dashboard', badge: undefined as string | undefined },
+  { name: 'Radar Elite', description: 'Le Top 15 des tendances validées par Outfity Intelligence (TikTok & Instagram)', href: '/trends', tourId: 'tour-trends', badge: undefined as string | undefined },
+  { name: 'Marques Tendances', description: 'Les marques les plus performantes de la semaine', href: '/brands', tourId: 'tour-brands', badge: undefined as string | undefined },
+  { name: 'Scanner IVS IA', description: 'Prédisez la viralité d\'un vêtement via photo', href: '/trends/visual', tourId: 'tour-spy', badge: 'NOUVEAU' },
 ];
 
 const tools = [

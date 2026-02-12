@@ -128,9 +128,11 @@ export function computeTrendScore(
     score += visualBonus;
   }
 
-  // Ajout d'une micro-variation pour le côté "temps réel"
-  const randomFactor = (Math.random() * 0.5);
-  score += randomFactor;
+  // Ajout d'une variation unique par produit (pour éviter les doublons de score)
+  // On utilise la longueur du nom et les caractères pour créer une décimale stable
+  const seed = (trendLabel?.length || 0) + (trendGrowthPercent || 0);
+  const uniqueVariation = (seed % 100) / 40; // Variation jusqu'à 2.5 points
+  score += uniqueVariation;
 
   return Math.round(clamp(score, 10, 99.8) * 100) / 100;
 }

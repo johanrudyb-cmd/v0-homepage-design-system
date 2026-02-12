@@ -27,7 +27,7 @@ const faqs = [
   },
   {
     question: 'Y a-t-il des limites sur le plan gratuit ?',
-    answer: 'Le plan gratuit vous donne accès à 3 analyses de tendances par mois et au calculateur de marge. Pour débloquer tous les outils (designs, logos, scripts marketing, shootings photo, sourcing complet, formation), passez au plan Créateur à 34 €/mois.',
+    answer: 'Le plan gratuit vous donne accès à 3 analyses de tendances par mois et au calculateur de marge. Pour débloquer toute la puissance d\'Outfity Intelligence (Radar Elite, 10 analyses détaillées, tech packs, création de contenu), passez au plan Créateur à 34 €/mois.',
   },
 ];
 

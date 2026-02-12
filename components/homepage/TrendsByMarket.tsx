@@ -105,18 +105,64 @@ export function TrendsByMarket() {
   const ageRange = selectedAge === '18-24 ans' ? '18-24' : '25-34';
 
   const displayedTrends = (() => {
-    const ageMatch = trends.filter(t => t.ageRange === ageRange);
+    // 1. Filtrer par âge
+    let ageMatch = trends.filter(t => t.ageRange === ageRange);
+
+    // Fonction pour diversifier les marques (Round Robin simplifié)
+    const diversifyByBrand = (list: TrendProduct[], limit: number) => {
+      const seenBrands = new Set<string>();
+      const result: TrendProduct[] = [];
+      const buckets: Record<string, TrendProduct[]> = {};
+
+      // Grouper par marque
+      list.forEach(item => {
+        const b = item.brand.toLowerCase();
+        if (!buckets[b]) buckets[b] = [];
+        buckets[b].push(item);
+      });
+
+      // Piocher une marque à la fois
+      let brandNames = Object.keys(buckets);
+      let brandIdx = 0;
+      while (result.length < limit && brandNames.length > 0) {
+        // Sécurité pour l'index suite à un splice
+        if (brandIdx >= brandNames.length) brandIdx = 0;
+
+        const currentBrand = brandNames[brandIdx];
+        const bucket = buckets[currentBrand];
+
+        if (bucket && bucket.length > 0) {
+          const product = bucket.shift();
+          if (product) result.push(product);
+        }
+
+        // Si le seau est vide, on retire la marque des options
+        if (!bucket || bucket.length === 0) {
+          brandNames.splice(brandIdx, 1);
+          // On ne change pas l'index car l'élément suivant a pris sa place
+        } else {
+          // Sinon on passe à la marque suivante (Rotation)
+          brandIdx = (brandIdx + 1) % brandNames.length;
+        }
+      }
+      return result;
+    };
+
+    // 2. Calculer les limites (Mobile vs Desktop)
+    const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 640;
+    const limitPerSegment = isSmallScreen ? 2 : 4;
 
     if (selectedGender === 'Homme') {
-      return ageMatch.filter(t => t.segment === 'homme').slice(0, 8);
+      return diversifyByBrand(ageMatch.filter(t => t.segment === 'homme'), limitPerSegment * 2);
     }
     if (selectedGender === 'Femme') {
-      return ageMatch.filter(t => t.segment === 'femme').slice(0, 8);
+      return diversifyByBrand(ageMatch.filter(t => t.segment === 'femme'), limitPerSegment * 2);
     }
 
-    // Par défaut : 4 Hommes + 4 Femmes
-    const men = ageMatch.filter(t => t.segment === 'homme').slice(0, 4);
-    const women = ageMatch.filter(t => t.segment === 'femme').slice(0, 4);
+    // Par défaut : Mix Homme / Femme
+    const men = diversifyByBrand(ageMatch.filter(t => t.segment === 'homme'), limitPerSegment);
+    const women = diversifyByBrand(ageMatch.filter(t => t.segment === 'femme'), limitPerSegment);
+
     return [...men, ...women];
   })();
 
@@ -148,8 +194,8 @@ export function TrendsByMarket() {
             Tendances de la semaine
           </h2>
           <div className="flex flex-wrap items-center gap-2 text-sm text-[#6e6e73]">
-            <Flame className="w-4 h-4 text-[#007AFF] shrink-0" />
-            <span>Indicateur tendance basé sur plus de 15 000 références.</span>
+            <Flame className="w-4 h-4 text-[#FF3B30] shrink-0 fill-[#FF3B30]" />
+            <span className="font-bold">Radar Elite : Le Top 60 des tendances hebdomadaires validées sur TikTok et Instagram.</span>
           </div>
         </div>
 
