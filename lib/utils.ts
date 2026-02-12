@@ -127,6 +127,18 @@ export function stripColorAndPromoFromTitle(title: string): string {
 }
 
 /**
+ * Retourne l'URL de base de l'application. 
+ * En production, utilise NEXT_PUBLIC_APP_URL.
+ * Sinon, essaie de deviner ou fallback sur localhost.
+ */
+export function getBaseUrl(): string {
+  if (typeof window !== 'undefined') return ''; // Browser should use relative path
+  if (process.env.NEXT_PUBLIC_APP_URL) return process.env.NEXT_PUBLIC_APP_URL;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return 'http://localhost:3000';
+}
+
+/**
  * Nettoie un titre produit : prix, puis couleur et phrases promo.
  */
 export function cleanProductTitle(title: string): string {

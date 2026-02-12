@@ -29,6 +29,7 @@ import {
   estimateInternalTrendPercent,
 } from '@/lib/trend-product-kpis';
 import { isRetailerBrand } from '@/lib/constants/retailer-exclusion';
+import { getBaseUrl } from '@/lib/utils';
 
 export default async function ProductDetailPage({
   params,
@@ -42,7 +43,7 @@ export default async function ProductDetailPage({
   // Vérifier si le produit est à la une (visible gratuitement)
   let isFeatured = false;
   try {
-    const featuredRes = await fetch(`${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/api/trends/homepage-featured`);
+    const featuredRes = await fetch(`${getBaseUrl()}/api/trends/homepage-featured`);
     if (featuredRes.ok) {
       const data = await featuredRes.json();
       isFeatured = (data.trends || []).some((t: any) => t.id === id);

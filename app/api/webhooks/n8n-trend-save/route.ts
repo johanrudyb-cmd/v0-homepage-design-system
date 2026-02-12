@@ -37,7 +37,12 @@ export async function POST(req: Request) {
         const apiKey = req.headers.get('x-api-key');
         const secret = process.env.N8N_WEBHOOK_SECRET || 'bmad_n8n_secret_default_2024';
 
+        if (process.env.NODE_ENV === 'production' && secret === 'bmad_n8n_secret_default_2024') {
+            console.warn('[WEBHOOK] ATTENTION: Utilisation du secret par défaut en production !');
+        }
+
         if (apiKey !== secret) {
+            console.error('[WEBHOOK] Tentative échouée avec clé:', apiKey?.slice(0, 4) + '...');
             return NextResponse.json({ error: 'Non autorisé' }, { status: 401 });
         }
 

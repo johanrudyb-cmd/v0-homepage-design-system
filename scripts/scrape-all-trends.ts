@@ -16,7 +16,8 @@ import { getAllSources } from '../lib/hybrid-radar-sources';
 import { scrapeHybridSource } from '../lib/hybrid-radar-scraper';
 import { notifyAdmin } from '../lib/admin-notifications';
 
-const WEBHOOK_URL = 'http://localhost:3000/api/webhooks/n8n-trend-save';
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+const WEBHOOK_URL = `${BASE_URL}/api/webhooks/n8n-trend-save`;
 const API_KEY = process.env.N8N_WEBHOOK_SECRET || 'bmad_n8n_secret_default_2024';
 
 async function main() {
