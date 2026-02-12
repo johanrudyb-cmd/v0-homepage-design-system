@@ -9,7 +9,7 @@ import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 import { getProductBrand, brandsMatch } from '@/lib/brand-utils';
 import { isExcludedProduct } from '@/lib/hybrid-radar-scraper';
-import { estimateInternalTrendPercent } from '@/lib/trend-product-kpis';
+import { estimateInternalTrendPercent, computeTrendScore } from '@/lib/trend-product-kpis';
 
 export const runtime = 'nodejs';
 
@@ -110,11 +110,19 @@ export async function GET(request: Request) {
           recurrenceInCategory,
         });
 
+      const ivsScore = computeTrendScore(
+        p.trendGrowthPercent ?? null,
+        p.trendLabel ?? null,
+        p.trendScoreVisual ?? null
+      );
+
       return {
         ...p,
         name: p.name ?? '',
         effectiveTrendGrowthPercent,
         effectiveTrendLabel: p.trendGrowthPercent == null && effectiveTrendGrowthPercent > 0 ? 'Estimé' : p.trendLabel,
+        // Nouveau : Score IVS Outfity
+        outfityIVS: ivsScore,
         // Helper pour le regroupement par marque (nécessaire pour le shuffle)
         displayBrand: getProductBrand(p.name, p.sourceBrand) || p.sourceBrand || 'Unknown',
         // Signature pour dédoublonnage multi-sources
@@ -122,12 +130,16 @@ export async function GET(request: Request) {
       };
     });
 
+    // FILTRE STRICT OUTFITY : On ne garde que les produits validés par l'IVS
+    // Seuil de 70 pour être considéré comme une "Vraie Tendance" Outfity
+    const validatedEnriched = enriched.filter(p => p.outfityIVS >= 70);
+
     /**
      * DÉDOUBLONNAGE PAR SIGNATURE
      * Si le même produit est présent via plusieurs sources, on ne garde que le meilleur.
      */
     const seenSignatures = new Set<string>();
-    const uniqueEnriched = enriched.filter(p => {
+    const uniqueEnriched = validatedEnriched.filter(p => {
       if (p.signature && seenSignatures.has(p.signature)) return false;
       seenSignatures.add(p.signature);
       return true;
@@ -144,19 +156,22 @@ export async function GET(request: Request) {
       groupedByBrand.get(b)!.push(p);
     }
 
-    const diversified: typeof enriched = [];
+    const diversified: typeof uniqueEnriched = [];
     const brands = Array.from(groupedByBrand.keys());
     let hasMore = true;
     let index = 0;
 
-    while (hasMore && diversified.length < limit) {
+    // On limite à 15 produits par bucket (le Top 15 Outfity)
+    const finalLimit = 15;
+
+    while (hasMore && diversified.length < finalLimit) {
       hasMore = false;
       for (const b of brands) {
         const list = groupedByBrand.get(b)!;
         if (index < list.length) {
           diversified.push(list[index]);
           hasMore = true;
-          if (diversified.length >= limit) break;
+          if (diversified.length >= finalLimit) break;
         }
       }
       index++;

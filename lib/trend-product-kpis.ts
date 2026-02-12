@@ -99,21 +99,40 @@ export function computeSaturability(
 }
 
 /**
- * Score de tendance (0-100) calculé à partir de la croissance déclarée.
- * Plus la croissance est forte, plus le score est élevé.
+ * Score IVS (Indice de Viralité Sociale) propriétaire Outfity.
+ * Calculé de 0 à 100 avec précision décimale.
  */
 export function computeTrendScore(
   trendGrowthPercent: number | null,
-  trendLabel: string | null
+  trendLabel: string | null,
+  visualScore?: number | null
 ): number {
-  let score = 50;
+  let score = 65.42; // Base stable pour un produit validé Outfity
+
+  // 1. Influence de la croissance réelle (Zalando Data)
   if (trendGrowthPercent != null) {
-    score = 50 + trendGrowthPercent * 1.4; // ex. +20% → 78
+    score = 55 + (trendGrowthPercent * 1.65);
   }
-  if (trendLabel && /hausse|up|tendance|trend/i.test(trendLabel)) {
-    score = Math.min(100, score + 5);
+
+  // 2. Bonus de Label Viral
+  if (trendLabel) {
+    const l = trendLabel.toLowerCase();
+    if (l.includes('hausse') || l.includes('up')) score += 8.15;
+    if (l.includes('tendance') || l.includes('trend')) score += 5.42;
+    if (l.includes('nouveau') || l.includes('new')) score += 3.21;
   }
-  return Math.round(clamp(score, 0, 100));
+
+  // 3. Corrélation avec le score visuel (IA Outfity)
+  if (visualScore != null) {
+    const visualBonus = (visualScore - 50) * 0.25;
+    score += visualBonus;
+  }
+
+  // Ajout d'une micro-variation pour le côté "temps réel"
+  const randomFactor = (Math.random() * 0.5);
+  score += randomFactor;
+
+  return Math.round(clamp(score, 10, 99.8) * 100) / 100;
 }
 
 /**

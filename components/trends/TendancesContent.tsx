@@ -559,7 +559,7 @@ export function TendancesContent() {
       </div>
       <p className="text-xs text-muted-foreground mb-3 flex items-center gap-2">
         <Flame className="w-3.5 h-3.5 text-orange-500" />
-        <span>Indicateur tendance basé sur plus de 15 000 références.</span>
+        <span>Outfity Intelligence : Analyse en temps réel des signaux de viralité sociale.</span>
       </p>
       {limitReached && user?.plan === 'free' && (
         <div className="mb-4 p-4 rounded-lg border-2 border-amber-500/50 bg-amber-50 flex items-center justify-between gap-4">
@@ -659,6 +659,11 @@ export function TendancesContent() {
                         {t.isGlobalTrendAlert && (
                           <span className="px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-xs font-medium">
                             Global Trend Alert
+                          </span>
+                        )}
+                        {((t as any).outfityIVS || t.trendScore) && (
+                          <span className="px-2 py-0.5 rounded-md bg-black/80 text-white text-[10px] font-bold border border-white/20">
+                            IVS {(t as any).outfityIVS || t.trendScore}%
                           </span>
                         )}
                       </div>

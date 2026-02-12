@@ -1,0 +1,108 @@
+{
+    "updatedAt": "2024-02-12T23:45:00Z",
+    "trendingSignals": {
+        "aesthetics": [
+            {
+                "name": "Clean Girl",
+                "weight": 1.2,
+                "socialVolume": "High"
+            },
+            {
+                "name": "Gorpcore",
+                "weight": 0.9,
+                "socialVolume": "Medium"
+            },
+            {
+                "name": "Quiet Luxury / Old Money",
+                "weight": 1.5,
+                "socialVolume": "Very High"
+            },
+            {
+                "name": "Y2K v2",
+                "weight": 1.1,
+                "socialVolume": "High"
+            },
+            {
+                "name": "Coquette / Balletcore",
+                "weight": 1.3,
+                "socialVolume": "High"
+            },
+            {
+                "name": "Office Siren / Corporate Chic",
+                "weight": 1.4,
+                "socialVolume": "Very High"
+            },
+            {
+                "name": "Mob Wife",
+                "weight": 1.1,
+                "socialVolume": "Medium"
+            }
+        ],
+        "colors": [
+            {
+                "name": "Peach Fuzz",
+                "weight": 1.1
+            },
+            {
+                "name": "Bordeaux / Cherry Red",
+                "weight": 1.4
+            },
+            {
+                "name": "Butter Yellow",
+                "weight": 1.2
+            },
+            {
+                "name": "Charcoal Grey",
+                "weight": 1.3
+            },
+            {
+                "name": "Silver / Metallic",
+                "weight": 1.1
+            }
+        ],
+        "details": [
+            {
+                "name": "Nœuds / Bows",
+                "weight": 1.5
+            },
+            {
+                "name": "Transparence / Mesh",
+                "weight": 1.3
+            },
+            {
+                "name": "Coupe Oversized / Boxy",
+                "weight": 1.4
+            },
+            {
+                "name": "Taille Haute",
+                "weight": 0.9
+            },
+            {
+                "name": "Épaules marquées",
+                "weight": 1.2
+            },
+            {
+                "name": "Effet Délavé / Vintage Wash",
+                "weight": 1.3
+            }
+        ],
+        "materials": [
+            {
+                "name": "Lin",
+                "weight": 1.1
+            },
+            {
+                "name": "Cuir vegan",
+                "weight": 1.2
+            },
+            {
+                "name": "Denim Brut",
+                "weight": 1.4
+            },
+            {
+                "name": "Satin",
+                "weight": 1.3
+            }
+        ]
+    }
+}

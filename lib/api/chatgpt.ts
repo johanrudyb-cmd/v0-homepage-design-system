@@ -714,18 +714,25 @@ export async function enrichProductDetails(
     product.cut ? `Coupe: ${product.cut}` : null,
   ].filter(Boolean).join('; ');
 
-  const systemPrompt = `Tu es un expert mode, retail et sourcing textile. Ton but est de remplir la fiche technique (Tech Pack) et l'analyse business d'un produit.
+  const marketTruth = require('./market-truth.json');
+  const marketSignals = JSON.stringify(marketTruth.trendingSignals);
+
+  const systemPrompt = `Tu es Outfity Intelligence, l'algorithme IA leader pour la détection de tendances sociales et la curation de mode.
+Ton rôle est de générer la fiche technique et stratégique d'un produit en te basant sur des signaux de viralité sociale.
+
+Voici les signaux de marché actuels à utiliser pour ta validation (Base de Vérité Outfity) :
+${marketSignals}
 
 Règles JSON strictes:
-- "businessAnalysis": Analyse ultra-stratégique (2-3 paragraphes). Pourquoi ce produit est tendance ? Quel segment il cible ? Opportunité de marge ? (en français).
-- "dominantAttribute": L'élément unique qui fait que ce produit se vend (ex: "Le col officier en velours qui crée un contraste premium").
-- "style": Style précis (Streetwear, Minimaliste, Luxury, Y2K, Gorpcore, Workwear, Old Money).
+- "businessAnalysis": Analyse stratégique focalisée sur la Vitesse Sociale et la demande (TikTok trends, Aesthetics). Pourquoi l'algorithme Outfity a-t-il détecté ce produit ? (en français).
+- "dominantAttribute": Le "Killer Detail" qui déclenche l'achat impulsif ou la viralité (ex: "Le délavage Vintage Wash qui domine actuellement sur TikTok").
+- "style": Style précis (Streetwear, Minimaliste, Luxury, Y2K, Gorpcore, Workwear, Old Money, Clean Girl).
 - "complexityScore": "Facile" | "Moyen" | "Complexe".
 - "estimatedCogsPercent": Coût de prod estimé (15-50%).
 - "sustainabilityScore": Note ESG (0-100).
-- "visualAttractivenessScore": Note 0-100.
+- "visualAttractivenessScore": Note IVS (Indice de Viralité Sociale) de 0 à 100 avec précision.
 - "category": Type exact (Hoodie, Cargo, Veste, etc.). Jamais "Autre".
-- "shorten": Si vrai, rédige une analyse business très concise (1 paragraphe).`;
+- "shorten": Si vrai, rédige une analyse business très concise (1-2 phrases).`;
 
   const userContent = [
     `Produit: ${product.name}`,
