@@ -21,6 +21,7 @@ import type { BrandIdentity } from './LaunchMapStepper';
 interface Phase0IdentityProps {
   brandId: string;
   brand?: BrandIdentity | null;
+  brandName?: string;
   onComplete: () => void;
   /** En onboarding : masque le champ nom (affiché par le parent comme « Sélecteur de nom de marque ») */
   hideNameField?: boolean;
@@ -40,7 +41,7 @@ function styleGuideBool(sg: Record<string, unknown> | null | undefined, key: str
   return sg[key] === true || sg[key] === 'true';
 }
 
-export function Phase0Identity({ brandId, brand, onComplete, hideNameField = false, demoMode = false, userPlan = 'free' }: Phase0IdentityProps) {
+export function Phase0Identity({ brandId, brand, brandName, onComplete, hideNameField = false, demoMode = false, userPlan = 'free' }: Phase0IdentityProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [saved, setSaved] = useState(false);
