@@ -31,6 +31,7 @@ import { STRATEGY_VIEW_ONBOARDING_LIMIT } from '@/lib/quota-config';
 interface Phase1StrategyProps {
   brandId: string;
   brand?: BrandIdentity | null;
+  brandName?: string;
   onComplete: () => void;
   /** Mode test (onboarding) : aucun enregistrement, simulation uniquement */
   demoMode?: boolean;
@@ -98,7 +99,7 @@ function formatStrategyForPresentation(raw: string): ({ type: 'section'; title: 
   return blocks;
 }
 
-export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, userPlan = 'free' }: Phase1StrategyProps) {
+export function Phase1Strategy({ brandId, brand, brandName, onComplete, demoMode = false, userPlan = 'free' }: Phase1StrategyProps) {
   const router = useRouter();
   const { toast } = useToast();
   const sg = brand?.styleGuide && typeof brand.styleGuide === 'object' ? brand.styleGuide as Record<string, unknown> : null;
