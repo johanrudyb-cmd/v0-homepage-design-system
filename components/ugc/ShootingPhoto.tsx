@@ -43,6 +43,7 @@ const GARMENT_TYPES = ['T-shirt', 'Hoodie', 'Sweatshirt', 'Pantalon', 'Short', '
 const LOCATION_OPTIONS = [
   { id: 'studio', label: 'Studio', promptValue: 'indoor photo studio' },
   { id: 'outdoor', label: 'Extérieur', promptValue: 'outdoor location' },
+  { id: 'boat_deck', label: 'Bateau / Yacht', promptValue: 'onboard a luxury boat deck, cushioned seating' },
 ] as const;
 
 const OUTDOOR_OPTIONS = [
@@ -51,18 +52,27 @@ const OUTDOOR_OPTIONS = [
   { id: 'beach', label: 'Plage', promptValue: 'beach, seaside' },
   { id: 'terrace', label: 'Terrasse / café', promptValue: 'terrace, café, casual outdoor' },
   { id: 'minimal_outdoor', label: 'Extérieur minimal (mur, quai)', promptValue: 'minimal outdoor, wall or quay' },
+  { id: 'gas_station_night', label: 'UK Gas Station (Nuit)', promptValue: 'gas station in England at night, wet ground reflecting colorful urban lights, building with signs' },
+  { id: 'soft_corner_rug', label: 'Coin Soft + Tapis', promptValue: 'minimalist indoor corner space with pale grey fabric walls and white fluffy rug' },
+  { id: 'mediterranean_coast', label: 'Côte Méditerranéenne', promptValue: 'scenic coastal town and terraced green hills in background, calm sea with anchored yachts' },
 ] as const;
 
 const LIGHTING_OPTIONS = [
   { id: 'soft_natural', label: 'Naturel doux', promptValue: 'soft natural lighting' },
   { id: 'studio_softbox', label: 'Studio (softbox)', promptValue: 'studio softbox lighting, professional' },
+  { id: 'soft_studio_diffused', label: 'Studio Diffus (Luxe)', promptValue: 'large soft key light, gentle fill, soft overhead diffusion, natural shadow density, no harsh hotspots' },
   { id: 'dramatic', label: 'Dramatique (contrasté)', promptValue: 'dramatic lighting, high contrast' },
   { id: 'golden_hour', label: 'Golden hour', promptValue: 'golden hour, warm sunlight' },
   { id: 'neon', label: 'Néon / urbain', promptValue: 'neon or urban night lighting' },
   { id: 'flat', label: 'Plat (e-commerce)', promptValue: 'flat even lighting, e-commerce' },
+  { id: 'night_cinematic', label: 'Nuit Cinématique', promptValue: 'cinematic night lighting, vibrant reflections from artificial lights, HDR sharpness' },
+  { id: 'youtube_studio', label: 'YouTube Studio (Vlog)', promptValue: 'cinematic YouTube lighting, soft key light with subtle rim light, professional studio look' },
+  { id: 'retro_flash', label: 'Flash Direct Retro', promptValue: 'built-in flash pop direct on skin, flattering glow and specular highlights, high-end 90s party vibe' },
 ] as const;
 
 const BACKGROUND_OPTIONS = [
+  { id: 'crimson_studio', label: 'Crimson Studio (Valentine)', promptValue: 'fully monochrome deep crimson studio, seamless red backdrop, glossy reflective red floor' },
+  { id: 'blush_pink_infinity', label: 'Rose Poudré (Infini)', promptValue: 'spacious studio environment with distant seamless soft blush-pink infinity backdrop, soft luxury pink tone, no horizon line, no corners' },
   { id: 'neutral_grey', label: 'Neutre gris', promptValue: 'neutral grey background' },
   { id: 'white', label: 'Blanc', promptValue: 'white background' },
   { id: 'black', label: 'Noir', promptValue: 'black background' },
@@ -78,6 +88,7 @@ const FRAMING_OPTIONS = [
   { id: 'full_body', label: 'Full body', promptValue: 'full body shot' },
   { id: 'editorial', label: 'Editorial (démarche)', promptValue: 'editorial, walking pose' },
   { id: 'static', label: 'Statique (debout)', promptValue: 'standing static pose' },
+  { id: 'footwear_ground_pose', label: 'Focus Chaussures (Sol)', promptValue: 'shoes resting naturally on floor, one upright, one leaning, no motion, footwear is hero subject, no face visible' },
 ] as const;
 
 const MOOD_OPTIONS = [
@@ -87,13 +98,24 @@ const MOOD_OPTIONS = [
   { id: 'luxury', label: 'Luxe', promptValue: 'luxury fashion, high end' },
   { id: 'casual', label: 'Décontracté', promptValue: 'casual, relaxed style' },
   { id: 'vibe_influencer', label: 'Vibe Influence', promptValue: 'influencer lifestyle style, carefree, confident, professional aesthetic' },
+  { id: 'valentine_editorial', label: 'Valentine Editorial', promptValue: 'High-fashion Valentine’s editorial, dramatic single key spotlight, sculpted shadows, rim light, dominant energy' },
+  { id: 'uk_drill_street', label: 'UK Street / Drill', promptValue: 'dark and moody UK street aesthetic, ultra-realistic portrait, natural proportions, authentic vibe' },
+  { id: 'cozy_editorial', label: 'Cozy Editorial', promptValue: 'clean minimalistic fashion editorial, modern and cozy vibe, cream whites and pale greys, soft textures' },
+  { id: 'luxury_footwear', label: 'Luxury Footwear (Maroon)', promptValue: 'luxury high-fashion footwear editorial, model wearing maroon elegant jumpsuit (slender Indian model, fair skin, face not visible), rose pearl nails, footwear craftsmanship focus' },
+  { id: 'male_creator', label: 'Male Creator / Vlog', promptValue: 'lifestyle YouTube creator aesthetic, friendly and approachable vibe, vlogger identity, premium influencer branding' },
+  { id: 'vintage_90s', label: 'Vintage 90s Retro', promptValue: 'ultra realistic vintage portrait, 90s style photo, dreamy haze glow around subject, low contrast natural grading SOOC, creamy colors' },
+  { id: 'vacation_luxury', label: 'Luxe Vacances', promptValue: 'vacation luxury vibe with Mediterranean coastal atmosphere, aspirational lifestyle mood, sun-kissed' },
 ] as const;
 
 const HAIR_OPTIONS = [
   { id: 'natural', label: 'Naturel', promptValue: 'natural hair, soft movement', genderRelevance: 'unisex' },
   { id: 'holiday_finish', label: 'Effet vacances', promptValue: 'relaxed holiday finish hair, neatly behind shoulders', genderRelevance: 'female' },
   { id: 'sleek', label: 'Lisse / élégant', promptValue: 'sleek elegant hair style', genderRelevance: 'unisex' },
+  { id: 'sleek_pony', label: 'Queue de cheval lisse', promptValue: 'sleek high ponytail with glass-like shine', genderRelevance: 'female' },
   { id: 'messy_bun', label: 'Chignon flou', promptValue: 'messy hair bun, casual style', genderRelevance: 'female' },
+  { id: 'wavy_textured', label: 'Ondulé / Texturé', promptValue: 'wavy hair with texture, slightly messy', genderRelevance: 'unisex' },
+  { id: 'straight_bangs', label: 'Lisse à frange', promptValue: 'straight long hair with blunt bangs', genderRelevance: 'female' },
+  { id: 'volume_up', label: 'Volume Haut / Coiffé', promptValue: 'short dark brown hair styled upward with volume, thick defined eyebrows', genderRelevance: 'male' },
   { id: 'groomed', label: 'Soigné', promptValue: 'neatly groomed hair', genderRelevance: 'male' },
 ] as const;
 
@@ -102,6 +124,8 @@ const MAKEUP_OPTIONS = [
   { id: 'vacation_glam', label: 'Vacation Glam', promptValue: 'fresh vacation glam makeup, glowing skin with visible texture, sun-kissed warmth, radiant', genderRelevance: 'female' },
   { id: 'natural_glow', label: 'Glow naturel', promptValue: 'natural glow makeup, dewy skin', genderRelevance: 'female' },
   { id: 'clean_girl', label: 'Clean Girl', promptValue: 'clean girl aesthetic makeup, minimalist', genderRelevance: 'female' },
+  { id: 'bold_red_lip', label: 'Rouge audacieux', promptValue: 'matte flawless skin, sharp winged liner, bold blue-toned red lipstick, subtle contour', genderRelevance: 'female' },
+  { id: 'soft_glam', label: 'Soft Glam', promptValue: 'soft glam makeup, natural lips with subtle gloss, glowing skin, warm highlights', genderRelevance: 'female' },
   { id: 'grooming_basic', label: 'Grooming (discret)', promptValue: 'natural clean skin grooming', genderRelevance: 'male' },
 ] as const;
 
@@ -115,12 +139,22 @@ const PROPS_OPTIONS = [
   { id: 'ice_cream', label: 'Glace', promptValue: 'holding a pink ice cream scoop in a cone near lips' },
   { id: 'coffee', label: 'Café / Latte', promptValue: 'holding a takeaway coffee cup' },
   { id: 'phone', label: 'Smartphone', promptValue: 'holding a modern smartphone, casual use' },
+  { id: 'silk_rose', label: 'Rose (Fleur)', promptValue: 'holding a single red rose, elegant' },
+  { id: 'scattered_roses', label: 'Roses au sol', promptValue: 'oversized silk roses scattered across the floor' },
+  { id: 'golf_r', label: 'Golf R (Noire)', promptValue: 'leaning against a black VW Golf R, street context' },
+  { id: 'beer_bottle', label: 'Bière / Boisson', promptValue: 'holding a cold beer bottle, sipping' },
 ] as const;
 
 const CAMERA_FINISH_OPTIONS = [
   { id: 'instagram_pro', label: 'Instagram Pro', promptValue: 'high-end Instagram travel aesthetic, natural light photography, shallow depth of field, realistic skin texture' },
   { id: 'editorial_grain', label: 'Grain Editorial', promptValue: 'editorial photography, subtle film grain, crisp focus' },
   { id: 'bokeh_luxury', label: 'Bokeh Luxe', promptValue: 'luxury bokeh, dreamy background blur' },
+  { id: 'vogue_campaign', label: 'Campagne Vogue', promptValue: 'Vogue-style luxury campaign, cinematic color grading, sharp editorial lighting, high detail, premium fashion advertisement, 85mm lens' },
+  { id: 'iphone_16_pro', label: 'iPhone 17 Pro Max', promptValue: 'iPhone 17 Pro Max photo quality, 8k, ultra-realistic detailed hyper, HDR cinematic sharpness, natural proportions' },
+  { id: 'smartphone_wide', label: 'Smartphone Grand Angle', promptValue: 'smartphone camera, wide-angle fixed lens, slight distortion, deep focus, no film grain' },
+  { id: 'cinematic_product_4k', label: 'Cinematic 4K (Produit)', promptValue: '4K vertical 9:16 cinematic studio setup, camera locked, no zoom, shallow depth of field, luxury editorial realism, no glow effects' },
+  { id: 'dslr_pro_vlog', label: 'DSLR Pro Vlog', promptValue: 'DSLR quality, 8K resolution, hyper-realistic details, natural skin imperfections, high dynamic range, modern content creator style' },
+  { id: 'vintage_powershot', label: 'Canon PowerShot G7X', promptValue: 'Photorealistic Canon PowerShot G7X Mark III signature look, creamy bokeh, f/1.8-2.8, fine film grain, vintage mood glowy effect, SOOC natural colors' },
 ] as const;
 
 /** Angles pour shooting produit (4 photos obligatoires). */
@@ -136,6 +170,9 @@ const MANNEQUIN_POSE_OPTIONS = [
   { id: 'profile', label: 'De profil', promptValue: 'profile view, side pose' },
   { id: 'crossed_arms', label: 'Bras croisés', promptValue: 'arms crossed, relaxed' },
   { id: 'natural_stand', label: 'Debout naturel', promptValue: 'natural standing, casual' },
+  { id: 'floor_leg_up', label: 'Au sol jambe levée', promptValue: 'lying on floor, supporting upper body, one leg raised against wall, looking into phone camera' },
+  { id: 'sexy_confident', label: 'Sexy / Confiante', promptValue: 'sexy confident pose, looking over shoulder, hair slightly messy, natural allure' },
+  { id: 'boat_lounging', label: 'Détente Bateau', promptValue: 'reclining on cushioned boat seat, arm casually stretched over seat, lounging posture' },
 ] as const;
 
 /** Options facultatives pour 2 ou 3 mannequins (groupe). */
