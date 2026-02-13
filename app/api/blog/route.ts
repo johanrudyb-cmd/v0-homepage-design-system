@@ -1,0 +1,47 @@
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { getCurrentUser } from '@/lib/auth-helpers';
+
+export async function POST(req: Request) {
+    try {
+        const user = await getCurrentUser();
+        // Simple admin check : email admin ou domaine biangory.com
+        const isAdmin = user?.email === 'johanrudyb@gmail.com' || user?.email?.endsWith('@biangory.com');
+
+        if (!isAdmin) {
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const body = await req.json();
+        const { title, slug, excerpt, content, coverImage, published, tags, relatedBrands } = body;
+
+        // Check slug uniqueness
+        const existing = await prisma.blogPost.findUnique({
+            where: { slug },
+        });
+
+        if (existing) {
+            return NextResponse.json({ message: 'Ce slug existe déjà. Veuillez le modifier.' }, { status: 400 });
+        }
+
+        const post = await prisma.blogPost.create({
+            data: {
+                title,
+                slug,
+                excerpt,
+                content,
+                author: user?.name || 'OUTFITY Team',
+                published,
+                publishedAt: published ? new Date() : undefined,
+                tags: tags || [],
+                relatedBrands: relatedBrands || [],
+                coverImage,
+            },
+        });
+
+        return NextResponse.json(post);
+    } catch (error) {
+        console.error('[BLOG_POST]', error);
+        return NextResponse.json({ error: 'Internal Error' }, { status: 500 });
+    }
+}
