@@ -144,6 +144,8 @@ model Mannequin {
   name      String   // Nom affiché (ex. "Mannequin 1", "Emma")
   imageUrl  String   @db.Text // Image de référence (résultat Try-On ou photo uploadée)
   source    String   @default("virtual_tryon") // virtual_tryon | upload
+  gender    String   @default("female") // male, female, unisex
+  description String? @db.Text
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

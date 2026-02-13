@@ -6,6 +6,6 @@ export const LAUNCH_MAP_PHASES = [
   { id: 3, title: 'Design & Mockup', subtitle: 'Création visuelle', description: 'Apprenez à créer votre design et téléchargez votre pack de mockup' },
   { id: 4, title: 'Tech Pack', subtitle: 'Fiche technique', description: 'Transformez votre mockup en fiche technique et définissez les dimensions' },
   { id: 5, title: 'Sourcing', subtitle: 'Demande de devis', description: 'Contactez au moins 2 usines du Hub pour obtenir des devis' },
-  { id: 6, title: 'Contenu IA', subtitle: 'Marketing social', description: 'Générez vos posts structurés avec l\'IA pour vos réseaux' },
+  { id: 6, title: 'Création de contenu', subtitle: 'Marketing social', description: 'Générez vos posts structurés avec l\'IA pour vos réseaux' },
   { id: 7, title: 'Création du site', subtitle: 'Boutique Shopify', description: 'Connectez votre compte Shopify pour lancer votre boutique' },
 ] as const;

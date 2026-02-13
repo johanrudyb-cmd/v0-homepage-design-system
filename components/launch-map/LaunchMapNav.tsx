@@ -23,9 +23,11 @@ import { LAUNCH_MAP_PHASES } from '@/lib/launch-map-constants';
 const PHASE_ICONS: Record<number, LucideIcon> = {
   0: Palette,
   1: Target,
+  2: Calculator,
   3: PenTool,
   4: FileText,
   5: Truck,
+  6: Megaphone,
   7: Store,
 };
 

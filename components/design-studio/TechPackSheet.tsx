@@ -174,66 +174,66 @@ export function TechPackSheet({ design, designerName, manufacturer, mainPlacemen
 
   return (
     <div
-      className="bg-white text-black overflow-hidden font-sans border-[3px] border-black w-full flex flex-col"
+      className="bg-white text-black overflow-hidden font-sans border-[2px] sm:border-[3px] border-black w-full flex flex-col"
       style={{ minHeight: `${minHeight}px` }}
     >
-      {/* Rangée 0 : Logo à gauche (sur cette ligne seulement) | Infos | SIZES */}
-      <div className="grid grid-cols-[auto_1fr_1fr] border-b-[3px] border-black flex-shrink-0">
-        <div className="flex flex-col items-center justify-center p-4 border-r border-black min-w-[100px] bg-white">
+      {/* Rangée 0 : Logo à gauche | Infos | SIZES */}
+      <div className="flex flex-col sm:grid sm:grid-cols-[auto_1fr_1fr] border-b-[2px] sm:border-b-[3px] border-black flex-shrink-0">
+        <div className="flex sm:flex-col items-center justify-center p-3 sm:p-4 border-b sm:border-b-0 sm:border-r border-black min-w-[100px] bg-white gap-3 sm:gap-1.5">
           {brandLogoUrl ? (
-            <div className="relative w-20 h-20">
+            <div className="relative w-12 h-12 sm:w-20 sm:h-20">
               <Image src={brandLogoUrl} alt={brandName} fill className="object-contain" unoptimized />
             </div>
           ) : (
-            <div className="w-20 h-20 border-2 border-dashed border-gray-300 flex items-center justify-center">
-              <span className="text-[10px] text-gray-400 uppercase">Logo</span>
+            <div className="w-12 h-12 sm:w-20 sm:h-20 border-2 border-dashed border-gray-300 flex items-center justify-center">
+              <span className="text-[8px] sm:text-[10px] text-gray-400 uppercase">Logo</span>
             </div>
           )}
-          <span className="mt-1.5 text-[10px] font-bold uppercase tracking-wide text-center leading-tight">{brandName}</span>
+          <span className="text-[10px] font-bold uppercase tracking-wide text-center leading-tight">{brandName}</span>
         </div>
-        <div className="flex flex-col border-r border-black min-h-0">
+        <div className="flex flex-col border-b sm:border-b-0 sm:border-r border-black min-h-0">
           <div className="grid grid-cols-2 border-b border-black">
-            <div className="border-r border-black py-1.5 px-2 font-bold uppercase text-[10px] text-gray-500">BRAND</div>
-            <div className="border-black py-1.5 px-2 text-xs font-medium">{brandName}</div>
+            <div className="border-r border-black py-1 sm:py-1.5 px-2 font-bold uppercase text-[9px] sm:text-[10px] text-gray-500">BRAND</div>
+            <div className="border-black py-1 sm:py-1.5 px-2 text-[10px] sm:text-xs font-medium">{brandName}</div>
           </div>
           <div className="grid grid-cols-2 border-b border-black">
-            <div className="border-r border-black py-1.5 px-2 font-bold uppercase text-[10px] text-gray-500">SEASON</div>
-            <div className="border-black py-1.5 px-2 text-xs font-medium">{season}</div>
+            <div className="border-r border-black py-1 sm:py-1.5 px-2 font-bold uppercase text-[9px] sm:text-[10px] text-gray-500">SEASON</div>
+            <div className="border-black py-1 sm:py-1.5 px-2 text-[10px] sm:text-xs font-medium">{season}</div>
           </div>
           <div className="grid grid-cols-2 border-b border-black">
-            <div className="border-r border-black py-1.5 px-2 font-bold uppercase text-[10px] text-gray-500">DESIGN NAME</div>
-            <div className="border-black py-1.5 px-2 text-xs font-medium">{designName}</div>
+            <div className="border-r border-black py-1 sm:py-1.5 px-2 font-bold uppercase text-[9px] sm:text-[10px] text-gray-500">DESIGN NAME</div>
+            <div className="border-black py-1 sm:py-1.5 px-2 text-[10px] sm:text-xs font-medium">{designName}</div>
           </div>
           <div className="grid grid-cols-2 border-b border-black">
-            <div className="border-r border-black py-1.5 px-2 font-bold uppercase text-[10px] text-gray-500">FABRIC</div>
-            <div className="border-black py-1.5 px-2 text-xs font-medium">{fabricToEn(fabric)}</div>
+            <div className="border-r border-black py-1 sm:py-1.5 px-2 font-bold uppercase text-[9px] sm:text-[10px] text-gray-500">FABRIC</div>
+            <div className="border-black py-1 sm:py-1.5 px-2 text-[10px] sm:text-xs font-medium">{fabricToEn(fabric)}</div>
           </div>
-          <div className="grid grid-cols-2 border-b border-black">
+          <div className="grid grid-cols-2 border-b border-black hidden sm:grid">
             <div className="border-r border-black py-1.5 px-2 font-bold uppercase text-[10px] text-gray-500">PRINT TYPE</div>
             <div className="border-black py-1.5 px-2 text-xs font-medium">{printTypeToEn(printType)}</div>
           </div>
-          <div className="grid grid-cols-2 border-b border-black">
+          <div className="grid grid-cols-2 border-b border-black hidden sm:grid">
             <div className="border-r border-black py-1.5 px-2 font-bold uppercase text-[10px] text-gray-500">ISSUE NO</div>
             <div className="border-black py-1.5 px-2 text-xs font-medium">{issueNo}</div>
           </div>
           <div className="grid grid-cols-2 border-b border-black">
-            <div className="border-r border-black py-1.5 px-2 font-bold uppercase text-[10px] text-gray-500">CATEGORY</div>
-            <div className="border-black py-1.5 px-2 text-xs font-medium">{category}</div>
+            <div className="border-r border-black py-1 sm:py-1.5 px-2 font-bold uppercase text-[9px] sm:text-[10px] text-gray-500">CATEGORY</div>
+            <div className="border-black py-1 sm:py-1.5 px-2 text-[10px] sm:text-xs font-medium">{category}</div>
           </div>
-          <div className="grid grid-cols-2 border-b border-black">
-            <div className="border-r border-black py-1.5 px-2 font-bold uppercase text-[10px] text-gray-500">IN DATE</div>
-            <div className="border-black py-1.5 px-2 text-xs font-medium">{formatDate(inDate)}</div>
+          <div className="grid grid-cols-2 sm:border-b border-black">
+            <div className="border-r border-black py-1 sm:py-1.5 px-2 font-bold uppercase text-[9px] sm:text-[10px] text-gray-500">IN DATE</div>
+            <div className="border-black py-1 sm:py-1.5 px-2 text-[10px] sm:text-xs font-medium">{formatDate(inDate)}</div>
           </div>
-          <div className="grid grid-cols-2">
-            <div className="border-r border-black py-1.5 px-2 font-bold uppercase text-[10px] text-gray-500">OUT DATE</div>
-            <div className="border-black py-1.5 px-2 text-xs font-medium">{formatDate(outDate)}</div>
+          <div className="grid grid-cols-2 sm:hidden border-t border-black">
+            <div className="border-r border-black py-1 px-2 font-bold uppercase text-[9px] text-gray-500">PRINT</div>
+            <div className="border-black py-1 px-2 text-[10px] font-medium">{printTypeToEn(printType)}</div>
           </div>
         </div>
         <div className="flex flex-col min-h-0">
           <PanelHeader>SIZES</PanelHeader>
-          <div className="flex-1 min-h-[100px] flex flex-wrap items-center justify-center gap-3 p-4 bg-white">
+          <div className="flex-1 min-h-[60px] sm:min-h-[100px] flex flex-wrap items-center justify-center gap-2 sm:gap-3 p-3 sm:p-4 bg-white">
             {sizes.map((s) => (
-              <div key={s} className="border-2 border-black px-5 py-3 font-bold text-base uppercase">
+              <div key={s} className="border sm:border-2 border-black px-3 py-1.5 sm:px-5 sm:py-3 font-bold text-xs sm:text-base uppercase">
                 {s}
               </div>
             ))}
@@ -241,12 +241,11 @@ export function TechPackSheet({ design, designerName, manufacturer, mainPlacemen
         </div>
       </div>
 
-      {/* Rangée 1 : THUMBNAIL (mockups plus grands) | LOGOS & DESIGN */}
-      <div className="grid border-b-[3px] border-black flex-1 min-h-[280px]" style={{ gridTemplateColumns: '1.4fr 1fr' }}>
-        <div className="flex flex-col border-r border-black min-h-0">
+      {/* Rangée 1 : THUMBNAIL | LOGOS & DESIGN */}
+      <div className="flex flex-col sm:grid sm:grid-cols-[1.4fr_1fr] border-b-[2px] sm:border-b-[3px] border-black flex-1 min-h-[300px]">
+        <div className="flex flex-col border-b sm:border-b-0 sm:border-r border-black min-h-0">
           <PanelHeader>THUMBNAIL</PanelHeader>
-          <div className="flex-1 min-h-[240px] flex bg-white p-1">
-            {/* Vue unifiée : devant + dos sur le même document (comme les mockups) */}
+          <div className="flex-1 min-h-[260px] sm:min-h-[240px] flex bg-white p-1">
             <div className="relative flex-1 border border-dashed border-gray-300 rounded flex items-stretch justify-stretch bg-gray-50/50 overflow-hidden min-h-[220px]">
               {frontImageUrl ? (
                 <>
@@ -285,26 +284,26 @@ export function TechPackSheet({ design, designerName, manufacturer, mainPlacemen
                   </svg>
                 </>
               ) : (
-                <span className="absolute inset-0 flex items-center justify-center text-gray-400 text-xs font-bold uppercase">Devant + Dos</span>
+                <span className="absolute inset-0 flex items-center justify-center text-gray-400 text-[10px] sm:text-xs font-bold uppercase">Devant + Dos</span>
               )}
             </div>
           </div>
         </div>
-        <div className="flex flex-col min-h-0">
+        <div className="flex flex-col min-h-0 bg-gray-50/30">
           <PanelHeader>LOGOS & DESIGN</PanelHeader>
-          <div className="flex-1 grid gap-1.5 p-2 bg-white min-h-0 overflow-auto" style={{ gridTemplateColumns: `repeat(${logosCols}, minmax(0, 1fr))`, gridAutoRows: logoVeryCompact ? 'minmax(52px, 1fr)' : logoCompact ? 'minmax(64px, 1fr)' : 'minmax(80px, 1fr)' }}>
+          <div className="flex-1 grid gap-1 p-2 bg-white min-h-0 overflow-auto" style={{ gridTemplateColumns: `repeat(${labelCount > 4 ? 3 : 2}, minmax(0, 1fr))`, gridAutoRows: 'minmax(60px, auto)' }}>
             {labels.map((lb) => (
-              <div key={lb.letter} className={`border border-black flex flex-col items-center justify-center bg-white ${logoVeryCompact ? 'p-1 min-h-[52px]' : logoCompact ? 'p-1.5 min-h-[64px]' : 'p-2 min-h-[80px]'}`}>
-                <span className={`font-bold text-primary mb-0.5 ${logoVeryCompact ? 'text-[8px]' : logoCompact ? 'text-[9px]' : 'text-[10px]'}`}>[{lb.letter}] {labelTypeToEn(lb.type)}</span>
+              <div key={lb.letter} className="border border-black flex flex-col items-center justify-center bg-white p-1.5 min-h-[60px]">
+                <span className="font-bold text-primary text-[8px] sm:text-[9px] mb-0.5 whitespace-nowrap overflow-hidden text-ellipsis w-full text-center">[{lb.letter}] {labelTypeToEn(lb.type)}</span>
                 {lb.imageUrl ? (
-                  <div className={`relative mx-auto shrink-0 ${logoVeryCompact ? 'w-10 h-8' : logoCompact ? 'w-12 h-10' : 'w-16 h-12'}`}>
+                  <div className="relative w-10 h-8 sm:w-12 sm:h-10 mx-auto shrink-0">
                     <Image src={lb.imageUrl} alt={`${lb.letter}`} fill className="object-contain" unoptimized />
                   </div>
                 ) : (
-                  <span className="text-gray-400 text-xs">—</span>
+                  <span className="text-gray-400 text-[10px]">—</span>
                 )}
-                <span className={`font-bold font-mono mt-0.5 text-red-600 ${logoVeryCompact ? 'text-[7px]' : logoCompact ? 'text-[8px]' : 'text-[9px]'}`}>{lb.widthIn} in × {lb.heightIn} in</span>
-                <span className={`text-gray-500 mt-0.5 truncate max-w-full ${logoVeryCompact ? 'text-[6px]' : logoCompact ? 'text-[7px]' : 'text-[8px]'}`}>{placementToEn(lb.placement)}</span>
+                <span className="font-bold font-mono mt-0.5 text-red-600 text-[8px] sm:text-[9px]">{lb.widthIn}&quot; × {lb.heightIn}&quot;</span>
+                <span className="text-gray-500 mt-0.5 text-[7px] sm:text-[8px] truncate max-w-full">{placementToEn(lb.placement)}</span>
               </div>
             ))}
           </div>
@@ -312,35 +311,35 @@ export function TechPackSheet({ design, designerName, manufacturer, mainPlacemen
       </div>
 
       {/* Rangée 3 : DESIGNER | MANUFACTURER | COLOR SWATCHES */}
-      <div className="grid grid-cols-3 border-t-[3px] border-black flex-shrink-0">
-        <div className="flex flex-col border-r border-black">
+      <div className="flex flex-col sm:grid sm:grid-cols-3 border-t-[2px] sm:border-t-[3px] border-black flex-shrink-0">
+        <div className="flex flex-col border-b sm:border-b-0 sm:border-r border-black">
           <PanelHeader>DESIGNER</PanelHeader>
-          <div className="bg-white p-3 min-h-[70px] flex items-center justify-center">
+          <div className="bg-white p-2 sm:p-3 min-h-[50px] sm:min-h-[70px] flex items-center justify-center">
             {designerLogoUrl ? (
-              <div className="relative w-full h-10">
+              <div className="relative w-full h-8 sm:h-10">
                 <Image src={designerLogoUrl} alt="Designer" fill className="object-contain" unoptimized />
               </div>
             ) : (
-              <span className="text-sm font-medium text-black">{designerDisplay}</span>
+              <span className="text-xs sm:text-sm font-medium text-black">{designerDisplay}</span>
             )}
           </div>
         </div>
-        <div className="flex flex-col border-r border-black">
+        <div className="flex flex-col border-b sm:border-b-0 sm:border-r border-black">
           <PanelHeader>MANUFACTURER</PanelHeader>
-          <div className="bg-white p-3 min-h-[70px] flex items-center justify-center">
-            <span className="text-sm font-bold text-black">{manufacturerDisplay}</span>
+          <div className="bg-white p-2 sm:p-3 min-h-[50px] sm:min-h-[70px] flex items-center justify-center">
+            <span className="text-xs sm:text-sm font-bold text-black">{manufacturerDisplay}</span>
           </div>
         </div>
         <div className="flex flex-col">
           <PanelHeader>COLOR SWATCHES</PanelHeader>
-          <div className="bg-white p-3 min-h-[70px] flex flex-wrap gap-2 items-center justify-center">
+          <div className="bg-white p-2 sm:p-3 min-h-[50px] sm:min-h-[70px] flex flex-wrap gap-2 items-center justify-center">
             {colorSwatches.slice(0, 6).map((sw, i) => (
               <div key={i} className="flex flex-col items-center gap-0.5">
                 <div
-                  className="w-10 h-6 border border-black shrink-0"
+                  className="w-8 h-4 sm:w-10 sm:h-6 border border-black shrink-0"
                   style={{ backgroundColor: sw.hex.startsWith('#') ? sw.hex : `#${sw.hex}` }}
                 />
-                <span className="text-[9px] font-mono text-gray-700">{sw.hex.startsWith('#') ? sw.hex : `#${sw.hex}`}</span>
+                <span className="text-[7px] sm:text-[9px] font-mono text-gray-700">{sw.hex.startsWith('#') ? sw.hex : `#${sw.hex}`}</span>
               </div>
             ))}
           </div>

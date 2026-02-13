@@ -458,6 +458,7 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
               brand={brand ? { id: brand.id, name: brand.name, logo: brand.logo, colorPalette: brand.colorPalette, typography: brand.typography, styleGuide: brand.styleGuide } : null}
               onComplete={() => handlePhaseComplete(6)}
               isCompleted={progress.phase6}
+              userPlan={userPlan}
             />
           )}
           {!isTransitioning && phaseToRender === 7 && (

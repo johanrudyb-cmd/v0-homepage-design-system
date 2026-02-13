@@ -93,7 +93,7 @@ function getSectionMeta(title: string, index: number): { label: string; Icon: Re
   return { label: shortTitle.length <= 25 ? shortTitle : def.label, Icon: def.Icon };
 }
 
-function extractBullets(content: string, max = 5): string[] {
+function extractBullets(content: string, max = 3): string[] {
   return content
     .split('\n')
     .filter((l) => /^[-*]\s+/.test(l.trim()))

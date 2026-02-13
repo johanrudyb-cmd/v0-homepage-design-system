@@ -686,6 +686,31 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
       />
       <Card className="border-2 border-primary/20 bg-primary/5">
         <CardContent className="pt-6">
+          {/* Step indicator */}
+          <div className="flex items-center gap-2 mb-8 bg-background/50 p-2 rounded-xl border border-primary/10">
+            {[
+              { id: 1, label: 'Positionnement', active: !!positioning },
+              { id: 2, label: 'Public cible', active: !!targetAudience },
+              { id: 3, label: 'Inspiration', active: !!selectedSlug }
+            ].map((s, i) => (
+              <div key={s.id} className="flex-1 flex items-center gap-2">
+                <div className={cn(
+                  "w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold transition-colors",
+                  s.active ? "bg-primary text-white" : "bg-muted text-muted-foreground"
+                )}>
+                  {s.id}
+                </div>
+                <span className={cn(
+                  "text-[10px] font-bold uppercase tracking-wider hidden sm:inline",
+                  s.active ? "text-foreground" : "text-muted-foreground"
+                )}>
+                  {s.label}
+                </span>
+                {i < 2 && <div className="flex-1 h-px bg-muted mx-2" />}
+              </div>
+            ))}
+          </div>
+
           <h3 className="font-bold text-lg text-foreground mb-2">Stratégie marketing</h3>
           <p className="text-sm text-muted-foreground mb-6">
             Définissez votre stratégie en quelques choix : positionnement, puis public cible, puis marques de référence. Les marques s'affichent en fonction de vos sélections.

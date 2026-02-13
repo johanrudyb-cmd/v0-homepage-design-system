@@ -26,6 +26,8 @@ interface Mannequin {
   name: string;
   imageUrl: string;
   source: string;
+  gender?: 'male' | 'female' | 'unisex';
+  description?: string;
 }
 
 interface ShootingPhotoProps {
@@ -84,6 +86,41 @@ const MOOD_OPTIONS = [
   { id: 'streetwear', label: 'Streetwear', promptValue: 'streetwear, urban style' },
   { id: 'luxury', label: 'Luxe', promptValue: 'luxury fashion, high end' },
   { id: 'casual', label: 'Décontracté', promptValue: 'casual, relaxed style' },
+  { id: 'vibe_influencer', label: 'Vibe Influence', promptValue: 'influencer lifestyle style, carefree, confident, professional aesthetic' },
+] as const;
+
+const HAIR_OPTIONS = [
+  { id: 'natural', label: 'Naturel', promptValue: 'natural hair, soft movement', genderRelevance: 'unisex' },
+  { id: 'holiday_finish', label: 'Effet vacances', promptValue: 'relaxed holiday finish hair, neatly behind shoulders', genderRelevance: 'female' },
+  { id: 'sleek', label: 'Lisse / élégant', promptValue: 'sleek elegant hair style', genderRelevance: 'unisex' },
+  { id: 'messy_bun', label: 'Chignon flou', promptValue: 'messy hair bun, casual style', genderRelevance: 'female' },
+  { id: 'groomed', label: 'Soigné', promptValue: 'neatly groomed hair', genderRelevance: 'male' },
+] as const;
+
+const MAKEUP_OPTIONS = [
+  { id: 'none', label: 'Aucun / Naturel', promptValue: 'no makeup, natural skin', genderRelevance: 'unisex' },
+  { id: 'vacation_glam', label: 'Vacation Glam', promptValue: 'fresh vacation glam makeup, glowing skin with visible texture, sun-kissed warmth, radiant', genderRelevance: 'female' },
+  { id: 'natural_glow', label: 'Glow naturel', promptValue: 'natural glow makeup, dewy skin', genderRelevance: 'female' },
+  { id: 'clean_girl', label: 'Clean Girl', promptValue: 'clean girl aesthetic makeup, minimalist', genderRelevance: 'female' },
+  { id: 'grooming_basic', label: 'Grooming (discret)', promptValue: 'natural clean skin grooming', genderRelevance: 'male' },
+] as const;
+
+const ACCESSORIES_OPTIONS = [
+  { id: 'luxe_bags', label: 'Sacs de luxe', promptValue: 'carrying a luxury designer mini bag' },
+  { id: 'gold_jewelry', label: 'Bijoux dorés', promptValue: 'gold hoop earrings, layered delicate gold bracelets and rings' },
+  { id: 'chic_sunglasses', label: 'Lunettes chic', promptValue: 'chic designer sunglasses' },
+] as const;
+
+const PROPS_OPTIONS = [
+  { id: 'ice_cream', label: 'Glace', promptValue: 'holding a pink ice cream scoop in a cone near lips' },
+  { id: 'coffee', label: 'Café / Latte', promptValue: 'holding a takeaway coffee cup' },
+  { id: 'phone', label: 'Smartphone', promptValue: 'holding a modern smartphone, casual use' },
+] as const;
+
+const CAMERA_FINISH_OPTIONS = [
+  { id: 'instagram_pro', label: 'Instagram Pro', promptValue: 'high-end Instagram travel aesthetic, natural light photography, shallow depth of field, realistic skin texture' },
+  { id: 'editorial_grain', label: 'Grain Editorial', promptValue: 'editorial photography, subtle film grain, crisp focus' },
+  { id: 'bokeh_luxury', label: 'Bokeh Luxe', promptValue: 'luxury bokeh, dreamy background blur' },
 ] as const;
 
 /** Angles pour shooting produit (4 photos obligatoires). */
@@ -147,6 +184,8 @@ function getPoseOptionLabel(poseId: string): string {
   return getOptionLabel(MANNEQUIN_POSE_OPTIONS, poseId) || getOptionLabel(MANNEQUIN_GROUP_POSE_OPTIONS, poseId);
 }
 
+const QUALITY_BASE = 'high-end photography, cinematic lighting';
+
 /** Construit le prompt scène (anglais) pour le moteur à partir des choix utilisateur. */
 function buildScenePrompt(options: {
   location: string;
@@ -155,10 +194,15 @@ function buildScenePrompt(options: {
   background: string;
   framing: string;
   mood: string;
+  hair: string;
+  makeup: string;
+  accessories: string[];
+  props: string[];
+  cameraFinish: string;
   mannequinInstruction?: string;
   mannequinPoseOptional?: string;
 }): string {
-  const parts: string[] = ['professional fashion photo', 'realistic'];
+  const parts: string[] = [QUALITY_BASE];
   const loc = LOCATION_OPTIONS.find((o) => o.id === options.location);
   if (loc) parts.push(loc.promptValue);
   if (options.location === 'outdoor') {
@@ -173,6 +217,25 @@ function buildScenePrompt(options: {
   if (frame) parts.push(frame.promptValue);
   const moodOpt = MOOD_OPTIONS.find((o) => o.id === options.mood);
   if (moodOpt) parts.push(moodOpt.promptValue);
+
+  const hairOpt = HAIR_OPTIONS.find((o) => o.id === options.hair);
+  if (hairOpt) parts.push(hairOpt.promptValue);
+  const makeupOpt = MAKEUP_OPTIONS.find((o) => o.id === options.makeup);
+  if (makeupOpt) parts.push(makeupOpt.promptValue);
+
+  options.accessories.forEach(accId => {
+    const opt = ACCESSORIES_OPTIONS.find(o => o.id === accId);
+    if (opt) parts.push(opt.promptValue);
+  });
+
+  options.props.forEach(propId => {
+    const opt = PROPS_OPTIONS.find(o => o.id === propId);
+    if (opt) parts.push(opt.promptValue);
+  });
+
+  const camOpt = CAMERA_FINISH_OPTIONS.find((o) => o.id === options.cameraFinish);
+  if (camOpt) parts.push(camOpt.promptValue);
+
   if (options.mannequinPoseOptional) {
     const poseSingle = MANNEQUIN_POSE_OPTIONS.find((o) => o.id === options.mannequinPoseOptional);
     const poseGroup = MANNEQUIN_GROUP_POSE_OPTIONS.find((o) => o.id === options.mannequinPoseOptional);
@@ -206,10 +269,16 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
   const [background, setBackground] = useState<string>('neutral_grey');
   const [framing, setFraming] = useState<string>('full_body');
   const [mood, setMood] = useState<string>('lookbook');
+  const [hair, setHair] = useState<string>('natural');
+  const [makeup, setMakeup] = useState<string>('natural_glow');
+  const [selectedAccessories, setSelectedAccessories] = useState<string[]>([]);
+  const [selectedProps, setSelectedProps] = useState<string[]>([]);
+  const [cameraFinish, setCameraFinish] = useState<string>('instagram_pro');
   const [mannequinInstruction, setMannequinInstruction] = useState('');
   const [mannequinPoseOptional, setMannequinPoseOptional] = useState<string>('');
   const [productBackground, setProductBackground] = useState<string>('white');
   const [aspectRatio, setAspectRatio] = useState<string>('3:4');
+  const [magicEnhance, setMagicEnhance] = useState(true);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
   const [previewModalImageUrl, setPreviewModalImageUrl] = useState<string | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -228,6 +297,9 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
     backgroundLabel: string;
     framingLabel: string;
     moodLabel: string;
+    hairLabel: string;
+    makeupLabel: string;
+    cameraLabel: string;
     mannequinInstruction?: string;
     mannequinPoseLabel?: string;
     scenePrompt: string;
@@ -312,6 +384,7 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
 
     const scenePrompt = buildScenePrompt({
       location, outdoorType, lighting, background, framing, mood,
+      hair, makeup, accessories: selectedAccessories, props: selectedProps, cameraFinish,
       mannequinInstruction, mannequinPoseOptional,
     });
     setIsGenerating(true);
@@ -336,7 +409,8 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
           scenePrompt,
           mannequinInstruction: mannequinInstruction.trim() || undefined,
           mannequinPoseOptional: mannequinPoseOptional || undefined,
-          sceneOptions: { location, outdoorType, lighting, background, framing, mood },
+          sceneOptions: { location, outdoorType, lighting, background, framing, mood, hair, makeup, cameraFinish },
+          magicEnhance,
         }),
       });
       const data = await res.json();
@@ -358,6 +432,9 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
         backgroundLabel: getOptionLabel(BACKGROUND_OPTIONS, background),
         framingLabel: getOptionLabel(FRAMING_OPTIONS, framing),
         moodLabel: getOptionLabel(MOOD_OPTIONS, mood),
+        hairLabel: getOptionLabel(HAIR_OPTIONS, hair),
+        makeupLabel: getOptionLabel(MAKEUP_OPTIONS, makeup),
+        cameraLabel: getOptionLabel(CAMERA_FINISH_OPTIONS, cameraFinish),
         mannequinInstruction: mannequinInstruction.trim() || undefined,
         mannequinPoseLabel: mannequinPoseOptional ? getPoseOptionLabel(mannequinPoseOptional) : undefined,
         scenePrompt,
@@ -658,233 +735,199 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
           {/* ——— Shooting mannequin : mannequin + instruction + options facultatives + paramètres scène ——— */}
           {shootingMode === 'mannequin' && (
             <>
-          {/* Mannequins : sélection 1 à 3 (clic pour cocher / décocher) */}
-          <div>
-            <div className="flex items-center justify-between gap-2 mb-2">
-              <label className="block text-sm font-semibold text-foreground">
-                Mannequin(s)
-              </label>
-              {onSwitchToTryOn && (
-                <Button type="button" variant="ghost" size="sm" onClick={onSwitchToTryOn} className="text-primary gap-1">
-                  <ImageIcon className="w-4 h-4" />
-                  Créer un mannequin dans Virtual Try-On
-                </Button>
-              )}
-            </div>
-            <p className="text-xs text-muted-foreground mb-2">Sélectionnez 1 à 3 mannequins (clic pour cocher / décocher). Les options facultatives s&apos;adaptent au nombre choisi.</p>
-            {loadingMannequins ? (
-              <p className="text-sm text-muted-foreground flex items-center gap-2">
-                <Loader2 className="w-4 h-4 animate-spin" />
-                Chargement des mannequins…
-              </p>
-            ) : mannequins.length === 0 ? (
-              <div className="rounded-xl border-2 border-dashed border-border bg-muted/20 p-6 text-center">
-                <p className="text-sm text-muted-foreground mb-2">Aucun mannequin enregistré.</p>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Créez un rendu dans Virtual Try-On puis cliquez sur « Enregistrer comme mannequin », ou ajoutez une photo ci-dessous.
-                </p>
-                <Button type="button" variant="outline" size="sm" onClick={() => setShowAddMannequinUpload(true)} className="gap-2">
-                  <Upload className="w-4 h-4" />
-                  Ajouter un mannequin (photo)
-                </Button>
-              </div>
-            ) : (
-              <div className="flex flex-wrap gap-3">
-                {mannequins.map((m) => {
-                  const selected = selectedMannequinIds.includes(m.id);
-                  return (
+              {/* Mannequins : sélection 1 à 3 (clic pour cocher / décocher) */}
+              <div>
+                <div className="flex items-center justify-between gap-2 mb-2">
+                  <label className="block text-sm font-semibold text-foreground">
+                    Mannequin(s)
+                  </label>
+                  {onSwitchToTryOn && (
+                    <Button type="button" variant="ghost" size="sm" onClick={onSwitchToTryOn} className="text-primary gap-1">
+                      <ImageIcon className="w-4 h-4" />
+                      Créer un mannequin dans Virtual Try-On
+                    </Button>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mb-2">Sélectionnez 1 à 3 mannequins (clic pour cocher / décocher). Les options facultatives s&apos;adaptent au nombre choisi.</p>
+                {loadingMannequins ? (
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Chargement des mannequins…
+                  </p>
+                ) : mannequins.length === 0 ? (
+                  <div className="rounded-xl border-2 border-dashed border-border bg-muted/20 p-6 text-center">
+                    <p className="text-sm text-muted-foreground mb-2">Aucun mannequin enregistré.</p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Créez un rendu dans Virtual Try-On puis cliquez sur « Enregistrer comme mannequin », ou ajoutez une photo ci-dessous.
+                    </p>
+                    <Button type="button" variant="outline" size="sm" onClick={() => setShowAddMannequinUpload(true)} className="gap-2">
+                      <Upload className="w-4 h-4" />
+                      Ajouter un mannequin (photo)
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="flex flex-wrap gap-3">
+                    {mannequins.map((m) => {
+                      const selected = selectedMannequinIds.includes(m.id);
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          onClick={() => {
+                            const wasSingle = selectedMannequinIds.length <= 1;
+                            let next: string[];
+                            if (selected) {
+                              next = selectedMannequinIds.filter((id) => id !== m.id);
+                            } else if (selectedMannequinIds.length < 3) {
+                              next = [...selectedMannequinIds, m.id];
+                            } else return;
+                            setSelectedMannequinIds(next);
+                            const nowSingle = next.length <= 1;
+                            if (wasSingle !== nowSingle) setMannequinPoseOptional('');
+                          }}
+                          className={cn(
+                            'rounded-xl border-2 p-2 text-left transition-all w-28 overflow-hidden',
+                            selected
+                              ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
+                              : 'border-border hover:border-primary/50 bg-muted/20'
+                          )}
+                          disabled={isGenerating}
+                        >
+                          <div className="relative">
+                            <div className="aspect-[3/4] rounded-lg overflow-hidden bg-muted mb-1">
+                              <img src={m.imageUrl} alt={m.name} className="w-full h-full object-cover" />
+                            </div>
+                            {selected && (
+                              <span className="absolute top-1 right-1 rounded-full bg-primary text-primary-foreground text-xs w-5 h-5 flex items-center justify-center font-bold">
+                                {selectedMannequinIds.indexOf(m.id) + 1}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs font-medium text-foreground truncate" title={m.name}>{m.name}</p>
+                        </button>
+                      );
+                    })}
                     <button
-                      key={m.id}
                       type="button"
-                      onClick={() => {
-                        const wasSingle = selectedMannequinIds.length <= 1;
-                        let next: string[];
-                        if (selected) {
-                          next = selectedMannequinIds.filter((id) => id !== m.id);
-                        } else if (selectedMannequinIds.length < 3) {
-                          next = [...selectedMannequinIds, m.id];
-                        } else return;
-                        setSelectedMannequinIds(next);
-                        const nowSingle = next.length <= 1;
-                        if (wasSingle !== nowSingle) setMannequinPoseOptional('');
-                      }}
-                      className={cn(
-                        'rounded-xl border-2 p-2 text-left transition-all w-28 overflow-hidden',
-                        selected
-                          ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
-                          : 'border-border hover:border-primary/50 bg-muted/20'
-                      )}
-                      disabled={isGenerating}
+                      onClick={() => setShowAddMannequinUpload(true)}
+                      className="w-28 rounded-xl border-2 border-dashed border-border bg-muted/20 p-4 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all"
                     >
-                      <div className="relative">
-                        <div className="aspect-[3/4] rounded-lg overflow-hidden bg-muted mb-1">
-                          <img src={m.imageUrl} alt={m.name} className="w-full h-full object-cover" />
-                        </div>
-                        {selected && (
-                          <span className="absolute top-1 right-1 rounded-full bg-primary text-primary-foreground text-xs w-5 h-5 flex items-center justify-center font-bold">
-                            {selectedMannequinIds.indexOf(m.id) + 1}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs font-medium text-foreground truncate" title={m.name}>{m.name}</p>
+                      <UserPlus className="w-6 h-6" />
+                      <span className="text-xs font-medium">Ajouter</span>
                     </button>
-                  );
-                })}
-                <button
-                  type="button"
-                  onClick={() => setShowAddMannequinUpload(true)}
-                  className="w-28 rounded-xl border-2 border-dashed border-border bg-muted/20 p-4 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all"
-                >
-                  <UserPlus className="w-6 h-6" />
-                  <span className="text-xs font-medium">Ajouter</span>
-                </button>
-              </div>
-            )}
-
-            {showAddMannequinUpload && (
-              <Card className="mt-4 p-4 bg-muted/20">
-                <p className="text-sm font-medium mb-2">Nouveau mannequin (photo)</p>
-                <div className="flex flex-wrap gap-3 items-end">
-                  <div>
-                    <label className="block text-xs text-muted-foreground mb-1">Nom</label>
-                    <input
-                      type="text"
-                      value={newMannequinName}
-                      onChange={(e) => setNewMannequinName(e.target.value)}
-                      placeholder="Ex. Emma"
-                      className="rounded-md border border-input bg-background px-3 py-2 text-sm w-40"
-                    />
                   </div>
-                  <div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => setNewMannequinFile(e.target.files?.[0] ?? null)}
-                      className="text-sm"
-                    />
-                  </div>
-                  <Button size="sm" onClick={handleAddMannequinFromUpload} disabled={savingMannequin || !newMannequinName.trim() || !newMannequinFile}>
-                    {savingMannequin ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}
-                  </Button>
-                  <Button size="sm" variant="ghost" onClick={() => { setShowAddMannequinUpload(false); setNewMannequinFile(null); setNewMannequinName(''); }}>
-                    Annuler
-                  </Button>
-                </div>
-              </Card>
-            )}
-          </div>
+                )}
 
-          {/* Ce que vous voulez que le mannequin fasse (libre) */}
-          <div>
-            <label className="block text-sm font-semibold text-foreground mb-2">Décrivez ce que vous voulez que le mannequin fasse</label>
-            <p className="text-xs text-muted-foreground mb-1">Pose, action, expression… en quelques mots. Facultatif.</p>
-            <textarea
-              value={mannequinInstruction}
-              onChange={(e) => setMannequinInstruction(e.target.value)}
-              placeholder="Ex. : regard caméra, sourire léger, main dans la poche, marche dynamique…"
-              className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[80px] resize-y"
-              disabled={isGenerating}
-            />
-          </div>
-
-          {/* Options facultatives : pose 1 mannequin ou groupe (2–3) */}
-          <div>
-            <label className="block text-sm font-semibold text-foreground mb-1">Options facultatives</label>
-            {selectedMannequinIds.length <= 1 ? (
-              <>
-                <p className="text-xs text-muted-foreground mb-2">Pose pour un mannequin (optionnel).</p>
-                <div className="flex flex-wrap gap-2">
-                  {MANNEQUIN_POSE_OPTIONS.map((o) => (
-                    <Button
-                      key={o.id}
-                      type="button"
-                      variant={mannequinPoseOptional === o.id ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setMannequinPoseOptional(mannequinPoseOptional === o.id ? '' : o.id)}
-                      disabled={isGenerating}
-                    >
-                      {o.label}
-                    </Button>
-                  ))}
-                </div>
-              </>
-            ) : (
-              <>
-                <p className="text-xs text-muted-foreground mb-2">Poses pour {selectedMannequinIds.length} mannequins (optionnel).</p>
-                <div className="flex flex-wrap gap-2">
-                  {MANNEQUIN_GROUP_POSE_OPTIONS.map((o) => (
-                    <Button
-                      key={o.id}
-                      type="button"
-                      variant={mannequinPoseOptional === o.id ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setMannequinPoseOptional(mannequinPoseOptional === o.id ? '' : o.id)}
-                      disabled={isGenerating}
-                    >
-                      {o.label}
-                    </Button>
-                  ))}
-                </div>
-              </>
-            )}
-          </div>
-
-          {/* Paramètres du shooting : format, lieu, éclairage, fond, cadrage, ambiance (comme en studio photo) */}
-          <Card className="bg-muted/20 border-2 border-border">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                <Info className="w-4 h-4 text-primary" />
-                Paramètres du shooting (studio photo)
-              </CardTitle>
-              <CardDescription className="text-xs">
-                Choisissez les options pour que chaque photo soit unique et précise : format, lieu, éclairage, fond, cadrage, ambiance.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4 text-sm">
-              <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Format de la photo</label>
-                <div className="flex flex-wrap gap-2">
-                  {ASPECT_RATIO_OPTIONS.map((o) => (
-                    <Button
-                      key={o.id}
-                      type="button"
-                      variant={aspectRatio === o.id ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setAspectRatio(o.id)}
-                      disabled={isGenerating}
-                    >
-                      {o.label}
-                    </Button>
-                  ))}
-                </div>
+                {showAddMannequinUpload && (
+                  <Card className="mt-4 p-4 bg-muted/20">
+                    <p className="text-sm font-medium mb-2">Nouveau mannequin (photo)</p>
+                    <div className="flex flex-wrap gap-3 items-end">
+                      <div>
+                        <label className="block text-xs text-muted-foreground mb-1">Nom</label>
+                        <input
+                          type="text"
+                          value={newMannequinName}
+                          onChange={(e) => setNewMannequinName(e.target.value)}
+                          placeholder="Ex. Emma"
+                          className="rounded-md border border-input bg-background px-3 py-2 text-sm w-40"
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => setNewMannequinFile(e.target.files?.[0] ?? null)}
+                          className="text-sm"
+                        />
+                      </div>
+                      <Button size="sm" onClick={handleAddMannequinFromUpload} disabled={savingMannequin || !newMannequinName.trim() || !newMannequinFile}>
+                        {savingMannequin ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}
+                      </Button>
+                      <Button size="sm" variant="ghost" onClick={() => { setShowAddMannequinUpload(false); setNewMannequinFile(null); setNewMannequinName(''); }}>
+                        Annuler
+                      </Button>
+                    </div>
+                  </Card>
+                )}
               </div>
+
+              {/* Ce que vous voulez que le mannequin fasse (libre) */}
               <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Lieu</label>
-                <div className="flex flex-wrap gap-2">
-                  {LOCATION_OPTIONS.map((o) => (
-                    <Button
-                      key={o.id}
-                      type="button"
-                      variant={location === o.id ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setLocation(o.id)}
-                      disabled={isGenerating}
-                    >
-                      {o.label}
-                    </Button>
-                  ))}
-                </div>
-                {location === 'outdoor' && (
-                  <div className="mt-2">
-                    <label className="block text-xs font-medium text-muted-foreground mb-1">Type d&apos;extérieur</label>
+                <label className="block text-sm font-semibold text-foreground mb-2">Décrivez ce que vous voulez que le mannequin fasse</label>
+                <p className="text-xs text-muted-foreground mb-1">Pose, action, expression… en quelques mots. Facultatif.</p>
+                <textarea
+                  value={mannequinInstruction}
+                  onChange={(e) => setMannequinInstruction(e.target.value)}
+                  placeholder="Ex. : regard caméra, sourire léger, main dans la poche, marche dynamique…"
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[80px] resize-y"
+                  disabled={isGenerating}
+                />
+              </div>
+
+              {/* Options facultatives : pose 1 mannequin ou groupe (2–3) */}
+              <div>
+                <label className="block text-sm font-semibold text-foreground mb-1">Options facultatives</label>
+                {selectedMannequinIds.length <= 1 ? (
+                  <>
+                    <p className="text-xs text-muted-foreground mb-2">Pose pour un mannequin (optionnel).</p>
                     <div className="flex flex-wrap gap-2">
-                      {OUTDOOR_OPTIONS.map((o) => (
+                      {MANNEQUIN_POSE_OPTIONS.map((o) => (
                         <Button
                           key={o.id}
                           type="button"
-                          variant={outdoorType === o.id ? 'default' : 'outline'}
+                          variant={mannequinPoseOptional === o.id ? 'default' : 'outline'}
                           size="sm"
-                          onClick={() => setOutdoorType(o.id)}
+                          onClick={() => setMannequinPoseOptional(mannequinPoseOptional === o.id ? '' : o.id)}
+                          disabled={isGenerating}
+                        >
+                          {o.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs text-muted-foreground mb-2">Poses pour {selectedMannequinIds.length} mannequins (optionnel).</p>
+                    <div className="flex flex-wrap gap-2">
+                      {MANNEQUIN_GROUP_POSE_OPTIONS.map((o) => (
+                        <Button
+                          key={o.id}
+                          type="button"
+                          variant={mannequinPoseOptional === o.id ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setMannequinPoseOptional(mannequinPoseOptional === o.id ? '' : o.id)}
+                          disabled={isGenerating}
+                        >
+                          {o.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+
+              {/* Paramètres du shooting : format, lieu, éclairage, fond, cadrage, ambiance (comme en studio photo) */}
+              <Card className="bg-muted/20 border-2 border-border">
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-semibold flex items-center gap-2">
+                    <Info className="w-4 h-4 text-primary" />
+                    Paramètres du shooting (studio photo)
+                  </CardTitle>
+                  <CardDescription className="text-xs">
+                    Choisissez les options pour que chaque photo soit unique et précise : format, lieu, éclairage, fond, cadrage, ambiance.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4 text-sm">
+                  <div>
+                    <label className="block text-xs font-semibold text-foreground mb-1">Format de la photo</label>
+                    <div className="flex flex-wrap gap-2">
+                      {ASPECT_RATIO_OPTIONS.map((o) => (
+                        <Button
+                          key={o.id}
+                          type="button"
+                          variant={aspectRatio === o.id ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setAspectRatio(o.id)}
                           disabled={isGenerating}
                         >
                           {o.label}
@@ -892,128 +935,254 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                       ))}
                     </div>
                   </div>
-                )}
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Éclairage</label>
-                <div className="flex flex-wrap gap-2">
-                  {LIGHTING_OPTIONS.map((o) => (
-                    <Button
-                      key={o.id}
-                      type="button"
-                      variant={lighting === o.id ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setLighting(o.id)}
-                      disabled={isGenerating}
-                    >
-                      {o.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Fond</label>
-                <div className="flex flex-wrap gap-2">
-                  {BACKGROUND_OPTIONS.map((o) => (
-                    <Button
-                      key={o.id}
-                      type="button"
-                      variant={background === o.id ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setBackground(o.id)}
-                      disabled={isGenerating}
-                    >
-                      {o.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Cadrage / pose</label>
-                <div className="flex flex-wrap gap-2">
-                  {FRAMING_OPTIONS.map((o) => (
-                    <Button
-                      key={o.id}
-                      type="button"
-                      variant={framing === o.id ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setFraming(o.id)}
-                      disabled={isGenerating}
-                    >
-                      {o.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div>
-                <label className="block text-xs font-semibold text-foreground mb-1">Ambiance</label>
-                <div className="flex flex-wrap gap-2">
-                  {MOOD_OPTIONS.map((o) => (
-                    <Button
-                      key={o.id}
-                      type="button"
-                      variant={mood === o.id ? 'default' : 'outline'}
-                      size="sm"
-                      onClick={() => setMood(o.id)}
-                      disabled={isGenerating}
-                    >
-                      {o.label}
-                    </Button>
-                  ))}
-                </div>
-              </div>
-              <div className="pt-2 border-t border-border">
-                <p className="font-medium text-foreground mb-1">Récap de votre shooting</p>
-                <ul className="space-y-1 text-xs text-muted-foreground">
-                  <li><span className="text-foreground">Mannequin(s) :</span> {selectedMannequinIds.length > 0 ? selectedMannequinIds.map((id) => mannequins.find((m) => m.id === id)?.name ?? '—').join(', ') : '—'}</li>
-                  <li><span className="text-foreground">Vêtement :</span> {selectedDesignId ? (() => { const d = designs.find((x) => x.id === selectedDesignId); return d ? getDesignDisplayName(d) : '—'; })() : uploadedFile ? uploadedFile.name : '—'}</li>
-                  <li><span className="text-foreground">Lieu :</span> {getOptionLabel(LOCATION_OPTIONS, location)}{location === 'outdoor' ? ` (${getOptionLabel(OUTDOOR_OPTIONS, outdoorType)})` : ''}</li>
-                  <li><span className="text-foreground">Éclairage :</span> {getOptionLabel(LIGHTING_OPTIONS, lighting)} · <span className="text-foreground">Fond :</span> {getOptionLabel(BACKGROUND_OPTIONS, background)}</li>
-                  <li><span className="text-foreground">Cadrage :</span> {getOptionLabel(FRAMING_OPTIONS, framing)} · <span className="text-foreground">Ambiance :</span> {getOptionLabel(MOOD_OPTIONS, mood)}</li>
-                </ul>
-              </div>
-            </CardContent>
-          </Card>
-
-          {error && (
-            <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg">{error}</div>
-          )}
-
-          {shootingMode === 'mannequin' && (
-            photoQuota?.isExhausted ? (
-              <Button onClick={openSurplusModal} className="w-full gap-2 bg-gradient-to-r from-primary to-primary/80 shadow-lg">
-                <Camera className="w-4 h-4" />
-                Recharger ce module
-              </Button>
-            ) : (
-              <>
-                {photoQuota?.isAlmostFinished && (
-                  <div className="flex items-center justify-between gap-2 rounded-md bg-amber-500/15 px-3 py-2 text-amber-800 dark:text-amber-200 mb-3">
-                    <span className="text-xs font-medium">Stock épuisé bientôt !</span>
-                    <button type="button" onClick={openSurplusModal} className="text-xs font-semibold underline hover:no-underline">Prendre une recharge</button>
+                  <div>
+                    <label className="block text-xs font-semibold text-foreground mb-1">Lieu</label>
+                    <div className="flex flex-wrap gap-2">
+                      {LOCATION_OPTIONS.map((o) => (
+                        <Button
+                          key={o.id}
+                          type="button"
+                          variant={location === o.id ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setLocation(o.id)}
+                          disabled={isGenerating}
+                        >
+                          {o.label}
+                        </Button>
+                      ))}
+                    </div>
+                    {location === 'outdoor' && (
+                      <div className="mt-2">
+                        <label className="block text-xs font-medium text-muted-foreground mb-1">Type d&apos;extérieur</label>
+                        <div className="flex flex-wrap gap-2">
+                          {OUTDOOR_OPTIONS.map((o) => (
+                            <Button
+                              key={o.id}
+                              type="button"
+                              variant={outdoorType === o.id ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setOutdoorType(o.id)}
+                              disabled={isGenerating}
+                            >
+                              {o.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                )}
-                <Button
-                  onClick={() => setShowConfirmPhoto(true)}
-                  disabled={isGenerating || selectedMannequinIds.length === 0 || (!selectedDesignId && !uploadedFile)}
-                  className="w-full gap-2"
-                >
-                  {isGenerating ? (
-                    <>
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      Génération en cours…
-                    </>
-                  ) : (
-                    <>
-                      <Camera className="w-4 h-4" />
-                      Générer la photo de shooting (mannequin)
-                      <GenerationCostBadge feature="ugc_shooting_photo" />
-                    </>
-                  )}
-                </Button>
-              </>
-            )
-          )}
+                  <div>
+                    <label className="block text-xs font-semibold text-foreground mb-1">Éclairage</label>
+                    <div className="flex flex-wrap gap-2">
+                      {LIGHTING_OPTIONS.map((o) => (
+                        <Button
+                          key={o.id}
+                          type="button"
+                          variant={lighting === o.id ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setLighting(o.id)}
+                          disabled={isGenerating}
+                        >
+                          {o.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-foreground mb-1">Fond</label>
+                    <div className="flex flex-wrap gap-2">
+                      {BACKGROUND_OPTIONS.map((o) => (
+                        <Button
+                          key={o.id}
+                          type="button"
+                          variant={background === o.id ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setBackground(o.id)}
+                          disabled={isGenerating}
+                        >
+                          {o.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-foreground mb-1">Cadrage / pose</label>
+                    <div className="flex flex-wrap gap-2">
+                      {FRAMING_OPTIONS.map((o) => (
+                        <Button
+                          key={o.id}
+                          type="button"
+                          variant={framing === o.id ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setFraming(o.id)}
+                          disabled={isGenerating}
+                        >
+                          {o.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-foreground mb-1">Ambiance</label>
+                    <div className="flex flex-wrap gap-2">
+                      {MOOD_OPTIONS.map((o) => (
+                        <Button
+                          key={o.id}
+                          type="button"
+                          variant={mood === o.id ? 'default' : 'outline'}
+                          size="sm"
+                          onClick={() => setMood(o.id)}
+                          disabled={isGenerating}
+                        >
+                          {o.label}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-border">
+                    <p className="font-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Détails de Personnage (Realism+)</p>
+                    <div className="space-y-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-foreground mb-1">Coiffure</label>
+                        <div className="flex flex-wrap gap-2">
+                          {HAIR_OPTIONS.map((o) => (
+                            <Button
+                              key={o.id}
+                              type="button"
+                              variant={hair === o.id ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setHair(o.id)}
+                              disabled={isGenerating}
+                            >
+                              {o.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-foreground mb-1">Maquillage</label>
+                        <div className="flex flex-wrap gap-2">
+                          {MAKEUP_OPTIONS.map((o) => (
+                            <Button
+                              key={o.id}
+                              type="button"
+                              variant={makeup === o.id ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setMakeup(o.id)}
+                              disabled={isGenerating}
+                            >
+                              {o.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-foreground mb-1">Accessoires</label>
+                        <div className="flex flex-wrap gap-2">
+                          {ACCESSORIES_OPTIONS.map((o) => (
+                            <Button
+                              key={o.id}
+                              type="button"
+                              variant={selectedAccessories.includes(o.id) ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setSelectedAccessories(prev => prev.includes(o.id) ? prev.filter(id => id !== o.id) : [...prev, o.id])}
+                              disabled={isGenerating}
+                            >
+                              {o.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-foreground mb-1">Accessoires de scène (Props)</label>
+                        <div className="flex flex-wrap gap-2">
+                          {PROPS_OPTIONS.map((o) => (
+                            <Button
+                              key={o.id}
+                              type="button"
+                              variant={selectedProps.includes(o.id) ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setSelectedProps(prev => prev.includes(o.id) ? prev.filter(id => id !== o.id) : [...prev, o.id])}
+                              disabled={isGenerating}
+                            >
+                              {o.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-foreground mb-1">Finition Caméra</label>
+                        <div className="flex flex-wrap gap-2">
+                          {CAMERA_FINISH_OPTIONS.map((o) => (
+                            <Button
+                              key={o.id}
+                              type="button"
+                              variant={cameraFinish === o.id ? 'default' : 'outline'}
+                              size="sm"
+                              onClick={() => setCameraFinish(o.id)}
+                              disabled={isGenerating}
+                            >
+                              {o.label}
+                            </Button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-border">
+                    <p className="font-medium text-foreground mb-1">Récap de votre shooting</p>
+                    <ul className="space-y-1 text-xs text-muted-foreground">
+                      <li><span className="text-foreground">Mannequin(s) :</span> {selectedMannequinIds.length > 0 ? selectedMannequinIds.map((id) => mannequins.find((m) => m.id === id)?.name ?? '—').join(', ') : '—'}</li>
+                      <li><span className="text-foreground">Vêtement :</span> {selectedDesignId ? (() => { const d = designs.find((x) => x.id === selectedDesignId); return d ? getDesignDisplayName(d) : '—'; })() : uploadedFile ? uploadedFile.name : '—'}</li>
+                      <li><span className="text-foreground">Style :</span> {getOptionLabel(HAIR_OPTIONS, hair)} · {getOptionLabel(MAKEUP_OPTIONS, makeup)}</li>
+                      <li><span className="text-foreground">Lieu :</span> {getOptionLabel(LOCATION_OPTIONS, location)}{location === 'outdoor' ? ` (${getOptionLabel(OUTDOOR_OPTIONS, outdoorType)})` : ''}</li>
+                      <li><span className="text-foreground">Finition :</span> {getOptionLabel(CAMERA_FINISH_OPTIONS, cameraFinish)}</li>
+                    </ul>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {error && (
+                <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg">{error}</div>
+              )}
+
+              {shootingMode === 'mannequin' && (
+                photoQuota?.isExhausted ? (
+                  <Button onClick={openSurplusModal} className="w-full gap-2 bg-gradient-to-r from-primary to-primary/80 shadow-lg">
+                    <Camera className="w-4 h-4" />
+                    Recharger ce module
+                  </Button>
+                ) : (
+                  <>
+                    {photoQuota?.isAlmostFinished && (
+                      <div className="flex items-center justify-between gap-2 rounded-md bg-amber-500/15 px-3 py-2 text-amber-800 dark:text-amber-200 mb-3">
+                        <span className="text-xs font-medium">Stock épuisé bientôt !</span>
+                        <button type="button" onClick={openSurplusModal} className="text-xs font-semibold underline hover:no-underline">Prendre une recharge</button>
+                      </div>
+                    )}
+                    <Button
+                      onClick={() => setShowConfirmPhoto(true)}
+                      disabled={isGenerating || selectedMannequinIds.length === 0 || (!selectedDesignId && !uploadedFile)}
+                      className="w-full gap-2"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="w-4 h-4 animate-spin" />
+                          Génération en cours…
+                        </>
+                      ) : (
+                        <>
+                          <Camera className="w-4 h-4" />
+                          Générer la photo de shooting (mannequin)
+                          <GenerationCostBadge feature="ugc_shooting_photo" />
+                        </>
+                      )}
+                    </Button>
+                  </>
+                )
+              )}
             </>
           )}
         </CardContent>

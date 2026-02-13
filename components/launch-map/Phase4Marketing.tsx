@@ -9,6 +9,7 @@ interface Phase4MarketingProps {
   brand?: { id: string; name: string; logo?: string | null; colorPalette?: unknown; typography?: unknown; styleGuide?: unknown } | null;
   onComplete?: () => void;
   isCompleted: boolean;
+  userPlan?: string;
 }
 
 interface DesignItem {
@@ -17,7 +18,7 @@ interface DesignItem {
   flatSketchUrl: string | null;
 }
 
-export function Phase4Marketing({ brandId, brandName, brand, onComplete, isCompleted }: Phase4MarketingProps) {
+export function Phase4Marketing({ brandId, brandName, brand, onComplete, isCompleted, userPlan = 'free' }: Phase4MarketingProps) {
   const [designs, setDesigns] = useState<DesignItem[]>([]);
   const [scriptsCount, setScriptsCount] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -90,6 +91,7 @@ export function Phase4Marketing({ brandId, brandName, brand, onComplete, isCompl
         brandName={brandName}
         designs={designs}
         brand={brand || undefined}
+        userPlan={userPlan}
       />
     </div>
   );

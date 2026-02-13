@@ -1198,3 +1198,48 @@ export async function getBrandQuickMetadata(brandName: string): Promise<{
   if (!raw) throw new Error('Empty AI response');
   return JSON.parse(raw);
 }
+
+/**
+ * Améliore un prompt de shooting photo pour atteindre un niveau de réalisme "Influencer Pro".
+ * Prend en compte le sexe/genre du mannequin pour éviter les erreurs (ex: maquillage sur un homme si non souhaité).
+ */
+export async function enhanceShootingPrompt(options: {
+  basePrompt: string;
+  mannequinDescription?: string;
+  brandStyle?: string;
+  extraContext?: string;
+}): Promise<string> {
+  if (!openai) throw new Error('AI not configured');
+
+  const completion = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [
+      {
+        role: 'system',
+        content: `Tu es un expert en "Prompt Engineering" pour des IA génératrices d'images ultra-réalistes (type Higgsfield, Midjourney v6).
+        Ta mission est de transformer une description simple en un script de shooting photo professionnel "Influencer Travel/Fashion aesthetic".
+        
+        RÈGLES D'OR :
+        1. RÉALISME : Ajoute des détails sur la texture de peau, le grain de la photo, la profondeur de champ (bokeh), et l'éclairage cinématique.
+        2. CONTEXTE : Si le mannequin est un homme, adapte les détails (pas de maquillage féminin ou de pose "pout" sauf si explicitement demandé).
+        3. DÉTAILS : Ajoute des détails sur l'environnement, les reflets, la pose naturelle et confiante.
+        4. STRUCTURE : Le prompt doit être en ANGLAIS, séparé par des virgules.
+        
+        Niveau de détail attendu (exemple) : "Lakeside promenade, soft background blur, natural daylight, soft water reflections, three-quarter body, relaxed pose, crisp focus, realistic skin texture, high-end photography".`,
+      },
+      {
+        role: 'user',
+        content: `Améliore ce prompt de base : "${options.basePrompt}".
+        Infos complémentaires :
+        - Mannequin : ${options.mannequinDescription || 'non spécifié'}
+        - Style de marque : ${options.brandStyle || 'fashion'}
+        - Contexte extra : ${options.extraContext || 'aucun'}
+        
+        Génère UNIQUEMENT le prompt final en anglais.`,
+      },
+    ],
+    temperature: 0.7,
+  });
+
+  return completion.choices[0]?.message?.content?.trim() || options.basePrompt;
+}

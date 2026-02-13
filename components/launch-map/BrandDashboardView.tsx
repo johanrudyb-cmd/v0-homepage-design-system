@@ -506,10 +506,6 @@ export function BrandDashboardView({
                   <p className="text-xs text-muted-foreground font-medium">Fournisseurs</p>
                   <p className="text-2xl font-bold text-foreground mt-1">{suppliers.length}</p>
                 </div>
-                <div className="rounded-lg border border-border bg-muted/20 p-4">
-                  <p className="text-xs text-muted-foreground font-medium">Scripts UGC</p>
-                  <p className="text-2xl font-bold text-foreground mt-1">{ugcCount}</p>
-                </div>
               </div>
             </div>
             <div>

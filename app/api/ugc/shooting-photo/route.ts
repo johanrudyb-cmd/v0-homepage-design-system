@@ -5,6 +5,7 @@ import { generateShootingPhoto, isHiggsfieldConfigured } from '@/lib/api/higgsfi
 import { prisma } from '@/lib/prisma';
 import { NotificationHelpers } from '@/lib/notifications';
 import { withAIUsageLimit } from '@/lib/ai-usage';
+import { enhanceShootingPrompt } from '@/lib/api/chatgpt';
 
 export const runtime = 'nodejs';
 
@@ -49,6 +50,7 @@ export async function POST(request: Request) {
     const mannequinInstruction = typeof body.mannequinInstruction === 'string' && body.mannequinInstruction.trim() ? body.mannequinInstruction.trim() : undefined;
     const mannequinPoseOptional = typeof body.mannequinPoseOptional === 'string' && body.mannequinPoseOptional.trim() ? body.mannequinPoseOptional.trim() : undefined;
     const sceneOptions = body.sceneOptions && typeof body.sceneOptions === 'object' && !Array.isArray(body.sceneOptions) ? body.sceneOptions : undefined;
+    const magicEnhance = !!body.magicEnhance;
 
     if (!brandId || !mannequinId || !designUrl) {
       return NextResponse.json(
@@ -70,6 +72,20 @@ export async function POST(request: Request) {
     const mannequinImageUrl = toAbsoluteImageUrl(mannequin.imageUrl, request);
     const designImageUrl = toAbsoluteImageUrl(designUrl, request);
 
+    let finalPrompt = scenePrompt;
+    if (magicEnhance) {
+      try {
+        finalPrompt = await enhanceShootingPrompt({
+          basePrompt: scenePrompt,
+          mannequinDescription: mannequin.description || mannequin.name,
+          brandStyle: brand.styleGuide && typeof brand.styleGuide === 'object' ? (brand.styleGuide as any).preferredStyle : undefined,
+          extraContext: mannequinInstruction,
+        });
+      } catch (e) {
+        console.warn('Magic Enhance failed, using base prompt:', e);
+      }
+    }
+
     const imageUrl = await withAIUsageLimit(
       user.id,
       user.plan ?? 'free',
@@ -80,7 +96,7 @@ export async function POST(request: Request) {
           garmentType,
           garmentLabel,
           aspectRatio,
-          scenePrompt,
+          scenePrompt: finalPrompt,
           mannequinInstruction,
           mannequinPoseOptional,
           sceneOptions,

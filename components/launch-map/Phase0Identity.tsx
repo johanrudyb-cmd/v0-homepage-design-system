@@ -6,7 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { Loader2, ArrowRight, CheckCircle2, Sun, ImageOff, Upload, Sparkles } from 'lucide-react';
+import { Loader2, ArrowRight, CheckCircle2, Sun, ImageOff, Upload, Sparkles, Globe } from 'lucide-react';
 import { BrandLogo } from '@/components/brands/BrandLogo';
 import { cn } from '@/lib/utils';
 import {
@@ -247,222 +247,189 @@ export function Phase0Identity({ brandId, brand, onComplete, hideNameField = fal
       </Card>
 
       {/* Identité de base */}
-      <div className="grid gap-6 sm:grid-cols-2">
+      <div className="grid gap-4 sm:grid-cols-2">
         {!hideNameField && (
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-foreground">Nom de la marque *</label>
+          <div className="space-y-1.5">
+            <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Nom de la marque *</label>
             <Input
               value={name}
               onChange={(e) => { setName(e.target.value); setError(''); }}
               placeholder="Ex. Ma Marque"
-              className="border-2"
+              className="h-10 border-2"
             />
           </div>
         )}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold text-foreground">Logo</label>
-          <div className="flex flex-col gap-2">
-            {!noLogo ? (
-              <>
-                <div
-                  onDrop={handleLogoDrop}
-                  onDragOver={handleLogoDragOver}
-                  onClick={() => logoFileInputRef.current?.click()}
-                  className={cn(
-                    'flex gap-3 items-center min-h-[56px] rounded-lg border-2 border-dashed transition-colors cursor-pointer',
-                    logoUploading ? 'border-primary/50 bg-primary/5' : 'border-muted-foreground/30 hover:border-primary/40 hover:bg-muted/30'
-                  )}
-                >
-                  <input
-                    ref={logoFileInputRef}
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={handleLogoFileSelect}
-                  />
-                  <div className="w-14 h-14 rounded-lg overflow-hidden bg-muted shrink-0 border-2 flex items-center justify-center">
-                    {logo ? (
-                      <BrandLogo logoUrl={logo} brandName={name || 'Logo'} className="w-full h-full object-contain" />
-                    ) : logoUploading ? (
-                      <Loader2 className="w-6 h-6 animate-spin text-primary" />
-                    ) : (
-                      <Upload className="w-6 h-6 text-muted-foreground" />
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0 py-2">
-                    {logo ? (
-                      <p className="text-sm text-foreground">Cliquez ou glissez-déposez pour remplacer le logo (256×256 px)</p>
-                    ) : (
-                      <p className="text-sm text-muted-foreground">Glissez-déposez votre logo (256×256 px) ici ou cliquez pour choisir un fichier</p>
-                    )}
-                  </div>
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Taille requise : <strong>256 × 256 pixels</strong> (carré). Ou collez l&apos;URL d&apos;une image ci-dessous.
-                </p>
-                <Input
-                  value={logo}
-                  onChange={(e) => { setLogo(e.target.value); setLogoUploadError(''); }}
-                  placeholder="URL du logo (https://...)"
-                  className="border-2"
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Logo</label>
+          {!noLogo ? (
+            <div className="flex flex-col gap-2">
+              <div
+                onDrop={handleLogoDrop}
+                onDragOver={handleLogoDragOver}
+                onClick={() => logoFileInputRef.current?.click()}
+                className={cn(
+                  'flex gap-3 items-center min-h-[50px] rounded-xl border-2 border-dashed transition-all cursor-pointer p-1.5',
+                  logoUploading ? 'border-primary/50 bg-primary/5' : 'border-muted-foreground/20 hover:border-primary/40 hover:bg-muted/30'
+                )}
+              >
+                <input
+                  ref={logoFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleLogoFileSelect}
                 />
-                {logoUploadError && <p className="text-sm text-destructive" role="alert">{logoUploadError}</p>}
-                <div className="flex flex-wrap gap-2">
-                  <Button type="button" variant="ghost" size="sm" className="text-muted-foreground gap-2" onClick={handleNoLogo}>
-                    <ImageOff className="w-4 h-4" />
-                    Je n&apos;ai pas de logo
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    size="sm"
-                    className="text-primary border-primary/30 hover:bg-primary/5 gap-2"
-                    onClick={() => {
-                      router.push('/launch-map/phase/1');
-                    }}
-                  >
-                    <Sparkles className="w-4 h-4" />
-                    Générer avec l&apos;IA (Ideogram)
-                  </Button>
+                <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0 border-2 flex items-center justify-center shadow-sm">
+                  {logo ? (
+                    <BrandLogo logoUrl={logo} brandName={name || 'Logo'} className="w-full h-full object-contain" />
+                  ) : logoUploading ? (
+                    <Loader2 className="w-5 h-5 animate-spin text-primary" />
+                  ) : (
+                    <Upload className="w-5 h-5 text-muted-foreground" />
+                  )}
                 </div>
-              </>
-            ) : (
-              <>
-                <div className="flex flex-col gap-3">
-                  <span className="text-sm text-muted-foreground">
-                    Une stratégie calquée est nécessaire pour générer un logo cohérent avec votre positionnement.
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    <Button type="button" variant="outline" size="sm" onClick={() => setNoLogo(false)}>
-                      J&apos;ai un logo à ajouter
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="default"
-                      size="sm"
-                      className="gap-2"
-                      onClick={() => {
-                        router.push('/launch-map/phase/1');
-                      }}
-                    >
-                      <Sparkles className="w-4 h-4" />
-                      Générer mon logo par IA
-                    </Button>
-                  </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[11px] font-medium text-foreground leading-tight">
+                    {logo ? 'Changer le logo' : 'Ajouter un logo (256x256)'}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground truncate">PNG, JPG ou SVG</p>
                 </div>
-              </>
-            )}
+              </div>
+              <div className="flex gap-2">
+                <Button type="button" variant="ghost" size="sm" className="h-8 text-[10px] font-bold uppercase tracking-tight text-muted-foreground gap-1.5 px-2" onClick={handleNoLogo}>
+                  <ImageOff className="w-3 h-3" />
+                  Pas de logo
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  className="h-8 text-[10px] font-bold uppercase tracking-tight text-primary border-primary/20 hover:bg-primary/5 gap-1.5 px-2"
+                  onClick={() => router.push('/launch-map/phase/1')}
+                >
+                  <Sparkles className="w-3 h-3" />
+                  IA Logo
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border-2 border-dashed border-muted-foreground/20">
+              <span className="text-[11px] text-muted-foreground font-medium">Mode sans logo</span>
+              <Button type="button" variant="ghost" size="sm" className="h-auto p-0 text-[11px] hover:bg-transparent underline" onClick={() => setNoLogo(false)}>
+                En ajouter un
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Détails & Socials - Plus compact */}
+      <div className="rounded-3xl border-2 border-black/5 bg-white p-4 sm:p-6 space-y-4 shadow-apple-sm">
+        <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+          <Globe className="w-4 h-4 text-primary" />
+          Présence en ligne
+        </h3>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">URL du site / domaine</label>
+            <Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="ma-marque.com" className="h-10 bg-muted/20 border-none shadow-none focus-visible:ring-1" />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Slogan / Baseline</label>
+            <Input value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="La marque qui..." className="h-10 bg-muted/20 border-none shadow-none focus-visible:ring-1" />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Instagram</label>
+            <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="@mamarque" className="h-10 bg-muted/20 border-none shadow-none focus-visible:ring-1" />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Twitter / X</label>
+            <Input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="@mamarque" className="h-10 bg-muted/20 border-none shadow-none focus-visible:ring-1" />
           </div>
         </div>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Domaine du site</label>
-          <Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="ex. ma-marque.com" className="border-2" />
+      {/* Produit Recommandé - Plus compact */}
+      <div className="rounded-3xl border-2 border-primary/20 bg-primary/5 p-4 sm:p-6 space-y-4">
+        <div className="flex items-start justify-between gap-4">
+          <div className="space-y-1">
+            <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+              <Sun className="w-4 h-4 text-primary" />
+              Produit recommandé
+            </h4>
+            <p className="text-[11px] text-muted-foreground leading-snug">{recommendation.reason}</p>
+          </div>
         </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Slogan / baseline</label>
-          <Input value={tagline} onChange={(e) => setTagline(e.target.value)} placeholder="Ex. La marque qui vous ressemble" className="border-2" />
-        </div>
-        <div className="space-y-2 sm:col-span-2">
-          <label className="text-sm font-medium text-muted-foreground">Description courte</label>
-          <Input value={description} onChange={(e) => setDescription(e.target.value)} placeholder="Description de la marque" className="border-2" />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Instagram</label>
-          <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="@mamarque" className="border-2" />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium text-muted-foreground">Twitter / X</label>
-          <Input value={twitter} onChange={(e) => setTwitter(e.target.value)} placeholder="@mamarque" className="border-2" />
+
+        <div className="grid gap-3 sm:grid-cols-2">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Type</label>
+            <select
+              value={productType}
+              onChange={(e) => {
+                const v = e.target.value as ProductTypeId;
+                setProductType(v);
+                const opts = getWeightOptions(v);
+                setProductWeight(opts[0]?.value ?? '180 g/m²');
+              }}
+              className="w-full h-10 px-3 text-xs bg-white border-none rounded-xl focus:ring-1 focus:ring-primary shadow-apple-sm font-semibold"
+            >
+              {PRODUCT_TYPE_IDS.map((id) => (
+                <option key={id} value={id}>{getProductTypeLabel(id)}</option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Poids (g/m²)</label>
+            <select
+              value={productWeight}
+              onChange={(e) => setProductWeight(e.target.value)}
+              className="w-full h-10 px-3 text-xs bg-white border-none rounded-xl focus:ring-1 focus:ring-primary shadow-apple-sm font-semibold"
+            >
+              {weightOptions.map((w) => (
+                <option key={w.value} value={w.value}>{w.label}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Recommandation saisonnière + produit principal */}
-      <Card className="border-2 border-primary/20 bg-primary/5">
-        <CardContent className="pt-6">
-          <h4 className="font-semibold text-foreground mb-2 flex items-center gap-2">
-            <Sun className="w-4 h-4 text-primary" />
-            Produit principal recommandé
-          </h4>
-          <p className="text-sm text-muted-foreground mb-4">{recommendation.reason}</p>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Type de vêtement</label>
-              <select
-                value={productType}
-                onChange={(e) => {
-                  const v = e.target.value as ProductTypeId;
-                  setProductType(v);
-                  const opts = getWeightOptions(v);
-                  setProductWeight(opts[0]?.value ?? '180 g/m²');
-                }}
-                className="w-full h-11 px-4 py-2.5 text-sm bg-background border-2 border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium"
-              >
-                {PRODUCT_TYPE_IDS.map((id) => (
-                  <option key={id} value={id}>{getProductTypeLabel(id)}</option>
-                ))}
-              </select>
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Grammage (g/m²)</label>
-              <select
-                value={productWeight}
-                onChange={(e) => setProductWeight(e.target.value)}
-                className="w-full h-11 px-4 py-2.5 text-sm bg-background border-2 border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium"
-              >
-                {weightOptions.map((w) => (
-                  <option key={w.value} value={w.value}>{w.label}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <p className="text-xs text-muted-foreground mt-2">
-            Ce choix sera repris automatiquement dans la Calculatrice et le Design ; vous pourrez le modifier avec une confirmation.
-          </p>
-        </CardContent>
-      </Card>
+      {/* Story - Plus compact */}
+      <div className="rounded-3xl border-2 border-black/5 bg-white p-4 sm:p-6 space-y-3">
+        <h4 className="font-bold text-foreground text-sm flex items-center gap-2">
+          <Sparkles className="w-4 h-4 text-primary" />
+          Votre Histoire
+        </h4>
+        <p className="text-[11px] text-muted-foreground">
+          Utilisée pour générer vos fiches produits et votre stratégie.
+        </p>
+        <Textarea
+          value={story}
+          onChange={(e) => setStory(e.target.value)}
+          placeholder="Racontez pourquoi vous lancez cette marque..."
+          className="border-none bg-muted/30 min-h-[100px] text-sm rounded-2xl resize-none focus-visible:ring-1"
+        />
+      </div>
 
-      {/* Pourquoi créer sa marque — histoire / raison d'être (réutilisée partout : descriptions produit, stratégie, etc.) */}
-      <Card className="border-2 border-primary/20 bg-primary/5">
-        <CardContent className="pt-6">
-          <h4 className="font-semibold text-foreground mb-1">Pourquoi avez-vous créé cette marque ? Racontez votre histoire</h4>
-          <p className="text-sm text-muted-foreground mb-4">
-            On réutilisera cette histoire dans vos descriptions produit et partout pour donner du sens à la marque et que les gens s&apos;y retrouvent — c&apos;est la clé d&apos;une marque qui cartonne.
-          </p>
-          <Textarea
-            value={story}
-            onChange={(e) => setStory(e.target.value)}
-            placeholder="Ex. J'ai lancé cette marque après des années à ne pas trouver de vêtements qui me ressemblent. Je voulais des pièces minimalistes, durables, avec une vraie histoire derrière chaque coupe…"
-            className="border-2 min-h-[120px] resize-y"
-          />
-        </CardContent>
-      </Card>
-
-      {/* Infos créateur */}
-      <Card className="border-2 bg-muted/20">
-        <CardContent className="pt-6">
-          <h4 className="font-semibold text-foreground mb-4">Informations que seul le créateur connaît</h4>
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-muted-foreground">Étape actuelle</label>
-              <select
-                value={stage}
-                onChange={(e) => setStage(e.target.value)}
-                className="w-full h-11 px-4 py-2.5 text-sm bg-background border-2 border-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20 font-medium"
-              >
-                <option value="">Sélectionnez</option>
-                <option value="ideation">Idéation / projet</option>
-                <option value="prelaunch">Pré-lancement</option>
-                <option value="launch">Lancement</option>
-                <option value="growth">Croissance</option>
-                <option value="established">Marque établie</option>
-              </select>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+      {/* Étape / Stade - Plus compact */}
+      <div className="rounded-3xl border-2 border-black/5 bg-white p-4 sm:p-6 flex items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h4 className="font-bold text-foreground text-sm">Stade du projet</h4>
+          <p className="text-[11px] text-muted-foreground">Où en êtes-vous ?</p>
+        </div>
+        <select
+          value={stage}
+          onChange={(e) => setStage(e.target.value)}
+          className="h-10 px-4 text-xs font-bold bg-muted/30 border-none rounded-xl focus:ring-1 focus:ring-primary"
+        >
+          <option value="">Sélectionnez</option>
+          <option value="ideation">Projet</option>
+          <option value="prelaunch">Pré-lancement</option>
+          <option value="launch">Lancement</option>
+          <option value="growth">Croissance</option>
+          <option value="established">Établie</option>
+        </select>
+      </div>
 
       {error && <p ref={errorRef} className="text-sm text-destructive font-medium">{error}</p>}
       {saved && <p className="text-sm text-green-600 font-medium flex items-center gap-2"><CheckCircle2 className="w-4 h-4" /> Enregistré.</p>}
