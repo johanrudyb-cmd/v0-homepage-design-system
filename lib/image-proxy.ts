@@ -11,9 +11,15 @@ export function proxyImageUrl(url: string | null | undefined): string | null {
         return url;
     }
 
-    // Si l'URL est externe, la proxyfier
+    // Si l'URL est externe, la proxyfier en encodant l'URL source pour masquer le domaine (Zalando/ASOS)
     if (url.startsWith('http://') || url.startsWith('https://')) {
-        return `/api/proxy-image?url=${encodeURIComponent(url)}`;
+        // Encodage Base64 simple pour obfusquer la source aux yeux des utilisateurs F12
+        try {
+            const encodedUrl = Buffer.from(url).toString('base64');
+            return `/api/proxy-image?url=${encodedUrl}&encoded=true`;
+        } catch (e) {
+            return `/api/proxy-image?url=${encodeURIComponent(url)}`;
+        }
     }
 
     return url;

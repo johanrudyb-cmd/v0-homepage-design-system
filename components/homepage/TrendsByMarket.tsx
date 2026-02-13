@@ -292,16 +292,14 @@ export function TrendsByMarket() {
                       <div className="relative aspect-[4/5] sm:aspect-square min-h-[250px] sm:min-h-0 bg-[#F5F5F7] overflow-hidden">
                         {product.imageUrl ? (
                           <img
-                            src={product.imageUrl}
+                            src={proxyImageUrl(product.imageUrl) || ''}
                             alt={product.name}
                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                             referrerPolicy="no-referrer"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
-                              const proxied = proxyImageUrl(product.imageUrl || '');
-                              if (proxied && target.src !== proxied) {
-                                target.src = proxied;
-                              }
+                              // Si l'image proxyfiait échoue, on ne tente pas le lien direct pour rester anonyme
+                              target.style.display = 'none';
                             }}
                           />
                         ) : (
