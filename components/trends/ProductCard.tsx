@@ -65,9 +65,16 @@ export function ProductCard({ product, userId, isFavorite: initialIsFavorite }: 
         <div className="relative aspect-square bg-muted rounded-t-lg overflow-hidden">
           {product.imageUrl ? (
             <img
-              src={proxyImageUrl(product.imageUrl) || product.imageUrl}
+              src={proxyImageUrl(product.imageUrl) || product.imageUrl || ''}
               alt={product.name}
               className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+              referrerPolicy="no-referrer"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                if (product.imageUrl && target.src !== product.imageUrl) {
+                  target.src = product.imageUrl;
+                }
+              }}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center text-stone-400">
@@ -79,8 +86,8 @@ export function ProductCard({ product, userId, isFavorite: initialIsFavorite }: 
           <button
             onClick={handleToggleFavorite}
             className={`absolute top-3 right-3 p-2 rounded-lg transition-colors ${isFavorite
-                ? 'bg-primary text-white'
-                : 'bg-background/80 text-muted-foreground hover:bg-background border border-border'
+              ? 'bg-primary text-white'
+              : 'bg-background/80 text-muted-foreground hover:bg-background border border-border'
               }`}
           >
             <svg className="w-5 h-5" fill={isFavorite ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">

@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { cn } from '@/lib/utils';
 import {
   ChevronDown,
   ChevronLeft,
@@ -18,6 +19,7 @@ import {
   Check,
   FileText,
   Trash2,
+  TrendingUp,
 } from 'lucide-react';
 import type { BrandIdentity } from './LaunchMapStepper';
 import {
@@ -146,6 +148,17 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
   const fileInputMainLogoRef = useRef<HTMLInputElement>(null);
   const fileInputFrontDesignRef = useRef<HTMLInputElement>(null);
   const fileInputDesignerRef = useRef<HTMLInputElement>(null);
+  const [mobileTab, setMobileTab] = useState<'form' | 'preview'>('form');
+  const [collapsedSections, setCollapsedSections] = useState<Record<string, boolean>>({
+    type: false,
+    import: false,
+    details: false,
+    dimensions: true
+  });
+
+  const toggleSection = (id: string) => {
+    setCollapsedSections(prev => ({ ...prev, [id]: !prev[id] }));
+  };
 
   const [selectedDesignId, setSelectedDesignIdState] = useState<string | null>(null);
 
@@ -535,7 +548,7 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
             <div className="flex flex-wrap justify-center gap-3">
               <Link
                 href="/launch-map/tech-packs"
-                className="inline-flex items-center justify-center h-10 px-5 text-sm font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all" 
+                className="inline-flex items-center justify-center h-10 px-5 text-sm font-semibold rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 transition-all"
               >
                 {isEditMode ? 'Retour à Mes tech packs' : 'Voir Mes tech packs'}
               </Link>
@@ -565,9 +578,36 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
   }
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto min-h-[400px] lg:h-[calc(100vh-180px)] lg:flex lg:flex-col lg:overflow-hidden">
+    <div className="w-full max-w-[1600px] mx-auto min-h-[400px] lg:h-[calc(100vh-180px)] lg:flex lg:flex-col lg:overflow-hidden relative">
+      {/* Mobile Tab Switcher */}
+      <div className="lg:hidden sticky top-0 z-50 bg-background border-b flex p-1 gap-1">
+        <button
+          onClick={() => setMobileTab('form')}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all",
+            mobileTab === 'form' ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted"
+          )}
+        >
+          <FileText className="w-4 h-4" />
+          Éditer
+        </button>
+        <button
+          onClick={() => setMobileTab('preview')}
+          className={cn(
+            "flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-sm font-bold transition-all",
+            mobileTab === 'preview' ? "bg-primary text-primary-foreground shadow-md" : "text-muted-foreground hover:bg-muted"
+          )}
+        >
+          <TrendingUp className="w-4 h-4" />
+          Aperçu
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 lg:grid-cols-[minmax(380px,480px)_1fr] gap-0 lg:flex-1 lg:min-h-0 lg:overflow-hidden">
-        <div className="border-b lg:border-b-0 lg:border-r border-border overflow-y-auto p-4 lg:p-6 space-y-6 bg-background lg:min-h-0">
+        <div className={cn(
+          "border-b lg:border-b-0 lg:border-r border-border overflow-y-auto p-4 lg:p-6 space-y-6 bg-background lg:min-h-0",
+          mobileTab !== 'form' && "hidden lg:block"
+        )}>
           <div>
             <h2 className="text-lg font-semibold mb-1">{isEditMode ? 'Modifier le tech pack' : 'Remplir le tech pack'}</h2>
             <p className="text-sm text-muted-foreground">
@@ -580,25 +620,39 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
             )}
           </div>
           {/* 1. Type de produit */}
-
-          {true && (
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle className="leading-snug break-words">Choisissez le type de produit</CardTitle>
-                <CardDescription>Sélectionnez le type de vêtement pour votre mockup (mêmes options que dans le reste de l&apos;app).</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex flex-wrap gap-3">
+          <Card className="border-2 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('type')}
+              className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/30"
+            >
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                1. Type de produit
+              </CardTitle>
+              <ChevronDown className={cn("w-5 h-5 transition-transform", !collapsedSections.type && "rotate-180")} />
+            </button>
+            {!collapsedSections.type && (
+              <CardContent className="pt-0 space-y-4">
+                <CardDescription>Sélectionnez le type de vêtement pour votre mockup.</CardDescription>
+                <div className="flex flex-wrap gap-2">
                   {MOCKUP_TYPES.map((t) => (
-                    <button key={t} type="button" onClick={() => setMockupType(t)} className={`px-4 py-3 rounded-xl border-2 text-left transition-all whitespace-normal ${mockupType === t ? 'border-primary bg-primary/10' : 'border-border hover:border-primary/50'}`}>
-                      <span className="font-medium text-sm">{t}</span>
-                      {mockupType === t && <span className="ml-2 text-primary text-sm inline-flex items-center gap-1"><Check className="w-4 h-4 shrink-0" /> Sélectionné</span>}
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setMockupType(t)}
+                      className={cn(
+                        "px-3 py-2 rounded-lg border-2 text-xs font-semibold transition-all",
+                        mockupType === t ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:border-primary/50'
+                      )}
+                    >
+                      {t}
                     </button>
                   ))}
                 </div>
               </CardContent>
-            </Card>
-          )}
+            )}
+          </Card>
 
           {/* 2. Dimensions classiques — menu déroulant */}
           {true && (
@@ -635,50 +689,63 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
             </Card>
           )}
 
-          {/* Étape 3 : Import du mockup (un seul document devant + dos) */}
-          {true && (
-            <Card className="border-2">
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2"><Upload className="w-5 h-5 text-primary" /> Importer votre mockup</CardTitle>
-                <CardDescription>Importez un seul document contenant devant et dos (PNG ou JPG). Votre mockup apparaîtra dans le tech pack et le PDF.</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-6">
+          {/* Étape 3 : Import du mockup */}
+          <Card className="border-2 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('import')}
+              className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/30"
+            >
+              <CardTitle className="text-base flex items-center gap-2">
+                <Upload className="w-5 h-5 text-primary" />
+                2. Import du Mockup
+              </CardTitle>
+              <ChevronDown className={cn("w-5 h-5 transition-transform", !collapsedSections.import && "rotate-180")} />
+            </button>
+            {!collapsedSections.import && (
+              <CardContent className="pt-0 space-y-4">
+                <CardDescription>Importez un document devant + dos (PNG/JPG).</CardDescription>
                 <input ref={fileInputMockupRef} type="file" accept="image/*" className="hidden" onChange={handleMockupFileChange} />
-
-                <div>
-                  <div className="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors" onClick={() => fileInputMockupRef.current?.click()}>
-                    {uploadedMockupUrl ? (
-                      <div className="space-y-2">
-                        <img src={uploadedMockupUrl} alt="Mockup" className="max-h-48 mx-auto object-contain rounded" />
-                        <p className="text-xs text-muted-foreground">Cliquez pour modifier</p>
-                      </div>
-                    ) : (
-                      <>
-                        {isUploading ? <Loader2 className="w-12 h-12 animate-spin text-primary mx-auto mb-2" /> : <Upload className="w-12 h-12 text-muted-foreground mx-auto mb-2" />}
-                        <p className="text-sm font-medium">Cliquez pour importer votre mockup (devant + dos)</p>
-                        <p className="text-xs text-muted-foreground mt-1">Un seul document au format PNG ou JPG</p>
-                      </>
-                    )}
-                  </div>
+                <div
+                  className="border-2 border-dashed rounded-xl p-6 text-center cursor-pointer hover:border-primary/50 hover:bg-muted/30 transition-colors"
+                  onClick={() => fileInputMockupRef.current?.click()}
+                >
+                  {uploadedMockupUrl ? (
+                    <div className="space-y-2">
+                      <img src={uploadedMockupUrl} alt="Mockup" className="max-h-32 mx-auto object-contain rounded shadow-sm" />
+                      <p className="text-[10px] text-muted-foreground">Cliquez pour modifier</p>
+                    </div>
+                  ) : (
+                    <div className="py-4">
+                      {isUploading ? <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" /> : <Upload className="w-8 h-8 text-muted-foreground mx-auto" />}
+                      <p className="text-xs font-bold mt-2">Importer le mockup</p>
+                    </div>
+                  )}
                 </div>
-
                 {!isEditMode && (
-                  <Button onClick={handleContinueFromStep3} disabled={!uploadedMockupUrl || isAddingDesign} className="w-full gap-2">
-                    {isAddingDesign ? <><Loader2 className="w-4 h-4 animate-spin" /> Préparation...</> : 'Initialiser le tech pack'}
+                  <Button onClick={handleContinueFromStep3} disabled={!uploadedMockupUrl || isAddingDesign} className="w-full h-11 text-sm font-bold shadow-apple">
+                    {isAddingDesign ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Initialisation...</> : 'Initialiser avec cette image'}
                   </Button>
                 )}
               </CardContent>
-            </Card>
-          )}
+            )}
+          </Card>
 
-          {/* Étape 4 : Compléter le tech pack (modèle SPEED DEMON) + prévisualisation live */}
-          {true && (
-            <Card className="border-2">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2"><FileText className="w-5 h-5 text-primary" /> Compléter le tech pack</CardTitle>
-                  <CardDescription>Remplissez les champs — la fiche se met à jour en direct.</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
+          {/* Étape 4 : Compléter le tech pack */}
+          <Card className="border-2 overflow-hidden">
+            <button
+              type="button"
+              onClick={() => toggleSection('details')}
+              className="w-full flex items-center justify-between p-4 text-left hover:bg-muted/30"
+            >
+              <CardTitle className="text-base flex items-center gap-2">
+                <FileText className="w-5 h-5 text-primary" />
+                3. Détails Techniques
+              </CardTitle>
+              <ChevronDown className={cn("w-5 h-5 transition-transform", !collapsedSections.details && "rotate-180")} />
+            </button>
+            {!collapsedSections.details && (
+              <CardContent className="pt-0 space-y-6">
                 <input ref={fileInputMainLogoRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e, 'mainLogo')} />
                 <input ref={fileInputFrontDesignRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e, 'frontDesign')} />
                 <input ref={fileInputDesignerRef} type="file" accept="image/*" className="hidden" onChange={(e) => handleLogoUpload(e, 'designer')} />
@@ -688,138 +755,65 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <Label>Saison</Label>
-                      <Input placeholder="ex. SS26, FW24" value={season} onChange={(e) => setSeason(e.target.value)} className="mt-1" />
+                      <Input placeholder="ex. SS26" value={season} onChange={(e) => setSeason(e.target.value)} className="mt-1 h-9 text-sm" />
                     </div>
                     <div>
                       <Label>Nom du design</Label>
-                      <Input placeholder="ex. SPEED DEMON" value={designName} onChange={(e) => setDesignName(e.target.value)} className="mt-1" />
+                      <Input placeholder="ex. SPEED DEMON" value={designName} onChange={(e) => setDesignName(e.target.value)} className="mt-1 h-9 text-sm" />
                     </div>
                     <div>
                       <Label>Catégorie</Label>
-                      <select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <select value={category} onChange={(e) => setCategory(e.target.value)} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm h-9">
                         {CATEGORY_OPTIONS.map((opt) => <option key={opt.value} value={opt.value}>{opt.label}</option>)}
                       </select>
                     </div>
                     <div>
                       <Label>Matière</Label>
-                      <select value={fabric} onChange={(e) => setFabric(e.target.value)} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
+                      <select value={fabric} onChange={(e) => setFabric(e.target.value)} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-1.5 text-sm h-9">
                         {FABRIC_OPTIONS.map((opt) => <option key={opt.value || 'empty'} value={opt.value}>{opt.label}</option>)}
                       </select>
-                      {fabric === 'Autre' && <Input placeholder="Préciser la matière" value={fabricOther} onChange={(e) => setFabricOther(e.target.value)} className="mt-1" />}
-                    </div>
-                    <div>
-                      <Label>Type d&apos;impression</Label>
-                      <select value={printType} onChange={(e) => setPrintType(e.target.value)} className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm">
-                        {PRINT_TYPE_OPTIONS.map((opt) => <option key={opt.value || 'empty'} value={opt.value}>{opt.label}</option>)}
-                      </select>
-                    </div>
-                    <div>
-                      <Label>Référence</Label>
-                      <Input placeholder="ex. HOODIE-0004" value={issueNo} onChange={(e) => setIssueNo(e.target.value)} className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Créé le</Label>
-                      <Input type="date" value={todayStr()} readOnly className="mt-1" />
-                    </div>
-                    <div>
-                      <Label>Livraison prévue le</Label>
-                      <Input type="date" value={outDate} onChange={(e) => setOutDate(e.target.value)} className="mt-1" />
+                      {fabric === 'Autre' && <Input placeholder="Préciser" value={fabricOther} onChange={(e) => setFabricOther(e.target.value)} className="mt-1 h-9 text-sm" />}
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <h4 className="text-sm font-semibold text-primary">Tailles souhaitées (S, M, L…)</h4>
-                  <p className="text-xs text-muted-foreground">Sélectionnez les tailles à afficher en haut à droite de la fiche.</p>
-                  <div className="flex flex-wrap gap-2">
-                    {SIZE_OPTIONS.map((s) => (
-                      <label key={s} className="flex items-center gap-1.5 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={sizes.includes(s)}
-                          onChange={(e) => {
-                            if (e.target.checked) setSizes((prev) => [...prev, s].sort((a, b) => SIZE_OPTIONS.indexOf(a) - SIZE_OPTIONS.indexOf(b)));
-                            else setSizes((prev) => prev.filter((x) => x !== s));
-                          }}
-                          className="rounded"
-                        />
-                        <span className="text-sm font-medium">{s}</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-
-                <div className="space-y-2">
-                  <h4 className="text-sm font-semibold text-primary">Logos et design</h4>
-                  <p className="text-xs text-muted-foreground">[A] Logo devant, [B] Logo arrière, [C]… logos supplémentaires. Pour chaque : emplacement, taille en pouces.</p>
+                  <h4 className="text-sm font-semibold text-primary">Logos et Emplacements</h4>
                   {labels.map((lb, idx) => (
-                    <div key={`${lb.letter}-${idx}`} className="border rounded-lg p-3 space-y-2 bg-muted/20">
+                    <div key={`${lb.letter}-${idx}`} className="border rounded-lg p-2 space-y-2 bg-muted/20">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="font-bold text-primary w-8">[{lb.letter}]</span>
-                        <span className="text-sm text-muted-foreground">{lb.type}</span>
-                        <span className="text-xs text-muted-foreground hidden sm:inline">— {lb.placement}</span>
-                        <label className="flex items-center gap-1.5 text-xs cursor-pointer ml-auto">
-                          <input type="checkbox" checked={!!lb.isNeckTag} onChange={(e) => setLabels((prev) => prev.map((l, i) => (i === idx ? { ...l, isNeckTag: e.target.checked } : { ...l, isNeckTag: e.target.checked ? false : l.isNeckTag })))} /> État. cou
-                        </label>
+                        <span className="font-bold text-primary text-xs">[{lb.letter}]</span>
+                        <span className="text-xs font-semibold flex-1 truncate">{lb.type}</span>
                         <input type="file" accept="image/*" className="hidden" id={`label-${idx}`} onChange={(e) => idx === 0 ? handleLogoUpload(e, 'frontDesign') : handleLogoUpload(e, 'label', idx)} />
-                        <Button type="button" variant="outline" size="sm" onClick={() => document.getElementById(`label-${idx}`)?.click()} disabled={uploadingLogo === (idx === 0 ? 'frontDesign' : `label-${idx}`)} className="gap-1">
-                          {uploadingLogo === (idx === 0 ? 'frontDesign' : `label-${idx}`) ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-                          {lb.imageUrl ? 'Remplacer' : 'Importer'}
+                        <Button type="button" variant="ghost" size="sm" onClick={() => document.getElementById(`label-${idx}`)?.click()} disabled={uploadingLogo === (idx === 0 ? 'frontDesign' : `label-${idx}`)} className="h-7 text-[10px] px-2 border">
+                          {lb.imageUrl ? 'Changer' : 'Logo'}
                         </Button>
-                        {idx >= 2 && (
-                          <Button type="button" variant="ghost" size="sm" className="text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setLabels((prev) => prev.filter((_, i) => i !== idx).map((l, i) => ({ ...l, letter: String.fromCharCode(65 + i) })))} aria-label="Supprimer">
-                            <Trash2 className="w-4 h-4" />
-                          </Button>
-                        )}
-                        {lb.imageUrl && <img src={lb.imageUrl} alt="" className="h-8 w-8 object-contain border rounded" />}
+                        {lb.imageUrl && <img src={lb.imageUrl} alt="" className="h-6 w-6 object-contain border rounded" />}
                       </div>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                        <div><Label className="text-xs">Emplacement</Label>
-                          <select value={lb.placement} onChange={(e) => setLabels((prev) => prev.map((l, i) => (i === idx ? { ...l, placement: e.target.value } : l)))} className="mt-1 w-full rounded-md border border-input bg-background px-2 py-1.5 text-sm">
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="col-span-1">
+                          <Label className="text-[10px]">Pos.</Label>
+                          <select value={lb.placement} onChange={(e) => setLabels((prev) => prev.map((l, i) => (i === idx ? { ...l, placement: e.target.value } : l)))} className="mt-0.5 w-full rounded-md border border-input bg-background px-1 py-1 text-[10px] h-7">
                             {placementOptions.map((opt) => <option key={opt} value={opt}>{opt}</option>)}
                           </select>
                         </div>
-                        <div><Label className="text-xs">Largeur (pouces)</Label><Input type="number" step={0.5} value={lb.widthIn} onChange={(e) => setLabels((prev) => prev.map((l, i) => (i === idx ? { ...l, widthIn: parseFloat(e.target.value) || 0 } : l)))} className="mt-1" /></div>
-                        <div><Label className="text-xs">Hauteur (pouces)</Label><Input type="number" step={0.5} value={lb.heightIn} onChange={(e) => setLabels((prev) => prev.map((l, i) => (i === idx ? { ...l, heightIn: parseFloat(e.target.value) || 0 } : l)))} className="mt-1" /></div>
+                        <div><Label className="text-[10px]">L (in)</Label><Input type="number" step={0.5} value={lb.widthIn} onChange={(e) => setLabels((prev) => prev.map((l, i) => (i === idx ? { ...l, widthIn: parseFloat(e.target.value) || 0 } : l)))} className="mt-0.5 h-7 text-[10px] px-1" /></div>
+                        <div><Label className="text-[10px]">H (in)</Label><Input type="number" step={0.5} value={lb.heightIn} onChange={(e) => setLabels((prev) => prev.map((l, i) => (i === idx ? { ...l, heightIn: parseFloat(e.target.value) || 0 } : l)))} className="mt-0.5 h-7 text-[10px] px-1" /></div>
                       </div>
                     </div>
                   ))}
-                  <Button type="button" variant="outline" size="sm" onClick={() => setLabels((prev) => [...prev, { letter: String.fromCharCode(65 + prev.length), imageUrl: null, widthIn: 14, heightIn: 8, placement: placementOptions[0] || 'Poitrine (centre)', type: 'Logo supp.' }])}>
+                  <Button type="button" variant="outline" size="sm" className="w-full text-xs h-8" onClick={() => setLabels((prev) => [...prev, { letter: String.fromCharCode(65 + prev.length), imageUrl: null, widthIn: 14, heightIn: 8, placement: placementOptions[0] || 'Poitrine (centre)', type: 'Logo supp.' }])}>
                     + Ajouter un logo
                   </Button>
                 </div>
 
-                <div className="space-y-2">
-                  <h4 className="text-sm font-semibold text-primary">Designer / Créateur</h4>
-                  <div className="flex gap-3">
-                    <div className="border-2 border-dashed rounded-lg p-3 text-center cursor-pointer hover:bg-muted/50 w-24" onClick={() => fileInputDesignerRef.current?.click()}>
-                      {uploadingLogo === 'designer' ? <Loader2 className="w-8 h-8 animate-spin mx-auto" /> : designerLogoUrl ? <img src={designerLogoUrl} alt="" className="h-14 mx-auto object-contain" /> : <><Upload className="w-6 h-6 mx-auto text-muted-foreground" /><span className="text-xs block mt-1">Logo</span></>}
-                    </div>
-                    <Input placeholder="Ou nom du designer" value={designerName} onChange={(e) => setDesignerName(e.target.value)} className="flex-1 self-center" />
-                  </div>
+                <div className="pt-2">
+                  <Label className="text-sm font-semibold text-primary">Fabricant / Marque</Label>
+                  <Input placeholder="ex. Voltrix" value={manufacturer} onChange={(e) => setManufacturer(e.target.value)} className="mt-1 h-9 text-sm" />
                 </div>
-
-                <div className="space-y-2">
-                  <h4 className="text-sm font-semibold text-primary">Échantillons de couleurs</h4>
-                  <div className="flex flex-wrap gap-2">
-                    {colorSwatches.map((sw, i) => (
-                      <div key={i} className="flex items-center gap-1">
-                        <input type="color" value={sw.hex} onChange={(e) => setColorSwatches((prev) => prev.map((s, j) => (j === i ? { hex: e.target.value } : s)))} className="w-8 h-8 rounded border cursor-pointer" />
-                        <Input value={sw.hex} onChange={(e) => setColorSwatches((prev) => prev.map((s, j) => (j === i ? { hex: e.target.value } : s)))} className="w-24 font-mono text-xs" placeholder="#HEX" />
-                      </div>
-                    ))}
-                    <Button type="button" variant="outline" size="sm" onClick={() => setColorSwatches((prev) => [...prev, { hex: '#cccccc' }])}>+ Couleur</Button>
-                  </div>
-                </div>
-
-                <div>
-                  <Label htmlFor="tp-manufacturer">Fabricant</Label>
-                  <Input id="tp-manufacturer" placeholder="ex. Voltrix" value={manufacturer} onChange={(e) => setManufacturer(e.target.value)} className="mt-1" />
-                </div>
-
               </CardContent>
-            </Card>
-          )}
+            )}
+          </Card>
 
           {/* 10. Modifier dimensions ? */}
           <Card>
@@ -835,34 +829,34 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
               {modifyDimensions === true && (
 
                 <div className="mt-4 space-y-3 max-h-[240px] overflow-y-auto">
-                {sizesForForm.map((size) => (
-                  <Card key={size}>
-                    <CardHeader className="py-3">
-                      <CardTitle className="text-base">Taille {size}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="grid grid-cols-2 gap-3">
-                      {dimensionKeys.map((key) => (
-                        <div key={key}>
-                          <Label className="text-xs">{DIMENSION_LABELS[key]}</Label>
-                          <Input
-                            type="number"
-                            step={0.5}
-                            value={dimensionsBySize[size]?.[key] ?? ''}
-                            onChange={(e) => {
-                              const v = e.target.value ? parseFloat(e.target.value) : undefined;
-                              setDimensionsBySize((prev) => ({
-                                ...prev,
-                                [size]: { ...prev[size], [key]: v },
-                              }));
-                            }}
-                            className="mt-1"
-                          />
-                        </div>
-                      ))}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                  {sizesForForm.map((size) => (
+                    <Card key={size}>
+                      <CardHeader className="py-3">
+                        <CardTitle className="text-base">Taille {size}</CardTitle>
+                      </CardHeader>
+                      <CardContent className="grid grid-cols-2 gap-3">
+                        {dimensionKeys.map((key) => (
+                          <div key={key}>
+                            <Label className="text-xs">{DIMENSION_LABELS[key]}</Label>
+                            <Input
+                              type="number"
+                              step={0.5}
+                              value={dimensionsBySize[size]?.[key] ?? ''}
+                              onChange={(e) => {
+                                const v = e.target.value ? parseFloat(e.target.value) : undefined;
+                                setDimensionsBySize((prev) => ({
+                                  ...prev,
+                                  [size]: { ...prev[size], [key]: v },
+                                }));
+                              }}
+                              className="mt-1"
+                            />
+                          </div>
+                        ))}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
               )}
             </CardContent>
           </Card>
@@ -895,7 +889,10 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
         </div>
 
         {/* Droite : tech pack en direct — reste visible pendant le défilement du formulaire */}
-        <div className="p-4 lg:p-6 bg-muted/30 overflow-y-auto lg:min-h-0">
+        <div className={cn(
+          "p-4 lg:p-6 bg-muted/30 overflow-y-auto lg:min-h-0",
+          mobileTab !== 'preview' && "hidden lg:block"
+        )}>
           <div className="rounded-lg overflow-hidden border-2 border-border bg-stone-100 shadow-lg">
             <TechPackSheet
               design={{

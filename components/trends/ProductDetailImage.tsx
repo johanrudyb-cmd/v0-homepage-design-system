@@ -3,13 +3,23 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { Package } from 'lucide-react';
+import { proxyImageUrl } from '@/lib/image-proxy';
 
 function normalizeImageUrl(url: string | null | undefined): string | null {
   if (!url || typeof url !== 'string') return null;
   const u = url.trim();
   if (!u) return null;
-  if (u.startsWith('//')) return `https:${u}`;
-  if (u.startsWith('http://') || u.startsWith('https://')) return u;
+
+  // Si c'est déjà une URL complète, on la passe au proxy
+  if (u.startsWith('http://') || u.startsWith('https://')) {
+    return proxyImageUrl(u);
+  }
+
+  // Gérer le cas //
+  if (u.startsWith('//')) {
+    return proxyImageUrl(`https:${u}`);
+  }
+
   return `https:${u}`;
 }
 
@@ -43,6 +53,7 @@ export function ProductDetailImage({ imageUrl, alt, className = 'object-cover' }
         alt={alt}
         className={className}
         style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+        referrerPolicy="no-referrer"
       />
     );
   }

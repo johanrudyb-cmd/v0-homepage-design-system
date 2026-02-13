@@ -8,7 +8,8 @@ import { DesignResult } from './DesignResult';
 import { DesignGallery } from './DesignGallery';
 import { CollectionsManager } from './CollectionsManager';
 import { DesignTemplates } from './DesignTemplates';
-import { Sparkles } from 'lucide-react';
+import { Sparkles, ChevronDown } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import { GenerationCostBadge } from '@/components/ui/generation-cost-badge';
 import { GenerationLoadingPopup } from '@/components/ui/generation-loading-popup';
 
@@ -64,6 +65,7 @@ export function DesignStudioForm({ brandId, brand, existingDesigns, initialData 
   const [error, setError] = useState('');
   const [selectedCollectionId, setSelectedCollectionId] = useState<string | null>(null);
   const [showTemplates, setShowTemplates] = useState(false);
+  const [isCollectionsOpen, setIsCollectionsOpen] = useState(false);
 
   const handleGenerate = async () => {
     if (!type || !cut || !material) {
@@ -123,11 +125,23 @@ export function DesignStudioForm({ brandId, brand, existingDesigns, initialData 
       <GenerationLoadingPopup open={isGenerating} title="Génération du tech pack…" />
       {/* Collections Sidebar */}
       <div className="lg:col-span-1">
-        <CollectionsManager
-          brandId={brandId}
-          onCollectionSelect={setSelectedCollectionId}
-          selectedCollectionId={selectedCollectionId}
-        />
+        <div className="lg:hidden mb-4">
+          <Button
+            variant="outline"
+            className="w-full flex justify-between items-center text-sm font-bold h-11 border-2"
+            onClick={() => setIsCollectionsOpen(!isCollectionsOpen)}
+          >
+            <span>📁 Collections & Archives</span>
+            <ChevronDown className={cn("w-4 h-4 transition-transform", isCollectionsOpen && "rotate-180")} />
+          </Button>
+        </div>
+        <div className={cn(isCollectionsOpen ? "block" : "hidden lg:block")}>
+          <CollectionsManager
+            brandId={brandId}
+            onCollectionSelect={setSelectedCollectionId}
+            selectedCollectionId={selectedCollectionId}
+          />
+        </div>
       </div>
 
       {/* Formulaire et Galerie */}
@@ -137,25 +151,22 @@ export function DesignStudioForm({ brandId, brand, existingDesigns, initialData 
           <DesignTemplates brandId={brandId} onSelectTemplate={handleSelectTemplate} />
         )}
 
-        <Card className="border-2">
-          <CardHeader>
-            <div className="flex items-center justify-between">
+        <Card className="border-2 shadow- apple">
+          <CardHeader className="p-4 sm:p-6 pb-2 sm:pb-4 text-center sm:text-left">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <CardTitle className="text-xl font-bold">
-                  Créer un nouveau design
+                <CardTitle className="text-lg sm:text-xl font-black">
+                  Nouveau design
                 </CardTitle>
-                <CardDescription className="font-medium">
-                  Remplissez les informations pour générer votre Tech Pack
-                </CardDescription>
               </div>
               <Button
                 variant="outline"
                 onClick={() => setShowTemplates(!showTemplates)}
-                className="border-2"
+                className="border-2 h-9 text-xs font-bold"
                 size="sm"
               >
-                <Sparkles className="w-4 h-4 mr-2" />
-                {showTemplates ? 'Masquer' : 'Voir'} templates
+                <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                {showTemplates ? 'Fermer' : 'Templates AI'}
               </Button>
             </div>
           </CardHeader>
@@ -332,7 +343,7 @@ export function DesignStudioForm({ brandId, brand, existingDesigns, initialData 
               variant="default"
             >
               {isGenerating ? 'Génération en cours...' : 'Générer le Tech Pack'}
-            <GenerationCostBadge feature="design_tech_pack" />
+              <GenerationCostBadge feature="design_tech_pack" />
             </Button>
           </CardContent>
         </Card>
@@ -343,8 +354,8 @@ export function DesignStudioForm({ brandId, brand, existingDesigns, initialData 
         )}
 
         {/* Galerie des designs existants */}
-        <DesignGallery 
-          designs={filteredDesigns} 
+        <DesignGallery
+          designs={filteredDesigns}
           brandId={brandId}
           selectedCollectionId={selectedCollectionId}
         />

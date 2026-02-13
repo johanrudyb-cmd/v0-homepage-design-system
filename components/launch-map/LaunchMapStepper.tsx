@@ -3,7 +3,14 @@
 import { useState, useEffect, useRef, useCallback, useMemo, Suspense } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, ChevronRight } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import {
+  Loader2,
+  ChevronRight,
+  BarChart3,
+  LayoutDashboard,
+  ChevronDown
+} from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
 import { Phase0Identity } from './Phase0Identity';
 import { Phase1Strategy } from './Phase1Strategy';
@@ -136,6 +143,7 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
   });
   const [savingSummary, setSavingSummary] = useState<string | null>(null);
   const phaseContentRef = useRef<HTMLDivElement>(null);
+  const [isDashboardOpen, setIsDashboardOpen] = useState(false);
 
   useEffect(() => {
     const s = launchMap?.phaseSummaries;
@@ -223,35 +231,38 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
     <div className="space-y-5">
       {!onlyPhaseContent && (
         <>
-          {/* Barre de progression */}
-          <Card className="border-2">
-            <CardContent className="pt-4 pb-4 px-5">
-              <div className="flex items-center justify-between mb-3">
-                <div>
-                  <h3 className="text-lg font-bold text-foreground">
-                    Progression globale
-                  </h3>
-                  <p className="text-sm text-muted-foreground font-medium">
-                    {completedPhases} sur 7 phases complétées
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-foreground">
-                    {Math.round(progressPercentage)}%
+          {/* Barre de progression - Version compacte sur mobile */}
+          <Card className="border-2 shadow-sm">
+            <CardContent className="py-3 px-4 sm:py-4 sm:px-5">
+              <div className="flex items-center justify-between gap-4">
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <h3 className="text-sm sm:text-lg font-extrabold text-[#1d1d1f] flex items-center gap-2">
+                      <BarChart3 className="w-4 h-4 text-primary" />
+                      Progression
+                    </h3>
+                    <span className="text-sm font-bold text-primary">
+                      {Math.round(progressPercentage)}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div
+                      className="gradient-primary h-2 rounded-full transition-all duration-700 ease-out shadow-apple-sm"
+                      style={{ width: `${progressPercentage}%` }}
+                    />
                   </div>
                 </div>
-              </div>
-              <div className="w-full bg-muted rounded-full h-2.5">
-                <div
-                  className="gradient-primary h-2.5 rounded-full transition-all duration-500"
-                  style={{ width: `${progressPercentage}%` }}
-                />
+                <div className="hidden sm:block text-right">
+                  <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">
+                    {completedPhases}/7 Phases
+                  </p>
+                </div>
               </div>
             </CardContent>
           </Card>
 
-          {/* Stepper visuel */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+          {/* Stepper visuel - Horizontal scroll on mobile */}
+          <div className="flex overflow-x-auto pb-4 pt-1 px-1 -mx-4 sm:mx-0 sm:px-0 scrollbar-hide gap-3 sm:grid sm:grid-cols-4 lg:grid-cols-7 sm:gap-2">
             {phases.map((phase, index) => {
               const isCompleted = progress[`phase${phase.id}` as keyof typeof progress];
               const isCurrent = phaseToRender === phase.id;
@@ -262,14 +273,16 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
                   key={phase.id}
                   onClick={() => setCurrentPhase(phase.id)}
                   disabled={false}
-                  className={`relative p-3 sm:p-4 rounded-xl border-2 transition-all ${isCurrent
-                    ? 'border-primary bg-primary/10 shadow-modern'
-                    : isCompleted
-                      ? 'border-success bg-success/10'
-                      : isAccessible
-                        ? 'border-border bg-card hover:border-primary/50 hover:shadow-modern'
-                        : 'border-border bg-muted opacity-50 cursor-not-allowed'
-                    }`}
+                  className={cn(
+                    "relative flex-shrink-0 w-[140px] sm:w-auto p-3 rounded-xl border-2 transition-all duration-300",
+                    isCurrent
+                      ? 'border-primary bg-primary/10 shadow-apple'
+                      : isCompleted
+                        ? 'border-success/30 bg-success/5'
+                        : isAccessible
+                          ? 'border-border bg-card hover:border-primary/50'
+                          : 'border-border bg-muted opacity-50 cursor-not-allowed'
+                  )}
                 >
                   <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
                     <div
@@ -304,58 +317,69 @@ export function LaunchMapStepper({ brandId, launchMap, brand, hasIdentity = fals
           </div>
 
           {/* Espace dashboard : résumés modifiables + accès aux outils */}
-          <Card className="border-2 border-primary/10">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-lg font-bold">Espace dashboard</CardTitle>
-              <CardDescription className="text-sm">
-                Résumés modifiables par phase et accès rapide aux outils (calculateur, design, sourcing, go-to-market).
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
-                {phases.map((phase) => {
-                  const key = String(phase.id);
-                  return (
-                    <Card key={phase.id} className="border-2">
-                      <CardHeader className="pb-1 pt-3 px-4">
-                        <div className="flex items-center justify-between gap-2">
-                          <div className="min-w-0">
-                            <CardTitle className="text-sm">{phase.title}</CardTitle>
-                            <CardDescription className="text-xs truncate">{phase.subtitle}</CardDescription>
-                          </div>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => openPhase(phase.id)}
-                            className="shrink-0 h-8"
-                          >
-                            Ouvrir
-                            <ChevronRight className="w-3 h-3 ml-0.5" />
-                          </Button>
-                        </div>
-                      </CardHeader>
-                      <CardContent className="space-y-1 pt-0 px-4 pb-4">
-                        <label className="text-xs font-medium text-muted-foreground">Résumé (modifiable)</label>
-                        <textarea
-                          value={summaries[key] ?? ''}
-                          onChange={(e) => setSummaries((prev) => ({ ...prev, [key]: e.target.value }))}
-                          onBlur={() => saveSummary(phase.id)}
-                          placeholder={`Résumé pour ${phase.title}…`}
-                          className="w-full min-h-[60px] rounded-md border-2 border-input bg-background px-2.5 py-1.5 text-sm resize-y"
-                          rows={2}
-                        />
-                        {savingSummary === key && (
-                          <span className="text-xs text-muted-foreground flex items-center gap-1">
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                            Enregistrement…
-                          </span>
-                        )}
-                      </CardContent>
-                    </Card>
-                  );
-                })}
+          <Card className="border-2 border-primary/10 overflow-hidden">
+            <button
+              onClick={() => setIsDashboardOpen(!isDashboardOpen)}
+              className="w-full flex items-center justify-between p-4 sm:p-6 text-left hover:bg-muted/30 transition-colors"
+            >
+              <div>
+                <CardTitle className="text-base sm:text-lg font-bold flex items-center gap-2">
+                  <LayoutDashboard className="w-5 h-5 text-primary" />
+                  Espace dashboard
+                </CardTitle>
+                <CardDescription className="text-xs sm:text-sm">
+                  Résumés et accès rapide aux outils.
+                </CardDescription>
               </div>
-            </CardContent>
+              <ChevronDown className={cn("w-5 h-5 text-muted-foreground transition-transform duration-300", isDashboardOpen && "rotate-180")} />
+            </button>
+            {isDashboardOpen && (
+              <CardContent className="pt-0">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 pb-4">
+                  {phases.map((phase) => {
+                    const key = String(phase.id);
+                    return (
+                      <Card key={phase.id} className="border-2">
+                        <CardHeader className="pb-1 pt-3 px-4">
+                          <div className="flex items-center justify-between gap-2">
+                            <div className="min-w-0">
+                              <CardTitle className="text-sm">{phase.title}</CardTitle>
+                              <CardDescription className="text-xs truncate">{phase.subtitle}</CardDescription>
+                            </div>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openPhase(phase.id)}
+                              className="shrink-0 h-8"
+                            >
+                              Ouvrir
+                              <ChevronRight className="w-3 h-3 ml-0.5" />
+                            </Button>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-1 pt-0 px-4 pb-4">
+                          <label className="text-xs font-medium text-muted-foreground">Résumé (modifiable)</label>
+                          <textarea
+                            value={summaries[key] ?? ''}
+                            onChange={(e) => setSummaries((prev) => ({ ...prev, [key]: e.target.value }))}
+                            onBlur={() => saveSummary(phase.id)}
+                            placeholder={`Résumé pour ${phase.title}…`}
+                            className="w-full min-h-[60px] rounded-md border-2 border-input bg-background px-2.5 py-1.5 text-sm resize-y"
+                            rows={2}
+                          />
+                          {savingSummary === key && (
+                            <span className="text-xs text-muted-foreground flex items-center gap-1">
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                              Enregistrement…
+                            </span>
+                          )}
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            )}
           </Card>
         </>
       )}

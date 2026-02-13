@@ -43,6 +43,17 @@ export function TrendsByMarket() {
   const [sortBy] = useState('Meilleures tendances (score)');
   const [analysesCount, setAnalysesCount] = useState<number | null>(null);
   const [homepageIds, setHomepageIds] = useState<Set<string>>(new Set());
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  // Détecter la taille de l'écran (Mobile vs Desktop)
+  useEffect(() => {
+    const checkScreen = () => {
+      setIsSmallScreen(window.innerWidth < 640);
+    };
+    checkScreen();
+    window.addEventListener('resize', checkScreen);
+    return () => window.removeEventListener('resize', checkScreen);
+  }, []);
 
   // Charger les tendances et les infos utilisateur
   useEffect(() => {
@@ -149,7 +160,6 @@ export function TrendsByMarket() {
     };
 
     // 2. Calculer les limites (Mobile vs Desktop)
-    const isSmallScreen = typeof window !== 'undefined' && window.innerWidth < 640;
     const limitPerSegment = isSmallScreen ? 2 : 4;
 
     if (selectedGender === 'Homme') {
@@ -282,9 +292,16 @@ export function TrendsByMarket() {
                       <div className="relative aspect-[4/5] sm:aspect-square min-h-[250px] sm:min-h-0 bg-[#F5F5F7] overflow-hidden">
                         {product.imageUrl ? (
                           <img
-                            src={proxyImageUrl(product.imageUrl) || product.imageUrl}
+                            src={proxyImageUrl(product.imageUrl) || product.imageUrl || ''}
                             alt={product.name}
                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              if (product.imageUrl && target.src !== product.imageUrl) {
+                                target.src = product.imageUrl;
+                              }
+                            }}
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-[#6e6e73]">

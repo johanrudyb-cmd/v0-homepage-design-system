@@ -630,15 +630,21 @@ export function TendancesContent() {
                     <div className="aspect-[3/4] bg-muted relative shrink-0">
                       {t.imageUrl ? (
                         <img
-                          src={proxyImageUrl(t.imageUrl) || t.imageUrl}
+                          src={proxyImageUrl(t.imageUrl) || t.imageUrl || ''}
                           alt={t.name}
                           className="w-full h-full object-cover"
+                          referrerPolicy="no-referrer"
                           onError={(e) => {
-                            // En cas d'erreur, afficher l'icône par défaut
-                            e.currentTarget.style.display = 'none';
-                            const parent = e.currentTarget.parentElement;
-                            if (parent) {
-                              parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-12 h-12 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
+                            const target = e.target as HTMLImageElement;
+                            if (t.imageUrl && target.src !== t.imageUrl) {
+                              target.src = t.imageUrl;
+                            } else {
+                              // Si même l'original échoue, on affiche l'icône
+                              target.style.display = 'none';
+                              const parent = target.parentElement;
+                              if (parent) {
+                                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-12 h-12 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
+                              }
                             }
                           }}
                         />

@@ -48,10 +48,10 @@ export function TrendsHero() {
           {/* Titre principal */}
           <div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold tracking-tight text-[#000000] mb-4 sm:mb-6 px-2">
-              Propulsez votre marque avec Outfity Intelligence
+              Créez votre marque de vêtement avec les données des géants
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-[#6e6e73] font-light max-w-2xl mx-auto mb-6 sm:mb-8 px-2">
-              Validez vos designs avec notre algorithme de corrélation sociale. Mêmes signaux. Mêmes usines. Mêmes succès commerciaux.
+              Validez vos designs avec les tendances virales de TikTok et Instagram. Mêmes signaux. Mêmes usines. Mêmes succès commerciaux.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link

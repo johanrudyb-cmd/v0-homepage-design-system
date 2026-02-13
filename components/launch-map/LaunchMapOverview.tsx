@@ -15,6 +15,7 @@ import {
   Store,
   FileText,
   Target,
+  ChevronDown,
 } from 'lucide-react';
 import { getSeasonalRecommendation, getProductTypeLabel } from '@/lib/seasonal-recommendation';
 import { LAUNCH_MAP_PHASES } from '@/lib/launch-map-constants';
@@ -152,9 +153,11 @@ export function LaunchMapOverview({
     };
   }, [brand.id, canGetRecommendations]);
 
+  const [isAdviceOpen, setIsAdviceOpen] = useState(false);
+
   return (
     <div className="min-h-screen bg-[#F5F5F7]">
-      <div className="px-4 sm:px-6 lg:px-12 py-6 sm:py-10 lg:py-12 max-w-[96rem] mx-auto space-y-6 sm:space-y-10">
+      <div className="px-4 sm:px-6 lg:px-12 py-4 sm:py-10 lg:py-12 max-w-[96rem] mx-auto space-y-4 sm:space-y-10">
         {/* En-tête avec logo en coin */}
         <section className="rounded-xl border border-border bg-card overflow-hidden animate-slide-in-down">
           <div className="p-4 sm:p-6 flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -168,9 +171,9 @@ export function LaunchMapOverview({
                   </div>
                 )}
               </div>
-              <div>
-                <h1 className="text-2xl font-bold text-foreground">{brand.name}</h1>
-                <p className="text-muted-foreground mt-1">Vue d&apos;ensemble — métriques et conseils</p>
+              <div className="flex-1 min-w-0">
+                <h1 className="text-xl sm:text-2xl font-bold text-foreground truncate">{brand.name}</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-0.5 truncate">Vue d&apos;ensemble — métriques et conseils</p>
                 {(brandSlug || positioning || targetAudience) && (
                   <div className="mt-3 flex flex-wrap gap-2 text-sm">
                     {brandSlug && (
@@ -201,44 +204,48 @@ export function LaunchMapOverview({
 
         {/* Métriques détaillées */}
         <section className="rounded-xl border border-border bg-card overflow-hidden animate-slide-in-up">
-          <div className="p-3 border-b border-border bg-muted/30">
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">Métriques</h2>
+          <div className="p-3 border-b border-border bg-muted/30 flex items-center justify-between">
+            <h2 className="text-[10px] font-bold text-foreground uppercase tracking-wider">Tableau de bord</h2>
+            <div className="flex items-center gap-2 text-[10px] text-muted-foreground font-bold">
+              <BarChart3 className="w-3 h-3" />
+              <span>{progressPercentage}% · {completedPhases}/8</span>
+            </div>
           </div>
-          <div className="p-4 grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div className="rounded-lg border border-border bg-muted/20 p-4">
+          <div className="flex overflow-x-auto p-3 gap-3 scrollbar-hide sm:grid sm:grid-cols-4 sm:p-4">
+            <div className="flex-shrink-0 w-36 sm:w-auto rounded-lg border border-border bg-muted/10 p-3 sm:p-4">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <PenTool className="w-4 h-4" />
-                <span className="text-xs font-medium">Designs créés</span>
+                <PenTool className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold uppercase tracking-tight">Designs</span>
               </div>
-              <p className="text-2xl font-bold text-foreground mt-2">{designCount}</p>
-              <Link href="/design-studio" className="text-xs text-primary hover:underline mt-1 inline-flex items-center gap-1">
-                Design Studio <ExternalLink className="w-3 h-3" />
+              <p className="text-xl font-black text-foreground mt-1">{designCount}</p>
+              <Link href="/design-studio" className="text-[10px] text-primary font-bold hover:underline mt-1 inline-flex items-center gap-1">
+                Studio <ExternalLink className="w-2.5 h-2.5" />
               </Link>
             </div>
-            <div className="rounded-lg border border-border bg-muted/20 p-4">
+            <div className="flex-shrink-0 w-36 sm:w-auto rounded-lg border border-border bg-muted/10 p-3 sm:p-4">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <BarChart3 className="w-4 h-4" />
-                <span className="text-xs font-medium">Progression</span>
+                <BarChart3 className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold uppercase tracking-tight">Progression</span>
               </div>
-              <p className="text-2xl font-bold text-foreground mt-2">{progressPercentage}%</p>
-              <p className="text-xs text-muted-foreground mt-1">{completedPhases} / {LAUNCH_MAP_PHASES.length} phases complétées</p>
+              <p className="text-xl font-black text-foreground mt-1">{progressPercentage}%</p>
+              <p className="text-[10px] text-muted-foreground mt-1 font-medium">{completedPhases}/8 phases</p>
             </div>
-            <div className="rounded-lg border border-border bg-muted/20 p-4">
+            <div className="flex-shrink-0 w-36 sm:w-auto rounded-lg border border-border bg-muted/10 p-3 sm:p-4">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Truck className="w-4 h-4" />
-                <span className="text-xs font-medium">Fournisseurs</span>
+                <Truck className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold uppercase tracking-tight">Fournisseurs</span>
               </div>
-              <p className="text-2xl font-bold text-foreground mt-2">{suppliers.length}</p>
-              <p className="text-xs text-muted-foreground mt-1">avec qui vous travaillez</p>
+              <p className="text-xl font-black text-foreground mt-1">{suppliers.length}</p>
+              <p className="text-[10px] text-muted-foreground mt-1 font-medium">Partenaires</p>
             </div>
-            <div className="rounded-lg border border-border bg-muted/20 p-4">
+            <div className="flex-shrink-0 w-36 sm:w-auto rounded-lg border border-border bg-muted/10 p-3 sm:p-4">
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Megaphone className="w-4 h-4" />
-                <span className="text-xs font-medium">Scripts UGC</span>
+                <Megaphone className="w-3.5 h-3.5" />
+                <span className="text-[10px] font-bold uppercase tracking-tight">Scripts</span>
               </div>
-              <p className="text-2xl font-bold text-foreground mt-2">{ugcCount}</p>
-              <Link href="/ugc" className="text-xs text-primary hover:underline mt-1 inline-flex items-center gap-1">
-                UGC Lab <ExternalLink className="w-3 h-3" />
+              <p className="text-xl font-black text-foreground mt-1">{ugcCount}</p>
+              <Link href="/ugc" className="text-[10px] text-primary font-bold hover:underline mt-1 inline-flex items-center gap-1">
+                UGC Lab <ExternalLink className="w-2.5 h-2.5" />
               </Link>
             </div>
           </div>
@@ -273,97 +280,105 @@ export function LaunchMapOverview({
           </div>
         </section>
 
-        {/* Conseil (uniquement si identité + stratégie complétées, 1 fois / 24 h) */}
         <section className="rounded-xl border-2 border-primary/25 bg-primary/5 shadow-sm overflow-hidden animate-slide-in-up">
-          <div className="p-4 border-b border-primary/20 bg-primary/10 flex items-center gap-3">
-            <Lightbulb className="w-6 h-6 text-primary shrink-0" />
-            <h2 className="text-base font-bold text-foreground uppercase tracking-wide">
-              Conseil
-            </h2>
-          </div>
-          <div className="p-6 space-y-6">
-            {!canGetRecommendations ? (
-              <div className="rounded-lg border-2 border-primary/20 bg-background/80 p-5">
-                <p className="text-base font-semibold text-foreground">Conseils personnalisés</p>
-                <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
-                  {userPlan === 'free'
-                    ? "Les conseils personnalisés par IA sont réservés aux membres Créateur. Passez au plan supérieur pour débloquer vos recommandations de croissance."
-                    : "Complétez l'identité et la stratégie de votre marque pour recevoir vos conseils, adaptés à votre secteur et à votre marque d'inspiration. Mise à jour une fois par jour."}
-                </p>
-                <div className="flex flex-wrap gap-2 mt-4">
-                  {userPlan === 'free' ? (
-                    <Link
-                      href="/auth/choose-plan"
-                      className="text-sm text-primary hover:underline font-semibold"
-                    >
-                      🚀 Passer au plan Créateur →
-                    </Link>
-                  ) : (
-                    <>
-                      <Link
-                        href="/launch-map/phase/0"
-                        className="text-sm text-primary hover:underline font-semibold"
-                      >
-                        Compléter l&apos;identité →
-                      </Link>
-                      <span className="text-muted-foreground">·</span>
-                      <Link
-                        href="/launch-map/phase/1"
-                        className="text-sm text-primary hover:underline font-semibold"
-                      >
-                        Compléter la stratégie →
-                      </Link>
-                    </>
-                  )}
-                </div>
-              </div>
-            ) : recommendationsLoading ? (
-              <div className="flex items-center gap-3 text-foreground py-4 font-medium animate-fade-in">
-                <div className="w-5 h-5 border-2 border-[#007AFF]/20 border-t-[#007AFF] rounded-full animate-apple-spin" />
-                <span>Génération de vos conseils…</span>
-              </div>
-            ) : recommendationsError ? (
-              <p className="text-sm text-muted-foreground">{recommendationsError}</p>
-            ) : aiRecommendations.length > 0 ? (
-              <>
-                <ul className="space-y-4">
-                  {aiRecommendations.slice(0, 3).map((rec, i) => (
-                    <li key={i} className="flex gap-4 rounded-lg bg-background/80 border border-border py-3 px-4">
-                      <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center">
-                        {i + 1}
-                      </span>
-                      <p className="text-base text-foreground leading-relaxed font-medium">{rec}</p>
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-xs text-muted-foreground font-medium">
-                  {recommendationsCached ? 'Prochaine mise à jour demain.' : 'Mises à jour une fois par jour.'}
-                </p>
-              </>
-            ) : null}
-
-            {/* Contexte saisonnier (complément) */}
-            <div className="rounded-lg border border-border bg-muted/30 p-4">
-              <p className="font-semibold text-foreground text-sm">Saison à venir (hémisphère nord)</p>
-              <p className="text-sm text-muted-foreground mt-1">{seasonalRec.reason}</p>
-              <p className="text-sm text-foreground mt-2">
-                Produit recommandé : <strong>{getProductTypeLabel(seasonalRec.productType)}</strong> — {seasonalRec.weight}
-                {brandProductType && brandProductType !== seasonalRec.productType && (
-                  <span className="text-muted-foreground ml-2">
-                    (vous : {formatProductType(brandProductType)})
-                  </span>
-                )}
-              </p>
+          <button
+            type="button"
+            onClick={() => setIsAdviceOpen(!isAdviceOpen)}
+            className="w-full p-3 sm:p-4 border-b border-primary/20 bg-primary/10 flex items-center justify-between hover:bg-primary/20 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <Lightbulb className="w-5 h-5 text-primary shrink-0" />
+              <h2 className="text-sm font-bold text-foreground uppercase tracking-wide">
+                Conseil IA
+              </h2>
             </div>
-          </div>
+            <ChevronDown className={cn("w-4 h-4 text-primary transition-transform duration-300", isAdviceOpen && "rotate-180")} />
+          </button>
+          {isAdviceOpen && (
+            <div className="p-4 sm:p-6 space-y-4">
+              {!canGetRecommendations ? (
+                <div className="rounded-lg border-2 border-primary/20 bg-background/80 p-5">
+                  <p className="text-base font-semibold text-foreground">Conseils personnalisés</p>
+                  <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                    {userPlan === 'free'
+                      ? "Les conseils personnalisés par IA sont réservés aux membres Créateur. Passez au plan supérieur pour débloquer vos recommandations de croissance."
+                      : "Complétez l'identité et la stratégie de votre marque pour recevoir vos conseils, adaptés à votre secteur et à votre marque d'inspiration. Mise à jour une fois par jour."}
+                  </p>
+                  <div className="flex flex-wrap gap-2 mt-4">
+                    {userPlan === 'free' ? (
+                      <Link
+                        href="/auth/choose-plan"
+                        className="text-sm text-primary hover:underline font-semibold"
+                      >
+                        🚀 Passer au plan Créateur →
+                      </Link>
+                    ) : (
+                      <>
+                        <Link
+                          href="/launch-map/phase/0"
+                          className="text-sm text-primary hover:underline font-semibold"
+                        >
+                          Compléter l&apos;identité →
+                        </Link>
+                        <span className="text-muted-foreground">·</span>
+                        <Link
+                          href="/launch-map/phase/1"
+                          className="text-sm text-primary hover:underline font-semibold"
+                        >
+                          Compléter la stratégie →
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ) : recommendationsLoading ? (
+                <div className="flex items-center gap-3 text-foreground py-4 font-medium animate-fade-in">
+                  <div className="w-5 h-5 border-2 border-[#007AFF]/20 border-t-[#007AFF] rounded-full animate-apple-spin" />
+                  <span>Génération de vos conseils…</span>
+                </div>
+              ) : recommendationsError ? (
+                <p className="text-sm text-muted-foreground">{recommendationsError}</p>
+              ) : aiRecommendations.length > 0 ? (
+                <>
+                  <ul className="space-y-4">
+                    {aiRecommendations.slice(0, 3).map((rec, i) => (
+                      <li key={i} className="flex gap-4 rounded-lg bg-background/80 border border-border py-3 px-4">
+                        <span className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground text-sm font-bold flex items-center justify-center">
+                          {i + 1}
+                        </span>
+                        <p className="text-base text-foreground leading-relaxed font-medium">{rec}</p>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="text-xs text-muted-foreground font-medium">
+                    {recommendationsCached ? 'Prochaine mise à jour demain.' : 'Mises à jour une fois par jour.'}
+                  </p>
+                </>
+              ) : null}
+
+              {/* Contexte saisonnier (complément) */}
+              <div className="rounded-lg border border-border bg-muted/30 p-4">
+                <p className="font-semibold text-foreground text-sm">Saison à venir (hémisphère nord)</p>
+                <p className="text-sm text-muted-foreground mt-1">{seasonalRec.reason}</p>
+                <p className="text-sm text-foreground mt-2">
+                  Produit recommandé : <strong>{getProductTypeLabel(seasonalRec.productType)}</strong> — {seasonalRec.weight}
+                  {brandProductType && brandProductType !== seasonalRec.productType && (
+                    <span className="text-muted-foreground ml-2">
+                      (vous : {formatProductType(brandProductType)})
+                    </span>
+                  )}
+                </p>
+              </div>
+            </div>
+          )}
         </section>
 
-        {/* Accès rapide aux phases */}
+        {/* Accès rapide aux phases - Horz scroll on mobile */}
         <section className="rounded-xl border border-border bg-card overflow-hidden animate-slide-in-up">
           <div className="p-3 border-b border-border bg-muted/30">
-            <h2 className="text-sm font-semibold text-foreground uppercase tracking-wide">Phases du parcours</h2>
+            <h2 className="text-[10px] font-bold text-foreground uppercase tracking-wider">Phases du parcours</h2>
           </div>
-          <div className="p-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+          <div className="flex overflow-x-auto p-3 gap-3 scrollbar-hide sm:grid sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 sm:p-4">
             {LAUNCH_MAP_PHASES.map((p) => {
               const completed = progress[`phase${p.id}` as keyof typeof progress];
               const isLocked = userPlan === 'free' && ![0, 2].includes(p.id);
@@ -375,8 +390,8 @@ export function LaunchMapOverview({
                   key={p.id}
                   href={href}
                   className={cn(
-                    'flex items-center gap-3 rounded-lg border p-4 transition-colors relative',
-                    'border-border bg-muted/20 hover:bg-muted/40 hover:border-primary/30',
+                    'flex-shrink-0 w-48 sm:w-auto flex items-center gap-3 rounded-lg border p-3 transition-colors relative',
+                    'border-border bg-muted/10 hover:bg-muted/30 hover:border-primary/30',
                     isLocked && 'opacity-80 grayscale-[0.5]'
                   )}
                 >
