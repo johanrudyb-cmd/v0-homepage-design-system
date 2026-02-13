@@ -7,25 +7,30 @@ import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const brands = [
-  { name: 'NIKE', logo: '/images/brand-logos/nike.png', scale: 1.6 },
-  { name: 'ADIDAS', logo: '/images/brand-logos/Adidas.png', scale: 2.6 },
-  { name: 'ZARA', logo: '/images/brand-logos/zara.PNG', scale: 2.6 },
-  { name: 'H&M', logo: '/images/brand-logos/H&M.png', scale: 2.0 },
-  { name: 'UNIQLO', logo: '/images/brand-logos/uniqlo.png', scale: 3.2 },
-  { name: 'MANGO', logo: '/images/brand-logos/mango.png', scale: 1.1 },
-  { name: 'CORTEIZ', logo: '/images/brand-logos/corteiz.png', scale: 3.2 },
-  { name: 'TRAPSTAR', logo: '/images/brand-logos/trapstar.png', scale: 4.2 },
-  { name: 'STONE ISLAND', logo: '/images/brand-logos/Stone Island.png', scale: 3.2 },
-  { name: 'CARHARTT', logo: '/images/brand-logos/Carhartt.png', scale: 1.1 },
-  { name: 'JACQUEMUS', logo: '/images/brand-logos/jacquemus.png', scale: 1.1 },
-  { name: 'MASSIMO DUTTI', logo: '/images/brand-logos/Massimo Dutti.png', scale: 0.9 },
+  { name: 'NIKE', logo: '/images/brand-logos/nike.png', scaleDesktop: 1.4, scaleMobile: 1.1 },
+  { name: 'ADIDAS', logo: '/images/brand-logos/Adidas.png', scaleDesktop: 2.2, scaleMobile: 1.5 },
+  { name: 'ZARA', logo: '/images/brand-logos/zara.PNG', scaleDesktop: 2.2, scaleMobile: 1.5 },
+  { name: 'H&M', logo: '/images/brand-logos/H&M.png', scaleDesktop: 1.8, scaleMobile: 1.2 },
+  { name: 'UNIQLO', logo: '/images/brand-logos/uniqlo.png', scaleDesktop: 2.8, scaleMobile: 1.8 },
+  { name: 'MANGO', logo: '/images/brand-logos/mango.png', scaleDesktop: 1.1, scaleMobile: 0.9 },
+  { name: 'CORTEIZ', logo: '/images/brand-logos/corteiz.png', scaleDesktop: 2.8, scaleMobile: 1.8 },
+  { name: 'TRAPSTAR', logo: '/images/brand-logos/trapstar.png', scaleDesktop: 3.8, scaleMobile: 2.2 },
+  { name: 'STONE ISLAND', logo: '/images/brand-logos/Stone Island.png', scaleDesktop: 2.8, scaleMobile: 1.8 },
+  { name: 'CARHARTT', logo: '/images/brand-logos/Carhartt.png', scaleDesktop: 1.4, scaleMobile: 1.0 },
+  { name: 'JACQUEMUS', logo: '/images/brand-logos/jacquemus.png', scaleDesktop: 1.3, scaleMobile: 1.0 },
+  { name: 'MASSIMO DUTTI', logo: '/images/brand-logos/Massimo Dutti.png', scaleDesktop: 0.9, scaleMobile: 0.7 },
 ];
 
 export function TrendsHero() {
   const [isVisible, setIsVisible] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
     setIsVisible(true);
+    const checkMobile = () => setIsMobile(window.innerWidth < 640);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
   return (
@@ -62,9 +67,9 @@ export function TrendsHero() {
           <div className="relative mt-16 sm:mt-24 lg:mt-32">
             <div className="mask-marquee relative overflow-hidden py-8 select-none">
               <div className="flex w-max animate-marquee-infinite">
-                {/* On duplique 2 fois pour un loop infini parfait avec translateX(-50%) */}
+                {/* On duplique 2 fois pour un loop infini parfait */}
                 {[0, 1].map((i) => (
-                  <div key={i} className="flex items-center gap-24 sm:gap-48 px-12 sm:px-24">
+                  <div key={i} className="flex items-center gap-10 sm:gap-24 px-5 sm:px-12">
                     {brands.map((brand, index) => (
                       <div
                         key={`${i}-${index}`}
@@ -73,8 +78,10 @@ export function TrendsHero() {
                         <img
                           src={brand.logo}
                           alt={brand.name}
-                          className="h-6 sm:h-8 md:h-10 w-auto object-contain grayscale mix-blend-multiply contrast-[1.1] brightness-[1.05]"
-                          style={{ transform: `scale(${brand.scale || 1})` }}
+                          className="h-5 sm:h-8 md:h-10 w-auto object-contain grayscale mix-blend-multiply contrast-[1.2] brightness-[1.1]"
+                          style={{
+                            transform: `scale(${isMobile ? brand.scaleMobile : brand.scaleDesktop})`
+                          }}
                           loading="lazy"
                         />
                       </div>
