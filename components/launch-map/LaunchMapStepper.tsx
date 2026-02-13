@@ -29,6 +29,8 @@ export interface LaunchMapData {
   phase3: boolean;
   phase4: boolean;
   phase5: boolean;
+  phase6?: boolean;
+  phase7?: boolean;
   shopifyShopDomain?: string | null;
   phase1Data: any;
   baseMockupByProductType?: Record<string, string> | null;
@@ -111,6 +113,8 @@ export function LaunchMapStepper({
     phase3: launchMap?.phase3 ?? false,
     phase4: launchMap?.phase4 ?? false,
     phase5: launchMap?.phase5 ?? false,
+    phase6: launchMap?.phase6 ?? false,
+    phase7: launchMap?.phase7 ?? false,
   });
 
   const [summaries, setSummaries] = useState<Record<string, string>>(() => {
