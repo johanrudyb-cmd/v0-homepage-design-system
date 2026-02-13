@@ -120,12 +120,36 @@ export async function GET(request: Request) {
       }
 
       if (filtered.length > 0) {
-        // Prendre les 4 premiers produits (les "top trends") au lieu de mélanger
-        // Cela garantit que la home affiche les vrais leaders de l'app
-        const topFour = filtered.slice(0, combo.count);
+        // Diversification par marque (Round Robin) pour éviter les doublons de marque (ex: 4x Adidas)
+        const groupedByBrand = new Map<string, any[]>();
+        for (const p of filtered) {
+          const brand = getProductBrand(p.name, p.sourceBrand) || 'Unknown';
+          if (!groupedByBrand.has(brand)) groupedByBrand.set(brand, []);
+          groupedByBrand.get(brand)!.push(p);
+        }
+
+        const brands = Array.from(groupedByBrand.keys());
+        const selectedProducts: any[] = [];
+        let brandIdx = 0;
+        let productIdx = 0;
+        let hasMore = true;
+
+        while (selectedProducts.length < combo.count && hasMore) {
+          hasMore = false;
+          for (let i = 0; i < brands.length; i++) {
+            const currentBrand = brands[(brandIdx + i) % brands.length];
+            const list = groupedByBrand.get(currentBrand)!;
+            if (productIdx < list.length) {
+              selectedProducts.push(list[productIdx]);
+              hasMore = true;
+              if (selectedProducts.length >= combo.count) break;
+            }
+          }
+          productIdx++;
+        }
 
         const now = Date.now();
-        const selected = topFour.map((p) => {
+        const selected = selectedProducts.map((p) => {
           const daysInRadar = p.createdAt
             ? Math.floor((now - p.createdAt.getTime()) / (24 * 60 * 60 * 1000))
             : 0;

@@ -158,25 +158,44 @@ export async function GET(request: Request) {
 
     const diversified: typeof uniqueEnriched = [];
     const brands = Array.from(groupedByBrand.keys());
-    let hasMore = true;
-    let index = 0;
 
-    // On limite à 15 produits par bucket (le Top 15 Outfity)
+    // On peut tenter de trier les marques par leur meilleur produit pour garder la pertinence
+    brands.sort((a, b) => {
+      const bestA = groupedByBrand.get(a)![0].outfityIVS || 0;
+      const bestB = groupedByBrand.get(b)![0].outfityIVS || 0;
+      return bestB - bestA;
+    });
+
+    let hasMore = true;
     const finalLimit = 15;
 
+    // Phase 1 : Priorité absolue aux "Top Trends" (Top 4 des meilleures marques)
+    const topBrands = brands.slice(0, 4);
+    for (const b of topBrands) {
+      const list = groupedByBrand.get(b)!;
+      if (list.length > 0) {
+        diversified.push(list[0]);
+        list.shift();
+      }
+    }
+
+    // Phase 2 : Round Robin classique pour le reste
     while (hasMore && diversified.length < finalLimit) {
       hasMore = false;
       for (const b of brands) {
         const list = groupedByBrand.get(b)!;
-        if (index < list.length) {
-          diversified.push(list[index]);
+        if (list.length > 0) {
+          diversified.push(list[0]);
+          list.shift();
           hasMore = true;
           if (diversified.length >= finalLimit) break;
         }
       }
-      index++;
     }
 
+    // Priorisation spéciale pour le parcours gratuit : 
+    // On s'assure que les produits qui étaient sur la homepage (les plus viraux)
+    // remontent bien en haut de la liste diversifiée pour leur faciliter l'accès.
     const trends = diversified;
 
     const summary = {
