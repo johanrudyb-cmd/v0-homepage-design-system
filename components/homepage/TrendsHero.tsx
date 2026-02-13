@@ -65,29 +65,29 @@ export function TrendsHero() {
 
           {/* Bandeau défilant avec logos de marques — Style Premium Apple */}
           <div className="relative mt-16 sm:mt-24 lg:mt-32">
-            <div className="mask-marquee relative overflow-hidden py-8 select-none">
-              <div className="flex w-max animate-marquee-infinite">
-                {/* On duplique 2 fois pour un loop infini parfait */}
-                {[0, 1].map((i) => (
-                  <div key={i} className="flex items-center gap-12 sm:gap-64 px-5 sm:px-16">
-                    {brands.map((brand, index) => (
-                      <div
-                        key={`${i}-${index}`}
-                        className="flex-shrink-0 transition-all duration-500 hover:scale-110 opacity-40 hover:opacity-100"
-                      >
-                        <img
-                          src={brand.logo}
-                          alt={brand.name}
-                          className="h-5 sm:h-8 md:h-10 w-auto object-contain grayscale mix-blend-multiply contrast-[1.5] brightness-[1.15]"
-                          style={{
-                            transform: `scale(${isMobile ? brand.scaleMobile : brand.scaleDesktop})`
-                          }}
-                          loading="lazy"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                ))}
+            <div className="w-full py-8 bg-white overflow-hidden">
+              {/* Le masque dégradé pour faire pro */}
+              <div className="relative w-full flex overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_50px,_black_calc(100%-50px),transparent_100%)]">
+
+                {/* La bande qui défile */}
+                <div className="flex animate-infinite-scroll hover:[animation-play-state:paused]">
+                  {[...brands, ...brands, ...brands].map((brand, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center justify-center mx-6 md:mx-14 w-24 md:w-40 flex-shrink-0 transition-all duration-500 hover:scale-110 opacity-40 hover:opacity-100"
+                    >
+                      <img
+                        src={brand.logo}
+                        alt={brand.name}
+                        className="w-full h-auto object-contain grayscale mix-blend-multiply contrast-[1.5] brightness-[1.15]"
+                        style={{
+                          transform: `scale(${isMobile ? brand.scaleMobile : brand.scaleDesktop})`
+                        }}
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
