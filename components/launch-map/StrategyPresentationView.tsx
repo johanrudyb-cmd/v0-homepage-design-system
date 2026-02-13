@@ -236,7 +236,7 @@ interface StrategyPresentationViewProps {
   visualIdentity?: VisualIdentityData | null;
   /** true = stratégie verrouillée : identité visuelle (typo, couleurs) en lecture seule */
   visualIdentityLocked?: boolean;
-  onClose: () => void;
+  onClose?: () => void;
   /** Action principale optionnelle (ex. "Calquer la stratégie") affichée dans le header */
   optionalPrimaryAction?: { label: string; onClick: () => void; disabled?: boolean };
   /** "Valider et continuer" dans la présentation (affiché quand stratégie calquée, pas en vue marque de référence) */
@@ -595,7 +595,7 @@ export function StrategyPresentationView({
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
+      if (e.key === 'Escape' && onClose) {
         e.preventDefault();
         onClose();
       }
