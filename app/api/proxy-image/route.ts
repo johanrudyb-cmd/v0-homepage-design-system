@@ -17,16 +17,7 @@ function isAllowedUrl(url: string): boolean {
 }
 
 export async function GET(request: NextRequest) {
-  let url = request.nextUrl.searchParams.get('url');
-  const isEncoded = request.nextUrl.searchParams.get('encoded') === 'true';
-
-  if (url && isEncoded) {
-    try {
-      url = Buffer.from(url, 'base64').toString('utf-8');
-    } catch (e) {
-      console.error('[proxy-image] Erreur décodage Base64:', e);
-    }
-  }
+  const url = request.nextUrl.searchParams.get('url');
 
   if (!url || !isAllowedUrl(url)) {
     return NextResponse.json({ error: 'URL invalide' }, { status: 400 });
