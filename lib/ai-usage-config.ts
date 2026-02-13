@@ -37,6 +37,8 @@ export type AIFeatureKey =
   | 'ugc_generate_mannequin'
   | 'ugc_virtual_tryon'
   | 'factories_match'
+  | 'assistant_chat_qa'
+  | 'assistant_chat_analysis'
   | 'other';
 
 /**
@@ -73,6 +75,8 @@ export const AI_FEATURE_COSTS: Record<AIFeatureKey, number> = {
   ugc_generate_mannequin: 0.12,
   ugc_virtual_tryon: 2.5,    // ~2,50 $ coût réel
   factories_match: 0.02,
+  assistant_chat_qa: 0.01,
+  assistant_chat_analysis: 0.05,
   other: 0.04,
 };
 
@@ -105,28 +109,63 @@ export const MAX_PER_MONTH_BY_PLAN: Record<string, Partial<Record<AIFeatureKey, 
     brand_strategy: 3,
     launch_map_recommendations: 12,
     trends_hybrid_scan: 1,
+    trends_analyse: 3, // Offre réelle : 3 / mois
   },
   starter: {
     brand_strategy: 3,
     launch_map_recommendations: 12,
     trends_hybrid_scan: 1,
+    trends_analyse: 3,
   },
   base: {
     brand_strategy: 10,
     launch_map_recommendations: 30,
     trends_hybrid_scan: 10,
+    trends_analyse: 10, // Plan Créateur : 10 / mois
   },
   growth: {
     brand_strategy: 15,
     launch_map_recommendations: 60,
     trends_hybrid_scan: 30,
+    trends_analyse: 30,
   },
   pro: {
     brand_strategy: 50,
     launch_map_recommendations: 200,
     trends_hybrid_scan: 100,
+    trends_analyse: 100,
   },
   enterprise: {}, // illimité
+};
+
+/**
+ * Limites journalières pour l'assistant (éviter consommation excessive).
+ */
+export const MAX_PER_DAY_BY_PLAN: Record<string, Partial<Record<AIFeatureKey, number>>> = {
+  free: {
+    assistant_chat_qa: 5, // Très conservateur pour free
+    assistant_chat_analysis: 1,
+  },
+  starter: {
+    assistant_chat_qa: 5,
+    assistant_chat_analysis: 1,
+  },
+  base: {
+    assistant_chat_qa: 20,
+    assistant_chat_analysis: 5,
+  },
+  growth: {
+    assistant_chat_qa: 40,
+    assistant_chat_analysis: 15,
+  },
+  pro: {
+    assistant_chat_qa: 100,
+    assistant_chat_analysis: 50,
+  },
+  enterprise: {
+    assistant_chat_qa: -1,
+    assistant_chat_analysis: -1,
+  },
 };
 
 export function getBudgetForPlan(plan: string): number {
@@ -160,6 +199,14 @@ export function getTokensForFeature(feature: AIFeatureKey): number {
 export function getMaxPerMonthForFeature(plan: string, feature: AIFeatureKey): number {
   const key = (plan || 'free').toLowerCase();
   const limits = MAX_PER_MONTH_BY_PLAN[key] ?? MAX_PER_MONTH_BY_PLAN.free ?? {};
+  const val = limits[feature];
+  return val ?? -1;
+}
+
+/** Limite journalière d'une feature pour un plan (-1 = illimité) */
+export function getMaxPerDayForFeature(plan: string, feature: AIFeatureKey): number {
+  const key = (plan || 'free').toLowerCase();
+  const limits = MAX_PER_DAY_BY_PLAN[key] ?? MAX_PER_DAY_BY_PLAN.free ?? {};
   const val = limits[feature];
   return val ?? -1;
 }

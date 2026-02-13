@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { User, Mail, Lock, Image as ImageIcon, Save, CheckCircle2 } from 'lucide-react';
+import { User, Mail, Lock, Image as ImageIcon, Save, CheckCircle2, FileText, Download } from 'lucide-react';
 import { SubscriptionWarning } from '@/components/subscription/SubscriptionWarning';
 
 interface SettingsFormProps {
@@ -27,6 +27,29 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
   const [portalLoading, setPortalLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [invoices, setInvoices] = useState<any[]>([]);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
+
+  useEffect(() => {
+    const fetchInvoices = async () => {
+      setLoadingInvoices(true);
+      try {
+        const res = await fetch('/api/stripe/invoices');
+        const data = await res.json();
+        if (data.invoices) {
+          setInvoices(data.invoices);
+        }
+      } catch (err) {
+        console.error('Erreur factures:', err);
+      } finally {
+        setLoadingInvoices(false);
+      }
+    };
+
+    if (user.stripeCustomerId) {
+      fetchInvoices();
+    }
+  }, [user.stripeCustomerId]);
 
   const [formData, setFormData] = useState({
     name: user.name || '',
@@ -259,11 +282,12 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
           <SubscriptionWarning context="cancel" />
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 bg-muted/30 rounded-lg border border-border gap-4">
             <div>
-              <p className="font-bold text-lg text-foreground">{user.plan === 'base' ? 'Créateur' : (user.plan === 'free' ? 'Gratuit' : user.plan)}</p>
+              <p className="font-bold text-lg text-foreground">
+                {user.plan === 'free' ? 'Plan Gratuit' : 'Plan Créateur'}
+              </p>
               <p className="text-sm text-muted-foreground font-medium mt-1">
-                {user.plan === 'free' && 'Accès aux fonctionnalités de base'}
-                {(user.plan === 'base' || user.plan === 'pro') && 'Accès à toutes les fonctionnalités'}
-                {user.plan === 'enterprise' && 'Accès complet + support prioritaire'}
+                {user.plan === 'free' ? 'Accès limité aux outils de base' : 'Accès intégral à l\'écosystème Créateur'}
+                {user.plan === 'enterprise' && ' + Support dédié & sur-mesure'}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
@@ -284,6 +308,85 @@ export function SettingsForm({ user: initialUser }: SettingsFormProps) {
               )}
             </div>
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Factures */}
+      <Card className="border-2">
+        <CardHeader>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-orange-500/10 text-orange-600 flex items-center justify-center">
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <CardTitle className="text-xl">Historique de facturation</CardTitle>
+              <CardDescription>Consultez et téléchargez vos factures Stripe</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {loadingInvoices ? (
+            <div className="flex items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+            </div>
+          ) : invoices.length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm">
+                <thead>
+                  <tr className="border-b border-border">
+                    <th className="py-3 font-semibold text-muted-foreground">Numéro</th>
+                    <th className="py-3 font-semibold text-muted-foreground">Date</th>
+                    <th className="py-3 font-semibold text-muted-foreground">Montant</th>
+                    <th className="py-3 font-semibold text-muted-foreground">Statut</th>
+                    <th className="py-3 text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {invoices.map((invoice) => (
+                    <tr key={invoice.id} className="hover:bg-muted/30 transition-colors">
+                      <td className="py-3 font-medium">{invoice.number}</td>
+                      <td className="py-3 text-muted-foreground">
+                        {new Date(invoice.date * 1000).toLocaleDateString('fr-FR', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </td>
+                      <td className="py-3 font-semibold">
+                        {(invoice.amount / 100).toFixed(2)} {invoice.currency.toUpperCase()}
+                      </td>
+                      <td className="py-3">
+                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${invoice.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                          }`}>
+                          {invoice.status === 'paid' ? 'Payée' : invoice.status}
+                        </span>
+                      </td>
+                      <td className="py-3 text-right">
+                        {invoice.pdf && (
+                          <a
+                            href={invoice.pdf}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title="Télécharger PDF"
+                            className="inline-flex items-center justify-center h-8 w-8 rounded-full hover:bg-black/5 text-[#1D1D1F] hover:text-[#007AFF] transition-all"
+                          >
+                            <Download className="w-4 h-4" />
+                          </a>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-8 text-muted-foreground">
+              <p>Aucune facture trouvée.</p>
+              {!user.stripeCustomerId && (
+                <p className="text-xs mt-1">Les factures apparaîtront après votre premier paiement.</p>
+              )}
+            </div>
+          )}
         </CardContent>
       </Card>
 

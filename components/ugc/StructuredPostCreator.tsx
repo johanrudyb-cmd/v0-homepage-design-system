@@ -269,7 +269,7 @@ export function StructuredPostCreator({ brandId, brandName, onSaved }: Structure
               Avez-vous reçu vos vêtements du fournisseur ?
             </h2>
             <p className="text-sm text-foreground/90 mb-4">
-              Oui : contenu mettant en avant le vêtement (tournage ou visuels IA). Non : vous créerez le contenu avec l&apos;IA. Vous pourrez planifier la date de publication ci-dessous.
+              Oui : contenu mettant en avant le vêtement (tournage ou visuels générés). Non : vous créerez le contenu avec notre assistant virtuel. Vous pourrez planifier la date de publication ci-dessous.
             </p>
             <div className="flex gap-3">
               <Button type="button" onClick={() => { setClothesReceived(true); setGenerateStructuredError(null); }} className="flex-1">
@@ -291,7 +291,7 @@ export function StructuredPostCreator({ brandId, brandName, onSaved }: Structure
             <div>
               <p className="text-base font-semibold text-foreground">Faites des économies sur vos shootings.</p>
               <p className="text-sm text-foreground/90 mt-0.5">
-                Générez des visuels au rendu pro avec l&apos;IA dans Virtual Try-On à moindre coût.
+                Générez des visuels au rendu pro dans Virtual Try-On à moindre coût.
               </p>
             </div>
           </div>
@@ -309,7 +309,7 @@ export function StructuredPostCreator({ brandId, brandName, onSaved }: Structure
           <div className="flex items-center gap-3">
             <VideoIcon className="w-6 h-6 text-amber-700 shrink-0" />
             <div>
-              <p className="text-base font-semibold text-foreground">Vous créerez ce contenu avec l&apos;aide de l&apos;IA.</p>
+              <p className="text-base font-semibold text-foreground">Vous créerez ce contenu avec notre assistant.</p>
               <p className="text-sm text-foreground/90 mt-0.5">Vos posts planifiés apparaîtront dans le Calendrier.</p>
             </div>
           </div>
@@ -322,159 +322,180 @@ export function StructuredPostCreator({ brandId, brandName, onSaved }: Structure
       <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
         {/* Colonne gauche : formulaire */}
         <div className="space-y-6 order-2 lg:order-1">
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-xl font-bold flex items-center gap-2">
-            <LayoutList className="w-5 h-5" />
-            Créer un post structuré
-          </CardTitle>
-          <p className="text-sm text-muted-foreground">
-            Générez un post (accroche, corps, CTA, hashtags) par IA à partir de votre stratégie. Choisissez la date en cliquant sur un jour dans le calendrier à droite.
-          </p>
-        </CardHeader>
-        <CardContent>
-          {clothesReceived === null ? (
-            <p className="text-sm text-muted-foreground">Répondez à la question ci-dessus pour continuer.</p>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="struct-platform">Plateforme</Label>
-                  <select
-                    id="struct-platform"
-                    value={platform}
-                    onChange={(e) => setPlatform(e.target.value as ContentCalendarPlatform)}
-                    className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                    required
-                  >
-                    {(['instagram', 'tiktok', 'linkedin', 'facebook', 'x'] as const).map((p) => (
-                      <option key={p} value={p}>{PLATFORM_LABELS[p]}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <Label>Date de publication</Label>
-                  <p className="text-sm mt-1 text-muted-foreground">
-                    {formStart ? (
-                      <strong className="text-foreground">{format(parseISO(formStart), 'd MMMM yyyy', { locale: fr })}</strong>
-                    ) : (
-                      'Choisissez un jour sur le calendrier à droite →'
-                    )}
-                    {clothesReceived === true && formStart && (
-                      <>
-                        <span className="block text-xs text-primary mt-0.5">Les 7 prochains jours (en surbrillance) sont recommandés.</span>
-                        <span className="block text-xs text-muted-foreground mt-0.5">Vous pouvez générer vos visuels avec l&apos;IA dans Virtual Try-On pour faire des économies sur les shootings.</span>
-                      </>
-                    )}
-                    {clothesReceived === false && (
-                      <span className="block text-xs text-muted-foreground mt-0.5">Vos posts planifiés apparaîtront dans le calendrier.</span>
-                    )}
-                    <span className="block text-xs text-muted-foreground mt-0.5">
-                      Publication prévue à <strong>{(calendarMeta?.contentStrategyFrequency?.recommendedPostTime ?? contentFrequency.recommendedPostTime ?? '18:00').replace(':', 'h')}</strong>. Un créneau « Prod » est ajouté le même jour.
-                    </span>
-                  </p>
-                </div>
-              </div>
-
-              <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
-                <p className="text-sm font-medium text-foreground mb-2">Génération par IA</p>
-                <p className="text-xs text-muted-foreground mb-3">
-                  Générez le contenu (titre, corps, description, CTA, hashtags) à partir de votre stratégie. Les champs sont fixes (non modifiables).
-                </p>
-                <Button type="button" variant="secondary" size="sm" onClick={handleGenerate} disabled={generateStructuredLoading || platform === 'autre'} className="gap-2">
-                  {generateStructuredLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                  Générer le contenu avec l&apos;IA
-                  <GenerationCostBadge feature="launch_map_structured_post" />
-                </Button>
-                {generateStructuredError && <p className="text-xs text-destructive mt-2">{generateStructuredError}</p>}
-              </div>
-
-              <div>
-                <Label>Titre / Accroche</Label>
-                <div className="mt-1 rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground min-h-[2.5rem]">
-                  {formStructured.headline || '— Généré par l\'IA —'}
-                </div>
-              </div>
-              <div>
-                <Label>Corps du message</Label>
-                <div className="mt-1 rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground min-h-[5rem] whitespace-pre-wrap">
-                  {formStructured.body || '— Généré par l\'IA —'}
-                </div>
-              </div>
-              <div>
-                <Label>Description</Label>
-                <div className="mt-1 rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground min-h-[2.5rem]">
-                  {formStructured.description || '— Généré par l\'IA —'}
-                </div>
-              </div>
-              <div>
-                <Label>Call-to-action (CTA)</Label>
-                <div className="mt-1 rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground min-h-[2.5rem]">
-                  {formStructured.cta || '— Généré par l\'IA —'}
-                </div>
-              </div>
-              <div>
-                <Label>Hashtags</Label>
-                <div className="mt-1 rounded-md border border-border bg-muted/50 px-3 py-2 text-sm text-muted-foreground min-h-[2.5rem]">
-                  {formStructured.hashtags || '— Généré par l\'IA —'}
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <input type="checkbox" id="struct-drop" checked={isDropOrSalePeriod} onChange={(e) => setIsDropOrSalePeriod(e.target.checked)} className="rounded border-input" />
-                <Label htmlFor="struct-drop" className="cursor-pointer text-sm">
-                  Période drop / vente régulière (autoriser plusieurs posts ce jour)
-                </Label>
-              </div>
-              {contentFrequencyLoading ? (
-                <p className="text-xs text-muted-foreground">Chargement de la fréquence…</p>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-xl font-bold flex items-center gap-2">
+                <LayoutList className="w-5 h-5" />
+                Créer un post structuré
+              </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Générez un post structuré (accroche, corps, CTA, hashtags) à partir de votre stratégie marketing. Choisissez la date sur le calendrier.
+              </p>
+            </CardHeader>
+            <CardContent>
+              {clothesReceived === null ? (
+                <p className="text-sm text-muted-foreground">Répondez à la question ci-dessus pour continuer.</p>
               ) : (
-                <p className="text-xs text-muted-foreground">Limite selon votre stratégie : <strong>{contentFrequency.label}</strong></p>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="struct-platform">Plateforme</Label>
+                      <select
+                        id="struct-platform"
+                        value={platform}
+                        onChange={(e) => setPlatform(e.target.value as ContentCalendarPlatform)}
+                        className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                        required
+                      >
+                        {(['instagram', 'tiktok', 'linkedin', 'facebook', 'x'] as const).map((p) => (
+                          <option key={p} value={p}>{PLATFORM_LABELS[p]}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <Label>Date de publication</Label>
+                      <p className="text-sm mt-1 text-muted-foreground">
+                        {formStart ? (
+                          <strong className="text-foreground">{format(parseISO(formStart), 'd MMMM yyyy', { locale: fr })}</strong>
+                        ) : (
+                          'Choisissez un jour sur le calendrier à droite →'
+                        )}
+                        {clothesReceived === true && formStart && (
+                          <>
+                            <span className="block text-xs text-primary mt-0.5">Les 7 prochains jours (en surbrillance) sont recommandés.</span>
+                            <span className="block text-xs text-muted-foreground mt-0.5">Vous pouvez générer vos visuels dans Virtual Try-On pour économiser sur les shootings physiques.</span>
+                          </>
+                        )}
+                        {clothesReceived === false && (
+                          <span className="block text-xs text-muted-foreground mt-0.5">Vos posts planifiés apparaîtront dans le calendrier.</span>
+                        )}
+                        <span className="block text-xs text-muted-foreground mt-0.5">
+                          Publication prévue à <strong>{(calendarMeta?.contentStrategyFrequency?.recommendedPostTime ?? contentFrequency.recommendedPostTime ?? '18:00').replace(':', 'h')}</strong>. Un créneau « Prod » est ajouté le même jour.
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+                    <p className="text-sm font-medium text-foreground mb-2 flex items-center gap-2">
+                      <Sparkles className="w-4 h-4 text-primary" />
+                      Assistant de Création
+                    </p>
+                    <p className="text-xs text-muted-foreground mb-3">
+                      Générez automatiquement une proposition de contenu (titre, corps, description, CTA, hashtags) basée sur votre stratégie marketing.
+                    </p>
+                    <Button type="button" variant="secondary" size="sm" onClick={handleGenerate} disabled={generateStructuredLoading || platform === 'autre'} className="gap-2 w-full sm:w-auto">
+                      {generateStructuredLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-3.5 h-3.5" />}
+                      Générer une proposition
+                      <GenerationCostBadge feature="launch_map_structured_post" />
+                    </Button>
+                    {generateStructuredError && <p className="text-xs text-destructive mt-2">{generateStructuredError}</p>}
+                  </div>
+
+                  <div>
+                    <Label className="text-xs font-medium text-foreground">Titre / Accroche</Label>
+                    <div className={cn(
+                      "mt-1 rounded-md border px-3 py-2 text-xs min-h-[2.5rem] transition-colors",
+                      formStructured.headline ? "bg-background border-input text-foreground" : "bg-muted/30 border-dashed border-border text-muted-foreground italic flex items-center"
+                    )}>
+                      {formStructured.headline || 'Le titre généré apparaîtra ici...'}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-foreground">Corps du message</Label>
+                    <div className={cn(
+                      "mt-1 rounded-md border px-3 py-2 text-xs min-h-[4.5rem] whitespace-pre-wrap transition-colors",
+                      formStructured.body ? "bg-background border-input text-foreground" : "bg-muted/30 border-dashed border-border text-muted-foreground italic flex items-center"
+                    )}>
+                      {formStructured.body || 'Le corps du poste généré apparaîtra ici...'}
+                    </div>
+                  </div>
+                  <div>
+                    <Label className="text-xs font-medium text-foreground">Description</Label>
+                    <div className={cn(
+                      "mt-1 rounded-md border px-3 py-2 text-xs min-h-[2.5rem] transition-colors",
+                      formStructured.description ? "bg-background border-input text-foreground" : "bg-muted/30 border-dashed border-border text-muted-foreground italic flex items-center"
+                    )}>
+                      {formStructured.description || 'La description générée apparaîtra ici...'}
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <Label className="text-xs font-medium text-foreground">Call-to-action (CTA)</Label>
+                      <div className={cn(
+                        "mt-1 rounded-md border px-3 py-2 text-xs min-h-[2.5rem] transition-colors",
+                        formStructured.cta ? "bg-background border-input text-foreground" : "bg-muted/30 border-dashed border-border text-muted-foreground italic flex items-center"
+                      )}>
+                        {formStructured.cta || 'En attente...'}
+                      </div>
+                    </div>
+                    <div>
+                      <Label className="text-xs font-medium text-foreground">Hashtags</Label>
+                      <div className={cn(
+                        "mt-1 rounded-md border px-3 py-2 text-xs min-h-[2.5rem] transition-colors",
+                        formStructured.hashtags ? "bg-background border-input text-foreground" : "bg-muted/30 border-dashed border-border text-muted-foreground italic flex items-center"
+                      )}>
+                        {formStructured.hashtags || 'En attente...'}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 pt-2">
+                    <input type="checkbox" id="struct-drop" checked={isDropOrSalePeriod} onChange={(e) => setIsDropOrSalePeriod(e.target.checked)} className="rounded border-input text-primary focus:ring-primary" />
+                    <Label htmlFor="struct-drop" className="cursor-pointer text-xs font-medium">
+                      Période drop / vente régulière (autoriser plusieurs posts ce jour)
+                    </Label>
+                  </div>
+                  {contentFrequencyLoading ? (
+                    <p className="text-xs text-muted-foreground">Chargement de la fréquence…</p>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">Limite selon votre stratégie : <strong>{contentFrequency.label}</strong></p>
+                  )}
+
+                  <div className="flex gap-2 pt-2">
+                    <Button type="submit" disabled={saving || !hasContent} size="sm" className="w-full">
+                      {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                      {saving ? 'Enregistrement...' : 'Enregistrer dans le calendrier'}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        setFormStructured({ headline: '', body: '', cta: '', hashtags: '', description: '' });
+                        setFormStart(todayStr);
+                        setGenerateStructuredError(null);
+                      }}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                </form>
               )}
+            </CardContent>
+          </Card>
 
-              <div className="flex gap-2">
-                <Button type="submit" disabled={saving || !hasContent}>
-                  {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer dans le calendrier'}
-                </Button>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => {
-                    setFormStructured({ headline: '', body: '', cta: '', hashtags: '', description: '' });
-                    setFormStart(todayStr);
-                    setGenerateStructuredError(null);
-                  }}
-                >
-                  Nouveau post
-                </Button>
-              </div>
-            </form>
-          )}
-        </CardContent>
-      </Card>
-
-      <p className="text-sm text-muted-foreground">
-        <Link href="/launch-map/calendar" className="text-primary hover:underline">
-          Voir le calendrier complet et gérer les événements →
-        </Link>
-      </p>
+          <p className="text-sm text-center text-muted-foreground">
+            <Link href="/launch-map/calendar" className="text-primary hover:underline font-medium">
+              Accéder au calendrier complet →
+            </Link>
+          </p>
         </div>
 
         {/* Colonne droite : calendrier */}
         <div className="order-1 lg:order-2 lg:sticky lg:top-4">
-          <Card>
-            <CardHeader className="pb-2">
+          <Card className="border-none shadow-none bg-transparent sm:bg-card sm:border sm:shadow-sm">
+            <CardHeader className="pb-4 pt-2 px-2 sm:px-6">
               <div className="flex items-center justify-between">
-                <CardTitle className="text-base flex items-center gap-2">
-                  <CalendarIcon className="w-4 h-4" />
+                <CardTitle className="text-sm font-semibold flex items-center gap-2 capitalize">
                   {format(currentMonth, 'MMMM yyyy', { locale: fr })}
                 </CardTitle>
                 <div className="flex items-center gap-1">
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-7 w-7"
                     onClick={() => setCurrentMonth((d) => subMonths(d, 1))}
                     aria-label="Mois précédent"
                   >
@@ -482,9 +503,9 @@ export function StructuredPostCreator({ brandId, brandName, onSaved }: Structure
                   </Button>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="ghost"
                     size="icon"
-                    className="h-8 w-8"
+                    className="h-7 w-7"
                     onClick={() => setCurrentMonth((d) => addMonths(d, 1))}
                     aria-label="Mois suivant"
                   >
@@ -493,13 +514,15 @@ export function StructuredPostCreator({ brandId, brandName, onSaved }: Structure
                 </div>
               </div>
             </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-7 gap-1 text-center text-xs">
+            <CardContent className="px-2 sm:px-6 pb-4">
+              <div className="grid grid-cols-7 gap-1 text-center text-[10px] mb-2 uppercase tracking-wide text-muted-foreground font-medium">
                 {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map((d) => (
-                  <div key={d} className="font-medium text-muted-foreground py-1">
+                  <div key={d}>
                     {d}
                   </div>
                 ))}
+              </div>
+              <div className="grid grid-cols-7 gap-1 text-xs">
                 {Array.from({ length: paddingDays }).map((_, i) => (
                   <div key={`pad-${i}`} className="aspect-square" />
                 ))}
@@ -508,8 +531,10 @@ export function StructuredPostCreator({ brandId, brandName, onSaved }: Structure
                   const dayEvents = eventsByDate[key] ?? [];
                   const isPast = isBefore(startOfDay(day), startOfDay(new Date()));
                   const isSelected = selectedDate && isSameDay(day, selectedDate);
+                  const isToday = isSameDay(day, new Date());
                   const isInSuggested7Days = clothesReceived === true && !isPast && isWithinInterval(day, { start: new Date(), end: suggestedRangeEnd });
                   const isChosenForPost = formStart && formStart.startsWith(key);
+
                   return (
                     <button
                       key={key}
@@ -521,19 +546,22 @@ export function StructuredPostCreator({ brandId, brandName, onSaved }: Structure
                         setFormStart(key);
                       }}
                       className={cn(
-                        'aspect-square rounded-md border text-sm transition-colors',
-                        isSameMonth(day, currentMonth)
-                          ? 'bg-background hover:bg-muted border-border'
-                          : 'bg-muted/30 text-muted-foreground border-transparent',
-                        isPast && 'opacity-50 cursor-not-allowed hover:bg-background',
-                        isSelected && !isPast && 'ring-2 ring-primary border-primary',
-                        isInSuggested7Days && !isPast && 'animate-pulse ring-2 ring-primary/60 bg-primary/10 border-primary/40',
-                        isChosenForPost && !isPast && 'ring-2 ring-primary border-primary font-semibold'
+                        'aspect-square rounded-full flex flex-col items-center justify-center relative transition-all',
+                        isSelected
+                          ? 'bg-primary text-primary-foreground font-semibold shadow-md scale-105 z-10'
+                          : 'hover:bg-muted text-foreground',
+                        isPast && 'opacity-30 cursor-not-allowed hover:bg-transparent',
+                        !isSelected && isToday && 'bg-accent/50 text-accent-foreground font-medium',
+                        !isSelected && !isPast && isInSuggested7Days && 'bg-primary/5 text-primary font-medium ring-1 ring-primary/20',
+                        !isSelected && !isPast && isChosenForPost && 'ring-2 ring-primary ring-offset-2'
                       )}
                     >
                       {format(day, 'd')}
                       {dayEvents.length > 0 && (
-                        <span className="block w-1.5 h-1.5 rounded-full bg-primary mx-auto mt-0.5" />
+                        <span className={cn(
+                          "absolute bottom-1 w-1 h-1 rounded-full",
+                          isSelected ? "bg-primary-foreground" : "bg-primary"
+                        )} />
                       )}
                     </button>
                   );

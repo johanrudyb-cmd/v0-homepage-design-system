@@ -436,11 +436,11 @@ export function Phase0Identity({ brandId, brand, onComplete, hideNameField = fal
 
       <div className="flex flex-wrap gap-3">
         <Button onClick={handleSave} disabled={loading || !name.trim()}>
-          {loading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Enregistrement…</> : 'Enregistrer les modifications'}
+          {loading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Mise à jour de l&apos;ADN…</> : 'Enregistrer les modifications'}
         </Button>
         {hasIdentity && (
           <Button variant="default" onClick={handleValidateAndContinue} disabled={loading}>
-            {loading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Enregistrement…</> : <>Valider et continuer<ArrowRight className="w-4 h-4 ml-2" /></>}
+            {loading ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Mise à jour de l&apos;ADN…</> : <>Valider et continuer<ArrowRight className="w-4 h-4 ml-2" /></>}
           </Button>
         )}
         <Button variant="outline" onClick={() => router.push('/brands/create')}>

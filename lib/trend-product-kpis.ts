@@ -153,21 +153,67 @@ export function estimateGrossMargin(
 }
 
 /**
+ * Inférence intelligente des données manquantes (Industry Standards).
+ * Si l'IA n'a pas détecté de matière ou d'entretien, on utilise des standards de l'industrie
+ * basés sur la catégorie pour éviter les rapports vides.
+ */
+export function inferSmartDefaults(category: string | null, field: 'material' | 'careInstructions' | 'color' | 'style'): string {
+  const cat = (category || 'Autre').toLowerCase();
+
+  if (field === 'material') {
+    if (/hoodie|sweat|pantalon de survêtement|jogging/.test(cat)) return 'Molleton de Coton (350g/m²)';
+    if (/t-shirt|tee|débardeur/.test(cat)) return 'Jersey de Coton Premium (210g/m²)';
+    if (/jean|denim|short/.test(cat)) return 'Denim Rigide 13oz (100% Coton)';
+    if (/chemise|shirt/.test(cat)) return 'Popeline de Coton ou Lin';
+    if (/veste|blouson|manteau|jacket/.test(cat)) return 'Polyester technique ou Nylon Ripstop';
+    if (/tricot|pull|cardigan|knit/.test(cat)) return 'Mélange Laine & Acrylique';
+    if (/cargo/.test(cat)) return 'Coton Twill robuste';
+    return 'Coton / Polyester standard';
+  }
+
+  if (field === 'careInstructions') {
+    if (/veste|manteau|jacket|tricot|pull|knit/.test(cat)) return 'Lavage délicat 30°C / Pas de sèche-linge';
+    if (/jean|denim/.test(cat)) return 'Lavage à froid retourné / Suspendre pour sécher';
+    return 'Lavage machine 30°C / Séchage tambour modéré';
+  }
+
+  if (field === 'style') {
+    if (/hoodie|sweat|cargo|jogging/.test(cat)) return 'Streetwear / Urbain';
+    if (/jean|denim/.test(cat)) return 'Casual / Quotidien';
+    if (/veste|manteau|chemise/.test(cat)) return 'Minimaliste / Formel';
+    return 'Contemporain';
+  }
+
+  if (field === 'color') return 'Coloris standard';
+
+  return '—';
+}
+
+/**
  * Complexité de fabrication : heuristique à partir de matière + description.
  * Broderies, détails techniques → Moyen ou Complexe.
  */
 export function inferComplexityScore(
   material: string | null,
-  description: string | null
+  description: string | null,
+  category?: string | null
 ): 'Facile' | 'Moyen' | 'Complexe' {
   const text = [material, description].filter(Boolean).join(' ').toLowerCase();
-  if (!text) return 'Facile';
+  const cat = (category || '').toLowerCase();
+
+  if (!text) {
+    if (/veste|blouson|manteau|jacket|cargo/.test(cat)) return 'Moyen';
+    return 'Facile';
+  }
+
   if (
-    /broderie|embroidery|détail|detail|poche|pocket|zip|bouton|button|doublure|lining|capuche|hood/.test(text)
+    /broderie|embroidery|détail|detail|poche|pocket|zip|bouton|button|doublure|lining|capuche|hood|rembourrage|puffer/.test(text)
   ) {
-    if (/broderie|embroidery|détail complexe|multiple pièces/.test(text)) return 'Complexe';
+    if (/broderie complexe|embroidery|multiple pièces|coutures asymétriques/.test(text)) return 'Complexe';
     return 'Moyen';
   }
+
+  if (/veste|manteau|jean|cargo/.test(cat)) return 'Moyen';
   return 'Facile';
 }
 
@@ -180,7 +226,7 @@ export function inferSustainabilityScore(
   description: string | null
 ): number | null {
   const text = [material, description].filter(Boolean).join(' ').toLowerCase();
-  if (!text) return null;
+  if (!text) return 45; // base neutre par défaut pour éviter le vide
   let score = 40; // base réaliste (neutre)
   if (/recyclé|recycle|recycled/.test(text)) score += 28;
   if (/bio|organic|coton biologique|organic cotton|gots|oeko-tex/.test(text)) score += 22;

@@ -1,7 +1,8 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 type Tab = 'classement' | 'rapport' | 'phases' | 'analyseur';
 
@@ -9,41 +10,45 @@ interface TrendsSubNavProps {
   active: Tab;
 }
 
-const tabs: { id: string; label: string; href: string; badge?: string }[] = [
-  { id: 'classement', label: 'Tendances', href: '/trends' },
+const tabs: { id: Tab; label: string; href: string; badge?: string }[] = [
+  { id: 'classement', label: 'Tendances Hebdo', href: '/trends' },
   { id: 'analyseur', label: 'Analyseur Visuel', href: '/trends/visual' },
 ];
 
 export function TrendsSubNav({ active }: TrendsSubNavProps) {
   return (
-    <nav className="flex flex-wrap gap-1 p-1 rounded-lg bg-muted/60 w-fit" aria-label="Sections Tendances de la semaine">
-      {tabs.map((tab) =>
-        tab.id === active ? (
-          <span
+    <nav
+      className="inline-flex p-1.5 rounded-[24px] bg-[#F5F5F7] border border-black/[0.03] w-fit"
+      aria-label="Navigation Tendances"
+    >
+      {tabs.map((tab) => {
+        const isActive = tab.id === active;
+
+        return (
+          <Link
             key={tab.id}
-            className="px-4 py-2 rounded-md bg-background text-sm font-medium shadow-sm border border-border"
-          >
-            {tab.label}
-          </span>
-        ) : (
-          <button
-            key={tab.id}
-            type="button"
-            onClick={() => tab.href !== '#' && (window.location.href = tab.href)}
+            href={tab.href}
             className={cn(
-              "px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center gap-2",
-              tab.href === '#' ? "text-muted-foreground/40 cursor-default" : "text-muted-foreground hover:text-foreground hover:bg-background/80"
+              "relative px-6 py-2.5 rounded-full text-xs font-black uppercase tracking-widest transition-all duration-300",
+              isActive ? "text-white" : "text-[#6e6e73] hover:text-black"
             )}
           >
-            {tab.label}
+            {isActive && (
+              <motion.div
+                layoutId="activeTab"
+                className="absolute inset-0 bg-black rounded-full shadow-apple"
+                transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
+              />
+            )}
+            <span className="relative z-10">{tab.label}</span>
             {tab.badge && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 font-bold uppercase tracking-wider">
+              <span className="relative z-10 ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-[#FF3B30] text-white">
                 {tab.badge}
               </span>
             )}
-          </button>
-        )
-      )}
+          </Link>
+        );
+      })}
     </nav>
   );
 }

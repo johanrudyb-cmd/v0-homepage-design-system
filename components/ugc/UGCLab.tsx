@@ -5,9 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { VirtualTryOn } from './VirtualTryOn';
 import { StructuredPostCreator } from './StructuredPostCreator';
 import { ShootingPhoto } from './ShootingPhoto';
-import { LayoutList, Image as ImageIcon, Camera, Sparkles } from 'lucide-react';
+import { LogoGenerator } from './LogoGenerator';
+import { LayoutList, Image as ImageIcon, Camera, Sparkles, PenTool } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 /** Design pour UGC (Virtual Try-On, Shooting). Compatible avec les designs renvoyés par /api/designs. */
 interface Design {
@@ -35,7 +37,7 @@ interface UGCLabProps {
 }
 
 export function UGCLab({ brandId, brandName, designs = [], brand, userPlan = 'free' }: UGCLabProps) {
-  const [activeTab, setActiveTab] = useState<'tryon' | 'shooting' | 'scripts'>('tryon');
+  const [activeTab, setActiveTab] = useState<'tryon' | 'shooting' | 'scripts' | 'logo'>('tryon');
 
   if (userPlan === 'free') {
     return (
@@ -79,48 +81,62 @@ export function UGCLab({ brandId, brandName, designs = [], brand, userPlan = 'fr
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Onglets modernes */}
-      <Card className="border-2">
+      <Card className="border-b-2 rounded-none border-x-0 border-t-0 shadow-none bg-transparent">
         <CardContent className="p-0">
-          <div className="flex gap-1 border-b-2 border-border bg-muted/30 p-1 rounded-t-lg">
+          <div className="flex gap-1 bg-muted/20 p-1 rounded-t-lg overflow-x-auto no-scrollbar">
             <button
               onClick={() => setActiveTab('tryon')}
               className={cn(
-                'flex-1 px-6 py-3 text-sm font-semibold rounded-lg transition-all relative',
+                'flex-1 min-w-[140px] px-4 py-2 text-xs font-semibold rounded-lg transition-all relative',
                 'flex items-center justify-center gap-2',
                 activeTab === 'tryon'
-                  ? 'bg-background text-foreground shadow-modern'
+                  ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <ImageIcon className="w-4 h-4" />
-              Virtual Try-On
+              <ImageIcon className="w-3.5 h-3.5" />
+              <span>Virtual Try-On</span>
+              <span className="hidden sm:inline-block px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-700 text-[10px] font-bold">PREMIUM</span>
             </button>
             <button
               onClick={() => setActiveTab('shooting')}
               className={cn(
-                'flex-1 px-6 py-3 text-sm font-semibold rounded-lg transition-all relative',
+                'flex-1 min-w-[140px] px-4 py-2 text-xs font-semibold rounded-lg transition-all relative',
                 'flex items-center justify-center gap-2',
                 activeTab === 'shooting'
-                  ? 'bg-background text-foreground shadow-modern'
+                  ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <Camera className="w-4 h-4" />
+              <Camera className="w-3.5 h-3.5" />
               Shooting photo
+            </button>
+            <button
+              onClick={() => setActiveTab('logo')}
+              className={cn(
+                'flex-1 min-w-[140px] px-4 py-2 text-xs font-semibold rounded-lg transition-all relative',
+                'flex items-center justify-center gap-2',
+                activeTab === 'logo'
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+            >
+              <PenTool className="w-3.5 h-3.5" />
+              Identité visuelle
             </button>
             <button
               onClick={() => setActiveTab('scripts')}
               className={cn(
-                'flex-1 px-6 py-3 text-sm font-semibold rounded-lg transition-all relative',
+                'flex-1 min-w-[140px] px-4 py-2 text-xs font-semibold rounded-lg transition-all relative',
                 'flex items-center justify-center gap-2',
                 activeTab === 'scripts'
-                  ? 'bg-background text-foreground shadow-modern'
+                  ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground'
               )}
             >
-              <LayoutList className="w-4 h-4" />
+              <LayoutList className="w-3.5 h-3.5" />
               Post structuré
             </button>
           </div>
@@ -128,21 +144,36 @@ export function UGCLab({ brandId, brandName, designs = [], brand, userPlan = 'fr
       </Card>
 
       {/* Contenu */}
-      {activeTab === 'tryon' && (
-        <VirtualTryOn brandId={brandId} designs={designs} />
-      )}
+      <div className="min-h-0">
+        {activeTab === 'tryon' && (
+          <div className="space-y-3">
+            <div className="px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-4 h-4 text-amber-600" />
+                <p className="text-xs font-medium text-amber-800">Le Virtual Try-On Premium est payant à l&apos;unité (7,90€ / essai).</p>
+              </div>
+              <Link href="/usage" className="text-[10px] font-bold text-amber-700 underline hover:no-underline shrink-0">CRÉDITS</Link>
+            </div>
+            <VirtualTryOn brandId={brandId} designs={designs} />
+          </div>
+        )}
 
-      {activeTab === 'shooting' && (
-        <ShootingPhoto
-          brandId={brandId}
-          designs={designs}
-          onSwitchToTryOn={() => setActiveTab('tryon')}
-        />
-      )}
+        {activeTab === 'shooting' && (
+          <ShootingPhoto
+            brandId={brandId}
+            designs={designs}
+            onSwitchToTryOn={() => setActiveTab('tryon')}
+          />
+        )}
 
-      {activeTab === 'scripts' && (
-        <StructuredPostCreator brandId={brandId} brandName={brandName} />
-      )}
+        {activeTab === 'logo' && (
+          <LogoGenerator brandId={brandId} />
+        )}
+
+        {activeTab === 'scripts' && (
+          <StructuredPostCreator brandId={brandId} brandName={brandName} />
+        )}
+      </div>
     </div>
   );
 }

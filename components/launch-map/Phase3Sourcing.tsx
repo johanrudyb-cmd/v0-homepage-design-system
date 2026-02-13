@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { Truck, Users } from 'lucide-react';
+import { Truck, Users, Loader2 } from 'lucide-react';
 
 interface SupplierItem {
   id: string;
@@ -81,10 +81,10 @@ export function Phase3Sourcing({ brandId, onComplete }: Phase3SourcingProps) {
         }
 
         const factoriesList = favData.factories || [];
-        
+
         // Créer une map pour fusionner fournisseurs avec devis ET favoris
         const suppliersMap = new Map<string, SupplierItem>();
-        
+
         // D'abord ajouter les fournisseurs qui ont reçu des devis
         for (const q of sentQuotes) {
           const f = q.factory;
@@ -103,7 +103,7 @@ export function Phase3Sourcing({ brandId, onComplete }: Phase3SourcingProps) {
             });
           }
         }
-        
+
         // Ensuite ajouter les favoris (s'ils ne sont pas déjà dans la map)
         for (const f of factoriesList) {
           const existing = suppliersMap.get(f.id);
@@ -122,10 +122,10 @@ export function Phase3Sourcing({ brandId, onComplete }: Phase3SourcingProps) {
             });
           }
         }
-        
+
         // Tous les fournisseurs (devis + favoris) sont maintenant dans "Fournisseurs avec qui vous travaillez"
         setSuppliers(Array.from(suppliersMap.values()));
-        
+
         // Ne plus afficher une section "Favoris" séparée
         setFavoriteSuppliers([]);
       } catch (error) {
@@ -169,7 +169,10 @@ export function Phase3Sourcing({ brandId, onComplete }: Phase3SourcingProps) {
   return (
     <div className="space-y-6">
       {loading ? (
-        <p className="text-sm text-muted-foreground">Chargement...</p>
+        <div className="flex flex-col items-center justify-center py-12 gap-3 text-muted-foreground">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-sm font-medium">Récupération des usines certifiées...</p>
+        </div>
       ) : (
         <>
           {suppliers.length > 0 && (

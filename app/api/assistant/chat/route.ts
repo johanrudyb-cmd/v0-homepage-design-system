@@ -1,0 +1,156 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { getCurrentUser } from '@/lib/auth-helpers';
+import { prisma } from '@/lib/prisma';
+import OpenAI from 'openai';
+import { withAIUsageLimit } from '@/lib/ai-usage';
+
+const openaiApiKey = process.env.CHATGPT_API_KEY || process.env.OPENAI_API_KEY;
+const openai = openaiApiKey ? new OpenAI({ apiKey: openaiApiKey }) : null;
+
+export async function POST(req: NextRequest) {
+    const user = await getCurrentUser();
+    if (!user) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+
+    try {
+        const { messages, confirmedAnalysis } = await req.json();
+
+        if (!openai) {
+            return NextResponse.json({ error: 'Service IA non configuré' }, { status: 503 });
+        }
+
+        // Récupérer les infos complètes de la marque pour un contexte ultra-précis
+        const userBrand = await prisma.brand.findFirst({
+            where: { userId: user.id },
+            orderBy: { createdAt: 'desc' },
+            include: {
+                launchMap: true,
+                strategyGenerations: { orderBy: { createdAt: 'desc' }, take: 1 },
+                _count: { select: { designs: true, collections: true } }
+            },
+        });
+
+        const lastMessage = messages[messages.length - 1].content;
+
+        // Calcul de la progression
+        const phases = userBrand?.launchMap;
+        const progress = phases ? [
+            phases.phase1 && "Stratégie",
+            phases.phase2 && "Rentabilité",
+            phases.phase3 && "Design",
+            phases.phase4 && "Tech Pack",
+            phases.phase5 && "Sourcing",
+            phases.phase6 && "Marketing",
+            phases.phase7 && "Shopify"
+        ].filter(Boolean).join(", ") : "Non démarré";
+
+        const systemPrompt = `Tu es Virgil, le Directeur Artistique (DA) personnel de l'utilisateur. Tu n'es PAS une IA généraliste type Gemini ou ChatGPT. Tu es un compagnon de haut niveau intégré à la plateforme Outfity pour piloter la vision créative de SA MARQUE.
+
+TON RÔLE :
+1. Agir comme le Directeur Artistique de l'utilisateur : guide ses choix créatifs et stratégiques.
+2. Analyser ses données actuelles pour le guider dans les prochaines étapes de son lancement (Launch Map).
+3. Faire le lien entre les tendances Elite Radar et son identité de marque unique.
+
+MÉMOIRE ARTISTIQUE (LE CERVEAU) :
+Tu dois te "nourrir" de chaque analyse pour affiner ta connaissance de la marque. 
+Si c'est une analyse confirmée, génère des "creative_insights" (ton de voix, préférences esthétiques, cibles identifiées) qui seront mémorisés pour alimenter les futurs scripts et stratégies.
+
+MISSION DE CONVERSION (CONSUBTIL) :
+Si l'utilisateur est en plan "free" (actuellement : ${user?.plan || 'free'}), ta mission est d'amener subtilement l'utilisateur à passer au plan CRÉATEUR. Ne sois pas agressif, sois inspirant. Par exemple : "Pour aller plus loin dans l'analyse de ce concurrent, tu devrais passer au plan Créateur qui nous débloque 10 analyses de marques par mois, c'est indispensable pour ton positionnement."
+
+QUOTAS DU PLAN CRÉATEUR :
+- 10 Analyses de Tendances / mois (au lieu de 3 en gratuit).
+- 10 Analyses de Marques / mois (accessibles via Virgil ou l'outil d'analyse).
+- Accès illimité aux stratégies et tech packs.
+
+CONTEXTE DE LA MARQUE :
+- Nom : ${userBrand?.name || 'Non défini'}
+- Stratégie actuelle : ${userBrand?.strategyGenerations?.[0]?.positioning || 'Non générée'}
+- Progression Launch Map : ${progress}
+- Inventaire : ${userBrand?._count.collections || 0} Collections, ${userBrand?._count.designs || 0} Designs créés.
+- Mémoire Virgil (Insights) : ${JSON.stringify(userBrand?.styleGuide || {})}
+
+LIMITES STRICTES :
+- Ne réponds PAS à des questions hors sujet (cuisine, code général, politique, etc.).
+- Si on te demande "Qui es-tu ?", réponds que tu es l'assistant dédié à la réussite de sa marque sur Outfity.
+- Sois un complément à l'outil : redirige l'utilisateur vers les sections (ex: "Tu devrais aller dans l'Analyseur Visuel pour valider cette matière").
+
+PERSONNALITÉ :
+Ton ton est celui d'un Directeur de Création expert : visionnaire, exigeant, mais extrêmement utile et concis. Style minimaliste (Apple UI).
+
+RÈGLE D'OR :
+Si l'utilisateur demande une ANALYSE PROFONDE d'une marque spécifique (ex: Zara, Nike) ou un rapport complet, tu dois mettre "intent": "analysis".
+
+FORMAT DE RÉPONSE OBLIGATOIRE (JSON STRICT) :
+{
+  "reply": "Ta réponse markdown ici",
+  "intent": "qa" | "analysis",
+  "analysis_target": "Nom de la marque/sujet si analyse, sinon null",
+  "creative_insights": { "audience": "...", "tone": "...", "aesthetic_preferences": "..." } // Remplir UNIQUEMENT lors d'une analyse confirmée
+}`;
+
+
+        // Déterminer la feature à facturer
+        // Si c'est une analyse confirmée, on consomme sur le quota "Analyse de marque" global
+        // Sinon, on consomme sur le quota "Assistant Q&A" (léger/gratuit)
+        const featureKey = confirmedAnalysis ? 'brand_analyze' : 'assistant_chat_qa';
+
+        const result = await withAIUsageLimit(
+            user.id,
+            user.plan || 'free',
+            featureKey,
+            async () => {
+                const completion = await openai.chat.completions.create({
+                    model: 'gpt-4o',
+                    messages: [
+                        { role: 'system', content: systemPrompt },
+                        ...messages.slice(-5),
+                    ],
+                    response_format: { type: 'json_object' },
+                    temperature: 0.7,
+                });
+
+                const rawResponse = completion.choices[0].message.content || '{}';
+                const parsed = JSON.parse(rawResponse);
+
+                // Si l'IA détecte une demande d'analyse mais que le client n'a pas encore "confirmé"
+                // on force l'intention à "analysis" pour que le front-end affiche le bouton de validation.
+                if (parsed.intent === 'analysis' && !confirmedAnalysis) {
+                    return {
+                        ...parsed,
+                        reply: "C'est une excellente question qui nécessite une analyse approfondie de cette marque. Pour te donner un rapport précis, cela consommera un crédit d'analyse de marque. Veux-tu continuer ?"
+                    };
+                }
+
+                // --- SYSTÈME DE MÉMOIRE (Apprentissage) ---
+                // Si Virgil a généré des insights lors d'une analyse, on les enregistre dans le styleGuide du Brand
+                if (confirmedAnalysis && parsed.creative_insights && userBrand) {
+                    try {
+                        const currentStyleGuide = (userBrand.styleGuide as any) || {};
+                        await prisma.brand.update({
+                            where: { id: userBrand.id },
+                            data: {
+                                styleGuide: {
+                                    ...currentStyleGuide,
+                                    virgilInsights: {
+                                        ...(currentStyleGuide.virgilInsights || {}),
+                                        ...parsed.creative_insights,
+                                        lastUpdateAt: new Date().toISOString(),
+                                    }
+                                }
+                            }
+                        });
+                    } catch (e) {
+                        console.warn('[Virgil Memory] Impossible de mettre à jour le cerveau:', e);
+                    }
+                }
+
+                return parsed;
+            }
+        );
+
+        return NextResponse.json(result);
+    } catch (error: any) {
+        console.error('[Assistant Chat Error]:', error);
+        return NextResponse.json({ error: error.message || 'Erreur interne' }, { status: 500 });
+    }
+}

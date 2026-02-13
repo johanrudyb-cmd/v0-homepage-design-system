@@ -328,13 +328,13 @@ export function Phase2Design({ brandId, brand, launchMap, onComplete }: Phase2De
   /** Sauvegarder directement le design sans passer par le mockup */
   const handleSaveDesignDirectly = async () => {
     setError(null);
-    
+
     // Vérifier qu'on a un design
     if (!designImageUrl) {
       setError('Aucun design à sauvegarder. Créez ou importez d\'abord un design.');
       return;
     }
-    
+
     setIsSaving(true);
     const placementsForMockup = PLACEMENTS_BY_PRODUCT[productType] ?? PLACEMENTS_BY_PRODUCT.tshirt;
     const placementToUse = stickerPlacements.length > 0 && placementsForMockup.includes(stickerPlacements[0]!)
@@ -353,7 +353,7 @@ export function Phase2Design({ brandId, brand, launchMap, onComplete }: Phase2De
         const uploadData = await uploadRes.json();
         if (!uploadRes.ok || !uploadData.url) throw new Error('Échec upload du design');
         finalDesignUrl = typeof window !== 'undefined' ? `${window.location.origin}${uploadData.url}` : uploadData.url;
-        
+
         // Enregistrer dans l'historique
         await fetch('/api/launch-map/design/history', {
           method: 'POST',
@@ -1008,425 +1008,426 @@ export function Phase2Design({ brandId, brand, launchMap, onComplete }: Phase2De
 
       {/* ——— Étape 1 : Générer ou importer un design (visible uniquement si pas encore validé) ——— */}
       {!designStepValidated && (
-      <Card className="border-2">
-        <CardHeader className="pb-2">
-          <CardTitle className="text-base flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
-            Générer ou importer un design
-          </CardTitle>
-          <CardDescription>Créez votre visuel d&apos;impression (IA, import ou tendance). Validez pour passer aux spécifications.</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <p className="text-sm font-medium text-foreground">Comment voulez-vous créer votre design ?</p>
-          <div className="flex flex-wrap gap-2">
-            <Button type="button" variant={stickerSource === 'ai' ? 'default' : 'outline'} size="sm" onClick={() => setStickerSource('ai')}>
-              <Sparkles className="w-3.5 h-3.5 mr-1.5" />
-              Mot ou phrase = logo
-            </Button>
-            <Button type="button" variant={stickerSource === 'logo_only' ? 'default' : 'outline'} size="sm" onClick={() => setStickerSource('logo_only')} disabled={!brand?.logo?.trim()} title={!brand?.logo?.trim() ? 'Enregistrez d\'abord un logo (phase Identité)' : undefined}>
-              <ImageIcon className="w-3.5 h-3.5 mr-1.5" />
-              Mon logo uniquement
-            </Button>
-            <Button type="button" variant={stickerSource === 'logo_plus_ai' ? 'default' : 'outline'} size="sm" onClick={() => setStickerSource('logo_plus_ai')} disabled={!brand?.logo?.trim()} title={!brand?.logo?.trim() ? 'Enregistrez d\'abord un logo (phase Identité)' : undefined}>
-              <ImageIcon className="w-3.5 h-3.5 mr-1.5" />
-              Créer un design à partir de mon logo
-            </Button>
-          </div>
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Emplacement(s) du design sur le vêtement ({productLabel})</p>
-            <p className="text-xs text-muted-foreground">Sélection multiple : cliquez pour ajouter ou retirer.</p>
-            <div className="flex flex-wrap gap-1.5">
-              {placementsForProduct.map((p) => (
-                <Button
-                  key={p}
-                  type="button"
-                  variant={stickerPlacements.includes(p) ? 'default' : 'outline'}
-                  size="sm"
-                  onClick={() => toggleStickerPlacement(p)}
-                >
-                  {p}
-                </Button>
-              ))}
+        <Card className="border-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-base flex items-center gap-2">
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs font-bold">1</span>
+              Générer ou importer un design
+            </CardTitle>
+            <CardDescription>Créez votre visuel d&apos;impression (IA, import ou tendance). Validez pour passer aux spécifications.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm font-medium text-foreground">Comment voulez-vous créer votre design ?</p>
+            <div className="flex flex-wrap gap-2">
+              <Button type="button" variant={stickerSource === 'ai' ? 'default' : 'outline'} size="sm" onClick={() => setStickerSource('ai')}>
+                <Sparkles className="w-3.5 h-3.5 mr-1.5" />
+                Mot ou phrase = logo
+              </Button>
+              <Button type="button" variant={stickerSource === 'logo_only' ? 'default' : 'outline'} size="sm" onClick={() => setStickerSource('logo_only')} disabled={!brand?.logo?.trim()} title={!brand?.logo?.trim() ? 'Enregistrez d\'abord un logo (phase Identité)' : undefined}>
+                <ImageIcon className="w-3.5 h-3.5 mr-1.5" />
+                Mon logo uniquement
+              </Button>
+              <Button type="button" variant={stickerSource === 'logo_plus_ai' ? 'default' : 'outline'} size="sm" onClick={() => setStickerSource('logo_plus_ai')} disabled={!brand?.logo?.trim()} title={!brand?.logo?.trim() ? 'Enregistrez d\'abord un logo (phase Identité)' : undefined}>
+                <ImageIcon className="w-3.5 h-3.5 mr-1.5" />
+                Créer un design à partir de mon logo
+              </Button>
             </div>
-            {stickerPlacements.length > 0 && (
-              <p className="text-xs text-muted-foreground">{stickerPlacements.length} emplacement(s) sélectionné(s) : {stickerPlacements.join(', ')}</p>
-            )}
-          </div>
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground">Couleur du vêtement</p>
-            <p className="text-xs text-muted-foreground">Le design sera adapté pour bien ressortir sur cette couleur. Recommandations selon votre cible.</p>
-            <div className="flex flex-wrap items-center gap-2">
-              <input
-                type="color"
-                value={isHexColor(garmentColorForDesign) ? normalizeHex(garmentColorForDesign.replace(/^#?/, '#')) : '#ffffff'}
-                onChange={(e) => setGarmentColorForDesign(e.target.value)}
-                className="h-9 w-14 cursor-pointer rounded border border-border bg-transparent"
-              />
-              <Input
-                value={garmentColorForDesign}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  if (v === '' || v.startsWith('#')) setGarmentColorForDesign(v || '#ffffff');
-                  else if (isHexColor('#' + v)) setGarmentColorForDesign('#' + v);
-                }}
-                placeholder="#ffffff"
-                className="w-24 font-mono text-sm"
-              />
-            </div>
-            <p className="text-xs font-medium text-muted-foreground mt-1">Recommandé pour votre cible</p>
-            <div className="flex flex-wrap gap-1.5">
-              {recommendedGarmentColors.map((hex) => (
-                <button
-                  key={hex}
-                  type="button"
-                  onClick={() => setGarmentColorForDesign(hex)}
-                  className={cn(
-                    'w-7 h-7 rounded-md border-2 shrink-0 transition-all',
-                    garmentColorForDesign.toLowerCase() === hex.toLowerCase() ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-primary/50'
-                  )}
-                  style={{ backgroundColor: hex }}
-                  title={hex}
-                />
-              ))}
-            </div>
-          </div>
-          {(stickerSource === 'ai' || stickerSource === 'logo_plus_ai') && (
-            <div className="space-y-3">
-              <div className="grid gap-3 sm:grid-cols-2">
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">Style du design (optionnel)</Label>
-                  <Input
-                    value={designStyleKeywords}
-                    onChange={(e) => setDesignStyleKeywords(e.target.value)}
-                    placeholder="ex. minimal, brut, typo bold, sans dégradé"
-                    className="min-h-9"
-                  />
-                  <p className="text-[10px] text-muted-foreground">Mots-clés pour coller à votre identité.</p>
-                </div>
-                <div className="space-y-1.5">
-                  <Label className="text-xs font-medium">À éviter dans le design (optionnel)</Label>
-                  <Input
-                    value={designAvoid}
-                    onChange={(e) => setDesignAvoid(e.target.value)}
-                    placeholder="ex. dessin animé, néon, fioritures"
-                    className="min-h-9"
-                  />
-                  <p className="text-[10px] text-muted-foreground">Ce que le design ne doit pas contenir.</p>
-                </div>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Emplacement(s) du design sur le vêtement ({productLabel})</p>
+              <p className="text-xs text-muted-foreground">Sélection multiple : cliquez pour ajouter ou retirer.</p>
+              <div className="flex flex-wrap gap-1.5 sm:gap-2">
+                {placementsForProduct.map((p) => (
+                  <Button
+                    key={p}
+                    type="button"
+                    variant={stickerPlacements.includes(p) ? 'default' : 'outline'}
+                    size="sm"
+                    onClick={() => toggleStickerPlacement(p)}
+                    className="h-auto py-1.5 px-3 whitespace-normal text-left break-words max-w-[140px] sm:max-w-none text-[11px] sm:text-xs leading-tight"
+                  >
+                    {p}
+                  </Button>
+                ))}
               </div>
-              <div className="space-y-1.5">
-                <Label className="text-xs font-medium">Ce que j&apos;aimerais / inspiration (optionnel)</Label>
-                <Textarea
-                  value={designInspiration}
-                  onChange={(e) => setDesignInspiration(e.target.value)}
-                  placeholder="ex. style vintage années 90, typo très bold, couleurs pastel, référence à un artiste..."
-                  className="min-h-[72px]"
-                  rows={3}
-                />
-                <p className="text-[10px] text-muted-foreground">Décrivez votre inspiration : l’IA l’intègre dans le prompt pour améliorer la créativité du design.</p>
-              </div>
-              {stickerSource === 'ai' ? (
-                <>
-                  <p className="text-xs text-muted-foreground">
-                    Indiquez ce que vous voulez écrire sur chaque emplacement. L&apos;IA génère un design lisible (nom de marque, slogan, etc.) pour chaque zone.
-                  </p>
-                  {stickerPlacements.map((p) => (
-                    <div key={p} className="space-y-1">
-                      <Label className="text-xs font-medium">Texte pour « {p} »</Label>
-                      <Input
-                        value={textByPlacement[p] ?? ''}
-                        onChange={(e) => setTextByPlacement((prev) => ({ ...prev, [p]: e.target.value }))}
-                        placeholder="ex. BIANGORY, slogan, mot..."
-                        className="min-h-9"
-                      />
-                    </div>
-                  ))}
-                </>
-              ) : (
-                <>
-                  <p className="text-xs text-muted-foreground">Optionnel : décrivez le cadre autour du logo (ex. motif géométrique, bordure épaisse).</p>
-                  <Textarea value={stickerDescription} onChange={(e) => setStickerDescription(e.target.value)} placeholder="ex. Bordure géométrique, couleurs de la marque" className="min-h-[72px]" />
-                </>
+              {stickerPlacements.length > 0 && (
+                <p className="text-[11px] sm:text-xs text-muted-foreground break-words">{stickerPlacements.length} emplacement(s) sélectionné(s) : {stickerPlacements.join(', ')}</p>
               )}
             </div>
-          )}
-          <div className="flex flex-wrap gap-3">
-            {stickerSource === 'logo_only' && (
-              <Button type="button" variant="default" size="sm" onClick={handleUseLogoOnly} className="gap-2">
-                <ImageIcon className="w-4 h-4" />
-                Utiliser mon logo
-              </Button>
-            )}
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground">Couleur du vêtement</p>
+              <p className="text-xs text-muted-foreground">Le design sera adapté pour bien ressortir sur cette couleur. Recommandations selon votre cible.</p>
+              <div className="flex flex-wrap items-center gap-2">
+                <input
+                  type="color"
+                  value={isHexColor(garmentColorForDesign) ? normalizeHex(garmentColorForDesign.replace(/^#?/, '#')) : '#ffffff'}
+                  onChange={(e) => setGarmentColorForDesign(e.target.value)}
+                  className="h-9 w-14 cursor-pointer rounded border border-border bg-transparent"
+                />
+                <Input
+                  value={garmentColorForDesign}
+                  onChange={(e) => {
+                    const v = e.target.value;
+                    if (v === '' || v.startsWith('#')) setGarmentColorForDesign(v || '#ffffff');
+                    else if (isHexColor('#' + v)) setGarmentColorForDesign('#' + v);
+                  }}
+                  placeholder="#ffffff"
+                  className="w-24 font-mono text-sm"
+                />
+              </div>
+              <p className="text-xs font-medium text-muted-foreground mt-1">Recommandé pour votre cible</p>
+              <div className="flex flex-wrap gap-1.5">
+                {recommendedGarmentColors.map((hex) => (
+                  <button
+                    key={hex}
+                    type="button"
+                    onClick={() => setGarmentColorForDesign(hex)}
+                    className={cn(
+                      'w-7 h-7 rounded-md border-2 shrink-0 transition-all',
+                      garmentColorForDesign.toLowerCase() === hex.toLowerCase() ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-primary/50'
+                    )}
+                    style={{ backgroundColor: hex }}
+                    title={hex}
+                  />
+                ))}
+              </div>
+            </div>
             {(stickerSource === 'ai' || stickerSource === 'logo_plus_ai') && (
-              <Button type="button" variant="default" size="sm" onClick={() => handleGenerateSticker(stickerDescription, stickerSource === 'logo_plus_ai')} disabled={isGenerating} className="gap-2">
-                {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
-                {stickerSource === 'logo_plus_ai' ? 'Générer un design à partir de mon logo' : 'Générer un design IA'}
-                <GenerationCostBadge feature="design_generate_sticker" />
-              </Button>
-            )}
-            <Button type="button" variant={mode === 'upload' ? 'default' : 'outline'} size="sm" onClick={() => uploadInputRef.current?.click()}>
-              <Upload className="w-4 h-4 mr-2" />
-              Importer mon design
-            </Button>
-            <input ref={uploadInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
-            <Button type="button" variant={mode === 'trend' ? 'default' : 'outline'} size="sm" onClick={() => setMode('trend')}>
-              <TrendingUp className="w-4 h-4 mr-2" />
-              Depuis une tendance
-            </Button>
-          </div>
-        </CardContent>
-        {stickerPlacements.length > 1 && (
-          <CardContent className="pt-0 space-y-3">
-            <p className="text-sm font-medium text-foreground">Design par emplacement</p>
-            <p className="text-xs text-muted-foreground">Choisissez un design dans l’historique pour chaque emplacement (autant que d’emplacements sélectionnés).</p>
-            {selectingForPlacement && (
-              <div className="rounded-lg border border-primary bg-primary/10 px-3 py-2 text-sm text-foreground">
-                Cliquez sur un design dans l’historique ci-dessous pour l’assigner à : <strong>{selectingForPlacement}</strong>
+              <div className="space-y-3">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium">Style du design (optionnel)</Label>
+                    <Input
+                      value={designStyleKeywords}
+                      onChange={(e) => setDesignStyleKeywords(e.target.value)}
+                      placeholder="ex. minimal, brut, typo bold, sans dégradé"
+                      className="min-h-9"
+                    />
+                    <p className="text-[10px] text-muted-foreground">Mots-clés pour coller à votre identité.</p>
+                  </div>
+                  <div className="space-y-1.5">
+                    <Label className="text-xs font-medium">À éviter dans le design (optionnel)</Label>
+                    <Input
+                      value={designAvoid}
+                      onChange={(e) => setDesignAvoid(e.target.value)}
+                      placeholder="ex. dessin animé, néon, fioritures"
+                      className="min-h-9"
+                    />
+                    <p className="text-[10px] text-muted-foreground">Ce que le design ne doit pas contenir.</p>
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <Label className="text-xs font-medium">Ce que j&apos;aimerais / inspiration (optionnel)</Label>
+                  <Textarea
+                    value={designInspiration}
+                    onChange={(e) => setDesignInspiration(e.target.value)}
+                    placeholder="ex. style vintage années 90, typo très bold, couleurs pastel, référence à un artiste..."
+                    className="min-h-[72px]"
+                    rows={3}
+                  />
+                  <p className="text-[10px] text-muted-foreground">Décrivez votre inspiration : l’IA l’intègre dans le prompt pour améliorer la créativité du design.</p>
+                </div>
+                {stickerSource === 'ai' ? (
+                  <>
+                    <p className="text-xs text-muted-foreground">
+                      Indiquez ce que vous voulez écrire sur chaque emplacement. L&apos;IA génère un design lisible (nom de marque, slogan, etc.) pour chaque zone.
+                    </p>
+                    {stickerPlacements.map((p) => (
+                      <div key={p} className="space-y-1">
+                        <Label className="text-xs font-medium">Texte pour « {p} »</Label>
+                        <Input
+                          value={textByPlacement[p] ?? ''}
+                          onChange={(e) => setTextByPlacement((prev) => ({ ...prev, [p]: e.target.value }))}
+                          placeholder="ex. BIANGORY, slogan, mot..."
+                          className="min-h-9"
+                        />
+                      </div>
+                    ))}
+                  </>
+                ) : (
+                  <>
+                    <p className="text-xs text-muted-foreground">Optionnel : décrivez le cadre autour du logo (ex. motif géométrique, bordure épaisse).</p>
+                    <Textarea value={stickerDescription} onChange={(e) => setStickerDescription(e.target.value)} placeholder="ex. Bordure géométrique, couleurs de la marque" className="min-h-[72px]" />
+                  </>
+                )}
               </div>
             )}
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {stickerPlacements.map((placement) => {
-                const img = getImageForPlacement(placement);
-                const rationale = designSet?.find((d) => d.placement === placement)?.rationale;
-                return (
-                  <div
-                    key={placement}
-                    className={cn(
-                      'rounded-xl border-2 overflow-hidden bg-muted/20',
-                      selectingForPlacement === placement ? 'border-primary ring-2 ring-primary/30' : 'border-border'
-                    )}
-                  >
-                    <div className="aspect-square bg-muted/30 relative">
-                      {img ? (
+            <div className="flex flex-wrap gap-3">
+              {stickerSource === 'logo_only' && (
+                <Button type="button" variant="default" size="sm" onClick={handleUseLogoOnly} className="gap-2">
+                  <ImageIcon className="w-4 h-4" />
+                  Utiliser mon logo
+                </Button>
+              )}
+              {(stickerSource === 'ai' || stickerSource === 'logo_plus_ai') && (
+                <Button type="button" variant="default" size="sm" onClick={() => handleGenerateSticker(stickerDescription, stickerSource === 'logo_plus_ai')} disabled={isGenerating} className="gap-2">
+                  {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
+                  {stickerSource === 'logo_plus_ai' ? 'Générer un design à partir de mon logo' : 'Générer un design IA'}
+                  <GenerationCostBadge feature="design_generate_sticker" />
+                </Button>
+              )}
+              <Button type="button" variant={mode === 'upload' ? 'default' : 'outline'} size="sm" onClick={() => uploadInputRef.current?.click()}>
+                <Upload className="w-4 h-4 mr-2" />
+                Importer mon design
+              </Button>
+              <input ref={uploadInputRef} type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
+              <Button type="button" variant={mode === 'trend' ? 'default' : 'outline'} size="sm" onClick={() => setMode('trend')}>
+                <TrendingUp className="w-4 h-4 mr-2" />
+                Depuis une tendance
+              </Button>
+            </div>
+          </CardContent>
+          {stickerPlacements.length > 1 && (
+            <CardContent className="pt-0 space-y-3">
+              <p className="text-sm font-medium text-foreground">Design par emplacement</p>
+              <p className="text-xs text-muted-foreground">Choisissez un design dans l’historique pour chaque emplacement (autant que d’emplacements sélectionnés).</p>
+              {selectingForPlacement && (
+                <div className="rounded-lg border border-primary bg-primary/10 px-3 py-2 text-sm text-foreground">
+                  Cliquez sur un design dans l’historique ci-dessous pour l’assigner à : <strong>{selectingForPlacement}</strong>
+                </div>
+              )}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {stickerPlacements.map((placement) => {
+                  const img = getImageForPlacement(placement);
+                  const rationale = designSet?.find((d) => d.placement === placement)?.rationale;
+                  return (
+                    <div
+                      key={placement}
+                      className={cn(
+                        'rounded-xl border-2 overflow-hidden bg-muted/20',
+                        selectingForPlacement === placement ? 'border-primary ring-2 ring-primary/30' : 'border-border'
+                      )}
+                    >
+                      <div className="aspect-square bg-muted/30 relative">
+                        {img ? (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPreviewModalImageUrl(img.startsWith('blob:') ? img : proxyImageUrl(img));
+                              setPreviewModalOpen(true);
+                            }}
+                            className="block w-full h-full cursor-pointer hover:ring-2 hover:ring-primary/30"
+                          >
+                            <PreviewWatermark src={img.startsWith('blob:') ? img : proxyImageUrl(img)} alt={placement} className="w-full h-full object-cover" />
+                          </button>
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">Aucun design</div>
+                        )}
+                      </div>
+                      <div className="p-3 space-y-2">
+                        <p className="font-medium text-sm text-foreground">Emplacement : {placement}</p>
+                        {rationale && <p className="text-xs text-muted-foreground leading-snug">{rationale}</p>}
+                        <Button type="button" variant="outline" size="sm" className="w-full gap-1.5" onClick={() => setSelectingForPlacement(placement)}>
+                          <History className="w-3.5 h-3.5" />
+                          Choisir dans l’historique
+                        </Button>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </CardContent>
+          )}
+          {designImageUrl && (
+            <CardContent className="pt-0 space-y-4">
+              {stickerPlacements.length === 1 && (
+                <p className="text-sm font-medium text-foreground">
+                  {designSet && designSet.length > 1 ? `Designs sur le vêtement (${designSet.length} emplacements)` : 'Design actuel'}
+                </p>
+              )}
+              {stickerPlacements.length === 1 && (
+                <div
+                  role="button"
+                  tabIndex={0}
+                  onClick={() => {
+                    setPreviewModalImageUrl(null);
+                    setPreviewModalOpen(true);
+                  }}
+                  onKeyDown={(e) => e.key === 'Enter' && setPreviewModalOpen(true)}
+                  onContextMenu={(e) => e.preventDefault()}
+                  className="block rounded-xl overflow-hidden border border-border bg-muted/30 aspect-square max-w-[200px] cursor-pointer hover:ring-2 hover:ring-primary/30 transition-shadow select-none"
+                  title="Cliquer pour agrandir (preview sur le site)"
+                >
+                  <PreviewWatermark src={designImageUrl.startsWith('blob:') ? designImageUrl : proxyImageUrl(designImageUrl)} alt="Design" className="w-full h-full pointer-events-none" />
+                </div>
+              )}
+              {stickerPlacements.length === 1 && designSet && designSet.length === 1 && designSet[0].rationale && (
+                <div className="rounded-lg border border-border bg-muted/20 p-3">
+                  <p className="text-xs font-semibold text-foreground mb-1">Pourquoi ce logo</p>
+                  <p className="text-xs text-muted-foreground leading-snug">{designSet[0].rationale}</p>
+                </div>
+              )}
+              {stickerPlacements.length === 1 && designSet && designSet.length > 1 && (
+                <div className="border-t pt-4 space-y-3">
+                  <p className="text-sm font-semibold text-foreground">Designs sur le même vêtement</p>
+                  <p className="text-xs text-muted-foreground">Tous ces visuels sont appliqués sur un seul vêtement : un design par emplacement (ex. poitrine + dos). Cliquez sur une image pour l’agrandir.</p>
+                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                    {designSet.map((d, i) => (
+                      <div
+                        key={`${d.placement}-${i}`}
+                        className="rounded-xl border-2 border-border overflow-hidden bg-muted/20"
+                      >
                         <button
                           type="button"
                           onClick={() => {
-                            setPreviewModalImageUrl(img.startsWith('blob:') ? img : proxyImageUrl(img));
+                            setPreviewModalImageUrl(d.imageUrl.startsWith('blob:') ? d.imageUrl : proxyImageUrl(d.imageUrl));
                             setPreviewModalOpen(true);
                           }}
-                          className="block w-full h-full cursor-pointer hover:ring-2 hover:ring-primary/30"
+                          onContextMenu={(e) => e.preventDefault()}
+                          className="block w-full aspect-square relative cursor-pointer hover:ring-2 hover:ring-primary/30 transition-shadow"
                         >
-                          <PreviewWatermark src={img.startsWith('blob:') ? img : proxyImageUrl(img)} alt={placement} className="w-full h-full object-cover" />
+                          <PreviewWatermark src={d.imageUrl.startsWith('blob:') ? d.imageUrl : proxyImageUrl(d.imageUrl)} alt={d.placement} className="w-full h-full object-cover pointer-events-none" />
                         </button>
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground text-sm">Aucun design</div>
-                      )}
-                    </div>
-                    <div className="p-3 space-y-2">
-                      <p className="font-medium text-sm text-foreground">Emplacement : {placement}</p>
-                      {rationale && <p className="text-xs text-muted-foreground leading-snug">{rationale}</p>}
-                      <Button type="button" variant="outline" size="sm" className="w-full gap-1.5" onClick={() => setSelectingForPlacement(placement)}>
-                        <History className="w-3.5 h-3.5" />
-                        Choisir dans l’historique
-                      </Button>
-                    </div>
+                        <div className="p-3 space-y-2">
+                          <p className="font-medium text-sm text-foreground">Emplacement : {d.placement}</p>
+                          <p className="text-xs font-semibold text-foreground">Pourquoi ce logo</p>
+                          <p className="text-xs text-muted-foreground leading-snug">{d.rationale}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                );
-              })}
-            </div>
-          </CardContent>
-        )}
-        {designImageUrl && (
-          <CardContent className="pt-0 space-y-4">
-            {stickerPlacements.length === 1 && (
-            <p className="text-sm font-medium text-foreground">
-              {designSet && designSet.length > 1 ? `Designs sur le vêtement (${designSet.length} emplacements)` : 'Design actuel'}
-            </p>
-            )}
-            {stickerPlacements.length === 1 && (
-            <div
-              role="button"
-              tabIndex={0}
-              onClick={() => {
-                setPreviewModalImageUrl(null);
-                setPreviewModalOpen(true);
-              }}
-              onKeyDown={(e) => e.key === 'Enter' && setPreviewModalOpen(true)}
-              onContextMenu={(e) => e.preventDefault()}
-              className="block rounded-xl overflow-hidden border border-border bg-muted/30 aspect-square max-w-[200px] cursor-pointer hover:ring-2 hover:ring-primary/30 transition-shadow select-none"
-              title="Cliquer pour agrandir (preview sur le site)"
-            >
-              <PreviewWatermark src={designImageUrl.startsWith('blob:') ? designImageUrl : proxyImageUrl(designImageUrl)} alt="Design" className="w-full h-full pointer-events-none" />
-            </div>
-            )}
-            {stickerPlacements.length === 1 && designSet && designSet.length === 1 && designSet[0].rationale && (
-              <div className="rounded-lg border border-border bg-muted/20 p-3">
-                <p className="text-xs font-semibold text-foreground mb-1">Pourquoi ce logo</p>
-                <p className="text-xs text-muted-foreground leading-snug">{designSet[0].rationale}</p>
-              </div>
-            )}
-            {stickerPlacements.length === 1 && designSet && designSet.length > 1 && (
+                </div>
+              )}
+              {previewModalOpen && (
+                <div
+                  className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
+                  onClick={() => { setPreviewModalOpen(false); setPreviewModalImageUrl(null); }}
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Aperçu du design"
+                >
+                  <div
+                    className="relative max-w-full max-h-full rounded-xl overflow-hidden bg-muted shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                    onContextMenu={(e) => e.preventDefault()}
+                  >
+                    <PreviewWatermark src={(() => { const u = previewModalImageUrl ?? designImageUrl; return u?.startsWith('blob:') ? u : proxyImageUrl(u ?? ''); })()} alt="Design" className="max-h-[85vh] w-auto object-contain" />
+                    <Button type="button" variant="secondary" size="icon" className="absolute top-2 right-2 rounded-full" onClick={() => { setPreviewModalOpen(false); setPreviewModalImageUrl(null); }} aria-label="Fermer">
+                      <X className="w-5 h-5" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+              {(stickerSource === 'ai' || stickerSource === 'logo_plus_ai') && (
+                <div className="border-t pt-4 space-y-2">
+                  <p className="text-sm font-medium text-muted-foreground">Pas satisfait ?</p>
+                  {stickerSource === 'ai' ? (
+                    <p className="text-xs text-muted-foreground">Modifiez les textes ci-dessus pour chaque emplacement puis régénérez.</p>
+                  ) : (
+                    <>
+                      <p className="text-xs text-muted-foreground">Décrivez le cadre que vous voulez autour du logo.</p>
+                      <Textarea value={stickerDescription} onChange={(e) => setStickerDescription(e.target.value)} placeholder="ex. Bordure géométrique, couleurs de la marque" className="min-h-[80px]" />
+                    </>
+                  )}
+                  <Button type="button" variant="outline" size="sm" onClick={handleRegenerateSticker} disabled={isGenerating} className="gap-2">
+                    {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+                    {stickerSource === 'logo_plus_ai' ? 'Régénérer le cadre avec cette description' : 'Régénérer le design'}
+                  </Button>
+                </div>
+              )}
               <div className="border-t pt-4 space-y-3">
-                <p className="text-sm font-semibold text-foreground">Designs sur le même vêtement</p>
-                <p className="text-xs text-muted-foreground">Tous ces visuels sont appliqués sur un seul vêtement : un design par emplacement (ex. poitrine + dos). Cliquez sur une image pour l’agrandir.</p>
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {designSet.map((d, i) => (
+                <p className="text-xs text-muted-foreground mb-2">Votre design sera enregistré. Vous pourrez le télécharger et passer ensuite à l'étape suivante pour télécharger un pack de mockup.</p>
+                {stickerPlacements.length > 1 && (!designSet || designSet.length < stickerPlacements.length) && (
+                  <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">Assignez un design à chaque emplacement pour pouvoir valider.</p>
+                )}
+                <div className="flex flex-wrap gap-2">
+                  <Button
+                    onClick={handleSaveDesignDirectly}
+                    className="gap-2"
+                    disabled={stickerPlacements.length > 1 && (!designSet || designSet.length < stickerPlacements.length) || isSaving}
+                  >
+                    {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                    Sauvegarder le design
+                  </Button>
+                  {designImageUrl && (
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        const d = designSet && designSet.length > 0
+                          ? { id: 'current', imageUrl: designSet[0].imageUrl, placement: designSet[0].placement }
+                          : { id: 'current', imageUrl: designImageUrl, placement: null };
+                        handleDownloadDesign(d);
+                      }}
+                      className="gap-2"
+                    >
+                      <Download className="w-4 h-4" />
+                      Télécharger le design
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </CardContent>
+          )}
+          <CardContent className={cn('border-t pt-4', !designImageUrl && 'pt-4')}>
+            <div className="space-y-2">
+              <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
+                <History className="w-4 h-4" />
+                Historique des designs (7 jours)
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {stickerPlacements.length > 1
+                  ? "Cliquez sur « Choisir dans l'historique » pour un emplacement, puis sur un design pour l'y assigner. Chaque design indique l'emplacement pour lequel il a été généré."
+                  : "Consultez vos designs récents. Cliquez sur un design pour l’utiliser comme design actuel, puis validez pour le tech pack."}
+              </p>
+              {designHistoryLoading ? (
+                <p className="text-xs text-muted-foreground">Chargement…</p>
+              ) : designHistory.length === 0 ? (
+                <p className="text-xs text-muted-foreground">Aucun design enregistré. Générez ou importez un design pour le retrouver ici.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
+                  {designHistory.map((d) => (
                     <div
-                      key={`${d.placement}-${i}`}
-                      className="rounded-xl border-2 border-border overflow-hidden bg-muted/20"
+                      key={d.id}
+                      className={cn(
+                        'rounded-lg border-2 overflow-hidden shrink-0 transition-all flex flex-col w-20 relative',
+                        selectedHistoryId === d.id && !selectingForPlacement ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-primary/50'
+                      )}
                     >
                       <button
                         type="button"
                         onClick={() => {
-                          setPreviewModalImageUrl(d.imageUrl.startsWith('blob:') ? d.imageUrl : proxyImageUrl(d.imageUrl));
-                          setPreviewModalOpen(true);
+                          const url = d.imageUrl.startsWith('http') ? proxyImageUrl(d.imageUrl) : d.imageUrl;
+                          if (selectingForPlacement) {
+                            assignHistoryToPlacement(selectingForPlacement, url, d.placement);
+                          } else {
+                            setDesignImageUrl(url);
+                            setDesignSet(null);
+                            setSelectedHistoryId(d.id);
+                            setMode('sticker');
+                          }
                         }}
-                        onContextMenu={(e) => e.preventDefault()}
-                        className="block w-full aspect-square relative cursor-pointer hover:ring-2 hover:ring-primary/30 transition-shadow"
+                        className="flex flex-col w-full text-left p-0"
+                        title={selectingForPlacement ? `Assigner à ${selectingForPlacement}` : 'Utiliser ce design'}
                       >
-                        <PreviewWatermark src={d.imageUrl.startsWith('blob:') ? d.imageUrl : proxyImageUrl(d.imageUrl)} alt={d.placement} className="w-full h-full object-cover pointer-events-none" />
+                        <div className="aspect-square w-full relative">
+                          <img src={d.imageUrl.startsWith('http') ? proxyImageUrl(d.imageUrl) : d.imageUrl} alt="" className="w-full h-full object-cover" />
+                        </div>
                       </button>
-                      <div className="p-3 space-y-2">
-                        <p className="font-medium text-sm text-foreground">Emplacement : {d.placement}</p>
-                        <p className="text-xs font-semibold text-foreground">Pourquoi ce logo</p>
-                        <p className="text-xs text-muted-foreground leading-snug">{d.rationale}</p>
-                      </div>
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="icon"
+                        className="absolute bottom-6 right-0.5 h-6 w-6 opacity-90 hover:opacity-100"
+                        title="Télécharger le design"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          handleDownloadDesign(d);
+                        }}
+                      >
+                        <Download className="h-3 w-3" />
+                      </Button>
+                      {d.placement && (
+                        <span className="text-[10px] text-muted-foreground px-1 py-0.5 truncate block" title={`Généré pour : ${d.placement}`}>
+                          Généré pour : {d.placement}
+                        </span>
+                      )}
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-            {previewModalOpen && (
-              <div
-                className="fixed inset-0 z-50 flex items-center justify-center bg-black/95 p-4"
-                onClick={() => { setPreviewModalOpen(false); setPreviewModalImageUrl(null); }}
-                role="dialog"
-                aria-modal="true"
-                aria-label="Aperçu du design"
-              >
-                <div
-                  className="relative max-w-full max-h-full rounded-xl overflow-hidden bg-muted shadow-2xl"
-                  onClick={(e) => e.stopPropagation()}
-                  onContextMenu={(e) => e.preventDefault()}
-                >
-                  <PreviewWatermark src={(() => { const u = previewModalImageUrl ?? designImageUrl; return u?.startsWith('blob:') ? u : proxyImageUrl(u ?? ''); })()} alt="Design" className="max-h-[85vh] w-auto object-contain" />
-                  <Button type="button" variant="secondary" size="icon" className="absolute top-2 right-2 rounded-full" onClick={() => { setPreviewModalOpen(false); setPreviewModalImageUrl(null); }} aria-label="Fermer">
-                    <X className="w-5 h-5" />
-                  </Button>
-                </div>
-              </div>
-            )}
-            {(stickerSource === 'ai' || stickerSource === 'logo_plus_ai') && (
-              <div className="border-t pt-4 space-y-2">
-                <p className="text-sm font-medium text-muted-foreground">Pas satisfait ?</p>
-                {stickerSource === 'ai' ? (
-                  <p className="text-xs text-muted-foreground">Modifiez les textes ci-dessus pour chaque emplacement puis régénérez.</p>
-                ) : (
-                  <>
-                    <p className="text-xs text-muted-foreground">Décrivez le cadre que vous voulez autour du logo.</p>
-                    <Textarea value={stickerDescription} onChange={(e) => setStickerDescription(e.target.value)} placeholder="ex. Bordure géométrique, couleurs de la marque" className="min-h-[80px]" />
-                  </>
-                )}
-                <Button type="button" variant="outline" size="sm" onClick={handleRegenerateSticker} disabled={isGenerating} className="gap-2">
-                  {isGenerating ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-                  {stickerSource === 'logo_plus_ai' ? 'Régénérer le cadre avec cette description' : 'Régénérer le design'}
-                </Button>
-              </div>
-            )}
-            <div className="border-t pt-4 space-y-3">
-              <p className="text-xs text-muted-foreground mb-2">Votre design sera enregistré. Vous pourrez le télécharger et passer ensuite à l'étape suivante pour télécharger un pack de mockup.</p>
-              {stickerPlacements.length > 1 && (!designSet || designSet.length < stickerPlacements.length) && (
-                <p className="text-xs text-amber-600 dark:text-amber-400 mb-2">Assignez un design à chaque emplacement pour pouvoir valider.</p>
               )}
-              <div className="flex flex-wrap gap-2">
-                <Button
-                  onClick={handleSaveDesignDirectly}
-                  className="gap-2"
-                  disabled={stickerPlacements.length > 1 && (!designSet || designSet.length < stickerPlacements.length) || isSaving}
-                >
-                  {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-                  Sauvegarder le design
-                </Button>
-                {designImageUrl && (
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      const d = designSet && designSet.length > 0 
-                        ? { id: 'current', imageUrl: designSet[0].imageUrl, placement: designSet[0].placement }
-                        : { id: 'current', imageUrl: designImageUrl, placement: null };
-                      handleDownloadDesign(d);
-                    }}
-                    className="gap-2"
-                  >
-                    <Download className="w-4 h-4" />
-                    Télécharger le design
-                  </Button>
-                )}
-              </div>
             </div>
           </CardContent>
-        )}
-        <CardContent className={cn('border-t pt-4', !designImageUrl && 'pt-4')}>
-          <div className="space-y-2">
-            <p className="text-sm font-medium text-foreground flex items-center gap-1.5">
-              <History className="w-4 h-4" />
-              Historique des designs (7 jours)
-            </p>
-            <p className="text-xs text-muted-foreground">
-              {stickerPlacements.length > 1
-                ? "Cliquez sur « Choisir dans l'historique » pour un emplacement, puis sur un design pour l'y assigner. Chaque design indique l'emplacement pour lequel il a été généré."
-                : "Consultez vos designs récents. Cliquez sur un design pour l’utiliser comme design actuel, puis validez pour le tech pack."}
-            </p>
-            {designHistoryLoading ? (
-              <p className="text-xs text-muted-foreground">Chargement…</p>
-            ) : designHistory.length === 0 ? (
-              <p className="text-xs text-muted-foreground">Aucun design enregistré. Générez ou importez un design pour le retrouver ici.</p>
-            ) : (
-              <div className="flex flex-wrap gap-2 max-h-48 overflow-y-auto">
-                {designHistory.map((d) => (
-                  <div
-                    key={d.id}
-                    className={cn(
-                      'rounded-lg border-2 overflow-hidden shrink-0 transition-all flex flex-col w-20 relative',
-                      selectedHistoryId === d.id && !selectingForPlacement ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-primary/50'
-                    )}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        const url = d.imageUrl.startsWith('http') ? proxyImageUrl(d.imageUrl) : d.imageUrl;
-                        if (selectingForPlacement) {
-                          assignHistoryToPlacement(selectingForPlacement, url, d.placement);
-                        } else {
-                          setDesignImageUrl(url);
-                          setDesignSet(null);
-                          setSelectedHistoryId(d.id);
-                          setMode('sticker');
-                        }
-                      }}
-                      className="flex flex-col w-full text-left p-0"
-                      title={selectingForPlacement ? `Assigner à ${selectingForPlacement}` : 'Utiliser ce design'}
-                    >
-                      <div className="aspect-square w-full relative">
-                        <img src={d.imageUrl.startsWith('http') ? proxyImageUrl(d.imageUrl) : d.imageUrl} alt="" className="w-full h-full object-cover" />
-                      </div>
-                    </button>
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="icon"
-                      className="absolute bottom-6 right-0.5 h-6 w-6 opacity-90 hover:opacity-100"
-                      title="Télécharger le design"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        handleDownloadDesign(d);
-                      }}
-                    >
-                      <Download className="h-3 w-3" />
-                    </Button>
-                    {d.placement && (
-                      <span className="text-[10px] text-muted-foreground px-1 py-0.5 truncate block" title={`Généré pour : ${d.placement}`}>
-                        Généré pour : {d.placement}
-                      </span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+        </Card>
       )}
 
       {mode === 'trend' && !designStepValidated && (

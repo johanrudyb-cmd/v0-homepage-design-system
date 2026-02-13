@@ -5,11 +5,13 @@ import { cn } from '@/lib/utils';
 import { AppleLoader } from './apple-loader';
 
 const DEFAULT_MESSAGES = [
-  'Veuillez patienter…',
-  'La génération peut prendre quelques secondes.',
-  'Ne fermez pas cette page.',
-  'Nous préparons votre contenu.',
-  "Un instant, c'est presque prêt.",
+  'Tissage de votre stratégie marketing...',
+  'Découpe des meilleures tendances mondiales...',
+  'Assemblage de votre identité de marque...',
+  'Drapage de vos mockups en haute définition...',
+  'Sourcing de vos futurs fournisseurs...',
+  'Affinage des détails de vos fiches techniques...',
+  'Filature de votre calendrier de contenu...',
 ];
 
 interface GenerationLoadingPopupProps {

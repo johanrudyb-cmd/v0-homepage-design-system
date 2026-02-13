@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { getProductBrand } from '@/lib/brand-utils';
 import { proxyImageUrl } from '@/lib/image-proxy';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { TrendingUp, Loader2, Eye, ChevronDown, ChevronUp, Globe, AlertTriangle, Flame, MapPin, CheckCircle, Lock } from 'lucide-react';
+import { Loader2, AlertTriangle, Flame, Globe, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
+import { UsageBadge } from '@/components/trends/UsageBadge';
 
 interface HybridTrend {
   id: string;
@@ -21,13 +23,9 @@ interface HybridTrend {
   trendScoreVisual: number | null;
   trendScore: number;
   averagePrice: number;
-  /** % croissance (ex. 15 pour "+15%") ou manuel */
   trendGrowthPercent: number | null;
-  /** Libellé (ex. "Tendance", "En hausse") */
   trendLabel: string | null;
-  /** % tendance calculé en interne quand trendGrowthPercent est null (récurrence, ancienneté, multi-zones) */
   effectiveTrendGrowthPercent?: number;
-  /** Libellé affiché quand % interne (ex. "Estimé") */
   effectiveTrendLabel?: string | null;
   imageUrl: string | null;
   sourceBrand: string | null;
@@ -42,59 +40,6 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
   const searchParams = useSearchParams();
   const router = useRouter();
   const brandFromUrl = searchParams.get('brand');
-  const [scrapingOnly, setScrapingOnly] = useState(false);
-  const [scrapeOnlyResult, setScrapeOnlyResult] = useState<{
-    totalItems: number;
-    savedToTrends?: number;
-    results: Array<{
-      sourceId: string;
-      brand: string;
-      marketZone: string;
-      url: string;
-      itemCount: number;
-      items: Array<{
-        name: string;
-        price: number;
-        imageUrl: string | null;
-        sourceUrl: string;
-        composition?: string | null;
-        careInstructions?: string | null;
-        color?: string | null;
-        sizes?: string | null;
-        countryOfOrigin?: string | null;
-        articleNumber?: string | null;
-      }>;
-    }>;
-  } | null>(null);
-  const [scrapeOnlyExpanded, setScrapeOnlyExpanded] = useState<string | null>(null);
-
-  const [sourcesList, setSourcesList] = useState<{ id: string; label: string; marketZone: string; segment: string; brand: string }[]>([]);
-  const [selectedSourceId, setSelectedSourceId] = useState<string>('');
-  const [customPreviewUrl, setCustomPreviewUrl] = useState<string>('');
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const [defaultTrendPercent, setDefaultTrendPercent] = useState<string>('');
-  const [previewResult, setPreviewResult] = useState<{
-    sourceId: string;
-    brand: string;
-    marketZone: string;
-    segment: string | null;
-    itemCount: number;
-    items: Array<{
-      name: string;
-      price: number;
-      imageUrl: string | null;
-      sourceUrl: string;
-      trendGrowthPercent?: number | null;
-      trendLabel?: string | null;
-      composition?: string | null;
-      careInstructions?: string | null;
-      color?: string | null;
-      sizes?: string | null;
-      countryOfOrigin?: string | null;
-      articleNumber?: string | null;
-    }>;
-  } | null>(null);
-  const [savingPreview, setSavingPreview] = useState(false);
 
   const [trends, setTrends] = useState<HybridTrend[]>(initialData?.trends || []);
   const [totalTrends, setTotalTrends] = useState<number>(initialData?.summary?.total || 0);
@@ -105,6 +50,7 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
   const [homepageIds, setHomepageIds] = useState<Set<string>>(new Set());
   const [analysesCount, setAnalysesCount] = useState<number | null>(null);
   const limitReached = searchParams.get('limit') === 'reached';
+
   const [ageRange, setAgeRange] = useState<'18-24' | '25-34'>(() => {
     if (typeof window === 'undefined') return '18-24';
     const a = sessionStorage.getItem('trends-list-ageRange');
@@ -120,51 +66,9 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
   const [sortBy, setSortBy] = useState<string>('best');
   const [globalOnly, setGlobalOnly] = useState(false);
   const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
-  const [recoveryTab, setRecoveryTab] = useState<'scrape' | 'preview'>('scrape');
-  const [moreCitiesOpen, setMoreCitiesOpen] = useState(false);
-
-  /** Villes principales / autres — dépendent du segment (homme ou femme). */
-  const MAIN_CITY_SLUGS = ['paris', 'berlin', 'milan'] as const;
-  const OTHER_CITY_SLUGS = ['copenhagen', 'stockholm', 'antwerp', 'zurich', 'london', 'amsterdam', 'warsaw'] as const;
-  const MAIN_CITY_IDS = MAIN_CITY_SLUGS.map((c) => `zalando-trend-${segment || 'homme'}-${c}`) as unknown as readonly string[];
-  const OTHER_CITY_IDS = OTHER_CITY_SLUGS.map((c) => `zalando-trend-${segment || 'homme'}-${c}`) as unknown as readonly string[];
-  const CITY_LABELS: Record<string, string> = {
-    paris: 'Paris',
-    berlin: 'Berlin',
-    milan: 'Milan',
-    copenhagen: 'Copenhague',
-    stockholm: 'Stockholm',
-    antwerp: 'Anvers',
-    zurich: 'Zurich',
-    london: 'Londres',
-    amsterdam: 'Amsterdam',
-    warsaw: 'Varsovie',
-  };
-  const getCityLabel = (sourceId: string) => {
-    const cityMatch = sourceId.match(/-(?:homme|femme)-(.+)$/);
-    if (cityMatch) return CITY_LABELS[cityMatch[1]] ?? cityMatch[1];
-    const ageMatch = sourceId.match(/^[a-z]+-18-24-(homme|femme)$/);
-    if (ageMatch) return `18-24 ans (${ageMatch[1] === 'homme' ? 'Homme' : 'Femme'})`;
-    return sourceId;
-  };
-
-  /** Catégorie cible pour les tendances Zalando (affichée dans l’UI). */
-  /** Tranches d'âge : 18-24 = ASOS (une page homme ou femme), 25-34 = Zalando (villes). */
-  const AGE_LABELS = { '18-24': '18-24 ans', '25-34': '25-34 ans' } as const;
-  const ASOS_18_24_SOURCE_ID = segment === 'femme' ? 'asos-18-24-femme' : 'asos-18-24-homme';
 
   const loadTrends = useCallback(async () => {
-    // Si on a des données initiales et que les filtres correspondent par défaut
-    // (segment homme, 18-24, sortBy best, zone EU), on saute le premier chargement
-    if (initialData &&
-      segment === 'homme' &&
-      ageRange === '18-24' &&
-      sortBy === 'best' &&
-      zone === 'EU' &&
-      !globalOnly &&
-      !brandFromUrl &&
-      trends.length > 0) {
-      console.log('[TendancesContent] Utilisation des données SSR initiales');
+    if (initialData && segment === 'homme' && ageRange === '18-24' && sortBy === 'best' && zone === 'EU' && !globalOnly && !brandFromUrl && trends.length > 0) {
       return;
     }
 
@@ -173,8 +77,8 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
       const params = new URLSearchParams();
       if (zone) params.set('marketZone', zone);
       params.set('ageRange', ageRange);
-      if (segment) params.set('segment', segment);
-      if (sortBy) params.set('sortBy', sortBy);
+      params.set('segment', segment);
+      params.set('sortBy', sortBy);
       if (globalOnly) params.set('globalOnly', 'true');
       if (brandFromUrl) params.set('brand', brandFromUrl);
       params.set('limit', '50');
@@ -195,13 +99,11 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
   }, [loadTrends]);
 
   useEffect(() => {
-    // Récupérer les tendances à la une pour la homepage (visibles en gratuit)
     fetch('/api/trends/homepage-featured').then((r) => r.ok ? r.json() : null).then((featuredData) => {
       const ids = (featuredData?.trends ?? []).map((t: { id?: string }) => t.id).filter(Boolean);
       setHomepageIds(new Set(ids));
     }).catch(() => { });
 
-    // Récupérer le nombre d'analyses si l'utilisateur est sur un plan gratuit
     if (user?.plan === 'free') {
       fetch('/api/trends/analyses-count')
         .then((r) => (r.ok ? r.json() : Promise.resolve({ count: 0 })))
@@ -210,561 +112,296 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
     }
   }, [user?.plan]);
 
-  useEffect(() => {
-    fetch('/api/trends/hybrid-radar/sources')
-      .then((r) => (r.ok ? r.json() : Promise.resolve({ sources: [] })))
-      .then((data) => setSourcesList(data.sources || []))
-      .catch(() => setSourcesList([]));
-  }, []);
-
-  // Au retour depuis la page détail : restaurer segment + ageRange puis scroll avec animation
-  const restoreScrollPosition = useCallback((smooth = true) => {
+  const handleAnalyzeClick = () => {
     try {
-      const saved = typeof sessionStorage !== 'undefined' ? sessionStorage.getItem('trends-list-scroll') : null;
-      if (saved === null) return;
-      sessionStorage.removeItem('trends-list-scroll');
-      const y = parseInt(saved, 10);
-      if (Number.isNaN(y) || y < 0) return;
-      const scroll = () => {
-        window.scrollTo({ top: y, behavior: smooth ? 'smooth' : 'auto' });
-      };
-      scroll();
-      requestAnimationFrame(scroll);
-      setTimeout(scroll, 100);
-      setTimeout(scroll, 400);
-      setTimeout(scroll, 700);
-    } catch (_) {
-      /**/
-    }
-  }, []);
-
-  // Nettoyer les clés sessionStorage après restauration (évite de réutiliser au prochain passage)
-  useEffect(() => {
-    sessionStorage.removeItem('trends-list-segment');
-    sessionStorage.removeItem('trends-list-ageRange');
-  }, []);
-
-  useEffect(() => {
-    restoreScrollPosition(true);
-  }, [restoreScrollPosition]);
-
-  // Retour arrière (bfcache ou remount) : pageshow déclenche la restauration
-  useEffect(() => {
-    const onPageShow = () => {
-      restoreScrollPosition(true);
-    };
-    window.addEventListener('pageshow', onPageShow);
-    return () => window.removeEventListener('pageshow', onPageShow);
-  }, [restoreScrollPosition]);
-
-  /** Références affichées : Paris, Berlin et Milan (API déjà filtrée). */
-  const sourcesForZone = sourcesList;
-
-  const handlePreviewByCity = async (overrideSourceId?: string) => {
-    const useCustomUrl = customPreviewUrl.trim().length > 0;
-    const effectiveSourceId = overrideSourceId ?? selectedSourceId;
-    if (!useCustomUrl && !effectiveSourceId) {
-      alert('Choisissez une ville / source ou collez l\'URL de la page à récupérer.');
-      return;
-    }
-    if (overrideSourceId) setSelectedSourceId(overrideSourceId);
-    setPreviewLoading(true);
-    setPreviewResult(null);
-    try {
-      const body: { sourceId?: string; customUrl?: string; brand: string; saveToTrends: boolean } = {
-        brand: 'Zalando',
-        saveToTrends: false,
-      };
-      if (useCustomUrl) body.customUrl = customPreviewUrl.trim();
-      else body.sourceId = effectiveSourceId;
-      const res = await fetch('/api/trends/hybrid-radar/scrape-only', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (res.ok && data.results?.length > 0) {
-        const src = data.results[0];
-        setPreviewResult({
-          sourceId: src.sourceId,
-          brand: src.brand,
-          marketZone: src.marketZone,
-          segment: src.segment ?? null,
-          itemCount: src.itemCount ?? src.items?.length ?? 0,
-          items: src.items || [],
-        });
-      } else if (res.ok && data.results?.length === 0) {
-        setPreviewResult(null);
-        alert('Aucun produit récupéré pour cette source.');
-      } else {
-        alert(data.error || 'Erreur');
-      }
-    } catch (e) {
-      alert(e instanceof Error ? e.message : 'Erreur');
-    } finally {
-      setPreviewLoading(false);
-    }
-  };
-
-  const handleValidatePreview = async () => {
-    if (!previewResult) return;
-    const items = Array.isArray(previewResult.items) ? previewResult.items : [];
-    if (items.length === 0) {
-      alert('Aucun produit à enregistrer.');
-      return;
-    }
-    setSavingPreview(true);
-    try {
-      const defaultPct =
-        defaultTrendPercent.trim() === ''
-          ? undefined
-          : Math.min(100, Math.max(0, parseInt(defaultTrendPercent.trim(), 10)));
-      const defaultPctNum = defaultPct !== undefined && !Number.isNaN(defaultPct) ? defaultPct : undefined;
-      const payload = {
-        sourceId: previewResult.sourceId,
-        brand: previewResult.brand,
-        marketZone: previewResult.marketZone ?? 'EU',
-        segment: previewResult.segment ?? 'homme',
-        defaultTrendPercent: defaultPctNum,
-        items: items.map((i: { name?: string; price?: number; imageUrl?: string | null; sourceUrl?: string; trendGrowthPercent?: number | null; trendLabel?: string | null; composition?: string | null; careInstructions?: string | null; color?: string | null; sizes?: string | null; countryOfOrigin?: string | null; articleNumber?: string | null; productBrand?: string | null }) => ({
-          name: i.name ?? '',
-          price: typeof i.price === 'number' ? i.price : 0,
-          imageUrl: i.imageUrl ?? null,
-          sourceUrl: i.sourceUrl ?? '',
-          trendGrowthPercent: i.trendGrowthPercent ?? null,
-          trendLabel: i.trendLabel ?? null,
-          composition: i.composition ?? null,
-          careInstructions: i.careInstructions ?? null,
-          color: i.color ?? null,
-          sizes: i.sizes ?? null,
-          countryOfOrigin: i.countryOfOrigin ?? null,
-          articleNumber: i.articleNumber ?? null,
-          productBrand: i.productBrand ?? null,
-        })),
-      };
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 90000);
-      const res = await fetch('/api/trends/hybrid-radar/save-from-preview', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload),
-        credentials: 'same-origin',
-        signal: controller.signal,
-      });
-      clearTimeout(timeoutId);
-      const data = await res.json().catch(() => ({ error: 'Réponse invalide du serveur' }));
-      if (res.ok) {
-        const saved = data.savedToTrends ?? 0;
-        setPreviewResult(null);
-        setSavingPreview(false); // Arrêter le spinner tout de suite : ne pas dépendre du rechargement des tendances
-        const savedAgeRange = previewResult.brand === 'ASOS' ? '18-24' : '25-34';
-        const savedSegment = previewResult.segment || 'homme';
-        setAgeRange(savedAgeRange);
-        setSegment(savedSegment);
-        setTrendsLoading(true);
-        const abortTrends = new AbortController();
-        const timeoutTrends = setTimeout(() => abortTrends.abort(), 15000);
-        try {
-          const params = new URLSearchParams();
-          if (zone) params.set('marketZone', zone);
-          params.set('ageRange', savedAgeRange);
-          params.set('segment', savedSegment);
-          params.set('sortBy', sortBy);
-          if (globalOnly) params.set('globalOnly', 'true');
-          if (brandFromUrl) params.set('brand', brandFromUrl);
-          params.set('limit', '50');
-          const resTrends = await fetch(`/api/trends/hybrid-radar?${params.toString()}`, { signal: abortTrends.signal });
-          clearTimeout(timeoutTrends);
-          const dataTrends = await resTrends.json().catch(() => ({}));
-          setTrends(Array.isArray(dataTrends.trends) ? dataTrends.trends : []);
-        } catch (e) {
-          clearTimeout(timeoutTrends);
-          console.error(e);
-        } finally {
-          setTrendsLoading(false);
-        }
-        const msg = typeof data.message === 'string' ? data.message : null;
-        if (msg) {
-          alert(msg);
-        } else {
-          const skipped = data.skipped?.total ?? 0;
-          if (skipped > 0) {
-            alert(
-              `${saved} tendance(s) enregistrée(s). ${skipped} article(s) non enregistré(s) (${data.skipped?.invalidUrl ?? 0} URL invalide, ${data.skipped?.duplicate ?? 0} doublon).`
-            );
-          } else {
-            alert(saved > 0 ? `${saved} tendance(s) enregistrée(s) — affichées dans les tendances ci-dessus.` : 'Aucune tendance enregistrée.');
-          }
-        }
-      } else {
-        const errMsg = data.error || (res.status === 401 ? 'Non authentifié. Connectez-vous pour enregistrer.' : 'Erreur');
-        alert(`${errMsg}${res.status ? ` (${res.status})` : ''}`);
-      }
-    } catch (e) {
-      const isAbort = e instanceof Error && e.name === 'AbortError';
-      const err = isAbort
-        ? 'La requête a pris trop de temps (90 s). Réessayez ou prévisualisez moins de produits.'
-        : (e instanceof Error ? e.message : String(e));
-      alert(isAbort ? err : `Erreur réseau ou serveur : ${err}`);
-    } finally {
-      setSavingPreview(false);
-    }
-  };
-
-  const handleScrapeOnly = async (sourceIdOrFull: string | false) => {
-    setScrapingOnly(true);
-    setScrapeOnlyResult(null);
-    try {
-      const body =
-        sourceIdOrFull === false
-          ? { brand: 'Zalando', saveToTrends: true, segment: segment || 'homme' }
-          : { brand: 'Zalando', sourceId: sourceIdOrFull, saveToTrends: true };
-      const res = await fetch('/api/trends/hybrid-radar/scrape-only', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-      });
-      const data = await res.json().catch(() => ({ error: 'Réponse invalide du serveur' }));
-      if (res.ok) {
-        setScrapeOnlyResult({
-          totalItems: data.totalItems ?? 0,
-          savedToTrends: data.savedToTrends,
-          results: data.results || [],
-        });
-        const saved = data.savedToTrends ?? 0;
-        const isAsos1824 = sourceIdOrFull === 'asos-18-24-homme' || sourceIdOrFull === 'asos-18-24-femme';
-        if (isAsos1824 && saved > 0) {
-          const asosSegment = sourceIdOrFull === 'asos-18-24-femme' ? 'femme' : 'homme';
-          setAgeRange('18-24');
-          setSegment(asosSegment);
-          setTrendsLoading(true);
-          try {
-            const params = new URLSearchParams();
-            if (zone) params.set('marketZone', zone);
-            params.set('ageRange', '18-24');
-            params.set('segment', asosSegment);
-            params.set('sortBy', sortBy);
-            if (globalOnly) params.set('globalOnly', 'true');
-            if (brandFromUrl) params.set('brand', brandFromUrl);
-            params.set('limit', '50');
-            const resTrends = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
-            const dataTrends = await resTrends.json().catch(() => ({}));
-            setTrends(Array.isArray(dataTrends.trends) ? dataTrends.trends : []);
-          } catch (e) {
-            console.error(e);
-          } finally {
-            setTrendsLoading(false);
-          }
-        } else {
-          await loadTrends();
-        }
-        if (saved > 0) {
-          alert(`${saved} tendance(s) enregistrée(s) — affichées dans les tendances ci-dessus.`);
-        }
-      } else {
-        alert(data.error || 'Erreur');
-      }
-    } catch (e) {
-      alert(e instanceof Error ? e.message : 'Erreur');
-    } finally {
-      setScrapingOnly(false);
-    }
+      sessionStorage.setItem('trends-list-scroll', String(window.scrollY ?? document.documentElement.scrollTop ?? 0));
+      sessionStorage.setItem('trends-list-segment', segment || 'homme');
+      sessionStorage.setItem('trends-list-ageRange', ageRange || '25-34');
+    } catch (_) { }
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12 pb-24">
+      {/* Brand Filter Active Indicator */}
       {brandFromUrl && (
-        <div className="mb-4 p-3 rounded-lg border bg-muted/30 flex items-center gap-3">
-          <span className="text-sm font-medium">Filtre :</span>
-          <span className="px-2 py-1 rounded-md bg-primary/10 text-primary font-semibold">{brandFromUrl}</span>
-          <Link href="/trends" className="text-sm text-muted-foreground hover:text-foreground underline">
-            Voir toutes les tendances
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="p-4 rounded-2xl bg-[#007AFF]/5 border border-[#007AFF]/10 flex items-center justify-between"
+        >
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#007AFF]" />
+            <span className="text-sm font-bold text-black tracking-tight">Filtre actif : {brandFromUrl}</span>
+          </div>
+          <Link href="/trends" className="text-xs font-black uppercase tracking-widest text-[#007AFF] hover:underline">
+            Réinitialiser
           </Link>
-        </div>
+        </motion.div>
       )}
-      <div className="sticky top-14 sm:top-16 z-30 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-black/5 space-y-3">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-lg font-extrabold tracking-tight text-[#1D1D1F] flex items-center gap-2">
-            Top 60 : Tendances de la semaine
-            {!trendsLoading && totalTrends > 0 && (
-              <span className="text-[10px] bg-[#FF3B30] text-white px-2 py-0.5 rounded-full font-black animate-pulse">
-                Elite
-              </span>
-            )}
-          </h2>
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-muted-foreground px-2 py-0.5 rounded-full bg-muted border border-black/5 uppercase tracking-tighter"> Zone EU</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-primary hover:bg-primary/5 h-8 text-xs font-bold"
-              onClick={() => setAdvancedFiltersOpen((v) => !v)}
-            >
-              {advancedFiltersOpen ? 'Fermer filtres' : 'Filtres avancés'}
-            </Button>
-          </div>
-        </div>
 
-        <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-          {/* Age selector */}
-          <div className="flex rounded-xl border border-black/5 bg-black/[0.03] p-1 shrink-0">
-            <button
-              type="button"
-              onClick={() => setAgeRange('18-24')}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${ageRange === '18-24' ? 'bg-white text-primary shadow-apple-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              18-24 ans
-            </button>
-            <button
-              type="button"
-              onClick={() => setAgeRange('25-34')}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${ageRange === '25-34' ? 'bg-white text-primary shadow-apple-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              25-34 ans
-            </button>
-          </div>
+      {/* Modern Sticky Navigation & Utility Bar */}
+      <div className="sticky top-14 sm:top-16 z-40 -mx-4 px-4 py-4 bg-white/70 backdrop-blur-2xl border-b border-black/[0.03]">
+        <div className="max-w-7xl mx-auto flex flex-col gap-6">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <h2 className="text-2xl font-black tracking-tight text-black">
+                Radar Elite
+                {!trendsLoading && totalTrends > 0 && (
+                  <span className="ml-3 text-[10px] bg-[#FF3B30] text-white px-2.5 py-1 rounded-full font-black tracking-widest uppercase">
+                    {totalTrends} Produits
+                  </span>
+                )}
+              </h2>
+              <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-black/5 rounded-full border border-black/5">
+                <div className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#6e6e73]">LIVE EU</span>
+              </div>
+            </div>
 
-          {/* Segment selector */}
-          <div className="flex rounded-xl border border-black/5 bg-black/[0.03] p-1 shrink-0">
-            <button
-              type="button"
-              onClick={() => setSegment('homme')}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${segment === 'homme' ? 'bg-white text-primary shadow-apple-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              Homme
-            </button>
-            <button
-              type="button"
-              onClick={() => setSegment('femme')}
-              className={`px-3 py-1 text-xs font-bold rounded-lg transition-all ${segment === 'femme' ? 'bg-white text-primary shadow-apple-sm' : 'text-muted-foreground hover:text-foreground'}`}
-            >
-              Femme
-            </button>
-          </div>
-
-          {/* Sort selector simplified for mobile */}
-          <select
-            value={sortBy === 'priceAsc' || sortBy === 'priceDesc' ? 'best' : sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="h-8 px-3 rounded-xl border border-black/5 bg-black/[0.03] text-[11px] font-bold text-muted-foreground outline-none focus:ring-1 focus:ring-primary/20"
-          >
-            <option value="best">Meilleurs scores</option>
-            <option value="recent">Plus récents</option>
-          </select>
-        </div>
-
-        {advancedFiltersOpen && (
-          <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-200">
-            <div className="p-3 rounded-2xl border border-black/5 bg-black/[0.02] flex items-center justify-between">
-              <label className="flex items-center gap-3 text-xs font-semibold text-[#1D1D1F]/70 cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={globalOnly}
-                  onChange={(e) => setGlobalOnly(e.target.checked)}
-                  className="w-4 h-4 rounded border-black/10 text-primary focus:ring-primary"
-                />
-                Global Trend Alert uniquement
-              </label>
-              <Link href="/trends" className="text-[10px] font-bold text-primary hover:underline">
-                Réinitialiser
-              </Link>
+            <div className="flex items-center gap-3">
+              <UsageBadge count={analysesCount} plan={user?.plan || 'free'} />
+              <Button
+                variant="ghost"
+                size="sm"
+                className="rounded-full bg-black/5 hover:bg-black/10 h-10 px-6 text-[11px] font-black uppercase tracking-widest"
+                onClick={() => setAdvancedFiltersOpen((v) => !v)}
+              >
+                {advancedFiltersOpen ? 'Masquer Filtres' : 'Filtres Avancés'}
+              </Button>
             </div>
           </div>
-        )}
-      </div>
-      <div className="flex flex-wrap items-center gap-2 text-sm text-[#6e6e73]">
-        <Flame className="w-4 h-4 text-[#FF3B30] shrink-0 fill-[#FF3B30]" />
-        <span className="font-bold">Radar Elite : Le Top 60 des tendances hebdomadaires validées sur TikTok et Instagram.</span>
-      </div>
-      {limitReached && user?.plan === 'free' && (
-        <div className="mb-4 p-4 rounded-lg border-2 border-amber-500/50 bg-amber-50 flex items-center justify-between gap-4">
-          <p className="text-sm font-medium text-amber-900">
-            Vous avez atteint la limite de 3 analyses par mois. Passez au plan Créateur pour analyser plus de tendances.
-          </p>
-          <Link
-            href="/auth/choose-plan"
-            className="shrink-0 px-4 py-2 bg-amber-600 text-white rounded-lg text-sm font-semibold hover:bg-amber-700"
-          >
-            Passer au plan Créateur
-          </Link>
+
+          <div className="flex flex-wrap items-center gap-4">
+            {/* Age selector */}
+            <div className="flex p-1 bg-[#F5F5F7] rounded-full sm:min-w-[200px]">
+              {(['18-24', '25-34'] as const).map((age) => (
+                <button
+                  key={age}
+                  onClick={() => setAgeRange(age)}
+                  className={cn(
+                    "flex-1 h-9 px-4 text-[11px] font-black uppercase tracking-widest rounded-full transition-all duration-300",
+                    ageRange === age ? "bg-white text-black shadow-apple-sm" : "text-[#6e6e73] hover:text-black"
+                  )}
+                >
+                  {age} ans
+                </button>
+              ))}
+            </div>
+
+            {/* Segment selector */}
+            <div className="flex p-1 bg-[#F5F5F7] rounded-full sm:min-w-[180px]">
+              {['homme', 'femme'].map((s) => (
+                <button
+                  key={s}
+                  onClick={() => setSegment(s)}
+                  className={cn(
+                    "flex-1 h-9 px-4 text-[11px] font-black uppercase tracking-widest rounded-full transition-all duration-300",
+                    segment === s ? "bg-white text-black shadow-apple-sm" : "text-[#6e6e73] hover:text-black"
+                  )}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+
+            {/* Sort selector */}
+            <div className="relative group">
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value)}
+                className="appearance-none h-11 pl-6 pr-10 rounded-full bg-[#F5F5F7] border-none text-[11px] font-black uppercase tracking-widest text-[#6e6e73] focus:ring-2 focus:ring-black/5 outline-none cursor-pointer hover:text-black transition-colors"
+              >
+                <option value="best">Meilleurs Scores IVS</option>
+                <option value="recent">Nouveautés Radar</option>
+                <option value="priceAsc">Prix : Croissant</option>
+                <option value="priceDesc">Prix : Décroissant</option>
+              </select>
+              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
+
+      <AnimatePresence mode="wait">
+        {advancedFiltersOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="overflow-hidden"
+          >
+            <div className="p-6 rounded-[32px] bg-[#F5F5F7] border border-black/[0.03] space-y-6">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
+                  <h4 className="text-sm font-black uppercase tracking-widest text-black">Alertes Globales</h4>
+                  <p className="text-xs text-[#6e6e73]">Afficher uniquement les produits qui tendent simultanément sur 2+ marchés mondiaux.</p>
+                </div>
+                <button
+                  onClick={() => setGlobalOnly(!globalOnly)}
+                  className={cn(
+                    "h-12 px-8 rounded-full text-xs font-black uppercase tracking-widest transition-all",
+                    globalOnly ? "bg-black text-white shadow-apple" : "bg-white text-black border border-black/5"
+                  )}
+                >
+                  {globalOnly ? 'Filtre Activé' : 'Activer le Filtre'}
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <div className="flex items-center gap-3 text-sm text-[#6e6e73]">
+        <Flame className="w-5 h-5 text-[#FF3B30] fill-[#FF3B30]" />
+        <span className="font-bold tracking-tight">Le Top 60 des tendances validées par nos algorithmes de viralité sociale.</span>
+      </div>
+
       {trendsLoading ? (
-        <div className="flex items-center gap-2 text-muted-foreground py-12">
-          <Loader2 className="w-5 h-5 animate-spin" />
-          Chargement des tendances…
+        <div className="flex flex-col items-center justify-center py-40 gap-4">
+          <div className="w-12 h-12 border-4 border-black/5 border-t-black rounded-full animate-spin" />
+          <p className="text-sm font-black uppercase tracking-widest text-[#6e6e73]">Mise à jour du Radar...</p>
         </div>
       ) : trends.length === 0 ? (
-        <Card>
-          <CardContent className="py-12 text-center text-muted-foreground">
-            <AlertTriangle className="w-12 h-12 mx-auto mb-2 opacity-50" />
-            <p>
-              {brandFromUrl
-                ? `Aucune tendance pour la marque « ${brandFromUrl} ».`
-                : 'Aucune tendance enregistrée pour le moment.'}
-            </p>
-            <p className="text-sm mt-1">
-              {brandFromUrl ? (
-                <Link href="/trends" className="underline hover:text-foreground">
-                  Voir toutes les tendances
-                </Link>
-              ) : (
-                'Utilisez la section « Récupérer les tendances » ci-dessous pour alimenter le radar.'
-              )}
-            </p>
-          </CardContent>
-        </Card>
+        <div className="py-32 text-center rounded-[32px] bg-[#F5F5F7] border border-dashed border-black/10">
+          <AlertTriangle className="w-16 h-16 mx-auto mb-6 text-black/20" />
+          <h3 className="text-xl font-black text-black mb-2 uppercase tracking-tight">Aucun résultat</h3>
+          <p className="text-[#6e6e73] mb-8">Nous n'avons trouvé aucun produit correspondant à vos filtres actuels.</p>
+          <Button onClick={() => { setGlobalOnly(false); setSortBy('best'); }} variant="outline" className="rounded-full px-8 font-black uppercase tracking-widest text-xs h-12">
+            Réinitialiser les filtres
+          </Button>
+        </div>
       ) : (
-        <>
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
-            {trends.map((t) => {
+        <motion.div
+          layout
+          className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8"
+        >
+          <AnimatePresence mode="popLayout">
+            {trends.map((t, index) => {
               const isFree = user?.plan === 'free';
               const isVisible = !isFree || homepageIds.has(t.id);
-              const canAnalyze = !isFree || (analysesCount !== null && analysesCount < 3);
-              const handleAnalyzeClick = (e: React.MouseEvent) => {
-                try {
-                  sessionStorage.setItem('trends-list-scroll', String(window.scrollY ?? document.documentElement.scrollTop ?? 0));
-                  sessionStorage.setItem('trends-list-segment', segment || 'homme');
-                  sessionStorage.setItem('trends-list-ageRange', ageRange || '25-34');
-                } catch (_) { }
-              };
+              const maxAnalyses = isFree ? 3 : 10;
+              const canAnalyze = !isFree || (analysesCount !== null && analysesCount < maxAnalyses);
               return (
-                <div key={t.id} className="group relative">
-                  <div
-                    className={cn(
-                      "bg-white rounded-[24px] overflow-hidden transition-all duration-500",
-                      "hover:scale-[1.03] hover:shadow-apple-lg hover:z-10",
-                      "shadow-apple border border-black/[0.03] relative flex flex-col h-full"
-                    )}
-                  >
+                <motion.div
+                  layout
+                  key={t.id}
+                  initial={{ opacity: 0, scale: 0.9, y: 30 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 30 }}
+                  transition={{
+                    duration: 0.6,
+                    delay: Math.min(index * 0.05, 0.5),
+                    ease: [0.23, 1, 0.32, 1]
+                  }}
+                  className="group relative"
+                >
+                  <div className="bg-white rounded-[32px] overflow-hidden transition-all duration-500 shadow-apple border border-black/[0.03] flex flex-col h-full hover:shadow-apple-lg hover:-translate-y-2">
                     {isFree && !isVisible && (
-                      <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-[24px] p-6 text-center">
-                        <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-4 shadow-apple">
+                      <div className="absolute inset-0 z-40 bg-white/40 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center">
+                        <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center mb-6 shadow-apple">
                           <Lock className="w-6 h-6 text-white" />
                         </div>
-                        <h4 className="text-sm font-bold text-black mb-2">Contenu Exclusif</h4>
+                        <h4 className="text-lg font-black text-black mb-4 tracking-tight">Analyse VIP</h4>
                         <Link
                           href="/auth/signup"
-                          className="px-6 py-2 bg-black text-white rounded-full text-xs font-bold hover:bg-black/90 transition-all active:scale-95 shadow-lg"
+                          className="w-full py-3 bg-black text-white rounded-full text-xs font-bold hover:bg-black/90 transition-all active:scale-95 shadow-xl uppercase tracking-widest"
                         >
-                          S'inscrire gratuitement
+                          Accès Gratuit
                         </Link>
                       </div>
                     )}
 
-                    <div className={cn("flex flex-col h-full", isFree && !isVisible ? 'opacity-10' : '')}>
-                      {/* Image du produit avec overlay au hover */}
-                      <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F5F7]">
-                        {t.imageUrl ? (
-                          <img
-                            src={proxyImageUrl(t.imageUrl) || t.imageUrl || ''}
-                            alt={t.name}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-apple group-hover:scale-110"
-                            referrerPolicy="no-referrer"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              if (t.imageUrl && target.src !== t.imageUrl) {
-                                target.src = t.imageUrl;
-                              } else {
-                                target.style.display = 'none';
-                                const parent = target.parentElement;
-                                if (parent) {
-                                  parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-10 h-10 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
-                                }
-                              }
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                            <Globe className="w-10 h-10 opacity-20" />
-                          </div>
-                        )}
+                    <div className={cn("flex flex-col h-full", isFree && !isVisible ? 'opacity-10 grayscale' : '')}>
+                      <div className="relative aspect-[3/4] overflow-hidden bg-[#F5F5F7]">
+                        <img
+                          src={proxyImageUrl(t.imageUrl) || t.imageUrl || ''}
+                          alt={t.name}
+                          className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-apple group-hover:scale-110"
+                          referrerPolicy="no-referrer"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            const p = proxyImageUrl(t.imageUrl || '');
+                            if (p && target.src !== p) target.src = p;
+                          }}
+                        />
 
-                        {/* Gradient Bottom Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                        {/* Badges Flottants */}
-                        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20">
+                        <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
                           {t.segment && (
-                            <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-black text-[9px] font-extrabold uppercase tracking-widest shadow-apple border border-black/5">
+                            <span className="px-3 py-1.5 rounded-2xl bg-white/90 backdrop-blur-md text-black text-[10px] font-black uppercase tracking-widest shadow-apple-sm">
                               {t.segment}
                             </span>
                           )}
                           {t.isGlobalTrendAlert && (
-                            <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[9px] font-extrabold uppercase tracking-widest shadow-lg">
-                              Global Alert
+                            <span className="px-3 py-1.5 rounded-2xl bg-[#007AFF] text-white text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5">
+                              <Globe className="w-3 h-3" />
+                              Global
                             </span>
                           )}
-                          {(t as any).outfityIVS && (t as any).outfityIVS > 85 && (
-                            <span className="px-2.5 py-1 rounded-full bg-[#FF3B30] text-white text-[9px] font-extrabold uppercase tracking-widest shadow-lg flex items-center gap-1">
-                              <Flame className="w-3 h-3 fill-current" />
-                              Hot
+                          {((t as any).outfityIVS || t.trendScore) > 85 && (
+                            <span className="px-3 py-1.5 rounded-2xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5">
+                              <div className="w-1.5 h-1.5 rounded-full bg-[#FF3B30] animate-pulse" />
+                              Elite Trend
                             </span>
                           )}
                         </div>
 
-                        {/* IVS Score Float */}
                         {((t as any).outfityIVS || t.trendScore) && (
-                          <div className="absolute bottom-3 right-3 z-20">
-                            <div className="px-3 py-1.5 rounded-xl bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-apple-lg text-right">
-                              <div className="text-[8px] font-bold uppercase tracking-tight text-white/60 mb-[-2px]">IVS Index</div>
-                              <div className="text-sm font-black tracking-tight">{(t as any).outfityIVS || t.trendScore}%</div>
+                          <div className="absolute bottom-4 right-4 z-20">
+                            <div className="px-4 py-2 rounded-2xl bg-black/80 backdrop-blur-xl text-white border border-white/20 shadow-apple-lg text-right">
+                              <div className="text-[9px] font-bold uppercase tracking-tight text-white/50 mb-[-2px]">IVS Index</div>
+                              <div className="text-lg font-black tracking-tight">{(t as any).outfityIVS || t.trendScore}%</div>
                             </div>
                           </div>
                         )}
                       </div>
 
-                      {/* Content Section */}
-                      <div className="p-4 sm:p-5 flex flex-col flex-grow bg-white">
-                        <div className="mb-3 min-w-0">
-                          <h3 className="text-sm sm:text-[15px] font-bold text-black leading-tight line-clamp-2 group-hover:text-[#007AFF] transition-colors mb-1.5">
+                      <div className="p-6 flex flex-col flex-grow">
+                        <div className="mb-4">
+                          <h3 className="text-[17px] font-bold text-black leading-tight line-clamp-2 transition-colors group-hover:text-[#007AFF] mb-2">
                             {t.name}
                           </h3>
-                          <div className="flex items-center gap-2 flex-wrap">
-                            <span className="text-[10px] sm:text-[11px] font-semibold text-[#6e6e73] bg-[#F5F5F7] px-2 py-0.5 rounded-md uppercase tracking-tighter">
+                          <div className="flex items-center gap-3">
+                            <span className="text-[10px] font-black text-[#6e6e73] bg-black/5 px-2 py-1 rounded-md uppercase tracking-widest">
                               {t.category}
                             </span>
-                            <span className="text-[10px] sm:text-[11px] font-bold text-black/40">
-                              • {(() => {
-                                const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand);
-                                return b || 'Brand';
-                              })()}
+                            <span className="text-[11px] font-bold text-black/20 italic">
+                              By {(t as any).productBrand || t.sourceBrand || 'Brand'}
                             </span>
                           </div>
                         </div>
 
                         {t.businessAnalysis && (
-                          <p className="text-[11px] text-[#6e6e73] line-clamp-2 mb-4 italic leading-relaxed">
+                          <p className="text-[12px] text-[#6e6e73] line-clamp-2 mb-6 italic leading-relaxed font-medium">
                             "{t.businessAnalysis}"
                           </p>
                         )}
 
-                        <div className="mt-auto pt-4 border-t border-black/[0.03]">
+                        <div className="mt-auto">
                           <Link
                             href={`/trends/${t.id}`}
-                            className={cn(
-                              "w-full group/btn relative overflow-hidden h-10 rounded-full text-xs font-bold transition-all duration-300",
-                              "bg-black text-white hover:bg-[#1D1D1F] active:scale-[0.98]",
-                              "flex items-center justify-center gap-2 shadow-apple"
-                            )}
                             onClick={handleAnalyzeClick}
+                            className="w-full h-12 rounded-full flex items-center justify-center text-xs font-black uppercase tracking-widest bg-black text-white shadow-apple hover:bg-[#1D1D1F] active:scale-95 transition-all duration-300"
                           >
-                            Analyser la tendance
+                            Analyse complète
                           </Link>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
+                </motion.div>
               );
             })}
-          </div>
-        </>
+          </AnimatePresence>
+        </motion.div>
       )}
 
-      <p className="text-xs text-muted-foreground mt-4 text-center">
-        Ces tendances sont mises à jour chaque semaine.
-      </p>
+      <div className="py-12 border-t border-black/[0.03] text-center">
+        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6e6e73]">
+          Algorithme de détection Outfity v4.2 • Mise à jour hebdomadaire
+        </p>
+      </div>
     </div>
   );
 }

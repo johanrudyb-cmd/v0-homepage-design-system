@@ -637,7 +637,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
                     {logoGenerating ? (
                       <>
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Génération des 4 propositions…
+                        Ciselage de vos emblèmes...
                       </>
                     ) : (
                       <>
@@ -1002,7 +1002,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
           {validateLoading ? (
             <>
               <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              Validation…
+              Planification du lancement...
             </>
           ) : needsLogo ? (
             <>
@@ -1054,7 +1054,7 @@ export function Phase1Strategy({ brandId, brand, onComplete, demoMode = false, u
                 ? strategyQuota?.isExhausted && !demoMode
                   ? { label: 'Recharger ce module', onClick: openSurplusModal, disabled: false }
                   : {
-                    label: strategyLoading ? 'Calquage en cours…' : 'Calquer la stratégie',
+                    label: strategyLoading ? 'Tissage de votre stratégie…' : 'Calquer la stratégie',
                     onClick: () => { setConfirmCalquerSlug(viewingTemplate.templateBrandSlug); setShowConfirmCalquer(true); },
                     disabled: strategyLoading || !brand?.name?.trim(),
                   }

@@ -130,7 +130,7 @@ export function VisualTrendScanner() {
                             {isScanning ? (
                                 <>
                                     <Loader2 className="w-6 h-6 animate-spin" />
-                                    Analyse par l&apos;IA en cours...
+                                    Scanning des fibres et du style...
                                 </>
                             ) : (
                                 <>

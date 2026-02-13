@@ -8,6 +8,7 @@ import { DashboardTutorial } from '@/components/dashboard/DashboardTutorial';
 import { PageTransition } from './PageTransition';
 import { PaywallGate } from '@/components/paywall/PaywallGate';
 import { ErrorBoundary } from '@/components/error/ErrorBoundary';
+import { ChatAssistant } from './ChatAssistant';
 
 function DashboardTutorialGate() {
   const pathname = usePathname();
@@ -61,6 +62,7 @@ export function DashboardLayout({
       <Suspense fallback={null}>
         <DashboardTutorialGate />
       </Suspense>
+      <ChatAssistant />
     </div>
   );
 }

@@ -13,6 +13,7 @@ import {
   getMaxPerMonthForFeature,
   getTokensForPlan,
   getTokensForFeature,
+  getMaxPerDayForFeature,
   TOKENS_PER_EUR,
   type AIFeatureKey,
 } from './ai-usage-config';
@@ -66,6 +67,15 @@ export async function getFeatureCountThisMonth(userId: string, feature: AIFeatur
   const periodStart = await getBillingPeriodStart(userId);
   return prisma.aIUsage.count({
     where: { userId, feature, createdAt: { gte: periodStart } },
+  });
+}
+
+/** Nombre d'utilisations d'une feature aujourd'hui (depuis minuit UTC) */
+export async function getFeatureCountToday(userId: string, feature: AIFeatureKey): Promise<number> {
+  const now = new Date();
+  const todayStart = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+  return prisma.aIUsage.count({
+    where: { userId, feature, createdAt: { gte: todayStart } },
   });
 }
 
@@ -142,16 +152,16 @@ export async function checkAIUsageLimit(
     }
   }
 
-  // Limites par feature (stratégie X fois, recommandations Y fois)
-  const maxPerMonth = getMaxPerMonthForFeature(plan, feature);
-  if (maxPerMonth >= 0) {
-    const count = await getFeatureCountThisMonth(userId, feature);
-    if (count >= maxPerMonth) {
+  // Limites journalières (Assistant, etc.)
+  const maxPerDay = getMaxPerDayForFeature(plan, feature);
+  if (maxPerDay >= 0) {
+    const countToday = await getFeatureCountToday(userId, feature);
+    if (countToday >= maxPerDay) {
       const label = FEATURE_LABELS[feature] ?? feature;
       return {
         allowed: false,
         remaining: 0,
-        message: `${label} limité à ${maxPerMonth} fois par mois. Prochaine utilisation le mois prochain ou passez à un plan supérieur.`,
+        message: `Limite journalière atteinte pour ${label} (${maxPerDay}). Réessaie demain !`,
       };
     }
   }

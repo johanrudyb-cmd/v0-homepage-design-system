@@ -60,8 +60,8 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
         <Card>
           <CardContent className="py-16 flex flex-col items-center justify-center gap-4">
             <div className="w-12 h-12 border-2 border-[#007AFF]/20 border-t-[#007AFF] rounded-full animate-apple-spin" />
-            <p className="text-[#1D1D1F]/70">Génération de l&apos;analyse IA en cours…</p>
-            <p className="text-sm text-[#1D1D1F]/50">Prévisions France, tendances à venir, recommandations.</p>
+            <p className="text-[#1D1D1F]/70 font-semibold italic">Tissage du rapport de tendances...</p>
+            <p className="text-sm text-[#1D1D1F]/50">Analyse des coupes, matières et volumes en cours.</p>
           </CardContent>
         </Card>
       </div>

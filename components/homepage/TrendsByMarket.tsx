@@ -6,10 +6,12 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { proxyImageUrl } from '@/lib/image-proxy';
-import { Flame, ChevronDown, Lock } from 'lucide-react';
+import { Flame, Lock } from 'lucide-react';
 import { BrandLogo } from '@/components/brands/BrandLogo';
 import { getBrandLogoUrl, getBrandKey } from '@/lib/curated-brands';
 import { REFERENCE_BRAND_WEBSITES } from '@/lib/constants/audience-reference-brands';
+import { motion, AnimatePresence } from 'framer-motion';
+import { UsageBadge } from '@/components/trends/UsageBadge';
 
 const getRefWebsite = (brandName: string) => {
   const k = getBrandKey(brandName || '');
@@ -39,8 +41,6 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
   const [loading, setLoading] = useState(!initialTrends);
   const [selectedAge, setSelectedAge] = useState<string>('18-24 ans');
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
-  const [selectedZone] = useState('Zone EU');
-  const [sortBy] = useState('Meilleures tendances (score)');
   const [analysesCount, setAnalysesCount] = useState<number | null>(null);
   const [homepageIds, setHomepageIds] = useState<Set<string>>(new Set(initialTrends?.map(t => t.id).filter(Boolean) as string[] || []));
   const [isSmallScreen, setIsSmallScreen] = useState(false);
@@ -128,7 +128,6 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
 
     // Fonction pour diversifier les marques (Round Robin simplifié)
     const diversifyByBrand = (list: TrendProduct[], limit: number) => {
-      const seenBrands = new Set<string>();
       const result: TrendProduct[] = [];
       const buckets: Record<string, TrendProduct[]> = {};
 
@@ -143,7 +142,6 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
       let brandNames = Object.keys(buckets);
       let brandIdx = 0;
       while (result.length < limit && brandNames.length > 0) {
-        // Sécurité pour l'index suite à un splice
         if (brandIdx >= brandNames.length) brandIdx = 0;
 
         const currentBrand = brandNames[brandIdx];
@@ -154,12 +152,9 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
           if (product) result.push(product);
         }
 
-        // Si le seau est vide, on retire la marque des options
         if (!bucket || bucket.length === 0) {
           brandNames.splice(brandIdx, 1);
-          // On ne change pas l'index car l'élément suivant a pris sa place
         } else {
-          // Sinon on passe à la marque suivante (Rotation)
           brandIdx = (brandIdx + 1) % brandNames.length;
         }
       }
@@ -186,50 +181,52 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
   const handleAnalyzeClick = (e: React.MouseEvent, trendId: string) => {
     e.preventDefault();
 
-    // Vérifier si l'utilisateur est connecté
     if (!user) {
       router.push('/auth/signin?redirect=/trends/' + trendId);
       return;
     }
 
-    // Vérifier la limite pour les utilisateurs gratuits
     if (user.plan === 'free' && analysesCount !== null && analysesCount >= 3) {
       router.push('/auth/choose-plan');
       return;
     }
 
-    // Rediriger vers la page d'analyse
     router.push(`/trends/${trendId}`);
   };
 
   return (
-    <section id="trends-by-market" className="py-12 sm:py-16 lg:py-20 bg-white border-t border-[#F2F2F2]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section id="trends-by-market" className="py-12 sm:py-24 lg:py-32 bg-white border-t border-black/[0.03]">
+      <div className="max-w-7xl mx-auto px-6 lg:px-12">
         {/* En-tête avec titre et indicateur */}
-        <div className="mb-6 sm:mb-8">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-[#000000] mb-3 sm:mb-4">
-            Tendances de la semaine
-          </h2>
-          <div className="flex flex-wrap items-center gap-2 text-sm text-[#6e6e73]">
-            <Flame className="w-4 h-4 text-[#FF3B30] shrink-0 fill-[#FF3B30]" />
-            <span className="font-bold">Radar Elite : Le Top 60 des tendances hebdomadaires validées sur TikTok et Instagram.</span>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 lg:mb-20">
+          <div className="space-y-6">
+            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-black leading-[0.9] max-w-2xl">
+              Tendances de la semaine
+            </h2>
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-[#34C759] animate-pulse" />
+              <span className="text-[12px] font-bold uppercase tracking-widest text-[#6e6e73]">
+                Radar Elite : Validé sur TikTok & Instagram
+              </span>
+            </div>
           </div>
+
+          {/* Credit System Display */}
+          <UsageBadge count={analysesCount} plan={user?.plan || 'free'} />
         </div>
 
-        {/* Filtres */}
-        <div className="mb-8 sm:mb-12 flex flex-wrap items-center gap-4 sm:gap-6">
-          {/* Groupe Âge */}
-          <div className="flex flex-wrap gap-2">
+        {/* Filtres modernisés */}
+        <div className="mb-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-2 bg-[#F5F5F7] rounded-[32px] sm:rounded-full">
+          <div className="flex items-center gap-2 p-1 w-full sm:w-auto">
             {['18-24 ans', '25-34 ans'].map((age) => (
               <button
                 key={age}
-                type="button"
                 onClick={() => setSelectedAge(age)}
                 className={cn(
-                  'min-h-[44px] px-6 py-2.5 rounded-full text-sm font-bold transition-all touch-manipulation',
+                  'flex-1 sm:flex-none h-12 px-8 rounded-full text-sm font-bold transition-all duration-300',
                   selectedAge === age
-                    ? 'bg-[#000000] text-white shadow-lg scale-105'
-                    : 'bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] active:bg-[#E0E0E0]'
+                    ? 'bg-black text-white shadow-apple-lg scale-105'
+                    : 'text-[#6e6e73] hover:text-black'
                 )}
               >
                 {age}
@@ -237,18 +234,16 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
             ))}
           </div>
 
-          {/* Groupe Genre */}
-          <div className="flex flex-wrap gap-2 border-l border-[#F2F2F2] pl-4 sm:pl-6">
+          <div className="flex items-center gap-2 p-1 w-full sm:w-auto border-t sm:border-t-0 sm:border-l border-black/5 sm:pl-4">
             {['Homme', 'Femme'].map((gender) => (
               <button
                 key={gender}
-                type="button"
                 onClick={() => setSelectedGender(selectedGender === gender ? null : gender)}
                 className={cn(
-                  'min-h-[44px] px-6 py-2.5 rounded-full text-sm font-bold transition-all touch-manipulation',
+                  'flex-1 sm:flex-none h-12 px-8 rounded-full text-sm font-bold transition-all duration-300',
                   selectedGender === gender
-                    ? 'bg-[#000000] text-white shadow-lg'
-                    : 'bg-[#F5F5F7] text-[#6e6e73] hover:bg-[#E5E5E7] active:bg-[#E0E0E0]'
+                    ? 'bg-black text-white shadow-apple-lg'
+                    : 'text-[#6e6e73] hover:text-black'
                 )}
               >
                 {gender}
@@ -257,165 +252,141 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
           </div>
         </div>
 
-        {/* Grille de produits */}
+        {/* Grille de produits animée */}
         {loading ? (
-          <div className="text-center py-12 text-[#6e6e73]">
-            Chargement des tendances...
-          </div>
-        ) : displayedTrends.length === 0 ? (
-          <div className="text-center py-12 text-[#6e6e73]">
-            Aucune tendance disponible
+          <div className="flex flex-col items-center justify-center py-32 gap-4">
+            <div className="w-12 h-12 border-4 border-black/5 border-t-black rounded-full animate-spin" />
+            <p className="text-sm font-bold text-[#6e6e73] uppercase tracking-widest">Initialisation du Radar...</p>
           </div>
         ) : (
-          <div
-            className={cn(
-              'grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-6',
-              'transition-all duration-1000',
-              isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-12'
-            )}
-          >
-            {displayedTrends.map((product) => {
-              const segmentLabel = product.segment === 'homme' ? 'Homme' : product.segment === 'femme' ? 'Femme' : product.segment;
-              const isFree = user?.plan === 'free';
-              const isPubliclyVisible = !isFree || homepageIds.has(product.id);
-              const canAnalyze = !isFree || (analysesCount !== null && analysesCount < 3);
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+            <AnimatePresence mode="popLayout">
+              {displayedTrends.map((product, index) => {
+                const segmentLabel = product.segment === 'homme' ? 'Homme' : 'Femme';
+                const isFree = user?.plan === 'free';
+                const isPubliclyVisible = !isFree || homepageIds.has(product.id);
 
-              return (
-                <div key={product.id} className="group relative">
-                  <div
-                    className={cn(
-                      "bg-white rounded-[24px] overflow-hidden transition-all duration-500",
-                      "hover:scale-[1.03] hover:shadow-apple-lg hover:z-10",
-                      "shadow-apple border border-black/[0.03] relative flex flex-col h-full bg-white"
-                    )}
+                return (
+                  <motion.div
+                    layout
+                    key={`${product.id}-${index}`}
+                    initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                    transition={{
+                      duration: 0.5,
+                      delay: index * 0.05,
+                      ease: [0.23, 1, 0.32, 1]
+                    }}
+                    className="group relative"
                   >
-                    {isFree && !isPubliclyVisible && (
-                      <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-[24px] p-6 text-center">
-                        <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-4 shadow-apple">
-                          <Lock className="w-6 h-6 text-white" />
+                    <div className="bg-white rounded-[32px] overflow-hidden transition-all duration-500 shadow-apple border border-black/[0.03] flex flex-col h-full hover:shadow-apple-lg hover:-translate-y-2">
+                      {isFree && !isPubliclyVisible && (
+                        <div className="absolute inset-0 z-40 bg-white/40 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center">
+                          <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center mb-6 shadow-apple">
+                            <Lock className="w-6 h-6 text-white" />
+                          </div>
+                          <h4 className="text-lg font-black text-black mb-4 tracking-tight">Rapport Privé</h4>
+                          <Link
+                            href="/auth/signup"
+                            className="w-full py-3 bg-black text-white rounded-full text-xs font-bold hover:bg-black/90 transition-all active:scale-95 shadow-xl"
+                          >
+                            Accès Gratuit
+                          </Link>
                         </div>
-                        <h4 className="text-sm font-bold text-black mb-2">Contenu Exclusif</h4>
-                        <Link
-                          href="/auth/signup"
-                          className="px-6 py-2 bg-black text-white rounded-full text-xs font-bold hover:bg-black/90 transition-all active:scale-95 shadow-lg"
-                        >
-                          S'inscrire gratuitement
-                        </Link>
-                      </div>
-                    )}
+                      )}
 
-                    <div className={cn("flex flex-col h-full", isFree && !isPubliclyVisible ? 'opacity-10' : '')}>
-                      {/* Image du produit avec overlay au hover */}
-                      <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F5F7]">
-                        {product.imageUrl ? (
+                      <div className={cn("flex flex-col h-full", isFree && !isPubliclyVisible ? 'opacity-10 grayscale' : '')}>
+                        <div className="relative aspect-[3/4] overflow-hidden bg-[#F5F5F7]">
                           <img
-                            src={product.imageUrl}
+                            src={product.imageUrl || ''}
                             alt={product.name}
                             className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-apple group-hover:scale-110"
                             referrerPolicy="no-referrer"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
                               const proxied = proxyImageUrl(product.imageUrl || '');
-                              if (proxied && target.src !== proxied) {
-                                target.src = proxied;
-                              }
+                              if (proxied && target.src !== proxied) target.src = proxied;
                             }}
                           />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-[#6e6e73]">
-                            <svg className="w-12 h-12 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                          </div>
-                        )}
 
-                        {/* Gradient Bottom Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                        {/* Badges Flottants */}
-                        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20">
-                          <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-black text-[9px] font-extrabold uppercase tracking-widest shadow-apple border border-black/5">
-                            {segmentLabel}
-                          </span>
-                          {product.trendScore && product.trendScore > 85 && (
-                            <span className="px-2.5 py-1 rounded-full bg-[#FF3B30] text-white text-[9px] font-extrabold uppercase tracking-widest shadow-lg flex items-center gap-1">
-                              <Flame className="w-3 h-3 fill-current" />
-                              Hot
+                          {/* Top Badges */}
+                          <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
+                            <span className="px-3 py-1.5 rounded-2xl bg-white/90 backdrop-blur-md text-black text-[10px] font-black uppercase tracking-widest shadow-apple-sm">
+                              {segmentLabel}
                             </span>
+                            {product.trendScore && product.trendScore > 85 && (
+                              <span className="px-3 py-1.5 rounded-2xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 animate-pulse">
+                                <div className="w-1.5 h-1.5 rounded-full bg-[#FF3B30]" />
+                                Trending Now
+                              </span>
+                            )}
+                          </div>
+
+                          {/* IVS Index Float */}
+                          {product.trendScore && (
+                            <div className="absolute bottom-4 right-4 z-20">
+                              <div className="px-4 py-2 rounded-2xl bg-black/80 backdrop-blur-xl text-white border border-white/20 shadow-apple-lg text-right">
+                                <div className="text-[9px] font-bold uppercase tracking-tight text-white/50 mb-[-2px]">IVS Index</div>
+                                <div className="text-lg font-black tracking-tight">{product.trendScore}%</div>
+                              </div>
+                            </div>
                           )}
                         </div>
 
-                        {/* IVS Score Float */}
-                        {product.trendScore && (
-                          <div className="absolute bottom-3 right-3 z-20">
-                            <div className="px-3 py-1.5 rounded-xl bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-apple-lg">
-                              <div className="text-[8px] font-bold uppercase tracking-tight text-white/60 mb-[-2px]">IVS Index</div>
-                              <div className="text-sm font-black tracking-tight">{product.trendScore}%</div>
+                        <div className="p-6 flex flex-col flex-grow">
+                          <div className="flex items-start justify-between gap-4 mb-4">
+                            <div className="min-w-0 flex-1">
+                              <h3 className="text-[17px] font-bold text-black leading-tight line-clamp-2 transition-colors group-hover:text-[#007AFF]">
+                                {product.name}
+                              </h3>
                             </div>
+                            <BrandLogo
+                              logoUrl={getBrandLogoUrl(product.brand, getRefWebsite(product.brand))}
+                              brandName={product.brand}
+                              className="w-8 h-8 opacity-40 group-hover:opacity-100 transition-all duration-700 shrink-0"
+                            />
                           </div>
-                        )}
-                      </div>
 
-                      {/* Content Section */}
-                      <div className="p-4 sm:p-5 flex flex-col flex-grow bg-white">
-                        <div className="flex items-start justify-between gap-2 mb-3">
-                          <div className="min-w-0 flex-1">
-                            <h3 className="text-sm sm:text-[15px] font-bold text-black leading-tight line-clamp-2 group-hover:text-[#007AFF] transition-colors">
-                              {product.name}
-                            </h3>
+                          <div className="flex items-center gap-2 mb-6">
+                            <span className="text-[10px] font-black text-[#6e6e73] bg-black/5 px-2 py-1 rounded-md uppercase tracking-widest">
+                              {product.category}
+                            </span>
+                            <span className="text-[11px] font-bold text-black/20 italic">
+                              By {product.brand}
+                            </span>
                           </div>
-                          <BrandLogo
-                            logoUrl={getBrandLogoUrl(product.brand, getRefWebsite(product.brand))}
-                            brandName={product.brand}
-                            className="w-7 h-7 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 shrink-0"
-                          />
-                        </div>
 
-                        <div className="flex items-center gap-2 mb-4">
-                          <span className="text-[11px] font-semibold text-[#6e6e73] bg-[#F5F5F7] px-2 py-0.5 rounded-md uppercase tracking-tighter">
-                            {product.category}
-                          </span>
-                          <span className="text-[11px] font-bold text-black/40">
-                            • {product.brand}
-                          </span>
-                        </div>
-
-                        <div className="mt-auto pt-4 border-t border-black/[0.03]">
                           <button
                             onClick={(e) => handleAnalyzeClick(e, product.id)}
-                            className={cn(
-                              "w-full group/btn relative overflow-hidden h-10 rounded-full text-xs font-bold transition-all duration-300",
-                              "bg-black text-white hover:bg-[#1D1D1F] active:scale-[0.98]",
-                              "flex items-center justify-center gap-2 shadow-apple"
-                            )}
+                            className="mt-auto w-full h-12 rounded-full text-xs font-black uppercase tracking-widest bg-black text-white shadow-apple hover:bg-[#1D1D1F] active:scale-95 transition-all duration-300"
                           >
-                            <span className="relative z-10">Analyser la tendance</span>
+                            Analyse complète
                           </button>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              );
-            })}
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
           </div>
         )}
 
-        {/* Lien vers toutes les tendances */}
-        <div className="mt-8 sm:mt-12 text-center">
+        <div className="mt-16 lg:mt-24 text-center">
           <Link
             href="/trends"
-            className="inline-flex items-center gap-2 min-h-[44px] items-center justify-center text-[#007AFF] hover:underline group text-base sm:text-lg font-medium touch-manipulation"
+            className="inline-flex items-center gap-4 bg-white border border-black/5 px-10 py-5 rounded-full text-black font-black uppercase tracking-widest text-sm shadow-apple hover:shadow-apple-lg hover:-translate-y-1 transition-all group"
           >
-            Voir toutes les tendances
-            <svg
-              className="w-5 h-5 group-hover:translate-x-1 transition-transform"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+            Explorer le Radar Complet
+            <motion.div
+              animate={{ x: [0, 5, 0] }}
+              transition={{ repeat: Infinity, duration: 1.5 }}
             >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-            </svg>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+              </svg>
+            </motion.div>
           </Link>
         </div>
       </div>

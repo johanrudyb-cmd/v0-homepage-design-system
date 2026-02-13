@@ -69,6 +69,6 @@ export async function generateGarmentRecommendations(
     `Considérez la position de votre logo : poitrine (centre) pour un look classique, ou dos pour un style plus streetwear.`
   );
 
-  // Limiter à 8 recommandations maximum
-  return recommendations.slice(0, 8);
+  // Limiter à 5 recommandations maximum
+  return recommendations.slice(0, 5);
 }

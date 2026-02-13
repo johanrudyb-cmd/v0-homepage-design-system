@@ -238,15 +238,14 @@ export function VirtualTryOn({ brandId, designs }: VirtualTryOnProps) {
             </div>
           )}
 
-          <div className="flex gap-2 overflow-x-auto pb-2">
+          <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
             {STEPS.map((s, i) => (
               <button
                 key={s.id}
                 type="button"
                 onClick={() => setStepIndex(i)}
-                className={`shrink-0 px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
-                  i === stepIndex ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'
-                }`}
+                className={`shrink-0 px-2.5 py-1 rounded-md text-xs font-medium transition-colors ${i === stepIndex ? 'bg-primary text-primary-foreground' : 'bg-muted hover:bg-muted/80'
+                  }`}
               >
                 {s.title}
               </button>
@@ -417,56 +416,56 @@ export function VirtualTryOn({ brandId, designs }: VirtualTryOnProps) {
             <>
               <div>
                 <Label>Comment créer le mannequin ?</Label>
-                <div className="grid gap-3 mt-2">
-                  <label className="flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                    <input
-                      type="radio"
-                      name="creationMethod"
-                      checked={answers.creationMethod === 'reference_photo'}
-                      onChange={() => update({ creationMethod: 'reference_photo' })}
-                      className="mt-1"
-                    />
-                    <div>
-                      <span className="font-medium">Uploader une photo de référence</span>
-                      <p className="text-sm text-muted-foreground mt-0.5">
-                        Pour copier un visage existant. L&apos;image sera utilisée telle quelle comme mannequin.
-                      </p>
-                      {answers.creationMethod === 'reference_photo' && (
-                        <div className="mt-3">
-                          <input
-                            type="file"
-                            accept="image/*"
-                            onChange={onReferenceFileChange}
-                            className="hidden"
-                            id="ref-photo"
-                          />
-                          <label htmlFor="ref-photo" className="inline-flex items-center gap-2 rounded-lg border border-input bg-background px-3 py-2 text-sm cursor-pointer hover:bg-muted/50">
-                            <Upload className="w-4 h-4" />
-                            {referenceFile ? referenceFile.name : 'Choisir une photo'}
-                          </label>
-                          {referencePreviewUrl && (
-                            <div className="mt-2 w-24 h-24 rounded-lg overflow-hidden border border-border">
-                              <img src={referencePreviewUrl} alt="Aperçu" className="w-full h-full object-cover" />
-                            </div>
-                          )}
-                        </div>
-                      )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
+                  <label className="flex flex-col gap-2 rounded-lg border p-3 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="creationMethod"
+                        checked={answers.creationMethod === 'reference_photo'}
+                        onChange={() => update({ creationMethod: 'reference_photo' })}
+                        className="accent-primary"
+                      />
+                      <span className="font-semibold text-sm">Via photo référence</span>
                     </div>
+                    <p className="text-xs text-muted-foreground ml-5">
+                      Copier un visage existant (upload).
+                    </p>
+                    {answers.creationMethod === 'reference_photo' && (
+                      <div className="mt-1 ml-5">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={onReferenceFileChange}
+                          className="hidden"
+                          id="ref-photo"
+                        />
+                        <label htmlFor="ref-photo" className="inline-flex items-center gap-1.5 rounded-md border border-input bg-background px-2.5 py-1.5 text-xs cursor-pointer hover:bg-muted/50">
+                          <Upload className="w-3.5 h-3.5" />
+                          {referenceFile ? <span className="truncate max-w-[120px]">{referenceFile.name}</span> : 'Choisir photo'}
+                        </label>
+                        {referencePreviewUrl && (
+                          <div className="mt-2 w-16 h-16 rounded-md overflow-hidden border border-border">
+                            <img src={referencePreviewUrl} alt="Aperçu" className="w-full h-full object-cover" />
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </label>
-                  <label className="flex items-start gap-3 rounded-xl border-2 p-4 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
-                    <input
-                      type="radio"
-                      name="creationMethod"
-                      checked={answers.creationMethod === 'ai_generate'}
-                      onChange={() => update({ creationMethod: 'ai_generate' })}
-                      className="mt-1"
-                    />
-                    <div>
-                      <span className="font-medium">Générer un visage unique avec l&apos;IA</span>
-                      <p className="text-sm text-muted-foreground mt-0.5">
-                        L&apos;IA génère un mannequin à partir de vos réponses (identité, look, vibe).
-                      </p>
+                  <label className="flex flex-col gap-2 rounded-lg border p-3 cursor-pointer hover:bg-muted/30 transition-colors has-[:checked]:border-primary has-[:checked]:bg-primary/5">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="radio"
+                        name="creationMethod"
+                        checked={answers.creationMethod === 'ai_generate'}
+                        onChange={() => update({ creationMethod: 'ai_generate' })}
+                        className="accent-primary"
+                      />
+                      <span className="font-semibold text-sm">Généré par l&apos;IA</span>
                     </div>
+                    <p className="text-xs text-muted-foreground ml-5">
+                      Visage unique basé sur vos critères.
+                    </p>
                   </label>
                 </div>
               </div>

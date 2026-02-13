@@ -752,30 +752,30 @@ export function StrategyPresentationView({
         </nav>
 
         {/* Ma marque / Marque de référence — pastilles */}
-        <div className="flex flex-wrap gap-3 mb-8">
+        <div className="flex flex-wrap gap-2 mb-8">
           {isTemplateView ? (
             brandName && (
-              <span className="px-4 py-2 rounded-full bg-[#007AFF]/10 text-sm font-medium text-[#007AFF]">
+              <span className="px-3 py-1.5 rounded-full bg-[#007AFF]/10 text-[11px] sm:text-sm font-medium text-[#007AFF] break-words">
                 Marque de référence : {brandName}
               </span>
             )
           ) : (
             <>
               {brandName && (
-                <span className="px-4 py-2 rounded-full bg-[#007AFF]/10 text-sm font-medium text-[#007AFF]">{brandName}</span>
+                <span className="px-3 py-1.5 rounded-full bg-[#007AFF]/10 text-[11px] sm:text-sm font-medium text-[#007AFF] break-words">{brandName}</span>
               )}
               {positioning && (
-                <span className="px-4 py-2 rounded-full bg-[#1D1D1F]/5 text-sm text-[#1D1D1F]/60">{positioning}</span>
+                <span className="px-3 py-1.5 rounded-full bg-[#1D1D1F]/5 text-[11px] sm:text-sm text-[#1D1D1F]/60 break-words">{positioning}</span>
               )}
               {targetAudience && (
-                <span className="px-4 py-2 rounded-full bg-[#1D1D1F]/5 text-sm text-[#1D1D1F]/60">{targetAudience}</span>
+                <span className="px-3 py-1.5 rounded-full bg-[#1D1D1F]/5 text-[11px] sm:text-sm text-[#1D1D1F]/60 break-words">{targetAudience}</span>
               )}
               {templateBrandName && (
-                <span className="px-4 py-2 rounded-full bg-[#1D1D1F]/5 text-sm text-[#1D1D1F]/60">Inspiré de {templateBrandName}</span>
+                <span className="px-3 py-1.5 rounded-full bg-[#1D1D1F]/5 text-[11px] sm:text-sm text-[#1D1D1F]/60 break-words">Inspiré de {templateBrandName}</span>
               )}
               {lastAIUpdate && !isNaN(new Date(lastAIUpdate).getTime()) && (
-                <span className="px-4 py-2 rounded-full bg-primary/10 text-sm font-medium text-primary flex items-center gap-2 animate-pulse">
-                  <Sparkles className="w-3.5 h-3.5" />
+                <span className="px-3 py-1.5 rounded-full bg-primary/10 text-[11px] sm:text-sm font-medium text-primary flex items-center gap-2 animate-pulse break-words">
+                  <Sparkles className="w-3.5 h-3.5 shrink-0" />
                   Dernière mise à jour IA : {new Date(lastAIUpdate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
                 </span>
               )}
@@ -892,13 +892,13 @@ export function StrategyPresentationView({
             const schematic = renderSectionSchematic(sec, i);
             return (
               <Card key={i} id={`strategy-section-${i}`} className="rounded-3xl bg-white shadow-apple overflow-hidden scroll-mt-4">
-                <div className="flex items-center gap-4 px-6 sm:px-8 py-4 sm:py-6 border-b border-black/5">
-                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#007AFF]/10 flex items-center justify-center shrink-0">
-                    <sec.meta.Icon className="w-5 h-5 sm:w-6 sm:h-6 text-[#007AFF]" />
+                <div className="flex items-center gap-3 sm:gap-4 px-5 sm:px-8 py-4 sm:py-6 border-b border-black/5">
+                  <div className="w-9 h-9 sm:w-12 sm:h-12 rounded-2xl bg-[#007AFF]/10 flex items-center justify-center shrink-0">
+                    <sec.meta.Icon className="w-4.5 h-4.5 sm:w-6 sm:h-6 text-[#007AFF]" />
                   </div>
-                  <CardTitle className="text-lg sm:text-xl font-semibold tracking-tight text-[#1D1D1F] break-words">{sec.title}</CardTitle>
+                  <CardTitle className="text-base sm:text-xl font-semibold tracking-tight text-[#1D1D1F] break-words flex-1 min-w-0">{sec.title}</CardTitle>
                 </div>
-                <CardContent className="px-5 sm:px-8 py-6 sm:py-8">
+                <CardContent className="px-4 sm:px-8 py-5 sm:py-8">
                   <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
                     <div className="rounded-3xl bg-white shadow-apple p-6 min-h-[280px] lg:min-h-[320px] flex flex-col">
                       <div className="flex-1 min-h-[260px] lg:min-h-[300px] flex items-center justify-center w-full min-w-0 overflow-auto">
@@ -909,9 +909,9 @@ export function StrategyPresentationView({
                         )}
                       </div>
                     </div>
-                    <div className="rounded-3xl bg-white shadow-apple p-6 min-h-[140px]">
-                      <p className="text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Contenu détaillé</p>
-                      <div className="text-sm leading-relaxed space-y-3 max-h-[300px] overflow-y-auto">
+                    <div className="rounded-3xl bg-white shadow-apple p-4 sm:p-6 min-h-[140px]">
+                      <p className="text-[10px] sm:text-xs font-semibold text-[#1D1D1F]/60 uppercase tracking-wider mb-4">Contenu détaillé</p>
+                      <div className="text-xs sm:text-sm leading-relaxed space-y-3 max-h-[400px] overflow-y-auto pr-1">
                         {sec.isTimingSection && sec.bullets.length > 0 ? (
                           <>
                             <ol className="relative border-l border-[#007AFF]/40 pl-6 space-y-3">

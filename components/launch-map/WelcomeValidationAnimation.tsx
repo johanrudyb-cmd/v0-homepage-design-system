@@ -5,10 +5,10 @@ import { useRouter } from 'next/navigation';
 import { Loader2, CheckCircle2 } from 'lucide-react';
 
 const VALIDATION_STEPS = [
-  { label: 'Finalisation de votre identité', duration: 800 },
-  { label: 'Préparation du Guide de lancement', duration: 1000 },
-  { label: 'Configuration du tableau de bord', duration: 900 },
-  { label: 'Redirection…', duration: 600 },
+  { label: 'Ciselage de votre marque', duration: 800 },
+  { label: 'Tissage du Guide de lancement', duration: 1000 },
+  { label: 'Déploiement du Studio Créatif', duration: 900 },
+  { label: 'Mise au point de l\'objectif…', duration: 600 },
 ];
 
 export function WelcomeValidationAnimation({ onComplete }: { onComplete?: () => void }) {
@@ -50,13 +50,12 @@ export function WelcomeValidationAnimation({ onComplete }: { onComplete?: () => 
           {VALIDATION_STEPS.map((step, i) => (
             <div
               key={step.label}
-              className={`flex items-center gap-3 rounded-lg border-2 p-3 transition-colors ${
-                i < stepIndex
+              className={`flex items-center gap-3 rounded-lg border-2 p-3 transition-colors ${i < stepIndex
                   ? 'border-success bg-success/10'
                   : i === stepIndex
-                  ? 'border-primary bg-primary/5'
-                  : 'border-border bg-muted/30'
-              }`}
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border bg-muted/30'
+                }`}
             >
               {i < stepIndex ? (
                 <CheckCircle2 className="w-5 h-5 text-success shrink-0" />
@@ -66,9 +65,8 @@ export function WelcomeValidationAnimation({ onComplete }: { onComplete?: () => 
                 <div className="w-5 h-5 rounded-full border-2 border-muted-foreground/30 shrink-0" />
               )}
               <span
-                className={`text-sm font-medium ${
-                  i <= stepIndex ? 'text-foreground' : 'text-muted-foreground'
-                }`}
+                className={`text-sm font-medium ${i <= stepIndex ? 'text-foreground' : 'text-muted-foreground'
+                  }`}
               >
                 {step.label}
               </span>

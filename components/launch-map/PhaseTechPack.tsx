@@ -724,7 +724,7 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
                 </div>
                 {!isEditMode && (
                   <Button onClick={handleContinueFromStep3} disabled={!uploadedMockupUrl || isAddingDesign} className="w-full h-11 text-sm font-bold shadow-apple">
-                    {isAddingDesign ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Initialisation...</> : 'Initialiser avec cette image'}
+                    {isAddingDesign ? <><Loader2 className="w-4 h-4 animate-spin mr-2" /> Assemblage des calques...</> : 'Initialiser avec cette image'}
                   </Button>
                 )}
               </CardContent>
@@ -877,7 +877,7 @@ export function PhaseTechPack({ brandId, brand, onComplete, standalone }: PhaseT
                 className={`gap-2 ${isEditMode ? 'flex-1' : 'w-full'}`}
               >
                 {saving ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Enregistrement...</>
+                  <><Loader2 className="w-4 h-4 animate-spin" /> Ciselage du pack technique...</>
                 ) : isEditMode ? (
                   'Enregistrer les modifications'
                 ) : (

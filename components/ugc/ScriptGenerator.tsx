@@ -318,7 +318,7 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
                     {isGenerating ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Génération en cours...
+                        Tressage des dialogues...
                       </>
                     ) : (
                       <>
@@ -333,7 +333,7 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
             </CardContent>
           </Card>
 
-          <GenerationLoadingPopup open={isGenerating} title="Génération des scripts en cours…" />
+          <GenerationLoadingPopup open={isGenerating} title="Écriture de vos scénarios viraux..." />
           <ConfirmGenerateModal
             open={showConfirmGenerate}
             onClose={() => setShowConfirmGenerate(false)}
@@ -489,7 +489,8 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
             </Card>
           )}
         </>
-      )}
-    </div>
+      )
+      }
+    </div >
   );
 }

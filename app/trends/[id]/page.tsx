@@ -21,12 +21,14 @@ import { EditTrendKpis } from '@/components/trends/EditTrendKpis';
 import { ProductDetailEnricher } from '@/components/trends/ProductDetailEnricher';
 import { BackToTrendsButton } from '@/components/trends/BackToTrendsButton';
 import { VisualTrendScanner } from '@/components/trends/VisualTrendScanner';
+import { UsageBadge } from '@/components/trends/UsageBadge';
 import {
   inferComplexityScore,
   inferSustainabilityScore,
   computeSaturability,
   computeTrendScore,
   estimateInternalTrendPercent,
+  inferSmartDefaults,
 } from '@/lib/trend-product-kpis';
 import { isRetailerBrand } from '@/lib/constants/retailer-exclusion';
 import { getBaseUrl, cn } from '@/lib/utils';
@@ -55,14 +57,15 @@ export default async function ProductDetailPage({
   const isFree = user.plan === 'free';
   const shouldLockTrend = isFree && !isFeatured;
 
-  // Plan gratuit : max 3 analyses/mois (pour les produits non à la une ou pour l'analyseur)
-  if (isFree && !isFeatured) {
-    const checkImage = await getFeatureCountThisMonth(user.id, 'trends_check_image');
-    const analyse = await getFeatureCountThisMonth(user.id, 'trends_analyse');
-    const detailView = await getFeatureCountThisMonth(user.id, 'trends_detail_view');
-    if (checkImage + analyse + detailView >= 3) {
-      redirect('/trends?limit=reached');
-    }
+  // Quotas réels : 3 / mois pour gratuit, 10 / mois pour Créateur
+  const checkImage = await getFeatureCountThisMonth(user.id, 'trends_check_image');
+  const analyse = await getFeatureCountThisMonth(user.id, 'trends_analyse');
+  const detailView = await getFeatureCountThisMonth(user.id, 'trends_detail_view');
+  const analysesCount = checkImage + analyse + detailView;
+  const maxAnalyses = isFree ? 3 : 10;
+
+  if (!isFeatured && analysesCount >= maxAnalyses) {
+    redirect('/trends?limit=reached');
   }
 
   const product = await prisma.trendProduct.findUnique({
@@ -114,7 +117,7 @@ export default async function ProductDetailPage({
 
   // KPIs calculés ou depuis la BDD
   // Complexité fabrication : priorité à l'IA, fallback note interne (heuristique matière/description)
-  const rawComplexity = product.complexityScore ?? inferComplexityScore(product.material, product.description);
+  const rawComplexity = product.complexityScore ?? inferComplexityScore(product.material, product.description, product.category);
   const complexityScore = rawComplexity === 'Différent' || rawComplexity?.toLowerCase() === 'different' ? 'Complexe' : rawComplexity;
   const sustainabilityScore = product.sustainabilityScore ?? inferSustainabilityScore(product.material, product.description);
 
@@ -137,10 +140,10 @@ export default async function ProductDetailPage({
 
   const infoRows: { label: string; value: string | React.ReactNode }[] = [
     { label: 'Catégorie', value: product.category },
-    { label: 'Style', value: product.style || '—' },
-    { label: 'Matière', value: (product.material && product.material !== 'Non spécifié') ? product.material : '—' },
-    { label: 'Couleur', value: product.color || '—' },
-    { label: 'Entretien', value: product.careInstructions || '—' },
+    { label: 'Style', value: product.style || inferSmartDefaults(product.category, 'style') },
+    { label: 'Matière', value: (product.material && product.material !== 'Non spécifié') ? product.material : inferSmartDefaults(product.category, 'material') },
+    { label: 'Couleur', value: product.color || inferSmartDefaults(product.category, 'color') },
+    { label: 'Entretien', value: product.careInstructions || inferSmartDefaults(product.category, 'careInstructions') },
     { label: 'Segment', value: product.segment ? String(product.segment).charAt(0).toUpperCase() + product.segment.slice(1) : '—' },
     { label: 'Zone marché', value: product.marketZone || '—' },
     { label: 'Marque', value: displayBrand },
@@ -172,7 +175,6 @@ export default async function ProductDetailPage({
           <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.05] px-6 py-4">
             <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
               <div className="flex items-center gap-4 min-w-0">
-                <BackToTrendsButton />
                 <div className="min-w-0">
                   <h1 className="text-xl font-bold tracking-tight text-[#1D1D1F] truncate leading-tight">
                     {product.name}

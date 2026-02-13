@@ -45,8 +45,15 @@ export async function generateUGCScripts(
         identityContext += `Couleurs de la marque : ${colors}. `;
       }
     }
-    if (brandIdentity.styleGuide) {
-      identityContext += `Style guide : ${JSON.stringify(brandIdentity.styleGuide)}. `;
+
+    const styleGuide = brandIdentity.styleGuide as any;
+    if (styleGuide) {
+      identityContext += `Style guide de base : ${JSON.stringify(styleGuide)}. `;
+
+      // Injecter la MÉMOIRE DE VIRGIL (Insights DA)
+      if (styleGuide.virgilInsights) {
+        identityContext += `\n[MÉMOIRE VIRGIL (Insights Directeur Artistique)] : ${JSON.stringify(styleGuide.virgilInsights)}. `;
+      }
     }
   }
 
@@ -726,13 +733,17 @@ ${marketSignals}
 Règles JSON strictes:
 - "businessAnalysis": Analyse stratégique focalisée sur la Vitesse Sociale et la demande (TikTok trends, Aesthetics). Pourquoi l'algorithme Outfity a-t-il détecté ce produit ? (en français).
 - "dominantAttribute": Le "Killer Detail" qui déclenche l'achat impulsif ou la viralité (ex: "Le délavage Vintage Wash qui domine actuellement sur TikTok").
-- "style": Style précis (Streetwear, Minimaliste, Luxury, Y2K, Gorpcore, Workwear, Old Money, Clean Girl).
-- "complexityScore": "Facile" | "Moyen" | "Complexe".
+- "style": Style précis (Streetwear, Minimaliste, Luxury, Y2K, Gorpcore, Workwear, Old Money, Clean Girl, Quiet Luxury).
+- "complexityScore": "Facile" | "Moyen" | "Complexe". Estéme la difficulté technique réelle.
 - "estimatedCogsPercent": Coût de prod estimé (15-50%).
 - "sustainabilityScore": Note ESG (0-100).
 - "visualAttractivenessScore": Note IVS (Indice de Viralité Sociale) de 0 à 100 avec précision.
 - "category": Type exact (Hoodie, Cargo, Veste, etc.). Jamais "Autre".
-- "shorten": Si vrai, rédige une analyse business très concise (1-2 phrases).`;
+- "material": Si non spécifié, déduis la matière la plus probable selon le visuel (ex: "Coton lourd", "Nylon Ripstop", "Laine mélangée").
+- "careInstructions": Instructions d'entretien standard pour ce type d'article.
+- "shorten": Si vrai, rédige une analyse business très concise (1-2 phrases).
+
+IMPORTANT: Ne laisse JAMAIS de champ vide. Utilise ton expertise mode pour déduire les caractéristiques les plus probables si elles ne sont pas écrites explicitement. Ton analyse doit être "bold" (audacieuse) et experte.`;
 
   const userContent = [
     `Produit: ${product.name}`,

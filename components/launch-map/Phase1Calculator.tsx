@@ -893,7 +893,7 @@ export function Phase1Calculator({ brandId, brand, initialData, onComplete }: Ph
 
             <div className="flex justify-end pt-2">
               <Button onClick={handleSave} disabled={isSaving || sellingPriceNum === 0} className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                {isSaving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Sauvegarde…</> : isCompleted ? 'Enregistrer les modifications' : 'Valider cette étape'}
+                {isSaving ? <><Loader2 className="w-4 h-4 animate-spin mr-2" />Archivage du scénario financier…</> : isCompleted ? 'Enregistrer les modifications' : 'Valider cette étape'}
               </Button>
             </div>
           </CardContent>

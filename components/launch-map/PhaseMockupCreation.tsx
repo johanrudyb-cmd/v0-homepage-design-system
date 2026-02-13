@@ -59,8 +59,9 @@ export function PhaseMockupCreation({ brandId, brand, onComplete }: PhaseMockupC
         </CardHeader>
         <CardContent>
           {isLoadingRecommendations ? (
-            <div className="flex items-center justify-center py-6">
+            <div className="flex flex-col items-center justify-center py-6 gap-2">
               <Loader2 className="w-5 h-5 animate-spin text-primary" />
+              <p className="text-xs text-muted-foreground">Analyse des lignes et des coupes...</p>
             </div>
           ) : recommendations.length > 0 ? (
             <ul className="space-y-2">

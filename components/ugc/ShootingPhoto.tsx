@@ -579,7 +579,7 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
     <div className="space-y-6">
       <GenerationLoadingPopup
         open={isGenerating}
-        title={shootingMode === 'product' ? 'Génération des 4 photos produit…' : 'Génération de la photo shooting…'}
+        title={shootingMode === 'product' ? 'Développement de votre catalogue...' : 'Capture de votre vision créative...'}
       />
       <Card className="border-2">
         <CardHeader>
@@ -599,22 +599,22 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
               <Button
                 type="button"
                 variant={shootingMode === 'product' ? 'default' : 'outline'}
-                size="lg"
+                size="sm"
                 onClick={() => { setShootingMode('product'); setResult(null); setResultProductUrls([]); setLastRealizationDetails(null); }}
-                className="gap-2"
+                className="gap-2 text-xs"
               >
-                <Shirt className="w-4 h-4" />
-                Shooting produit uniquement
+                <Shirt className="w-3.5 h-3.5" />
+                Shooting produit
               </Button>
               <Button
                 type="button"
                 variant={shootingMode === 'mannequin' ? 'default' : 'outline'}
-                size="lg"
+                size="sm"
                 onClick={() => { setShootingMode('mannequin'); setResult(null); setResultProductUrls([]); setLastRealizationDetails(null); }}
-                className="gap-2"
+                className="gap-2 text-xs"
               >
-                <ImageIcon className="w-4 h-4" />
-                Shooting avec mannequin
+                <ImageIcon className="w-3.5 h-3.5" />
+                Shooting mannequin
               </Button>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
@@ -631,7 +631,7 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
             {loadingDesigns ? (
               <p className="text-sm text-muted-foreground flex items-center gap-2 py-4">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Chargement de votre collection…
+                Déballage de votre collection…
               </p>
             ) : designs.length > 0 ? (
               <div className="flex flex-wrap gap-3 mb-3">
@@ -649,10 +649,10 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                         setUploadedFile(null);
                       }}
                       className={cn(
-                        'rounded-xl border-2 p-2 text-left transition-all w-28 overflow-hidden',
+                        'rounded-lg border-[1.5px] p-1.5 text-left transition-all w-24 overflow-hidden',
                         selected
-                          ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
-                          : 'border-border hover:border-primary/50 bg-muted/20'
+                          ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                          : 'border-border hover:border-primary/50 bg-muted/10'
                       )}
                       disabled={isGenerating}
                     >
@@ -753,8 +753,8 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                   >
                     {isGenerating ? (
                       <>
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                        Génération des 4 photos en cours…
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Développement des clichés...
                       </>
                     ) : (
                       <>
@@ -789,7 +789,7 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                 {loadingMannequins ? (
                   <p className="text-sm text-muted-foreground flex items-center gap-2">
                     <Loader2 className="w-4 h-4 animate-spin" />
-                    Chargement des mannequins…
+                    Préparation des mannequins…
                   </p>
                 ) : mannequins.length === 0 ? (
                   <div className="rounded-xl border-2 border-dashed border-border bg-muted/20 p-6 text-center">
@@ -823,10 +823,10 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                             if (wasSingle !== nowSingle) setMannequinPoseOptional('');
                           }}
                           className={cn(
-                            'rounded-xl border-2 p-2 text-left transition-all w-28 overflow-hidden',
+                            'rounded-lg border-[1.5px] p-1.5 text-left transition-all w-24 overflow-hidden',
                             selected
-                              ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
-                              : 'border-border hover:border-primary/50 bg-muted/20'
+                              ? 'border-primary bg-primary/5 ring-1 ring-primary/20'
+                              : 'border-border hover:border-primary/50 bg-muted/10'
                           )}
                           disabled={isGenerating}
                         >
@@ -847,7 +847,7 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                     <button
                       type="button"
                       onClick={() => setShowAddMannequinUpload(true)}
-                      className="w-28 rounded-xl border-2 border-dashed border-border bg-muted/20 p-4 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all"
+                      className="w-24 h-full rounded-lg border-2 border-dashed border-border bg-muted/10 p-2 flex flex-col items-center justify-center gap-1 text-muted-foreground hover:border-primary/50 hover:text-foreground transition-all"
                     >
                       <UserPlus className="w-6 h-6" />
                       <span className="text-xs font-medium">Ajouter</span>
@@ -856,17 +856,17 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                 )}
 
                 {showAddMannequinUpload && (
-                  <Card className="mt-4 p-4 bg-muted/20">
-                    <p className="text-sm font-medium mb-2">Nouveau mannequin (photo)</p>
-                    <div className="flex flex-wrap gap-3 items-end">
+                  <Card className="mt-2 p-3 bg-muted/20">
+                    <p className="text-xs font-medium mb-2">Nouveau mannequin (photo)</p>
+                    <div className="flex flex-wrap gap-2 items-end">
                       <div>
-                        <label className="block text-xs text-muted-foreground mb-1">Nom</label>
+                        <label className="block text-[10px] text-muted-foreground mb-0.5">Nom</label>
                         <input
                           type="text"
                           value={newMannequinName}
                           onChange={(e) => setNewMannequinName(e.target.value)}
                           placeholder="Ex. Emma"
-                          className="rounded-md border border-input bg-background px-3 py-2 text-sm w-40"
+                          className="rounded-md border border-input bg-background px-2 py-1 text-xs w-32"
                         />
                       </div>
                       <div>
@@ -874,13 +874,13 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                           type="file"
                           accept="image/*"
                           onChange={(e) => setNewMannequinFile(e.target.files?.[0] ?? null)}
-                          className="text-sm"
+                          className="text-xs max-w-[180px]"
                         />
                       </div>
-                      <Button size="sm" onClick={handleAddMannequinFromUpload} disabled={savingMannequin || !newMannequinName.trim() || !newMannequinFile}>
-                        {savingMannequin ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Enregistrer'}
+                      <Button size="sm" className="h-7 text-xs px-2" onClick={handleAddMannequinFromUpload} disabled={savingMannequin || !newMannequinName.trim() || !newMannequinFile}>
+                        {savingMannequin ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Enregistrer'}
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => { setShowAddMannequinUpload(false); setNewMannequinFile(null); setNewMannequinName(''); }}>
+                      <Button size="sm" variant="ghost" className="h-7 text-xs px-2" onClick={() => { setShowAddMannequinUpload(false); setNewMannequinFile(null); setNewMannequinName(''); }}>
                         Annuler
                       </Button>
                     </div>
@@ -890,297 +890,319 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
 
               {/* Ce que vous voulez que le mannequin fasse (libre) */}
               <div>
-                <label className="block text-sm font-semibold text-foreground mb-2">Décrivez ce que vous voulez que le mannequin fasse</label>
-                <p className="text-xs text-muted-foreground mb-1">Pose, action, expression… en quelques mots. Facultatif.</p>
+                <label className="block text-xs font-semibold text-foreground mb-1">Instruction libre (pose, action...)</label>
                 <textarea
                   value={mannequinInstruction}
                   onChange={(e) => setMannequinInstruction(e.target.value)}
-                  placeholder="Ex. : regard caméra, sourire léger, main dans la poche, marche dynamique…"
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm min-h-[80px] resize-y"
+                  placeholder="Ex. : regard caméra, sourire léger, main dans la poche..."
+                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-xs min-h-[50px] resize-y"
                   disabled={isGenerating}
                 />
               </div>
 
               {/* Options facultatives : pose 1 mannequin ou groupe (2–3) */}
-              <div>
-                <label className="block text-sm font-semibold text-foreground mb-1">Options facultatives</label>
+              <div className="mb-2">
+                <label className="block text-xs font-semibold text-foreground mb-1">Poses suggérées (facultatif)</label>
                 {selectedMannequinIds.length <= 1 ? (
-                  <>
-                    <p className="text-xs text-muted-foreground mb-2">Pose pour un mannequin (optionnel).</p>
-                    <div className="flex flex-wrap gap-2">
-                      {MANNEQUIN_POSE_OPTIONS.map((o) => (
-                        <Button
-                          key={o.id}
-                          type="button"
-                          variant={mannequinPoseOptional === o.id ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setMannequinPoseOptional(mannequinPoseOptional === o.id ? '' : o.id)}
-                          disabled={isGenerating}
-                        >
-                          {o.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </>
+                  <div className="flex flex-wrap gap-1">
+                    {MANNEQUIN_POSE_OPTIONS.map((o) => (
+                      <button
+                        key={o.id}
+                        type="button"
+                        onClick={() => setMannequinPoseOptional(mannequinPoseOptional === o.id ? '' : o.id)}
+                        className={cn(
+                          "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                          mannequinPoseOptional === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                        )}
+                        disabled={isGenerating}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
                 ) : (
-                  <>
-                    <p className="text-xs text-muted-foreground mb-2">Poses pour {selectedMannequinIds.length} mannequins (optionnel).</p>
-                    <div className="flex flex-wrap gap-2">
-                      {MANNEQUIN_GROUP_POSE_OPTIONS.map((o) => (
-                        <Button
-                          key={o.id}
-                          type="button"
-                          variant={mannequinPoseOptional === o.id ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setMannequinPoseOptional(mannequinPoseOptional === o.id ? '' : o.id)}
-                          disabled={isGenerating}
-                        >
-                          {o.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </>
+                  <div className="flex flex-wrap gap-1">
+                    {MANNEQUIN_GROUP_POSE_OPTIONS.map((o) => (
+                      <button
+                        key={o.id}
+                        type="button"
+                        onClick={() => setMannequinPoseOptional(mannequinPoseOptional === o.id ? '' : o.id)}
+                        className={cn(
+                          "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                          mannequinPoseOptional === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                        )}
+                        disabled={isGenerating}
+                      >
+                        {o.label}
+                      </button>
+                    ))}
+                  </div>
                 )}
               </div>
 
               {/* Paramètres du shooting : format, lieu, éclairage, fond, cadrage, ambiance (comme en studio photo) */}
               <Card className="bg-muted/20 border-2 border-border">
-                <CardHeader className="pb-2">
+                <CardHeader className="py-2 px-4">
                   <CardTitle className="text-sm font-semibold flex items-center gap-2">
-                    <Info className="w-4 h-4 text-primary" />
-                    Paramètres du shooting (studio photo)
+                    <Info className="w-3.5 h-3.5 text-primary" />
+                    Studio Photo
                   </CardTitle>
-                  <CardDescription className="text-xs">
-                    Choisissez les options pour que chaque photo soit unique et précise : format, lieu, éclairage, fond, cadrage, ambiance.
-                  </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4 text-sm">
-                  <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1">Format de la photo</label>
-                    <div className="flex flex-wrap gap-2">
-                      {ASPECT_RATIO_OPTIONS.map((o) => (
-                        <Button
-                          key={o.id}
-                          type="button"
-                          variant={aspectRatio === o.id ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setAspectRatio(o.id)}
-                          disabled={isGenerating}
-                        >
-                          {o.label}
-                        </Button>
-                      ))}
+                <CardContent className="space-y-3 px-4 pb-4 text-sm">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Format</label>
+                      <div className="flex flex-wrap gap-1">
+                        {ASPECT_RATIO_OPTIONS.map((o) => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            onClick={() => setAspectRatio(o.id)}
+                            className={cn(
+                              "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                              aspectRatio === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                            )}
+                            disabled={isGenerating}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Cadrage</label>
+                      <div className="flex flex-wrap gap-1">
+                        {FRAMING_OPTIONS.map((o) => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            onClick={() => setFraming(o.id)}
+                            className={cn(
+                              "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                              framing === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                            )}
+                            disabled={isGenerating}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
+
                   <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1">Lieu</label>
-                    <div className="flex flex-wrap gap-2">
+                    <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Lieu</label>
+                    <div className="flex flex-wrap gap-1">
                       {LOCATION_OPTIONS.map((o) => (
-                        <Button
+                        <button
                           key={o.id}
                           type="button"
-                          variant={location === o.id ? 'default' : 'outline'}
-                          size="sm"
                           onClick={() => setLocation(o.id)}
+                          className={cn(
+                            "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                            location === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                          )}
                           disabled={isGenerating}
                         >
                           {o.label}
-                        </Button>
+                        </button>
                       ))}
                     </div>
                     {location === 'outdoor' && (
-                      <div className="mt-2">
-                        <label className="block text-xs font-medium text-muted-foreground mb-1">Type d&apos;extérieur</label>
-                        <div className="flex flex-wrap gap-2">
-                          {OUTDOOR_OPTIONS.map((o) => (
-                            <Button
-                              key={o.id}
-                              type="button"
-                              variant={outdoorType === o.id ? 'default' : 'outline'}
-                              size="sm"
-                              onClick={() => setOutdoorType(o.id)}
-                              disabled={isGenerating}
-                            >
-                              {o.label}
-                            </Button>
-                          ))}
-                        </div>
+                      <div className="mt-1 flex flex-wrap gap-1">
+                        {OUTDOOR_OPTIONS.map((o) => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            onClick={() => setOutdoorType(o.id)}
+                            className={cn(
+                              "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                              outdoorType === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                            )}
+                            disabled={isGenerating}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
                       </div>
                     )}
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1">Éclairage</label>
-                    <div className="flex flex-wrap gap-2">
-                      {LIGHTING_OPTIONS.map((o) => (
-                        <Button
-                          key={o.id}
-                          type="button"
-                          variant={lighting === o.id ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setLighting(o.id)}
-                          disabled={isGenerating}
-                        >
-                          {o.label}
-                        </Button>
-                      ))}
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Éclairage</label>
+                      <div className="flex flex-wrap gap-1">
+                        {LIGHTING_OPTIONS.map((o) => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            onClick={() => setLighting(o.id)}
+                            className={cn(
+                              "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                              lighting === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                            )}
+                            disabled={isGenerating}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Fond</label>
+                      <div className="flex flex-wrap gap-1">
+                        {BACKGROUND_OPTIONS.map((o) => (
+                          <button
+                            key={o.id}
+                            type="button"
+                            onClick={() => setBackground(o.id)}
+                            className={cn(
+                              "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                              background === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                            )}
+                            disabled={isGenerating}
+                          >
+                            {o.label}
+                          </button>
+                        ))}
+                      </div>
                     </div>
                   </div>
+
                   <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1">Fond</label>
-                    <div className="flex flex-wrap gap-2">
-                      {BACKGROUND_OPTIONS.map((o) => (
-                        <Button
-                          key={o.id}
-                          type="button"
-                          variant={background === o.id ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setBackground(o.id)}
-                          disabled={isGenerating}
-                        >
-                          {o.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1">Cadrage / pose</label>
-                    <div className="flex flex-wrap gap-2">
-                      {FRAMING_OPTIONS.map((o) => (
-                        <Button
-                          key={o.id}
-                          type="button"
-                          variant={framing === o.id ? 'default' : 'outline'}
-                          size="sm"
-                          onClick={() => setFraming(o.id)}
-                          disabled={isGenerating}
-                        >
-                          {o.label}
-                        </Button>
-                      ))}
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-foreground mb-1">Ambiance</label>
-                    <div className="flex flex-wrap gap-2">
+                    <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Ambiance</label>
+                    <div className="flex flex-wrap gap-1">
                       {MOOD_OPTIONS.map((o) => (
-                        <Button
+                        <button
                           key={o.id}
                           type="button"
-                          variant={mood === o.id ? 'default' : 'outline'}
-                          size="sm"
                           onClick={() => setMood(o.id)}
+                          className={cn(
+                            "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                            mood === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                          )}
                           disabled={isGenerating}
                         >
                           {o.label}
-                        </Button>
+                        </button>
                       ))}
                     </div>
                   </div>
 
-                  <div className="pt-2 border-t border-border">
-                    <p className="font-xs font-bold uppercase tracking-wider text-muted-foreground mb-2">Détails de Personnage (Realism+)</p>
-                    <div className="space-y-4">
+                  <details className="group">
+                    <summary className="cursor-pointer text-xs font-medium text-primary hover:underline py-1 flex items-center gap-1">
+                      <span className="group-open:rotate-90 transition-transform">▸</span> Options avancées (Personnage & Détails)
+                    </summary>
+                    <div className="pt-2 pl-2 border-l-2 border-muted ml-1 mt-1 space-y-3">
                       <div>
-                        <label className="block text-xs font-semibold text-foreground mb-1">Coiffure</label>
-                        <div className="flex flex-wrap gap-2">
+                        <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Coiffure</label>
+                        <div className="flex flex-wrap gap-1">
                           {HAIR_OPTIONS.map((o) => (
-                            <Button
+                            <button
                               key={o.id}
                               type="button"
-                              variant={hair === o.id ? 'default' : 'outline'}
-                              size="sm"
                               onClick={() => setHair(o.id)}
+                              className={cn(
+                                "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                                hair === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                              )}
                               disabled={isGenerating}
                             >
                               {o.label}
-                            </Button>
+                            </button>
                           ))}
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-foreground mb-1">Maquillage</label>
-                        <div className="flex flex-wrap gap-2">
+                        <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Maquillage</label>
+                        <div className="flex flex-wrap gap-1">
                           {MAKEUP_OPTIONS.map((o) => (
-                            <Button
+                            <button
                               key={o.id}
                               type="button"
-                              variant={makeup === o.id ? 'default' : 'outline'}
-                              size="sm"
                               onClick={() => setMakeup(o.id)}
+                              className={cn(
+                                "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                                makeup === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                              )}
                               disabled={isGenerating}
                             >
                               {o.label}
-                            </Button>
+                            </button>
                           ))}
                         </div>
                       </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-foreground mb-1">Accessoires</label>
-                        <div className="flex flex-wrap gap-2">
-                          {ACCESSORIES_OPTIONS.map((o) => (
-                            <Button
-                              key={o.id}
-                              type="button"
-                              variant={selectedAccessories.includes(o.id) ? 'default' : 'outline'}
-                              size="sm"
-                              onClick={() => setSelectedAccessories(prev => prev.includes(o.id) ? prev.filter(id => id !== o.id) : [...prev, o.id])}
-                              disabled={isGenerating}
-                            >
-                              {o.label}
-                            </Button>
-                          ))}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Accessoires</label>
+                          <div className="flex flex-wrap gap-1">
+                            {ACCESSORIES_OPTIONS.map((o) => (
+                              <button
+                                key={o.id}
+                                type="button"
+                                onClick={() => setSelectedAccessories(prev => prev.includes(o.id) ? prev.filter(id => id !== o.id) : [...prev, o.id])}
+                                className={cn(
+                                  "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                                  selectedAccessories.includes(o.id) ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                                )}
+                                disabled={isGenerating}
+                              >
+                                {o.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Props</label>
+                          <div className="flex flex-wrap gap-1">
+                            {PROPS_OPTIONS.map((o) => (
+                              <button
+                                key={o.id}
+                                type="button"
+                                onClick={() => setSelectedProps(prev => prev.includes(o.id) ? prev.filter(id => id !== o.id) : [...prev, o.id])}
+                                className={cn(
+                                  "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                                  selectedProps.includes(o.id) ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                                )}
+                                disabled={isGenerating}
+                              >
+                                {o.label}
+                              </button>
+                            ))}
+                          </div>
                         </div>
                       </div>
                       <div>
-                        <label className="block text-xs font-semibold text-foreground mb-1">Accessoires de scène (Props)</label>
-                        <div className="flex flex-wrap gap-2">
-                          {PROPS_OPTIONS.map((o) => (
-                            <Button
-                              key={o.id}
-                              type="button"
-                              variant={selectedProps.includes(o.id) ? 'default' : 'outline'}
-                              size="sm"
-                              onClick={() => setSelectedProps(prev => prev.includes(o.id) ? prev.filter(id => id !== o.id) : [...prev, o.id])}
-                              disabled={isGenerating}
-                            >
-                              {o.label}
-                            </Button>
-                          ))}
-                        </div>
-                      </div>
-                      <div>
-                        <label className="block text-xs font-semibold text-foreground mb-1">Finition Caméra</label>
-                        <div className="flex flex-wrap gap-2">
+                        <label className="block text-[10px] font-bold uppercase text-muted-foreground mb-1">Finition Caméra</label>
+                        <div className="flex flex-wrap gap-1">
                           {CAMERA_FINISH_OPTIONS.map((o) => (
-                            <Button
+                            <button
                               key={o.id}
                               type="button"
-                              variant={cameraFinish === o.id ? 'default' : 'outline'}
-                              size="sm"
                               onClick={() => setCameraFinish(o.id)}
+                              className={cn(
+                                "px-2 py-1 rounded text-[10px] font-medium transition-colors border",
+                                cameraFinish === o.id ? "bg-primary text-primary-foreground border-primary" : "bg-background hover:bg-muted border-input"
+                              )}
                               disabled={isGenerating}
                             >
                               {o.label}
-                            </Button>
+                            </button>
                           ))}
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </details>
 
                   <div className="pt-2 border-t border-border">
-                    <p className="font-medium text-foreground mb-1">Récap de votre shooting</p>
-                    <ul className="space-y-1 text-xs text-muted-foreground">
-                      <li><span className="text-foreground">Mannequin(s) :</span> {selectedMannequinIds.length > 0 ? selectedMannequinIds.map((id) => mannequins.find((m) => m.id === id)?.name ?? '—').join(', ') : '—'}</li>
-                      <li><span className="text-foreground">Vêtement :</span> {selectedDesignId ? (() => { const d = designs.find((x) => x.id === selectedDesignId); return d ? getDesignDisplayName(d) : '—'; })() : uploadedFile ? uploadedFile.name : '—'}</li>
-                      <li><span className="text-foreground">Style :</span> {getOptionLabel(HAIR_OPTIONS, hair)} · {getOptionLabel(MAKEUP_OPTIONS, makeup)}</li>
-                      <li><span className="text-foreground">Lieu :</span> {getOptionLabel(LOCATION_OPTIONS, location)}{location === 'outdoor' ? ` (${getOptionLabel(OUTDOOR_OPTIONS, outdoorType)})` : ''}</li>
-                      <li><span className="text-foreground">Finition :</span> {getOptionLabel(CAMERA_FINISH_OPTIONS, cameraFinish)}</li>
+                    <p className="font-medium text-xs text-foreground mb-1">Récapitulatif</p>
+                    <ul className="space-y-0.5 text-[10px] text-muted-foreground">
+                      <li>Mannequin(s) : <span className="text-foreground">{selectedMannequinIds.length > 0 ? selectedMannequinIds.map((id) => mannequins.find((m) => m.id === id)?.name ?? '—').join(', ') : '—'}</span></li>
+                      <li>Vêtement : <span className="text-foreground">{selectedDesignId ? (() => { const d = designs.find((x) => x.id === selectedDesignId); return d ? getDesignDisplayName(d) : '—'; })() : uploadedFile ? uploadedFile.name : '—'}</span></li>
                     </ul>
                   </div>
                 </CardContent>
               </Card>
-
               {error && (
                 <div className="p-3 text-sm text-destructive bg-destructive/10 rounded-lg">{error}</div>
               )}
@@ -1207,7 +1229,7 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                       {isGenerating ? (
                         <>
                           <Loader2 className="w-4 h-4 animate-spin" />
-                          Génération en cours…
+                          Mise au point de l'objectif...
                         </>
                       ) : (
                         <>
