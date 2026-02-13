@@ -26,15 +26,22 @@ export async function GET(request: NextRequest) {
     const targetUrl = new URL(url);
     const origin = targetUrl.origin;
 
+    // Logique de Referer intelligent
+    let referer = origin + '/';
+    if (url.includes('asos')) {
+      referer = 'https://www.asos.com/';
+    } else if (url.includes('zalando')) {
+      referer = origin + '/';
+    }
+
     const res = await fetch(url, {
       headers: {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
         'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
         'Accept-Language': 'fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7',
         'Cache-Control': 'no-cache',
         'Pragma': 'no-cache',
-        'Referer': origin + '/',
-        'Origin': origin,
+        'Referer': referer,
         'Sec-Fetch-Dest': 'image',
         'Sec-Fetch-Mode': 'no-cors',
         'Sec-Fetch-Site': 'cross-site',
@@ -45,6 +52,12 @@ export async function GET(request: NextRequest) {
 
     if (!res.ok) {
       console.warn(`[proxy-image] Échec fetch: ${res.status} pour ${url}`);
+      // Tentative sans Referer si échec
+      if (referer) {
+        return fetch(url, {
+          headers: { 'User-Agent': 'Mozilla/5.0' }
+        });
+      }
       return new NextResponse(null, { status: res.status });
     }
 
