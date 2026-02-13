@@ -66,20 +66,20 @@ export function TrendsHero() {
           {/* Bandeau défilant avec logos de marques — Style Premium Apple */}
           <div className="relative mt-16 sm:mt-24 lg:mt-32">
             <div className="w-full py-8 bg-white overflow-hidden">
-              {/* Le masque dégradé pour faire pro */}
-              <div className="relative w-full flex overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_50px,_black_calc(100%-50px),transparent_100%)]">
+              {/* Le masque dégradé responsive */}
+              <div className="relative w-full flex overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_15%,_black_85%,transparent_100%)]">
 
                 {/* La bande qui défile */}
-                <div className="flex animate-infinite-scroll hover:[animation-play-state:paused]">
+                <div className="flex animate-infinite-scroll hover:[animation-play-state:paused] py-4">
                   {[...brands, ...brands, ...brands].map((brand, index) => (
                     <div
                       key={index}
-                      className="flex items-center justify-center mx-6 md:mx-14 w-24 md:w-40 flex-shrink-0 transition-all duration-500 hover:scale-110 opacity-40 hover:opacity-100"
+                      className="flex items-center justify-center flex-shrink-0 px-8 sm:px-12 md:px-20 transition-all duration-500 hover:scale-110 opacity-40 hover:opacity-100"
                     >
                       <img
                         src={brand.logo}
                         alt={brand.name}
-                        className="w-full h-auto object-contain grayscale mix-blend-multiply contrast-[1.5] brightness-[1.15]"
+                        className="h-6 sm:h-9 md:h-11 w-auto object-contain grayscale mix-blend-multiply contrast-[1.8] brightness-[1.2]"
                         style={{
                           transform: `scale(${isMobile ? brand.scaleMobile : brand.scaleDesktop})`
                         }}
