@@ -69,7 +69,7 @@ export function TrendsHero() {
               <div className="flex w-max animate-marquee-infinite">
                 {/* On duplique 2 fois pour un loop infini parfait */}
                 {[0, 1].map((i) => (
-                  <div key={i} className="flex items-center gap-10 sm:gap-24 px-5 sm:px-12">
+                  <div key={i} className="flex items-center gap-12 sm:gap-40 px-5 sm:px-16">
                     {brands.map((brand, index) => (
                       <div
                         key={`${i}-${index}`}
