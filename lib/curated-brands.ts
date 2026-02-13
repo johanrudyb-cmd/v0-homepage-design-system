@@ -157,6 +157,27 @@ export function getBrandLogoUrl(brandName: string, websiteUrl?: string | null): 
   const key = getBrandKey(brandName);
   const keyNorm = getBrandKeyNormalized(brandName);
 
+  // 0. Local Logos (Fichiers fournis par l'utilisateur)
+  const localLogos: Record<string, string> = {
+    'nike': '/images/brand-logos/nike.png',
+    'adidas': '/images/brand-logos/Adidas.png',
+    'zara': '/images/brand-logos/zara.PNG',
+    'h&m': '/images/brand-logos/H&M.png',
+    'uniqlo': '/images/brand-logos/uniqlo.png',
+    'mango': '/images/brand-logos/mango.png',
+    'corteiz': '/images/brand-logos/corteiz.png',
+    'trapstar': '/images/brand-logos/trapstar.png',
+    'minus two': '/images/brand-logos/Minus Two.png',
+    'stone island': '/images/brand-logos/Stone Island.png',
+    'carhartt': '/images/brand-logos/Carhartt.png',
+    'carhartt wip': '/images/brand-logos/Carhartt.png',
+    'jacquemus': '/images/brand-logos/jacquemus.png',
+    'massimo dutti': '/images/brand-logos/Massimo Dutti.png',
+  };
+
+  const localPath = localLogos[key] ?? localLogos[keyNorm] ?? localLogos[key.replace(/ /g, '')];
+  if (localPath) return localPath;
+
   // 1. BRAND_LOGOS (hardcoded)
   const fromMap =
     BRAND_LOGOS[key] ??

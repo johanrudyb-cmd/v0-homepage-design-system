@@ -7,24 +7,18 @@ import { ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const brands = [
-  { name: 'NIKE', domain: 'nike.com' },
-  { name: 'ADIDAS', domain: 'adidas.com' },
-  { name: 'ZARA', domain: 'zara.com' },
-  { name: 'H&M', domain: 'hm.com' },
-  { name: 'UNIQLO', domain: 'uniqlo.com' },
-  { name: 'PUMA', domain: 'puma.com' },
-  { name: 'THE NORTH FACE', domain: 'thenorthface.com' },
-  { name: 'NEW BALANCE', domain: 'newbalance.com' },
-  { name: 'LEVI\'S', domain: 'levi.com' },
-  { name: 'GUCCI', domain: 'gucci.com' },
-  { name: 'PRADA', domain: 'prada.com' },
-  { name: 'DIOR', domain: 'dior.com' },
-  { name: 'LOUIS VUITTON', domain: 'louisvuitton.com' },
-  { name: 'SUPREME', domain: 'supremenewyork.com' },
-  { name: 'CARHARTT', domain: 'carhartt.com' },
-  { name: 'BURBERRY', domain: 'burberry.com' },
-  { name: 'VERSACE', domain: 'versace.com' },
-  { name: 'LACOSTE', domain: 'lacoste.com' },
+  { name: 'NIKE', logo: '/images/brand-logos/nike.png', scale: 1.6 },
+  { name: 'ADIDAS', logo: '/images/brand-logos/Adidas.png', scale: 2.6 },
+  { name: 'ZARA', logo: '/images/brand-logos/zara.PNG', scale: 2.6 },
+  { name: 'H&M', logo: '/images/brand-logos/H&M.png', scale: 2.0 },
+  { name: 'UNIQLO', logo: '/images/brand-logos/uniqlo.png', scale: 3.2 },
+  { name: 'MANGO', logo: '/images/brand-logos/mango.png', scale: 1.1 },
+  { name: 'CORTEIZ', logo: '/images/brand-logos/corteiz.png', scale: 3.2 },
+  { name: 'TRAPSTAR', logo: '/images/brand-logos/trapstar.png', scale: 4.2 },
+  { name: 'STONE ISLAND', logo: '/images/brand-logos/Stone Island.png', scale: 3.2 },
+  { name: 'CARHARTT', logo: '/images/brand-logos/Carhartt.png', scale: 1.1 },
+  { name: 'JACQUEMUS', logo: '/images/brand-logos/jacquemus.png', scale: 1.1 },
+  { name: 'MASSIMO DUTTI', logo: '/images/brand-logos/Massimo Dutti.png', scale: 0.9 },
 ];
 
 export function TrendsHero() {
@@ -70,20 +64,18 @@ export function TrendsHero() {
               <div className="flex w-max animate-marquee-infinite">
                 {/* On duplique 2 fois pour un loop infini parfait avec translateX(-50%) */}
                 {[0, 1].map((i) => (
-                  <div key={i} className="flex items-center gap-8 sm:gap-16 px-4 sm:px-8">
+                  <div key={i} className="flex items-center gap-24 sm:gap-48 px-12 sm:px-24">
                     {brands.map((brand, index) => (
                       <div
                         key={`${i}-${index}`}
-                        className="flex-shrink-0 grayscale hover:grayscale-0 transition-all duration-500 hover:scale-110 opacity-40 hover:opacity-100"
+                        className="flex-shrink-0 transition-all duration-500 hover:scale-110 opacity-40 hover:opacity-100"
                       >
                         <img
-                          src={`https://logo.clearbit.com/${brand.domain}`}
+                          src={brand.logo}
                           alt={brand.name}
-                          className="h-6 sm:h-8 md:h-10 w-auto object-contain"
+                          className="h-6 sm:h-8 md:h-10 w-auto object-contain grayscale mix-blend-multiply contrast-[1.1] brightness-[1.05]"
+                          style={{ transform: `scale(${brand.scale || 1})` }}
                           loading="lazy"
-                          onError={(e) => {
-                            (e.target as HTMLElement).style.display = 'none';
-                          }}
                         />
                       </div>
                     ))}
