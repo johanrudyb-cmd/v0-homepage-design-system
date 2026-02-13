@@ -27,6 +27,8 @@ export interface LaunchMapOverviewProps {
   quoteCount: number;
   ugcCount: number;
   progressPercentage: number;
+  suppliers: any[];
+  weekEvents: any[];
   userPlan?: string;
 }
 
@@ -36,6 +38,8 @@ export function LaunchMapOverview({
   hasIdentity,
   designCount,
   progressPercentage,
+  suppliers = [],
+  weekEvents = [],
   userPlan = 'free',
 }: LaunchMapOverviewProps) {
   const progress: Record<string, boolean> = {
