@@ -12,13 +12,16 @@ import { SalesPricing } from '@/components/homepage/SalesPricing';
 import { FAQSection } from '@/components/homepage/FAQSection';
 import { CTASection } from '@/components/homepage/CTASection';
 import { Footer } from '@/components/homepage/Footer';
+import { getFeaturedTrends } from '@/lib/trends-data';
 
-export default function Home() {
+export default async function Home() {
+  const initialTrends = await getFeaturedTrends();
+
   return (
     <main className="min-h-screen bg-[#F5F5F7]">
       <AnimatedHeader />
       <TrendsHero />
-      <TrendsByMarket />
+      <TrendsByMarket initialTrends={initialTrends} />
       <TechPackShowcase />
       <StatsSection />
       <FashionGallery />

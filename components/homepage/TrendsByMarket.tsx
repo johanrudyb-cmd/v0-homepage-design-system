@@ -30,19 +30,19 @@ interface TrendProduct {
   trendGrowthPercent?: number;
 }
 
-export function TrendsByMarket() {
+export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct[] }) {
   const router = useRouter();
   const { data: session } = useSession();
   const user = session?.user as any;
   const [isVisible, setIsVisible] = useState(false);
-  const [trends, setTrends] = useState<TrendProduct[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [trends, setTrends] = useState<TrendProduct[]>(initialTrends || []);
+  const [loading, setLoading] = useState(!initialTrends);
   const [selectedAge, setSelectedAge] = useState<string>('18-24 ans');
   const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [selectedZone] = useState('Zone EU');
   const [sortBy] = useState('Meilleures tendances (score)');
   const [analysesCount, setAnalysesCount] = useState<number | null>(null);
-  const [homepageIds, setHomepageIds] = useState<Set<string>>(new Set());
+  const [homepageIds, setHomepageIds] = useState<Set<string>>(new Set(initialTrends?.map(t => t.id).filter(Boolean) as string[] || []));
   const [isSmallScreen, setIsSmallScreen] = useState(false);
 
   // Détecter la taille de l'écran (Mobile vs Desktop)
@@ -58,35 +58,42 @@ export function TrendsByMarket() {
   // Charger les tendances et les infos utilisateur
   useEffect(() => {
     const loadTrends = async () => {
-      setLoading(true);
-      try {
-        const trendsRes = await fetch('/api/trends/homepage-featured');
+      // Si on a déjà des tendances (via SSR), on ne recharge pas sauf si c'est vide
+      if (trends.length === 0) {
+        setLoading(true);
+        try {
+          const trendsRes = await fetch('/api/trends/homepage-featured');
 
-        if (trendsRes.ok) {
-          const trendsData = await trendsRes.json();
-          const trendsList = trendsData.trends || [];
-          setTrends(trendsList);
-          const ids = trendsList.map((t: TrendProduct) => t.id).filter(Boolean);
-          setHomepageIds(new Set(ids));
+          if (trendsRes.ok) {
+            const trendsData = await trendsRes.json();
+            const trendsList = trendsData.trends || [];
+            setTrends(trendsList);
+            const ids = trendsList.map((t: TrendProduct) => t.id).filter(Boolean);
+            setHomepageIds(new Set(ids));
+          }
+        } catch (error) {
+          console.error('Erreur lors du chargement des tendances:', error);
+        } finally {
+          setLoading(false);
         }
+      }
 
-        // Récupérer le nombre d'analyses ce mois pour les utilisateurs gratuits
-        if (user?.plan === 'free') {
+      // Toujours vérifier le quota d'analyses si plan free
+      if (user?.plan === 'free') {
+        try {
           const analysesRes = await fetch('/api/trends/analyses-count');
           if (analysesRes.ok) {
             const analysesData = await analysesRes.json();
             setAnalysesCount(analysesData.count || 0);
           }
+        } catch (e) {
+          console.error('Erreur quota analyses:', e);
         }
-      } catch (error) {
-        console.error('Erreur lors du chargement des tendances:', error);
-      } finally {
-        setLoading(false);
       }
     };
 
     loadTrends();
-  }, [user?.plan]);
+  }, [user?.plan, initialTrends]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(

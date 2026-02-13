@@ -37,7 +37,7 @@ interface HybridTrend {
   businessAnalysis: string | null;
 }
 
-export function TendancesContent() {
+export function TendancesContent({ initialData }: { initialData?: { trends: HybridTrend[]; summary: any } }) {
   const searchParams = useSearchParams();
   const router = useRouter();
   const brandFromUrl = searchParams.get('brand');
@@ -95,9 +95,9 @@ export function TendancesContent() {
   } | null>(null);
   const [savingPreview, setSavingPreview] = useState(false);
 
-  const [trends, setTrends] = useState<HybridTrend[]>([]);
-  const [totalTrends, setTotalTrends] = useState<number>(0);
-  const [trendsLoading, setTrendsLoading] = useState(true);
+  const [trends, setTrends] = useState<HybridTrend[]>(initialData?.trends || []);
+  const [totalTrends, setTotalTrends] = useState<number>(initialData?.summary?.total || 0);
+  const [trendsLoading, setTrendsLoading] = useState(!initialData);
   const { data: session } = useSession();
   const user = session?.user as any;
   const [zone, setZone] = useState<string>('EU');
@@ -153,6 +153,20 @@ export function TendancesContent() {
   const ASOS_18_24_SOURCE_ID = segment === 'femme' ? 'asos-18-24-femme' : 'asos-18-24-homme';
 
   const loadTrends = useCallback(async () => {
+    // Si on a des données initiales et que les filtres correspondent par défaut
+    // (segment homme, 18-24, sortBy best, zone EU), on saute le premier chargement
+    if (initialData &&
+      segment === 'homme' &&
+      ageRange === '18-24' &&
+      sortBy === 'best' &&
+      zone === 'EU' &&
+      !globalOnly &&
+      !brandFromUrl &&
+      trends.length > 0) {
+      console.log('[TendancesContent] Utilisation des données SSR initiales');
+      return;
+    }
+
     setTrendsLoading(true);
     try {
       const params = new URLSearchParams();
@@ -173,7 +187,7 @@ export function TendancesContent() {
     } finally {
       setTrendsLoading(false);
     }
-  }, [zone, ageRange, segment, sortBy, globalOnly, brandFromUrl]);
+  }, [zone, ageRange, segment, sortBy, globalOnly, brandFromUrl, initialData]);
 
   useEffect(() => {
     loadTrends();

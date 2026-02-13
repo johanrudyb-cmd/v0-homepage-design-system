@@ -3,6 +3,7 @@ import { TendancesContent } from '@/components/trends/TendancesContent';
 import { TrendsSubNav } from '@/components/trends/TrendsSubNav';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
+import { getHybridRadarTrends } from '@/lib/trends-data';
 
 export const metadata = {
   title: 'Tendances de la semaine',
@@ -14,6 +15,14 @@ export default async function TrendsPage() {
   if (!user) {
     redirect('/auth/signin');
   }
+
+  // Pré-charger les tendances par défaut (18-24 Homme par exemple) pour affichage instantané
+  const initialData = await getHybridRadarTrends({
+    segment: 'homme',
+    ageRange: '18-24',
+    sortBy: 'best',
+    limit: 50
+  });
 
   return (
     <DashboardLayout>
@@ -27,7 +36,7 @@ export default async function TrendsPage() {
           </p>
         </div>
         <TrendsSubNav active="classement" />
-        <TendancesContent />
+        <TendancesContent initialData={initialData} />
       </div>
     </DashboardLayout>
   );
