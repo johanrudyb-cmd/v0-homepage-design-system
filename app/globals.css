@@ -391,12 +391,12 @@
 }
 
 .animate-infinite-scroll {
-  animation: infinite-scroll 40s linear infinite;
+  animation: infinite-scroll 30s linear infinite;
 }
 
 @media (max-width: 768px) {
   .animate-infinite-scroll {
-    animation-duration: 25s;
+    animation-duration: 15s;
   }
 }
 
