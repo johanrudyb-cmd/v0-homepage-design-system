@@ -13,7 +13,6 @@ const brands = [
   { name: 'H&M', logo: '/images/brand-logos/H&M.png', scaleDesktop: 1.8, scaleMobile: 1.2 },
   { name: 'UNIQLO', logo: '/images/brand-logos/uniqlo.png', scaleDesktop: 2.8, scaleMobile: 1.8 },
   { name: 'MANGO', logo: '/images/brand-logos/mango.png', scaleDesktop: 1.1, scaleMobile: 0.9 },
-  { name: 'CORTEIZ', logo: '/images/brand-logos/corteiz.png', scaleDesktop: 2.8, scaleMobile: 1.8 },
   { name: 'TRAPSTAR', logo: '/images/brand-logos/trapstar.png', scaleDesktop: 3.8, scaleMobile: 2.2 },
   { name: 'STONE ISLAND', logo: '/images/brand-logos/Stone Island.png', scaleDesktop: 2.8, scaleMobile: 1.8 },
   { name: 'CARHARTT', logo: '/images/brand-logos/Carhartt.png', scaleDesktop: 1.4, scaleMobile: 1.0 },
