@@ -282,26 +282,36 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
 
               return (
                 <div key={product.id} className="group relative">
-                  <div className={`bg-white rounded-2xl sm:rounded-[32px] border border-[#F2F2F2] overflow-hidden transition-all duration-500 hover:scale-[1.02] hover:shadow-apple relative`}>
+                  <div
+                    className={cn(
+                      "bg-white rounded-[24px] overflow-hidden transition-all duration-500",
+                      "hover:scale-[1.03] hover:shadow-apple-lg hover:z-10",
+                      "shadow-apple border border-black/[0.03] relative flex flex-col h-full bg-white"
+                    )}
+                  >
                     {isFree && !isPubliclyVisible && (
-                      <div className="absolute inset-0 z-30 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md rounded-2xl sm:rounded-[32px] p-4 text-center">
-                        <Lock className="w-8 h-8 text-white mb-4 animate-pulse" />
+                      <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-[24px] p-6 text-center">
+                        <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-4 shadow-apple">
+                          <Lock className="w-6 h-6 text-white" />
+                        </div>
+                        <h4 className="text-sm font-bold text-black mb-2">Contenu Exclusif</h4>
                         <Link
-                          href="/auth/choose-plan"
-                          className="px-6 py-2.5 bg-white text-black rounded-full text-sm font-bold hover:bg-gray-100 shadow-xl transition-all active:scale-95"
+                          href="/auth/signup"
+                          className="px-6 py-2 bg-black text-white rounded-full text-xs font-bold hover:bg-black/90 transition-all active:scale-95 shadow-lg"
                         >
-                          Débloquer avec le plan Créateur
+                          S'inscrire gratuitement
                         </Link>
                       </div>
                     )}
-                    <div className={isFree && !isPubliclyVisible ? 'opacity-0' : ''}>
-                      {/* Image du produit */}
-                      <div className="relative aspect-[4/5] sm:aspect-square min-h-[250px] sm:min-h-0 bg-[#F5F5F7] overflow-hidden">
+
+                    <div className={cn("flex flex-col h-full", isFree && !isPubliclyVisible ? 'opacity-10' : '')}>
+                      {/* Image du produit avec overlay au hover */}
+                      <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F5F7]">
                         {product.imageUrl ? (
                           <img
                             src={product.imageUrl}
                             alt={product.name}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-apple group-hover:scale-110"
                             referrerPolicy="no-referrer"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
@@ -313,51 +323,75 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                           />
                         ) : (
                           <div className="w-full h-full flex items-center justify-center text-[#6e6e73]">
-                            <svg className="w-16 h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            <svg className="w-12 h-12 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
                           </div>
                         )}
 
-                        {/* Badge segment/zone */}
-                        <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-20">
-                          <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-[#000000] text-white text-[10px] sm:text-xs font-semibold">
-                            {segmentLabel} {product.zone}
+                        {/* Gradient Bottom Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                        {/* Badges Flottants */}
+                        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20">
+                          <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-black text-[9px] font-extrabold uppercase tracking-widest shadow-apple border border-black/5">
+                            {segmentLabel}
                           </span>
+                          {product.trendScore && product.trendScore > 85 && (
+                            <span className="px-2.5 py-1 rounded-full bg-[#FF3B30] text-white text-[9px] font-extrabold uppercase tracking-widest shadow-lg flex items-center gap-1">
+                              <Flame className="w-3 h-3 fill-current" />
+                              Hot
+                            </span>
+                          )}
                         </div>
+
+                        {/* IVS Score Float */}
+                        {product.trendScore && (
+                          <div className="absolute bottom-3 right-3 z-20">
+                            <div className="px-3 py-1.5 rounded-xl bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-apple-lg">
+                              <div className="text-[8px] font-bold uppercase tracking-tight text-white/60 mb-[-2px]">IVS Index</div>
+                              <div className="text-sm font-black tracking-tight">{product.trendScore}%</div>
+                            </div>
+                          </div>
+                        )}
                       </div>
 
-                      {/* Informations du produit */}
-                      <div className="p-3 sm:p-6 space-y-2 sm:space-y-3">
-                        <div className="flex items-center gap-2">
+                      {/* Content Section */}
+                      <div className="p-4 sm:p-5 flex flex-col flex-grow bg-white">
+                        <div className="flex items-start justify-between gap-2 mb-3">
+                          <div className="min-w-0 flex-1">
+                            <h3 className="text-sm sm:text-[15px] font-bold text-black leading-tight line-clamp-2 group-hover:text-[#007AFF] transition-colors">
+                              {product.name}
+                            </h3>
+                          </div>
                           <BrandLogo
                             logoUrl={getBrandLogoUrl(product.brand, getRefWebsite(product.brand))}
                             brandName={product.brand}
-                            className="w-8 h-8"
+                            className="w-7 h-7 grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-500 shrink-0"
                           />
-                          <div className="min-w-0">
-                            <h3 className="text-sm sm:text-lg font-semibold text-[#000000] mb-0.5 sm:mb-1 line-clamp-1 leading-tight">
-                              {product.name}
-                            </h3>
-                            <p className="text-[10px] sm:text-sm text-[#6e6e73] truncate">{product.category}</p>
-                            <p className="text-[10px] sm:text-sm text-[#6e6e73] font-medium truncate">{product.brand}</p>
-                          </div>
                         </div>
 
-                        {/* Bouton Analyser la tendance */}
-                        <button
-                          onClick={(e) => handleAnalyzeClick(e, product.id)}
-                          className={cn(
-                            'w-full px-3 py-2 sm:px-4 sm:py-3 rounded-full text-[10px] sm:text-sm font-semibold transition-all duration-200 group-hover:scale-[1.02] bg-[#000000] text-white hover:bg-[#1D1D1F]'
-                          )}
-                        >
-                          Analyser la tendance
-                        </button>
-                        {user?.plan === 'free' && analysesCount !== null && (
-                          <p className="text-xs text-center text-[#6e6e73]">
-                            {analysesCount}/3 analyses ce mois
-                          </p>
-                        )}
+                        <div className="flex items-center gap-2 mb-4">
+                          <span className="text-[11px] font-semibold text-[#6e6e73] bg-[#F5F5F7] px-2 py-0.5 rounded-md uppercase tracking-tighter">
+                            {product.category}
+                          </span>
+                          <span className="text-[11px] font-bold text-black/40">
+                            • {product.brand}
+                          </span>
+                        </div>
+
+                        <div className="mt-auto pt-4 border-t border-black/[0.03]">
+                          <button
+                            onClick={(e) => handleAnalyzeClick(e, product.id)}
+                            className={cn(
+                              "w-full group/btn relative overflow-hidden h-10 rounded-full text-xs font-bold transition-all duration-300",
+                              "bg-black text-white hover:bg-[#1D1D1F] active:scale-[0.98]",
+                              "flex items-center justify-center gap-2 shadow-apple"
+                            )}
+                          >
+                            <span className="relative z-10">Analyser la tendance</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>

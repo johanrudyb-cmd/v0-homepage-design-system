@@ -9,6 +9,7 @@ import { proxyImageUrl } from '@/lib/image-proxy';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { TrendingUp, Loader2, Eye, ChevronDown, ChevronUp, Globe, AlertTriangle, Flame, MapPin, CheckCircle, Lock } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 interface HybridTrend {
   id: string;
@@ -628,92 +629,133 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
                 } catch (_) { }
               };
               return (
-                <Card key={t.id} className="overflow-hidden flex flex-col relative">
-                  {isFree && !isVisible && (
-                    <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black/80 backdrop-blur-md rounded-lg p-4 text-center">
-                      <Lock className="w-8 h-8 text-white mb-4 animate-pulse" />
-                      <Link
-                        href="/auth/choose-plan"
-                        className="px-6 py-2.5 bg-white text-black rounded-full text-sm font-bold hover:bg-gray-100 shadow-xl transition-all active:scale-95"
-                      >
-                        Débloquer avec le plan Créateur
-                      </Link>
-                    </div>
-                  )}
-                  <div className={`flex flex-col flex-1 ${isFree && !isVisible ? 'opacity-0' : ''}`}>
-                    <div className="aspect-[3/4] bg-muted relative shrink-0">
-                      {t.imageUrl ? (
-                        <img
-                          src={proxyImageUrl(t.imageUrl) || t.imageUrl || ''}
-                          alt={t.name}
-                          className="w-full h-full object-cover"
-                          referrerPolicy="no-referrer"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            if (t.imageUrl && target.src !== t.imageUrl) {
-                              target.src = t.imageUrl;
-                            } else {
-                              // Si même l'original échoue, on affiche l'icône
-                              target.style.display = 'none';
-                              const parent = target.parentElement;
-                              if (parent) {
-                                parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-12 h-12 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
-                              }
-                            }
-                          }}
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center text-muted-foreground">
-                          <Globe className="w-12 h-12 opacity-40" />
+                <div key={t.id} className="group relative">
+                  <div
+                    className={cn(
+                      "bg-white rounded-[24px] overflow-hidden transition-all duration-500",
+                      "hover:scale-[1.03] hover:shadow-apple-lg hover:z-10",
+                      "shadow-apple border border-black/[0.03] relative flex flex-col h-full"
+                    )}
+                  >
+                    {isFree && !isVisible && (
+                      <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-white/95 backdrop-blur-sm rounded-[24px] p-6 text-center">
+                        <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-4 shadow-apple">
+                          <Lock className="w-6 h-6 text-white" />
                         </div>
-                      )}
-                      <div className="absolute top-2 left-2 flex flex-wrap gap-1">
-                        {t.segment && (
-                          <span className="px-2 py-0.5 rounded-md bg-primary/90 text-primary-foreground text-xs font-medium capitalize">
-                            {t.segment}
-                          </span>
+                        <h4 className="text-sm font-bold text-black mb-2">Contenu Exclusif</h4>
+                        <Link
+                          href="/auth/signup"
+                          className="px-6 py-2 bg-black text-white rounded-full text-xs font-bold hover:bg-black/90 transition-all active:scale-95 shadow-lg"
+                        >
+                          S'inscrire gratuitement
+                        </Link>
+                      </div>
+                    )}
+
+                    <div className={cn("flex flex-col h-full", isFree && !isVisible ? 'opacity-10' : '')}>
+                      {/* Image du produit avec overlay au hover */}
+                      <div className="relative aspect-[4/5] overflow-hidden bg-[#F5F5F7]">
+                        {t.imageUrl ? (
+                          <img
+                            src={proxyImageUrl(t.imageUrl) || t.imageUrl || ''}
+                            alt={t.name}
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-apple group-hover:scale-110"
+                            referrerPolicy="no-referrer"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              if (t.imageUrl && target.src !== t.imageUrl) {
+                                target.src = t.imageUrl;
+                              } else {
+                                target.style.display = 'none';
+                                const parent = target.parentElement;
+                                if (parent) {
+                                  parent.innerHTML = '<div class="w-full h-full flex items-center justify-center text-muted-foreground"><svg class="w-10 h-10 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg></div>';
+                                }
+                              }
+                            }}
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-muted-foreground">
+                            <Globe className="w-10 h-10 opacity-20" />
+                          </div>
                         )}
-                        <span className="px-2 py-0.5 rounded-md bg-background/90 text-xs font-medium">
-                          {t.marketZone || '—'}
-                        </span>
-                        {t.isGlobalTrendAlert && (
-                          <span className="px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-xs font-medium">
-                            Global Trend Alert
-                          </span>
-                        )}
+
+                        {/* Gradient Bottom Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                        {/* Badges Flottants */}
+                        <div className="absolute top-3 left-3 flex flex-col gap-1.5 z-20">
+                          {t.segment && (
+                            <span className="px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-md text-black text-[9px] font-extrabold uppercase tracking-widest shadow-apple border border-black/5">
+                              {t.segment}
+                            </span>
+                          )}
+                          {t.isGlobalTrendAlert && (
+                            <span className="px-2.5 py-1 rounded-full bg-amber-500 text-white text-[9px] font-extrabold uppercase tracking-widest shadow-lg">
+                              Global Alert
+                            </span>
+                          )}
+                          {(t as any).outfityIVS && (t as any).outfityIVS > 85 && (
+                            <span className="px-2.5 py-1 rounded-full bg-[#FF3B30] text-white text-[9px] font-extrabold uppercase tracking-widest shadow-lg flex items-center gap-1">
+                              <Flame className="w-3 h-3 fill-current" />
+                              Hot
+                            </span>
+                          )}
+                        </div>
+
+                        {/* IVS Score Float */}
                         {((t as any).outfityIVS || t.trendScore) && (
-                          <span className="px-2 py-0.5 rounded-md bg-black/80 text-white text-[10px] font-bold border border-white/20">
-                            IVS {(t as any).outfityIVS || t.trendScore}%
-                          </span>
+                          <div className="absolute bottom-3 right-3 z-20">
+                            <div className="px-3 py-1.5 rounded-xl bg-black/80 backdrop-blur-md text-white border border-white/20 shadow-apple-lg text-right">
+                              <div className="text-[8px] font-bold uppercase tracking-tight text-white/60 mb-[-2px]">IVS Index</div>
+                              <div className="text-sm font-black tracking-tight">{(t as any).outfityIVS || t.trendScore}%</div>
+                            </div>
+                          </div>
                         )}
                       </div>
+
+                      {/* Content Section */}
+                      <div className="p-4 sm:p-5 flex flex-col flex-grow bg-white">
+                        <div className="mb-3 min-w-0">
+                          <h3 className="text-sm sm:text-[15px] font-bold text-black leading-tight line-clamp-2 group-hover:text-[#007AFF] transition-colors mb-1.5">
+                            {t.name}
+                          </h3>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="text-[10px] sm:text-[11px] font-semibold text-[#6e6e73] bg-[#F5F5F7] px-2 py-0.5 rounded-md uppercase tracking-tighter">
+                              {t.category}
+                            </span>
+                            <span className="text-[10px] sm:text-[11px] font-bold text-black/40">
+                              • {(() => {
+                                const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand);
+                                return b || 'Brand';
+                              })()}
+                            </span>
+                          </div>
+                        </div>
+
+                        {t.businessAnalysis && (
+                          <p className="text-[11px] text-[#6e6e73] line-clamp-2 mb-4 italic leading-relaxed">
+                            "{t.businessAnalysis}"
+                          </p>
+                        )}
+
+                        <div className="mt-auto pt-4 border-t border-black/[0.03]">
+                          <Link
+                            href={`/trends/${t.id}`}
+                            className={cn(
+                              "w-full group/btn relative overflow-hidden h-10 rounded-full text-xs font-bold transition-all duration-300",
+                              "bg-black text-white hover:bg-[#1D1D1F] active:scale-[0.98]",
+                              "flex items-center justify-center gap-2 shadow-apple"
+                            )}
+                            onClick={handleAnalyzeClick}
+                          >
+                            Analyser la tendance
+                          </Link>
+                        </div>
+                      </div>
                     </div>
-                    <CardContent className="p-4 flex-1 flex flex-col">
-                      <h3 className="text-sm font-semibold line-clamp-4 leading-snug">{t.name}</h3>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {t.category} {t.cut ? `· ${t.cut}` : ''} {(() => {
-                          const b = (t as unknown as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand);
-                          return b ? `· ${b}` : '';
-                        })()}
-                      </p>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {(t.material && t.material.trim() && t.material !== 'Non spécifié') ? t.material : ''}
-                      </p>
-                      <Link
-                        href={`/trends/${t.id}`}
-                        className="inline-flex h-9 w-full items-center justify-center rounded-lg border border-border bg-background px-4 text-xs font-semibold transition-all hover:bg-muted hover:border-primary/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 mt-3"
-                        onClick={handleAnalyzeClick}
-                      >
-                        Analyser la tendance
-                      </Link>
-                      {t.businessAnalysis ? (
-                        <p className="text-xs text-muted-foreground mt-2 line-clamp-3 border-t pt-2">
-                          {t.businessAnalysis}
-                        </p>
-                      ) : null}
-                    </CardContent>
                   </div>
-                </Card>
+                </div>
               );
             })}
           </div>
