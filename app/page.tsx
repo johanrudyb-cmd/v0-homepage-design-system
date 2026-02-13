@@ -16,10 +16,20 @@ import { Footer } from '@/components/homepage/Footer';
 import { getFeaturedTrends } from '@/lib/trends-data';
 
 export default async function Home() {
-  // ... (rest of the file)
+  const initialTrends = await getFeaturedTrends();
+
   return (
     <main className="min-h-screen bg-[#F5F5F7]">
-      {/* ... other components */}
+      <AnimatedHeader />
+      <TrendsHero />
+      <TrendsByMarket initialTrends={initialTrends} />
+      <TechPackShowcase />
+      <StatsSection />
+      <FashionGallery />
+      <FoundationGrid />
+      <CreativeGrid />
+      <MarginCalculator />
+      <TestimonialsSection />
       <SalesPricing />
       <CTASection />
       <BlogGrid />
