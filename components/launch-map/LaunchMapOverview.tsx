@@ -87,7 +87,7 @@ export function LaunchMapOverview({
       <section className="space-y-4">
         <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground ml-1">Parcours de lancement</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-          {LAUNCH_MAP_PHASES.map((p) => {
+          {LAUNCH_MAP_PHASES.map((p: any) => {
             const Icon = PHASE_ICONS[p.id] || Palette;
             const completed = (progress as any)[`phase${p.id}`];
             const isLocked = userPlan === 'free' && ![0, 1].includes(p.id);

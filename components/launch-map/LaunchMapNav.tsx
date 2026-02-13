@@ -107,7 +107,7 @@ export function LaunchMapNav({
             <span className="text-center lg:text-left leading-tight">Calendrier</span>
           </Link>
 
-          {LAUNCH_MAP_PHASES.map((p) => {
+          {LAUNCH_MAP_PHASES.map((p: any) => {
             const Icon = PHASE_ICONS[p.id] || Circle;
             const completed = (progress as any)[`phase${p.id}`];
             const accessible = isPhaseAccessible();
