@@ -78,7 +78,7 @@ export function TrendsHero() {
                         <img
                           src={brand.logo}
                           alt={brand.name}
-                          className="h-5 sm:h-8 md:h-10 w-auto object-contain grayscale mix-blend-multiply contrast-[1.2] brightness-[1.1]"
+                          className="h-5 sm:h-8 md:h-10 w-auto object-contain grayscale mix-blend-multiply contrast-[1.5] brightness-[1.15]"
                           style={{
                             transform: `scale(${isMobile ? brand.scaleMobile : brand.scaleDesktop})`
                           }}
