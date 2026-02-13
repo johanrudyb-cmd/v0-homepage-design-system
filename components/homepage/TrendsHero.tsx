@@ -49,7 +49,7 @@ export function TrendsHero() {
               Créez votre marque de vêtement avec les données des géants
             </h1>
             <p className="text-base sm:text-lg lg:text-xl text-[#6e6e73] font-light max-w-2xl mx-auto mb-6 sm:mb-8 px-2">
-              Validez vos designs avec les tendances virales de TikTok et Instagram. Mêmes signaux. Mêmes usines. Mêmes succès commerciaux.
+              Créez vos designs avec les tendances virales de <span className="font-semibold text-[#000000]">TikTok</span> et <span className="font-semibold text-[#000000]">Instagram</span>.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
@@ -93,7 +93,7 @@ export function TrendsHero() {
             {/* Texte décoratif ou indicateur sous le slider — Traduit en français */}
             <div className="flex justify-center mt-6">
               <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#6e6e73]/40 text-center px-4">
-                Outfity Intelligence • Social Velocity Index • Mass-Market Correlation 2026
+                Outfity Intelligence • Détection Virale • Prédiction de Style • Trend Radar 2026
               </span>
             </div>
           </div>
