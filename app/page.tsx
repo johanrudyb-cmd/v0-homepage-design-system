@@ -9,28 +9,20 @@ import { MarginCalculator } from '@/components/homepage/MarginCalculator';
 import { TechPackShowcase } from '@/components/homepage/TechPackShowcase';
 import { TestimonialsSection } from '@/components/homepage/TestimonialsSection';
 import { SalesPricing } from '@/components/homepage/SalesPricing';
+import { BlogGrid } from '@/components/homepage/BlogGrid';
 import { FAQSection } from '@/components/homepage/FAQSection';
 import { CTASection } from '@/components/homepage/CTASection';
 import { Footer } from '@/components/homepage/Footer';
 import { getFeaturedTrends } from '@/lib/trends-data';
 
 export default async function Home() {
-  const initialTrends = await getFeaturedTrends();
-
+  // ... (rest of the file)
   return (
     <main className="min-h-screen bg-[#F5F5F7]">
-      <AnimatedHeader />
-      <TrendsHero />
-      <TrendsByMarket initialTrends={initialTrends} />
-      <TechPackShowcase />
-      <StatsSection />
-      <FashionGallery />
-      <FoundationGrid />
-      <CreativeGrid />
-      <MarginCalculator />
-      <TestimonialsSection />
+      {/* ... other components */}
       <SalesPricing />
       <CTASection />
+      <BlogGrid />
       <FAQSection />
       <Footer />
     </main>
