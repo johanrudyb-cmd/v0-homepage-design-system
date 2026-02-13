@@ -35,6 +35,8 @@ export interface LaunchMapNavProps {
   phase3: boolean;
   phase4: boolean;
   phase5: boolean;
+  phase6: boolean;
+  phase7: boolean;
 }
 
 export function LaunchMapNav({
@@ -45,6 +47,8 @@ export function LaunchMapNav({
   phase3,
   phase4,
   phase5,
+  phase6,
+  phase7,
 }: LaunchMapNavProps) {
   const pathname = usePathname();
 
@@ -62,6 +66,8 @@ export function LaunchMapNav({
     phase3,
     phase4,
     phase5,
+    phase6,
+    phase7,
   };
 
   const isOverview = pathname === '/launch-map' || pathname === '/launch-map/';
