@@ -15,6 +15,7 @@ import { useToast } from '@/components/ui/toast';
 import { Phase0Identity } from './Phase0Identity';
 import { Phase1Strategy } from './Phase1Strategy';
 import { PhaseMockupCreation } from './PhaseMockupCreation';
+
 import { PhaseTechPack } from './PhaseTechPack';
 import { Phase3Sourcing } from './Phase3Sourcing';
 import { Phase6Shopify } from './Phase6Shopify';
@@ -279,6 +280,7 @@ export function LaunchMapStepper({
               brandId={brandId}
               brand={brand}
               onComplete={() => handlePhaseComplete(2)}
+              userPlan={userPlan}
             />
           )}
           {!isTransitioning && phaseToRender === 3 && (

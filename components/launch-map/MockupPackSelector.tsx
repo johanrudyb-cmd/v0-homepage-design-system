@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Download, Loader2, Check } from 'lucide-react';
+import { Download, Loader2, Check, Lock } from 'lucide-react';
+import { useSurplusModal } from '@/components/usage/SurplusModalContext';
 
 interface MockupCategory {
   id: string;
@@ -17,9 +18,11 @@ interface MockupPackSelectorProps {
   brandName?: string;
   /** Si true, affiche une version compacte sans Card (pour intégration dans un autre bloc) */
   inline?: boolean;
+  userPlan?: string;
 }
 
-export function MockupPackSelector({ brandId, brandName, inline }: MockupPackSelectorProps) {
+export function MockupPackSelector({ brandId, brandName, inline, userPlan }: MockupPackSelectorProps) {
+  const openSurplusModal = useSurplusModal();
   const [categories, setCategories] = useState<MockupCategory[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [isLoading, setIsLoading] = useState(true);
@@ -49,6 +52,10 @@ export function MockupPackSelector({ brandId, brandName, inline }: MockupPackSel
   const deselectAll = () => setSelected(new Set());
 
   const handleDownload = async () => {
+    if (userPlan === 'free') {
+      openSurplusModal();
+      return;
+    }
     if (selected.size === 0) return;
     setIsDownloading(true);
     try {
@@ -111,9 +118,8 @@ export function MockupPackSelector({ brandId, brandName, inline }: MockupPackSel
             key={cat.id}
             type="button"
             onClick={() => toggle(cat.id)}
-            className={`flex items-center gap-2 p-3 rounded-lg border-2 text-left transition-all hover:border-primary/50 ${
-              selected.has(cat.id) ? 'border-primary bg-primary/10' : 'border-border'
-            }`}
+            className={`flex items-center gap-2 p-3 rounded-lg border-2 text-left transition-all hover:border-primary/50 ${selected.has(cat.id) ? 'border-primary bg-primary/10' : 'border-border'
+              }`}
           >
             <div className="w-5 h-5 rounded border flex items-center justify-center flex-shrink-0">
               {selected.has(cat.id) ? <Check className="w-3 h-3 text-primary" /> : null}
@@ -132,7 +138,7 @@ export function MockupPackSelector({ brandId, brandName, inline }: MockupPackSel
         size={inline ? 'sm' : 'md'}
         className="gap-2 w-full sm:w-auto"
       >
-        {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Download className="w-5 h-5" />}
+        {isDownloading ? <Loader2 className="w-5 h-5 animate-spin" /> : (userPlan === 'free' ? <Lock className="w-5 h-5" /> : <Download className="w-5 h-5" />)}
         Télécharger ({selected.size} type{selected.size > 1 ? 's' : ''} sélectionné{selected.size > 1 ? 's' : ''})
       </Button>
     </>

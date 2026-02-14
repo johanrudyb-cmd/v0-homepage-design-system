@@ -61,8 +61,15 @@ function getDomain(url: string): string {
 
 import { BrandAnalyzer } from './BrandAnalyzer';
 
+import { useSession } from 'next-auth/react';
+import { Lock } from 'lucide-react';
+
 export function BrandsContent() {
+  const { data: session } = useSession();
+  const user = session?.user as any;
   const router = useRouter();
+
+  // ... (rest of the component state)
   const [view, setView] = useState<'ranking' | 'analyzer'>('ranking');
   const [brands, setBrands] = useState<CuratedBrand[]>(CURATED_TOP_BRANDS);
   const [loadingInitial, setLoadingInitial] = useState(true);
@@ -136,6 +143,51 @@ export function BrandsContent() {
       setLoadingBrand(null);
     }
   };
+
+  if (user?.plan === 'free') {
+    return (
+      <div className="space-y-6">
+        {/* Header (visible but content locked) */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground flex items-center gap-2">
+              <TrendingUp className="w-6 h-6 text-primary" />
+              Marques tendances
+            </h1>
+            <p className="text-muted-foreground text-sm">
+              Découvrez les marques qui performent et analysez leur stratégie.
+            </p>
+          </div>
+        </div>
+
+        <div className="relative rounded-xl border-2 border-dashed p-12 text-center bg-muted/10 overflow-hidden">
+          {/* Blur effect over fake content */}
+          <div className="absolute inset-0 bg-white/60 backdrop-blur-md z-10 flex flex-col items-center justify-center p-6">
+            <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-6 shadow-xl">
+              <Lock className="w-8 h-8 text-white" />
+            </div>
+            <h3 className="text-xl font-black text-black mb-2 uppercase tracking-tight">Fonctionnalité Premium</h3>
+            <p className="text-muted-foreground max-w-md mb-8">
+              L'accès au classement des marques tendances et à l'analyseur stratégique est réservé aux membres Créateur.
+            </p>
+            <Link
+              href="/auth/choose-plan"
+              className="px-8 py-3 bg-[#007AFF] text-white rounded-full text-sm font-bold hover:bg-[#007AFF]/90 transition-all active:scale-95 shadow-xl uppercase tracking-widest"
+            >
+              Passer au Plan Créateur
+            </Link>
+          </div>
+
+          {/* Fake background content to show behind blur */}
+          <div className="grid grid-cols-1 gap-4 opacity-20 filter blur-sm pointer-events-none select-none">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="h-24 bg-gray-200 rounded-xl" />
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

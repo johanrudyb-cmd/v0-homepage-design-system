@@ -21,7 +21,7 @@ export default async function TrendsPage() {
     segment: 'homme',
     ageRange: '18-24',
     sortBy: 'best',
-    limit: 50
+    limit: 60
   });
 
   return (

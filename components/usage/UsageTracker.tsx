@@ -40,6 +40,7 @@ interface UsageTrackerFeatureProps {
   usage: FeatureUsage;
   isPremium?: boolean;
   onRecharge?: () => void;
+  isFree?: boolean;
 }
 
 function UsageTrackerFeature({
@@ -47,6 +48,7 @@ function UsageTrackerFeature({
   usage,
   isPremium = false,
   onRecharge,
+  isFree = false,
 }: UsageTrackerFeatureProps) {
   const { limit, used, remaining, label, isUnlimited: isUnlimitedFlag } = usage;
   const isUnlimited = isUnlimitedFlag ?? limit >= 999;
@@ -58,6 +60,10 @@ function UsageTrackerFeature({
 
   // Module Premium (Try-On) : affiche crédits restants ou bouton achat
   if (isPremium) {
+    // ... existing premium logic (assuming free users don't access premium module this way or it's handled separately)
+    // Actually, free users MIGHT see this if they have access to try-on via free trial?
+    // But request says "quand c'est finis faut passer direct a la version payante".
+    // Let's assume this applies to standard quotas first.
     return (
       <div className="space-y-2">
         <div className="flex items-center justify-between gap-2">
@@ -98,13 +104,13 @@ function UsageTrackerFeature({
         </div>
         {isAlmostFinished && (
           <div className="flex items-center justify-between gap-2 rounded-md bg-amber-500/15 px-3 py-2 text-amber-800 dark:text-amber-200">
-            <span className="text-xs font-medium">Stock épuisé bientôt !</span>
+            <span className="text-xs font-medium">{isFree ? "Plus que quelques essais !" : "Stock épuisé bientôt !"}</span>
             <button
               type="button"
-              onClick={onRecharge}
+              onClick={onRecharge} // This will be handled by parent passing different fn for free user
               className="text-xs font-semibold underline hover:no-underline"
             >
-              Prendre une recharge
+              {isFree ? "Passer Créateur" : "Prendre une recharge"}
             </button>
           </div>
         )}
@@ -114,7 +120,7 @@ function UsageTrackerFeature({
             onClick={onRecharge}
             className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-primary to-primary/80 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-primary/25 transition-all hover:from-primary/90 hover:to-primary/70 hover:shadow-xl hover:shadow-primary/30"
           >
-            <span className="drop-shadow-sm">Recharger ce module</span>
+            <span className="drop-shadow-sm">{isFree ? "Débloquer plus de quotas" : "Recharger ce module"}</span>
           </button>
         )}
       </div>
@@ -140,6 +146,7 @@ interface UsageTrackerCategoryProps {
   usage: Record<QuotaFeatureKey, FeatureUsage>;
   categoryLabel: string;
   onRecharge: () => void;
+  isFree?: boolean;
 }
 
 function UsageTrackerCategory({
@@ -148,6 +155,7 @@ function UsageTrackerCategory({
   usage,
   categoryLabel,
   onRecharge,
+  isFree = false,
 }: UsageTrackerCategoryProps) {
   return (
     <div className="space-y-4">
@@ -162,6 +170,7 @@ function UsageTrackerCategory({
             usage={usage[key]}
             isPremium={key === 'ugc_virtual_tryon'}
             onRecharge={onRecharge}
+            isFree={isFree}
           />
         ))}
       </div>
@@ -171,11 +180,16 @@ function UsageTrackerCategory({
 
 interface UsageTrackerProps {
   onRechargeClick?: () => void;
+  isFree?: boolean;
 }
 
-export function UsageTracker({ onRechargeClick }: UsageTrackerProps) {
+export function UsageTracker({ onRechargeClick, isFree = false }: UsageTrackerProps) {
   const [data, setData] = useState<QuotaData | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // ... (fetch logic remains same)
+  // But wait, I need to keep the fetch logic inside because I'm replacing the whole component body basically if I select large range.
+  // I will just replace the component definitions and render part.
 
   const fetchQuota = useCallback(() => {
     fetch('/api/usage/quota')
@@ -183,7 +197,7 @@ export function UsageTracker({ onRechargeClick }: UsageTrackerProps) {
       .then((d) => {
         if (d?.usage) setData(d);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 
@@ -224,7 +238,8 @@ export function UsageTracker({ onRechargeClick }: UsageTrackerProps) {
           features={data.categories[category]}
           usage={data.usage}
           categoryLabel={data.categoryLabels[category] ?? category}
-          onRecharge={onRechargeClick ?? (() => {})}
+          onRecharge={onRechargeClick ?? (() => { })}
+          isFree={isFree}
         />
       ))}
     </div>

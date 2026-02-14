@@ -11,9 +11,10 @@ interface PhaseMockupCreationProps {
   brandId: string;
   brand?: BrandIdentity | null;
   onComplete: () => void;
+  userPlan?: string;
 }
 
-export function PhaseMockupCreation({ brandId, brand, onComplete }: PhaseMockupCreationProps) {
+export function PhaseMockupCreation({ brandId, brand, onComplete, userPlan }: PhaseMockupCreationProps) {
   const [recommendations, setRecommendations] = useState<string[]>([]);
   const [isLoadingRecommendations, setIsLoadingRecommendations] = useState(true);
 
@@ -40,13 +41,13 @@ export function PhaseMockupCreation({ brandId, brand, onComplete }: PhaseMockupC
           </CardDescription>
         </CardHeader>
         <CardContent className="p-6">
-          <div className="aspect-video w-full rounded-lg bg-muted/50 flex items-center justify-center border-2 border-dashed border-muted-foreground/30 min-h-[200px]">
+          {/* <div className="aspect-video w-full rounded-lg bg-muted/50 flex items-center justify-center border-2 border-dashed border-muted-foreground/30 min-h-[200px]">
             <div className="text-center space-y-2 text-muted-foreground">
               <Video className="w-12 h-12 mx-auto" />
               <p className="text-sm">Vidéo tutorielle à venir</p>
             </div>
-          </div>
-          <MockupPackSelector brandId={brandId} brandName={brand?.name} />
+          </div> */}
+          <MockupPackSelector brandId={brandId} brandName={brand?.name} userPlan={userPlan} />
         </CardContent>
       </Card>
 

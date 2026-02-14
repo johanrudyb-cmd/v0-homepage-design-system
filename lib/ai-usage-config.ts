@@ -108,7 +108,7 @@ export const MAX_PER_MONTH_BY_PLAN: Record<string, Partial<Record<AIFeatureKey, 
   free: {
     brand_strategy: 3,
     launch_map_recommendations: 12,
-    trends_hybrid_scan: 1,
+    trends_hybrid_scan: 3,
     trends_analyse: 3, // Offre réelle : 3 / mois
   },
   starter: {

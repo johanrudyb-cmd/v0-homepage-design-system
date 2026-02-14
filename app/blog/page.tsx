@@ -29,7 +29,7 @@ export default async function BlogPage() {
           <div className="max-w-7xl mx-auto px-6 lg:px-12">
             <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
               <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#007AFF] mb-8">Magazine Industriel</span>
-              <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black tracking-tight text-black leading-[0.85] mb-12">
+              <h1 className="text-4xl sm:text-6xl lg:text-8xl font-black tracking-tight text-black leading-[0.9] mb-8 sm:mb-12">
                 Le radar <br />
                 <span className="text-[#6e6e73]/20 italic font-serif">OUTFITY</span>
               </h1>
@@ -76,7 +76,7 @@ export default async function BlogPage() {
 
         {/* Asymmetric Article Grid */}
         <section className="py-24 lg:py-40">
-          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-y-24 gap-x-12">
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-y-12 md:gap-y-24 gap-x-12">
             {posts.slice(1).map((post, index) => (
               <div key={post.id} className={cn(
                 "md:col-span-12 lg:col-span-6 group",

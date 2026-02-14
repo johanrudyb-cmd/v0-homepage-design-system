@@ -10,7 +10,7 @@ export async function GET(request: Request) {
       marketZone: searchParams.get('marketZone') || 'EU',
       segment: searchParams.get('segment') || 'homme',
       sortBy: searchParams.get('sortBy') || 'best',
-      limit: Math.min(parseInt(searchParams.get('limit') || '50', 10), 100),
+      limit: Math.min(parseInt(searchParams.get('limit') || '60', 10), 100),
       globalOnly: searchParams.get('globalOnly') === 'true',
       brandFilter: searchParams.get('brand')?.trim(),
       ageRange: searchParams.get('ageRange')?.trim(),

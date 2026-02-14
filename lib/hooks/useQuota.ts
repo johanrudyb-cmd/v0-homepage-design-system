@@ -36,7 +36,7 @@ type UseQuotaReturn =
   | { getFeatureStatus: (f: QuotaFeatureKey) => QuotaFeatureStatus | null; canUse: (f: QuotaFeatureKey) => boolean; data: QuotaData | null; loading: boolean; refresh: () => void };
 
 export function useQuota(feature: QuotaFeatureKey): QuotaFeatureStatus | null;
-export function useQuota(): UseQuotaReturn;
+export function useQuota(): { getFeatureStatus: (f: QuotaFeatureKey) => QuotaFeatureStatus | null; canUse: (f: QuotaFeatureKey) => boolean; data: QuotaData | null; loading: boolean; refresh: () => void };
 export function useQuota(feature?: QuotaFeatureKey): UseQuotaReturn {
   const [data, setData] = useState<QuotaData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -48,7 +48,7 @@ export function useQuota(feature?: QuotaFeatureKey): UseQuotaReturn {
       .then((d) => {
         if (d?.usage) setData(d);
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setLoading(false));
   }, []);
 

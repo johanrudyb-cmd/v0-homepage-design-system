@@ -251,6 +251,7 @@ interface StrategyPresentationViewProps {
   lastAIUpdate?: string | null;
   /** Si true, affiche un flou sur le contenu et un bouton d'upgrade */
   isFree?: boolean;
+  isOpen?: boolean;
 }
 
 const DEFAULT_VISUAL_IDENTITY: VisualIdentityData = {
@@ -276,9 +277,13 @@ export function StrategyPresentationView({
   logoUrl: logoUrlProp,
   lastAIUpdate,
   isFree = false,
+  isOpen = true,
 }: StrategyPresentationViewProps) {
   const router = useRouter();
   const [regenerating, setRegenerating] = useState(false);
+
+  if (!isOpen) return null;
+
   const initialVI = useMemo(
     () => ({
       colorPalette: {

@@ -7,15 +7,19 @@ import { Target } from 'lucide-react';
 interface UsageBadgeProps {
     count: number | null;
     plan: string;
+    limit?: number;
     className?: string;
 }
 
-export function UsageBadge({ count, plan, className }: UsageBadgeProps) {
+export function UsageBadge({ count, plan, limit, className }: UsageBadgeProps) {
     const isFree = plan === 'free';
-    const maxAnalyses = isFree ? 3 : 10;
+    // Use passed limit, or fallback to config-based defaults (3 for free, 10 for others as safe default)
+    const maxAnalyses = limit ?? (isFree ? 3 : 10);
     const safeCount = count ?? 0;
     const percent = Math.min((safeCount / maxAnalyses) * 100, 100);
     const remaining = Math.max(0, maxAnalyses - safeCount);
+
+    if (maxAnalyses === -1) return null; // Unlimited
 
     return (
         <motion.div

@@ -140,7 +140,7 @@ export async function getHybridRadarTrends(params: {
         marketZone = 'EU',
         segment = 'homme',
         sortBy = 'best',
-        limit = 50,
+        limit = 60,
         globalOnly = false,
         brandFilter,
         ageRange = '18-24'
@@ -253,7 +253,7 @@ export async function getHybridRadarTrends(params: {
         return bestB - bestA;
     });
 
-    const finalLimit = 15;
+    const finalLimit = limit;
     const topBrands = brands.slice(0, 4);
     for (const b of topBrands) {
         const list = groupedByBrand.get(b)!;
@@ -277,10 +277,12 @@ export async function getHybridRadarTrends(params: {
         }
     }
 
+    // const totalCount = await prisma.trendProduct.count({ where });
+
     return {
         trends: diversified,
         summary: {
-            total: filtered.length,
+            total: diversified.length,
             byZone: filtered.reduce((acc: any, p) => {
                 if (p.marketZone) acc[p.marketZone] = (acc[p.marketZone] || 0) + 1;
                 return acc;

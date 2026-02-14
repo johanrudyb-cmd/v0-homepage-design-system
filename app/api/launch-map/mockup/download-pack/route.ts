@@ -21,6 +21,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'brandId requis' }, { status: 400 });
     }
 
+    if (user.plan === 'free') {
+      return NextResponse.json({ error: 'Plan insuffisant (upgrade requis)' }, { status: 403 });
+    }
+
     const brand = await prisma.brand.findFirst({
       where: { id: brandId, userId: user.id },
     });

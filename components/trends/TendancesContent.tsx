@@ -11,7 +11,10 @@ import { Button } from '@/components/ui/button';
 import { Loader2, AlertTriangle, Flame, Globe, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { QUOTA_CONFIG } from '@/lib/quota-config';
 import { UsageBadge } from '@/components/trends/UsageBadge';
+import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
+
 
 interface HybridTrend {
   id: string;
@@ -79,9 +82,25 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
   const loadTrends = useCallback(async () => {
     // Prevent unnecessary reload if initial data matches default filters on mount
     const isDefault = segment === 'homme' && ageRange === '18-24' && sortBy === 'best' && zone === 'EU' && !globalOnly && !brandFromUrl;
-    if (initialData && isDefault && trends.length > 0) {
-      return;
+
+    /* 
+     * FIX: Removed the check that prevents reloading when filters match default.
+     * Previous logic caused a bug where switching back to "Homme" or "18-24" (defaults) 
+     * would not trigger a refresh if trends were already loaded from a previous non-default state.
+     */
+    if (initialData && !isRefreshing && trends.length === 0 && isDefault) {
+      // Only skip if we have no trends yet and we have initial data?
+      // Actually simpler to just rely on initialData being set in useState.
+      // But if we want to avoid double fetch on mount:
+      // The `useEffect` calls `loadTrends` on mount.
+      // We can just check if we just mounted?
+      // For now, let's allow re-fetch to ensure consistency, or check if trends deeply equal initialData (too expensive).
+      // To avoid flash, we can check if trends[0] matches.
     }
+
+    // We remove the return early to force update. To avoid double fetch on mount,
+    // we could use a ref, but `trends` is initialized with `initialData`.
+    // If we fetch again, it's fine.
 
     if (trends.length > 0) {
       setIsRefreshing(true);
@@ -97,7 +116,7 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
       params.set('sortBy', sortBy);
       if (globalOnly) params.set('globalOnly', 'true');
       if (brandFromUrl) params.set('brand', brandFromUrl);
-      params.set('limit', '50');
+      params.set('limit', '60');
 
       const res = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
       const data = res.ok ? await res.json().catch(() => ({})) : {};
@@ -123,12 +142,20 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
       setHomepageIds(new Set(ids));
     }).catch(() => { });
 
-    if (user?.plan === 'free') {
-      fetch('/api/trends/analyses-count')
-        .then((r) => (r.ok ? r.json() : Promise.resolve({ count: 0 })))
-        .then((d) => setAnalysesCount(d.count ?? 0))
-        .catch(() => { });
-    }
+    const fetchCount = () => {
+      // Fetch for free users, OR if we want to support paid users seeing their usage too
+      // For now, let's keep it consistent with previous logic but allow refresh
+      if (user?.plan === 'free') {
+        fetch('/api/trends/analyses-count')
+          .then((r) => (r.ok ? r.json() : Promise.resolve({ count: 0 })))
+          .then((d) => setAnalysesCount(d.count ?? 0))
+          .catch(() => { });
+      }
+    };
+
+    fetchCount();
+    window.addEventListener(USAGE_REFRESH_EVENT, fetchCount);
+    return () => window.removeEventListener(USAGE_REFRESH_EVENT, fetchCount);
   }, [user?.plan]);
 
   const handleAnalyzeClick = () => {
@@ -178,7 +205,11 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
             </div>
 
             <div className="flex items-center gap-3">
-              <UsageBadge count={analysesCount} plan={user?.plan || 'free'} />
+              <UsageBadge
+                count={analysesCount}
+                plan={user?.plan || 'free'}
+                limit={user?.plan === 'free' ? QUOTA_CONFIG.free.trends_hybrid_scan_limit : undefined}
+              />
               <Button
                 variant="ghost"
                 size="sm"

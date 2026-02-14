@@ -1,7 +1,8 @@
 'use client';
 
 import { Suspense, useEffect, useState } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,11 @@ import { useSurplusModal } from '@/components/usage/SurplusModalContext';
 import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
 
 function UsagePageContent() {
+  const { data: session } = useSession();
+  const user = session?.user as any;
+  const isFree = user?.plan === 'free';
+
+  const router = useRouter();
   const openSurplusModal = useSurplusModal();
   const searchParams = useSearchParams();
   const [showSuccess, setShowSuccess] = useState(false);
@@ -51,16 +57,19 @@ function UsagePageContent() {
           Mes quotas
         </h1>
         <p className="font-light text-sm text-[#1A1A1A] opacity-70">
-          Pack Fashion Launch — suivez vos utilisations et rechargez si besoin
+          {isFree
+            ? 'Suivez votre utilisation du plan Gratuit et découvrez nos offres'
+            : 'Pack Fashion Launch — suivez vos utilisations et rechargez si besoin'}
         </p>
       </div>
 
-      {/* Bouton Acheter des crédits */}
+      {/* Bouton Acheter des crédits / Upgrade */}
       <div className="flex justify-end">
         <Button
-          onClick={openSurplusModal}
+          onClick={isFree ? () => router.push('/auth/choose-plan') : openSurplusModal}
+          className={isFree ? "bg-[#007AFF] hover:bg-[#007AFF]/90" : ""}
         >
-          Acheter des crédits supplémentaires
+          {isFree ? 'Passer au Plan Créateur' : 'Acheter des crédits supplémentaires'}
         </Button>
       </div>
 
@@ -73,7 +82,7 @@ function UsagePageContent() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <UsageTracker onRechargeClick={openSurplusModal} />
+          <UsageTracker onRechargeClick={openSurplusModal} isFree={isFree} />
         </CardContent>
       </Card>
     </div>

@@ -55,7 +55,7 @@ export const QUOTA_CONFIG = {
     ugc_scripts_limit: 0,
     brand_logo_limit: 0,
     trends_check_limit: 1, // Limité à 1 pour free
-    trends_hybrid_scan_limit: 1, // 1 scan visuel pour free
+    trends_hybrid_scan_limit: 3, // 3 scans visuels pour free
     ugc_shooting_photo_limit: 0,
     ugc_shooting_product_limit: 0,
     site_texts_limit: 0,

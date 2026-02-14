@@ -84,27 +84,35 @@ export function AnimatedHeader() {
       <AnimatePresence>
         {isMenuOpen && (
           <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-white border-b border-[#F2F2F2] overflow-hidden"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-x-0 top-[56px] sm:top-[64px] bottom-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[#F2F2F2] overflow-y-auto md:hidden"
           >
-            <div className="px-4 py-6 space-y-4">
+            <div className="flex flex-col px-6 py-8 space-y-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className="block text-xl font-bold text-[#1D1D1F] py-2 hover:text-[#007AFF] transition-colors"
+                  className="text-2xl font-black tracking-tight text-[#1D1D1F] hover:text-[#007AFF] transition-colors"
                 >
                   {link.name}
                 </Link>
               ))}
-              <div className="pt-6 border-t border-[#F2F2F2]">
+              <div className="pt-8 mt-4 border-t border-[#F2F2F2] space-y-4">
+                <Link
+                  href="/auth/signin"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full py-3.5 text-center font-bold text-[#1D1D1F] border-2 border-[#E5E5E7] rounded-xl"
+                >
+                  Connexion
+                </Link>
                 <Link
                   href="/auth/signup"
                   onClick={() => setIsMenuOpen(false)}
-                  className="block w-full py-4 bg-[#007AFF] text-white rounded-2xl text-center font-bold"
+                  className="block w-full py-4 bg-[#007AFF] text-white rounded-xl text-center font-bold shadow-lg shadow-[#007AFF]/20"
                 >
                   Créer un compte
                 </Link>
