@@ -2,8 +2,9 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth-helpers';
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const user = await getCurrentUser();
         const isAdmin = user?.email === 'johanrudyb@gmail.com' || user?.email?.endsWith('@biangory.com');
 
@@ -19,12 +20,12 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
             where: { slug },
         });
 
-        if (existing && existing.id !== params.id) {
+        if (existing && existing.id !== id) {
             return NextResponse.json({ message: 'Ce slug est déjà pris par un autre article.' }, { status: 400 });
         }
 
         const post = await prisma.blogPost.update({
-            where: { id: params.id },
+            where: { id },
             data: {
                 title,
                 slug,
@@ -46,8 +47,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
     }
 }
 
-export async function DELETE(req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
+        const { id } = await params;
         const user = await getCurrentUser();
         const isAdmin = user?.email === 'johanrudyb@gmail.com' || user?.email?.endsWith('@biangory.com');
 
@@ -56,7 +58,7 @@ export async function DELETE(req: Request, { params }: { params: { id: string } 
         }
 
         await prisma.blogPost.delete({
-            where: { id: params.id },
+            where: { id },
         });
 
         return NextResponse.json({ success: true });

@@ -1,0 +1,269 @@
+{
+    "name": "📰 OUTFITY - Pilote Automatique (3-5/jour)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 6
+                        }
+                    ]
+                }
+            },
+            "id": "trigger-schedule",
+            "name": "Toutes les 6 heures",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                -100,
+                350
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://fashionunited.fr/rss/actualite"
+            },
+            "id": "rss-1",
+            "name": "FashionUnited (Pro)",
+            "type": "n8n-nodes-base.rssFeedRead",
+            "typeVersion": 1,
+            "position": [
+                100,
+                200
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://hypebeast.com/feed"
+            },
+            "id": "rss-2",
+            "name": "Hypebeast (Street)",
+            "type": "n8n-nodes-base.rssFeedRead",
+            "typeVersion": 1,
+            "position": [
+                100,
+                350
+            ]
+        },
+        {
+            "parameters": {
+                "url": "https://www.highsnobiety.com/feed/"
+            },
+            "id": "rss-3",
+            "name": "Highsnobiety (Culture)",
+            "type": "n8n-nodes-base.rssFeedRead",
+            "typeVersion": 1,
+            "position": [
+                100,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "mode": "combine",
+                "combineBy": "position"
+            },
+            "id": "merge-news",
+            "name": "Fusionner News",
+            "type": "n8n-nodes-base.merge",
+            "typeVersion": 2,
+            "position": [
+                350,
+                350
+            ]
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "http://localhost:3000/api/blog/trends-data",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "x-n8n-secret",
+                            "value": "bmad_n8n_secret_2024_ultra_secure"
+                        }
+                    ]
+                }
+            },
+            "id": "get-trends",
+            "name": "OUTFITY Trends Data",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                550,
+                500
+            ]
+        },
+        {
+            "parameters": {
+                "resource": "chat",
+                "model": "gpt-4o-mini",
+                "messages": {
+                    "messageValues": [
+                        {
+                            "role": "system",
+                            "content": "Tu es le Rédacteur en Chef d'OUTFITY. Analyse les news et nos données Radar. Choisis l'info la plus stratégique. Ne cite jamais Zalando/ASOS. Titre en Sentence case. Sortie JSON avec: title, slug, excerpt, content, tags."
+                        },
+                        {
+                            "role": "user",
+                            "content": "=News : {{ JSON.stringify($node[\"Fusionner News\"].json) }} | Radar Data : {{ JSON.stringify($node[\"OUTFITY Trends Data\"].json) }}"
+                        }
+                    ]
+                },
+                "jsonOutput": true
+            },
+            "id": "ai-editor",
+            "name": "IA - Rédacteur en Chef",
+            "type": "n8n-nodes-base.openAi",
+            "typeVersion": 1,
+            "position": [
+                750,
+                350
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "http://localhost:3000/api/blog/webhook",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "x-n8n-secret",
+                            "value": "bmad_n8n_secret_2024_ultra_secure"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "title",
+                            "value": "={{ $json.message.content.title }}"
+                        },
+                        {
+                            "name": "slug",
+                            "value": "={{ $json.message.content.slug }}"
+                        },
+                        {
+                            "name": "excerpt",
+                            "value": "={{ $json.message.content.excerpt }}"
+                        },
+                        {
+                            "name": "content",
+                            "value": "={{ $json.message.content.content }}"
+                        },
+                        {
+                            "name": "tags",
+                            "value": "={{ $json.message.content.tags }}"
+                        },
+                        {
+                            "name": "author",
+                            "value": "OUTFITY Intelligence"
+                        }
+                    ]
+                }
+            },
+            "id": "post-blog",
+            "name": "Publication Blog",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                950,
+                350
+            ]
+        }
+    ],
+    "connections": {
+        "trigger-schedule": {
+            "main": [
+                [
+                    {
+                        "node": "FashionUnited (Pro)",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Hypebeast (Street)",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Highsnobiety (Culture)",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "FashionUnited (Pro)": {
+            "main": [
+                [
+                    {
+                        "node": "Fusionner News",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Hypebeast (Street)": {
+            "main": [
+                [
+                    {
+                        "node": "Fusionner News",
+                        "type": "main",
+                        "index": 1
+                    }
+                ]
+            ]
+        },
+        "Highsnobiety (Culture)": {
+            "main": [
+                [
+                    {
+                        "node": "Fusionner News",
+                        "type": "main",
+                        "index": 2
+                    }
+                ]
+            ]
+        },
+        "Fusionner News": {
+            "main": [
+                [
+                    {
+                        "node": "IA - Rédacteur en Chef",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "OUTFITY Trends Data": {
+            "main": [
+                [
+                    {
+                        "node": "IA - Rédacteur en Chef",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "IA - Rédacteur en Chef": {
+            "main": [
+                [
+                    {
+                        "node": "Publication Blog",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

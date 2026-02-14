@@ -1,15 +1,17 @@
 import Link from 'next/link';
-import { ArrowLeft, FileText, TrendingUp, Sparkles, Calendar, User } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowRight, Sparkles, Calendar, User, Clock, Newspaper } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
+import { AnimatedHeader } from '@/components/homepage/AnimatedHeader';
+import { Footer } from '@/components/homepage/Footer';
+import { cn } from '@/lib/utils';
+import { Card, CardContent } from '@/components/ui/card';
 
 export const metadata = {
-  title: 'Blog Stratégies | OUTFITY',
-  description: 'Actualités, tendances et stratégies des marques qui réussissent. Notre IA adapte votre positionnement en temps réel grâce à notre veille sectorielle.',
+  title: 'Blog Mode & Stratégie | OUTFITY',
+  description: 'Tout l\'actualité du secteur, tendances et stratégies des marques qui réussissent.',
 };
 
 export default async function BlogPage() {
-  // Récupérer les articles de blog depuis la base de données
   const posts = await prisma.blogPost.findMany({
     where: { published: true },
     orderBy: { publishedAt: 'desc' },
@@ -17,139 +19,149 @@ export default async function BlogPage() {
   }).catch(() => []);
 
   return (
-    <div className="min-h-screen bg-[#F5F5F7]">
-      <header className="bg-white border-b border-[#F2F2F2] sticky top-0 z-10">
-        <div className="max-w-6xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-sm text-[#6e6e73] hover:text-[#007AFF] transition-colors"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              Retour à l'accueil
-            </Link>
-            <Link
-              href="/auth/signin"
-              className="px-4 py-2 rounded-lg bg-[#007AFF] text-white text-sm font-semibold hover:bg-[#007AFF]/90 transition-colors"
-            >
-              Se connecter
-            </Link>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-white">
+      <AnimatedHeader />
 
-      <main className="max-w-6xl mx-auto px-6 py-10 pb-20">
-        {/* Hero Section */}
-        <div className="mb-10">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-2xl bg-[#007AFF]/10 flex items-center justify-center">
-              <FileText className="w-7 h-7 text-[#007AFF]" />
-            </div>
-            <div>
-              <h1 className="text-4xl font-bold text-[#1D1D1F]">Blog Stratégies</h1>
-              <p className="text-[#6e6e73] text-sm mt-1">
-                Actualités, tendances et stratégies des marques qui réussissent
+      <main>
+        {/* Minimal Editorial Hero */}
+        <section className="bg-white pt-24 pb-16 sm:pt-32 sm:pb-24 overflow-hidden relative">
+          <div className="absolute top-0 left-0 w-full h-full bg-[#F5F5F7] -z-10 translate-y-[-50%] rounded-[100px]" />
+          <div className="max-w-7xl mx-auto px-6 lg:px-12">
+            <div className="flex flex-col items-center text-center max-w-4xl mx-auto">
+              <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#007AFF] mb-8">Magazine Industriel</span>
+              <h1 className="text-6xl sm:text-8xl lg:text-9xl font-black tracking-tight text-black leading-[0.85] mb-12">
+                Le radar <br />
+                <span className="text-[#6e6e73]/20 italic font-serif">OUTFITY</span>
+              </h1>
+              <p className="text-xl sm:text-2xl text-[#6e6e73] font-medium leading-relaxed max-w-2xl px-4 italic">
+                La confluence de la data, de la mode et de la stratégie.
               </p>
             </div>
           </div>
-        </div>
+        </section>
 
-        {/* AI Strategy Update Banner */}
-        <Card className="mb-10 border-2 border-[#007AFF]/20 bg-gradient-to-r from-[#007AFF]/5 to-[#007AFF]/10">
-          <CardContent className="p-6">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-full bg-[#007AFF]/20 flex items-center justify-center shrink-0">
-                <Sparkles className="w-6 h-6 text-[#007AFF]" />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg text-[#1D1D1F] mb-2 flex items-center gap-2">
-                  <TrendingUp className="w-5 h-5 text-[#007AFF]" />
-                  Vos stratégies évoluent automatiquement avec le marché
-                </h3>
-                <p className="text-sm text-[#6e6e73] leading-relaxed">
-                  Les articles de ce blog alimentent notre <strong>IA qui met à jour automatiquement</strong> les stratégies de nos utilisateurs premium.
-                  Chaque nouvelle tendance, chaque actualité pertinente concernant votre marque de référence est intégrée à votre positionnement pour garder votre stratégie toujours à jour.
-                </p>
-                <div className="mt-4 p-3 rounded-lg bg-white/50 border border-[#007AFF]/10">
-                  <p className="text-xs text-[#6e6e73]">
-                    <strong className="text-[#1D1D1F]">💡 Stratégie vivante :</strong> Contrairement aux consultants traditionnels qui vous livrent un document figé,
-                    OUTFITY adapte votre stratégie en continu selon l'évolution de votre secteur et de votre marque de référence.
+        {/* Featured Story - Magazine Style */}
+        {posts.length > 0 && (
+          <section className="py-12 px-6 max-w-7xl mx-auto">
+            <Link href={`/blog/${posts[0].slug}`} className="group relative block overflow-hidden rounded-[60px] bg-black aspect-[21/10]">
+              {posts[0].coverImage && (
+                <img
+                  src={posts[0].coverImage}
+                  alt={posts[0].title}
+                  className="absolute inset-0 w-full h-full object-cover opacity-70 transition-transform duration-[2000ms] group-hover:scale-105"
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+              <div className="absolute inset-0 flex flex-col justify-end p-12 sm:p-24 lg:p-32">
+                <div className="max-w-4xl space-y-8">
+                  <div className="flex items-center gap-4 text-white/60 text-xs font-black uppercase tracking-widest">
+                    <span className="px-3 py-1 rounded bg-[#007AFF] text-white">À LA UNE</span>
+                    <span>•</span>
+                    <span>{posts[0].author}</span>
+                  </div>
+                  <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white leading-none tracking-tighter group-hover:text-[#007AFF] transition-colors">
+                    {posts[0].title}
+                  </h2>
+                  <p className="text-white/60 text-xl font-medium line-clamp-2 max-w-2xl">
+                    {posts[0].excerpt}
                   </p>
+                  <div className="inline-flex items-center gap-4 text-white font-black uppercase tracking-widest text-sm pt-4">
+                    Explorer l'analyse <ArrowRight className="w-5 h-5 group-hover:translate-x-4 transition-all" />
+                  </div>
                 </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
+            </Link>
+          </section>
+        )}
 
-        {/* Articles Grid */}
-        {posts.length === 0 ? (
-          <Card className="border-2">
-            <CardContent className="py-16 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-muted mx-auto mb-4 flex items-center justify-center">
-                <FileText className="w-8 h-8 text-muted-foreground" />
-              </div>
-              <h3 className="text-lg font-bold text-[#1D1D1F] mb-2">Articles à venir</h3>
-              <p className="text-[#6e6e73] max-w-md mx-auto">
-                Nos premiers articles sur les stratégies des marques de référence (Nike, Patagonia, Supreme, etc.) arrivent bientôt !
-              </p>
-              <p className="text-sm text-[#6e6e73] mt-4">
-                En attendant, découvrez nos{' '}
-                <Link href="/#features" className="text-[#007AFF] hover:underline font-medium">
-                  fonctionnalités
-                </Link>
-                {' '}ou{' '}
-                <Link href="/auth/signin" className="text-[#007AFF] hover:underline font-medium">
-                  créez votre compte
-                </Link>
-                .
-              </p>
-            </CardContent>
-          </Card>
-        ) : (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {posts.map((post) => (
-              <Link key={post.id} href={`/blog/${post.slug}`}>
-                <Card className="h-full hover:shadow-lg hover:border-[#007AFF]/30 transition-all cursor-pointer">
-                  {post.coverImage && (
-                    <div className="aspect-video bg-muted relative overflow-hidden">
+        {/* Asymmetric Article Grid */}
+        <section className="py-24 lg:py-40">
+          <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-12 gap-y-24 gap-x-12">
+            {posts.slice(1).map((post, index) => (
+              <div key={post.id} className={cn(
+                "md:col-span-12 lg:col-span-6 group",
+                index % 3 === 0 && "lg:col-span-7",
+                index % 3 === 1 && "lg:col-span-5 pt-20",
+                index % 3 === 2 && "lg:col-span-12 flex flex-col md:flex-row gap-12 border-y border-black/5 py-32 mt-20"
+              )}>
+                <Link href={`/blog/${post.slug}`} className={cn(
+                  "block space-y-8",
+                  index % 3 === 2 && "flex flex-col md:flex-row gap-12 w-full"
+                )}>
+                  <div className={cn(
+                    "relative overflow-hidden rounded-[40px] bg-[#F5F5F7]",
+                    index % 3 === 2 ? "md:w-1/2 aspect-[16/10]" : "aspect-[4/3]"
+                  )}>
+                    {post.coverImage && (
                       <img
                         src={post.coverImage}
                         alt={post.title}
-                        className="w-full h-full object-cover"
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
                       />
+                    )}
+                    <div className="absolute top-8 left-8">
+                      <span className="px-4 py-2 bg-white/90 backdrop-blur-md rounded-full text-[10px] font-black uppercase tracking-widest text-[#007AFF]">
+                        DÉCRYPTAGE
+                      </span>
                     </div>
-                  )}
-                  <CardHeader className="pb-3">
-                    <div className="flex items-center gap-2 text-xs text-[#6e6e73] mb-2">
-                      <Calendar className="w-3 h-3" />
-                      <span>{new Date(post.publishedAt).toLocaleDateString('fr-FR')}</span>
-                      <span>•</span>
-                      <User className="w-3 h-3" />
+                  </div>
+
+                  <div className={cn(
+                    index % 3 === 2 ? "md:w-1/2 flex flex-col justify-center" : "space-y-6"
+                  )}>
+                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#6e6e73]/60">
+                      <span>{new Date(post.publishedAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</span>
+                      <span className="w-1 h-1 rounded-full bg-[#007AFF]" />
                       <span>{post.author}</span>
                     </div>
-                    <CardTitle className="text-base line-clamp-2 text-[#1D1D1F]">{post.title}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-[#6e6e73] line-clamp-3">{post.excerpt}</p>
-                    {post.tags && post.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-1 mt-3">
-                        {post.tags.slice(0, 3).map((tag) => (
-                          <span
-                            key={tag}
-                            className="px-2 py-0.5 rounded-full bg-[#007AFF]/10 text-[#007AFF] text-xs font-medium"
-                          >
-                            {tag}
-                          </span>
-                        ))}
+                    <h3 className={cn(
+                      "font-black text-black tracking-tight leading-tight group-hover:text-[#007AFF] transition-colors",
+                      index % 3 === 2 ? "text-4xl sm:text-6xl" : "text-3xl sm:text-4xl"
+                    )}>
+                      {post.title}
+                    </h3>
+                    <p className="text-lg text-[#6e6e73] font-medium leading-relaxed line-clamp-3">
+                      {post.excerpt}
+                    </p>
+                    <div className="pt-4 overflow-hidden">
+                      <div className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-black group-hover:gap-4 transition-all">
+                        Lire la suite <ArrowRight className="w-5 h-5 text-[#007AFF]" />
                       </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </Link>
+                    </div>
+                  </div>
+                </Link>
+              </div>
             ))}
           </div>
-        )}
+        </section>
+
+        {/* Industry Newsletter Style CTA */}
+        <section className="bg-black py-32 sm:py-48 overflow-hidden relative">
+          <div className="absolute top-0 right-0 w-1/2 h-full bg-[#007AFF] blur-[200px] opacity-10" />
+          <div className="max-w-7xl mx-auto px-6 text-center relative z-10">
+            <div className="max-w-3xl mx-auto space-y-12">
+              <Sparkles className="w-16 h-16 text-[#007AFF] mx-auto opacity-50" />
+              <h2 className="text-4xl sm:text-6xl font-black text-white leading-none tracking-tight">
+                REJOIGNEZ <br />
+                <span className="text-[#6e6e73]">L'ÉLITE DU SECTEUR</span>
+              </h2>
+              <p className="text-white/60 text-xl font-medium">
+                OUTFITY n'est pas qu'un outil. C'est votre veille stratégique automatisée. Chaque article ici met à jour les algorithmes pour nos membres VIP.
+              </p>
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-6 pt-12">
+                <Link href="/auth/signup" className="px-12 py-5 bg-white text-black font-black uppercase tracking-[0.2em] text-xs rounded-full hover:bg-[#007AFF] hover:text-white transition-all transform hover:scale-110">
+                  Commencer maintenant
+                </Link>
+                <Link href="/#pricing-section" className="text-white/40 font-black uppercase tracking-[0.2em] text-xs hover:text-white transition-colors">
+                  Voir les plans premium
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
+
+      <Footer />
     </div>
   );
 }

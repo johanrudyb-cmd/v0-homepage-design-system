@@ -136,9 +136,12 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Copyright */}
-        <div className="pt-6 border-t border-[#F2F2F2]">
-          <p className="text-sm text-[#6e6e73] font-normal text-center">
+        {/* Copyright & Legal Disclaimer */}
+        <div className="pt-6 border-t border-[#F2F2F2] space-y-4">
+          <p className="text-xs sm:text-sm text-[#86868b] font-normal text-center max-w-3xl mx-auto leading-relaxed italic opacity-80">
+            Les marques et logos cités appartiennent à leurs propriétaires respectifs. Leur mention sur OUTFITY est faite à des fins strictement informatives et d'analyse statistique, et n'implique aucune affiliation ou partenariat avec ces marques.
+          </p>
+          <p className="text-sm text-[#1d1d1f] font-bold text-center">
             © 2026 OUTFITY. Tous droits réservés.
           </p>
         </div>

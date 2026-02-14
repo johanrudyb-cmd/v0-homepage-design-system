@@ -311,13 +311,13 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                           />
 
                           {/* Top Badges */}
-                          <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
-                            <span className="px-3 py-1.5 rounded-2xl bg-white/90 backdrop-blur-md text-black text-[10px] font-black uppercase tracking-widest shadow-apple-sm">
+                          <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-20">
+                            <span className="px-2 py-1 rounded-xl bg-white/90 backdrop-blur-md text-black text-[9px] font-black uppercase tracking-widest shadow-apple-sm">
                               {segmentLabel}
                             </span>
                             {product.trendScore && product.trendScore > 85 && (
-                              <span className="px-3 py-1.5 rounded-2xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 animate-pulse">
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#FF3B30]" />
+                              <span className="px-2 py-1 rounded-xl bg-black text-white text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 animate-pulse">
+                                <div className="w-1 h-1 rounded-full bg-[#FF3B30]" />
                                 Trending Now
                               </span>
                             )}
@@ -326,9 +326,9 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                           {/* IVS Index Float */}
                           {product.trendScore && (
                             <div className="absolute bottom-4 right-4 z-20">
-                              <div className="px-4 py-2 rounded-2xl bg-black/80 backdrop-blur-xl text-white border border-white/20 shadow-apple-lg text-right">
-                                <div className="text-[9px] font-bold uppercase tracking-tight text-white/50 mb-[-2px]">IVS Index</div>
-                                <div className="text-lg font-black tracking-tight">{product.trendScore}%</div>
+                              <div className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl bg-black/80 backdrop-blur-xl text-white border border-white/20 shadow-apple-lg text-right">
+                                <div className="text-[8px] sm:text-[9px] font-bold uppercase tracking-tight text-white/50 mb-[-2px]">IVS Index</div>
+                                <div className="text-sm sm:text-lg font-black tracking-tight">{product.trendScore}%</div>
                               </div>
                             </div>
                           )}
@@ -337,7 +337,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                         <div className="p-6 flex flex-col flex-grow">
                           <div className="flex items-start justify-between gap-4 mb-4">
                             <div className="min-w-0 flex-1">
-                              <h3 className="text-[17px] font-bold text-black leading-tight line-clamp-2 transition-colors group-hover:text-[#007AFF]">
+                              <h3 className="text-[17px] font-bold text-black leading-tight line-clamp-2 sm:line-clamp-none transition-colors group-hover:text-[#007AFF]">
                                 {product.name}
                               </h3>
                             </div>
@@ -378,7 +378,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
             href="/trends"
             className="inline-flex items-center gap-4 bg-white border border-black/5 px-10 py-5 rounded-full text-black font-black uppercase tracking-widest text-sm shadow-apple hover:shadow-apple-lg hover:-translate-y-1 transition-all group"
           >
-            Explorer le Radar Complet
+            Analyser le Radar Complet
             <motion.div
               animate={{ x: [0, 5, 0] }}
               transition={{ repeat: Infinity, duration: 1.5 }}

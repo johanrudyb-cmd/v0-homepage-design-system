@@ -64,7 +64,7 @@ export function TrendsHero() {
 
           {/* Bandeau défilant avec logos de marques — Style Premium Apple */}
           <div className="relative mt-16 sm:mt-24 lg:mt-32">
-            <div className="w-full py-8 bg-white overflow-hidden">
+            <div className="w-full py-2 bg-white overflow-hidden">
               {/* Le masque dégradé responsive */}
               <div className="relative w-full flex overflow-hidden [mask-image:_linear-gradient(to_right,transparent_0,_black_15%,_black_85%,transparent_100%)]">
 

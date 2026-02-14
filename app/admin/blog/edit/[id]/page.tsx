@@ -3,9 +3,9 @@ import { prisma } from '@/lib/prisma';
 import { BlogPostForm } from '@/components/blog/BlogPostForm';
 
 interface EditBlogPostPageProps {
-    params: {
+    params: Promise<{
         id: string;
-    };
+    }>;
 }
 
 export const metadata = {
@@ -13,8 +13,9 @@ export const metadata = {
 };
 
 export default async function EditBlogPostPage({ params }: EditBlogPostPageProps) {
+    const { id } = await params;
     const post = await prisma.blogPost.findUnique({
-        where: { id: params.id },
+        where: { id },
     });
 
     if (!post) {

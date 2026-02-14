@@ -1,65 +1,118 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Menu, X } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export function AnimatedHeader() {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+  // Empêcher le scroll quand le menu est ouvert
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [isMenuOpen]);
+
+  const navLinks = [
+    { name: 'Fonctionnalités', href: '#features' },
+    { name: 'Tarifs', href: '#pricing-section' },
+    { name: 'Témoignages', href: '#testimonials-section' },
+    { name: 'Blog', href: '/blog' },
+    { name: 'FAQ', href: '#faq-section' },
+  ];
 
   return (
     <nav className="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-[#F2F2F2]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 sm:h-16 lg:h-20 flex items-center justify-between gap-2">
-        <Link href={isLoggedIn ? '/dashboard' : '/'} className="shrink-0">
-          <Image src="/icon.png" alt="Logo" width={140} height={140} className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-28 lg:w-28 xl:h-32 xl:w-32 object-contain bg-transparent" unoptimized />
-        </Link>
+        <div className="flex items-center gap-2">
+          {/* Menu Mobile Button */}
+          <button
+            onClick={() => setIsMenuOpen(!isMenuOpen)}
+            className="md:hidden p-2 text-[#1D1D1F] hover:bg-black/5 rounded-full transition-colors"
+            aria-label="Menu"
+          >
+            {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+          </button>
 
-        {/* Navigation - liens utiles à la navigation sur la page */}
-        <div className="hidden md:flex items-center gap-4 lg:gap-8">
-          <Link
-            href="#features"
-            className="text-sm font-medium text-[#6e6e73] hover:text-[#007AFF] transition-colors whitespace-nowrap"
-          >
-            Fonctionnalités
-          </Link>
-          <Link
-            href="#pricing-section"
-            className="text-sm font-medium text-[#6e6e73] hover:text-[#007AFF] transition-colors whitespace-nowrap"
-          >
-            Tarifs
-          </Link>
-          <Link
-            href="#testimonials-section"
-            className="text-sm font-medium text-[#6e6e73] hover:text-[#007AFF] transition-colors whitespace-nowrap"
-          >
-            Témoignages
-          </Link>
-          <Link
-            href="#faq-section"
-            className="text-sm font-medium text-[#6e6e73] hover:text-[#007AFF] transition-colors whitespace-nowrap"
-          >
-            FAQ
+          <Link href={isLoggedIn ? '/dashboard' : '/'} className="shrink-0">
+            <Image src="/icon.png" alt="Logo" width={140} height={140} className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-28 lg:w-28 xl:h-32 xl:w-32 object-contain bg-transparent" unoptimized />
           </Link>
         </div>
 
-        {/* CTA - boutons alignés avec le reste du site */}
+        {/* Navigation Desktop */}
+        <div className="hidden md:flex items-center gap-4 lg:gap-8">
+          {navLinks.map((link) => (
+            <Link
+              key={link.name}
+              href={link.href}
+              className="text-sm font-medium text-[#6e6e73] hover:text-[#007AFF] transition-colors whitespace-nowrap"
+            >
+              {link.name}
+            </Link>
+          ))}
+        </div>
+
+        {/* CTA */}
         <div className="flex items-center gap-2 sm:gap-3 shrink-0">
           <Link
             href="/auth/signin"
-            className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium border-2 border-[#E5E5E7] text-[#1D1D1F] hover:border-[#007AFF] hover:text-[#007AFF] transition-colors whitespace-nowrap"
+            className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold border-2 border-[#E5E5E7] text-[#1D1D1F] hover:border-[#007AFF] hover:text-[#007AFF] transition-colors whitespace-nowrap"
           >
-            Se connecter
+            Connexion
           </Link>
           <Link
             href="/auth/signup"
-            className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-medium bg-[#007AFF] text-white hover:bg-[#0056CC] transition-colors shadow-sm whitespace-nowrap"
+            className="hidden sm:block px-5 py-2.5 rounded-full text-sm font-bold bg-[#007AFF] text-white hover:bg-[#0056CC] transition-colors shadow-sm whitespace-nowrap"
           >
-            Créer un compte
+            S'inscrire
           </Link>
         </div>
       </div>
+
+      {/* Menu Mobile Overlay */}
+      <AnimatePresence>
+        {isMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="md:hidden bg-white border-b border-[#F2F2F2] overflow-hidden"
+          >
+            <div className="px-4 py-6 space-y-4">
+              {navLinks.map((link) => (
+                <Link
+                  key={link.name}
+                  href={link.href}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block text-xl font-bold text-[#1D1D1F] py-2 hover:text-[#007AFF] transition-colors"
+                >
+                  {link.name}
+                </Link>
+              ))}
+              <div className="pt-6 border-t border-[#F2F2F2]">
+                <Link
+                  href="/auth/signup"
+                  onClick={() => setIsMenuOpen(false)}
+                  className="block w-full py-4 bg-[#007AFF] text-white rounded-2xl text-center font-bold"
+                >
+                  Créer un compte
+                </Link>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

@@ -17,7 +17,7 @@ interface BlogPostData {
     slug: string;
     excerpt: string;
     content: string;
-    coverImage: string;
+    coverImage: string | null;
     published: boolean;
     tags: string[];
     relatedBrands: string[];
@@ -164,7 +164,7 @@ export function BlogPostForm({ initialData }: BlogPostFormProps) {
                     <Label htmlFor="coverImage">URL Image de couverture</Label>
                     <Input
                         id="coverImage"
-                        value={formData.coverImage}
+                        value={formData.coverImage || ''}
                         onChange={(e) => handleChange('coverImage', e.target.value)}
                         placeholder="https://..."
                     />
@@ -174,7 +174,7 @@ export function BlogPostForm({ initialData }: BlogPostFormProps) {
                     <Checkbox
                         id="published"
                         checked={formData.published}
-                        onCheckedChange={(checked) => handleChange('published', checked === true)}
+                        onCheckedChange={(checked: boolean | 'indeterminate') => handleChange('published', checked === true)}
                     />
                     <Label htmlFor="published" className="font-medium cursor-pointer">
                         Publier cet article immédiatement

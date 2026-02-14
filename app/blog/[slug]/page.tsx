@@ -1,28 +1,27 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, User, Clock, ArrowRight } from 'lucide-react';
-import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft, Calendar, User, Clock, ArrowRight, Sparkles, Share2 } from 'lucide-react';
 import { prisma } from '@/lib/prisma';
 import Markdown from 'react-markdown';
+import { AnimatedHeader } from '@/components/homepage/AnimatedHeader';
+import { Footer } from '@/components/homepage/Footer';
+import { cn } from '@/lib/utils';
 
-export const revalidate = 3600; // Revalidate every hour
+export const revalidate = 3600;
 
 interface BlogPostPageProps {
-    params: {
+    params: Promise<{
         slug: string;
-    };
+    }>;
 }
 
 export async function generateMetadata({ params }: BlogPostPageProps) {
+    const { slug } = await params;
     const post = await prisma.blogPost.findUnique({
-        where: { slug: params.slug },
+        where: { slug },
     });
 
-    if (!post) {
-        return {
-            title: 'Article non trouvé | OUTFITY',
-        };
-    }
+    if (!post) return { title: 'Article non trouvé | OUTFITY' };
 
     return {
         title: `${post.title} | Blog OUTFITY`,
@@ -36,18 +35,14 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
 }
 
 export default async function BlogPostPage({ params }: BlogPostPageProps) {
+    const { slug } = await params;
     const post = await prisma.blogPost.findUnique({
-        where: { slug: params.slug },
+        where: { slug },
     });
 
-    // En prod, on ne montre que les articles publiés. En dev, on peut voir les brouillons si on connait le slug (discutable, mais pratique)
-    // Ici j'ajoute une sécu simple
     const isProd = process.env.NODE_ENV === 'production';
-    if (!post || (isProd && !post.published)) {
-        notFound();
-    }
+    if (!post || (isProd && !post.published)) notFound();
 
-    // Articles suggérés (les 3 plus récents sauf celui-ci)
     const suggestedPosts = await prisma.blogPost.findMany({
         where: {
             published: true,
@@ -59,105 +54,222 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
     return (
         <div className="min-h-screen bg-[#F5F5F7]">
-            <header className="bg-white border-b border-[#F2F2F2] sticky top-0 z-10">
-                <div className="max-w-4xl mx-auto px-6 py-4">
-                    <div className="flex items-center justify-between">
+            <AnimatedHeader />
+
+            <main className="pb-32">
+                {/* Article Hero */}
+                <section className="relative pt-12 sm:pt-24 pb-12 sm:pb-32 bg-white">
+                    <div className="max-w-4xl mx-auto px-6 relative z-10">
                         <Link
                             href="/blog"
-                            className="inline-flex items-center gap-2 text-sm text-[#6e6e73] hover:text-[#007AFF] transition-colors"
+                            className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-widest text-[#007AFF] mb-12 hover:gap-4 transition-all"
                         >
                             <ArrowLeft className="w-4 h-4" />
-                            Retour au blog
+                            Retour à l'actualité
                         </Link>
-                    </div>
-                </div>
-            </header>
 
-            <main className="max-w-4xl mx-auto px-6 py-10 pb-20">
-                <article>
-                    {post.coverImage && (
-                        <div className="rounded-2xl overflow-hidden mb-8 shadow-lg aspect-[21/9]">
-                            <img
-                                src={post.coverImage}
-                                alt={post.title}
-                                className="w-full h-full object-cover"
-                            />
-                        </div>
-                    )}
-
-                    <div className="mb-8">
-                        <div className="flex items-center gap-4 text-sm text-[#6e6e73] mb-4">
-                            <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full border border-[#E5E5E5]">
-                                <Calendar className="w-3.5 h-3.5" />
+                        <div className="flex flex-wrap items-center gap-4 mb-10">
+                            <span className="px-3 py-1.5 rounded-full bg-black text-white text-[10px] font-black uppercase tracking-widest">
+                                {post.tags[0] || 'ACTU'}
+                            </span>
+                            <div className="h-4 w-px bg-black/10" />
+                            <div className="flex items-center gap-2 text-xs font-bold text-[#6e6e73]">
+                                <Calendar className="w-4 h-4" />
                                 {new Date(post.publishedAt).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}
-                            </span>
-                            <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full border border-[#E5E5E5]">
-                                <User className="w-3.5 h-3.5" />
-                                {post.author}
-                            </span>
-                            <span className="flex items-center gap-1.5 bg-white px-3 py-1 rounded-full border border-[#E5E5E5]">
-                                <Clock className="w-3.5 h-3.5" />
-                                {Math.max(1, Math.ceil(post.content.length / 1000))} min de lecture
-                            </span>
+                            </div>
                         </div>
 
-                        <h1 className="text-4xl md:text-5xl font-bold text-[#1D1D1F] leading-tight mb-6">
+                        <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight text-black leading-[1] mb-12">
                             {post.title}
                         </h1>
 
-                        {post.tags && post.tags.length > 0 && (
-                            <div className="flex flex-wrap gap-2 mb-8">
-                                {post.tags.map((tag) => (
-                                    <span
-                                        key={tag}
-                                        className="px-3 py-1 rounded-full bg-[#007AFF]/10 text-[#007AFF] text-sm font-medium"
-                                    >
-                                        #{tag}
-                                    </span>
-                                ))}
+                        <div className="flex items-center justify-between py-10 border-y border-black/5">
+                            <div className="flex items-center gap-5">
+                                <div className="w-14 h-14 rounded-full bg-[#007AFF]/10 flex items-center justify-center">
+                                    <User className="w-7 h-7 text-[#007AFF]" />
+                                </div>
+                                <div>
+                                    <p className="text-base font-black text-black uppercase tracking-tight">{post.author}</p>
+                                    <p className="text-[10px] font-bold text-[#6e6e73] uppercase tracking-widest flex items-center gap-1.5">
+                                        <Clock className="w-3.5 h-3.5" />
+                                        {Math.max(2, Math.ceil(post.content.length / 800))} min de lecture
+                                    </p>
+                                </div>
                             </div>
-                        )}
-                    </div>
-
-                    <div className="prose prose-lg prose-slate max-w-none bg-white p-8 md:p-12 rounded-3xl shadow-sm border border-[#F2F2F2]">
-                        <Markdown>{post.content}</Markdown>
-                    </div>
-                </article>
-
-                {suggestedPosts.length > 0 && (
-                    <div className="mt-20 border-t border-[#E5E5E5] pt-12">
-                        <h2 className="text-2xl font-bold text-[#1D1D1F] mb-8">Continuer la lecture</h2>
-                        <div className="grid gap-6 md:grid-cols-3">
-                            {suggestedPosts.map((suggested) => (
-                                <Link key={suggested.id} href={`/blog/${suggested.slug}`}>
-                                    <Card className="h-full hover:shadow-lg hover:border-[#007AFF]/30 transition-all cursor-pointer group">
-                                        {suggested.coverImage && (
-                                            <div className="aspect-video bg-muted relative overflow-hidden rounded-t-xl">
-                                                <img
-                                                    src={suggested.coverImage}
-                                                    alt={suggested.title}
-                                                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                                                />
-                                            </div>
-                                        )}
-                                        <CardContent className="p-5">
-                                            <div className="text-xs text-[#6e6e73] mb-2">
-                                                {new Date(suggested.publishedAt).toLocaleDateString('fr-FR')}
-                                            </div>
-                                            <h3 className="font-bold text-[#1D1D1F] group-hover:text-[#007AFF] transition-colors line-clamp-2 mb-2">
-                                                {suggested.title}
-                                            </h3>
-                                            <div className="flex items-center text-[#007AFF] text-sm font-medium mt-auto">
-                                                Lire l'article <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-                                            </div>
-                                        </CardContent>
-                                    </Card>
-                                </Link>
-                            ))}
+                            <button className="w-12 h-12 rounded-full border border-black/5 flex items-center justify-center hover:bg-black hover:text-white transition-all shadow-apple-sm">
+                                <Share2 className="w-5 h-5" />
+                            </button>
                         </div>
                     </div>
+                </section>
+
+                {/* Content Area */}
+                <div className="max-w-5xl mx-auto px-6 -mt-16 relative z-20 pb-20">
+                    <div className="bg-white rounded-[40px] shadow-2xl border border-black/[0.02] overflow-hidden">
+                        {/* Huge Cover Image */}
+                        {post.coverImage && (
+                            <div className="aspect-[21/10] w-full relative overflow-hidden">
+                                <img
+                                    src={post.coverImage}
+                                    alt={post.title}
+                                    className="w-full h-full object-cover"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent" />
+                            </div>
+                        )}
+
+                        <div className="p-8 sm:p-16 lg:px-24 lg:py-20 relative">
+                            {/* Floating Sidebar Info (Desktop) */}
+                            <div className="hidden lg:block absolute left-[-180px] top-20 w-[140px] space-y-8 sticky top-32">
+                                <div className="space-y-4">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6e6e73]/50">Rédigé par</p>
+                                    <div className="flex flex-col gap-3">
+                                        <div className="w-10 h-10 rounded-full bg-[#007AFF]/10 flex items-center justify-center">
+                                            <User className="w-5 h-5 text-[#007AFF]" />
+                                        </div>
+                                        <p className="text-sm font-black text-black leading-tight uppercase">{post.author}</p>
+                                    </div>
+                                </div>
+                                <div className="space-y-4 pt-8 border-t border-black/5">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6e6e73]/50">Temps de lecture</p>
+                                    <p className="text-sm font-bold text-black flex items-center gap-2 uppercase">
+                                        <Clock className="w-3.5 h-3.5" />
+                                        {Math.max(2, Math.ceil(post.content.length / 800))} min
+                                    </p>
+                                </div>
+                                <div className="space-y-4 pt-8 border-t border-black/5">
+                                    <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6e6e73]/50">Partage</p>
+                                    <button className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center hover:bg-[#007AFF] hover:text-white transition-all shadow-apple-sm group">
+                                        <Share2 className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <article className="max-w-3xl mx-auto">
+                                <Markdown
+                                    components={{
+                                        h1: ({ node, ...props }) => <h1 className="text-4xl sm:text-5xl font-black tracking-tight text-black mb-10 mt-16 leading-[1.1]" {...props} />,
+                                        h2: ({ node, ...props }) => <h2 className="text-3xl sm:text-4xl font-black tracking-tight text-black mb-8 mt-20 leading-tight flex items-center gap-4 before:h-[2px] before:w-8 before:bg-[#007AFF]/20" {...props} />,
+                                        h3: ({ node, ...props }) => <h3 className="text-2xl font-black tracking-tight text-black mb-6 mt-12 leading-tight" {...props} />,
+                                        p: ({ node, ...props }) => <p className="text-lg sm:text-xl text-[#1d1d1f]/80 leading-relaxed mb-10 font-medium" {...props} />,
+                                        ul: ({ node, ...props }) => <ul className="space-y-4 mb-10 list-none pl-0" {...props} />,
+                                        li: ({ node, ...props }) => (
+                                            <li className="flex items-start gap-4 text-lg text-[#1d1d1f] font-medium group">
+                                                <span className="w-1.5 h-1.5 rounded-full bg-[#007AFF] mt-2.5 shrink-0 group-hover:scale-150 transition-transform" />
+                                                <span className="leading-relaxed">{props.children}</span>
+                                            </li>
+                                        ),
+                                        blockquote: ({ node, ...props }) => (
+                                            <blockquote className="my-16 p-10 sm:p-14 bg-[#F5F5F7] rounded-[32px] border-l-[8px] border-[#007AFF] relative overflow-hidden" {...props}>
+                                                <Sparkles className="absolute top-8 right-8 w-12 h-12 text-[#007AFF]/5" />
+                                                <div className="text-2xl sm:text-3xl font-black italic text-[#1d1d1f] leading-snug relative z-10">
+                                                    {props.children}
+                                                </div>
+                                            </blockquote>
+                                        ),
+                                        strong: ({ node, ...props }) => <strong className="font-black text-black" {...props} />,
+                                        a: ({ node, ...props }) => <a className="text-[#007AFF] font-bold underline underline-offset-4 decoration-2 hover:bg-[#007AFF]/10 transition-all rounded px-1" {...props} />,
+                                    }}
+                                >
+                                    {post.content}
+                                </Markdown>
+
+                                {/* Bottom Info (Mobile only) */}
+                                <div className="lg:hidden mt-20 pt-10 border-t border-black/5 space-y-8">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-12 h-12 rounded-full bg-[#007AFF]/10 flex items-center justify-center">
+                                                <User className="w-6 h-6 text-[#007AFF]" />
+                                            </div>
+                                            <div>
+                                                <p className="text-xs font-black uppercase text-[#6e6e73]">Rédigé par</p>
+                                                <p className="text-sm font-black text-black uppercase">{post.author}</p>
+                                            </div>
+                                        </div>
+                                        <button className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center">
+                                            <Share2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {/* Tags at bottom */}
+                                {post.tags && post.tags.length > 0 && (
+                                    <div className="mt-24 pt-10 border-t-2 border-dashed border-black/5">
+                                        <div className="flex flex-wrap items-center gap-2">
+                                            <span className="text-[10px] font-black uppercase tracking-widest text-[#6e6e73] mr-4">Mots clés :</span>
+                                            {post.tags.map((tag) => (
+                                                <span
+                                                    key={tag}
+                                                    className="px-4 py-2 rounded-xl bg-[#F5F5F7] text-black text-[11px] font-black uppercase tracking-widest hover:bg-[#007AFF] hover:text-white transition-all cursor-pointer"
+                                                >
+                                                    #{tag}
+                                                </span>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+                            </article>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Suggested Articles */}
+                {suggestedPosts.length > 0 && (
+                    <section className="py-24 sm:py-32">
+                        <div className="max-w-7xl mx-auto px-6">
+                            <div className="flex flex-col md:flex-row md:items-end justify-between mb-16 gap-6">
+                                <div>
+                                    <h2 className="text-4xl font-black tracking-tight text-black mb-4 uppercase">
+                                        Continuer <br className="sm:hidden" />
+                                        <span className="text-[#6e6e73]/40">l'exploration</span>
+                                    </h2>
+                                    <p className="text-[#6e6e73] font-medium text-lg">D'autres analyses pour affiner votre radar.</p>
+                                </div>
+                                <Link
+                                    href="/blog"
+                                    className="group flex items-center gap-3 text-[#007AFF] font-black uppercase tracking-[0.2em] text-[10px]"
+                                >
+                                    Toute l'actualité
+                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                </Link>
+                            </div>
+
+                            <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-3">
+                                {suggestedPosts.map((suggested) => (
+                                    <Link key={suggested.id} href={`/blog/${suggested.slug}`} className="group">
+                                        <article className="flex flex-col h-full bg-white rounded-[40px] overflow-hidden shadow-apple transition-all duration-700 hover:shadow-apple-lg hover:-translate-y-3">
+                                            <div className="relative aspect-[16/10] overflow-hidden bg-[#F5F5F7]">
+                                                {suggested.coverImage && (
+                                                    <img
+                                                        src={suggested.coverImage}
+                                                        alt={suggested.title}
+                                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                                    />
+                                                )}
+                                                <div className="absolute top-6 left-6">
+                                                    <span className="px-3 py-1.5 rounded-2xl bg-white/90 backdrop-blur-md text-black text-[9px] font-black uppercase tracking-widest shadow-apple-sm">
+                                                        RECOMMANDÉ
+                                                    </span>
+                                                </div>
+                                            </div>
+                                            <div className="p-10">
+                                                <h3 className="text-2xl font-black text-black leading-tight mb-4 group-hover:text-[#007AFF] transition-colors line-clamp-2">
+                                                    {suggested.title}
+                                                </h3>
+                                                <p className="text-base text-[#6e6e73] font-medium leading-relaxed line-clamp-2">
+                                                    {suggested.excerpt}
+                                                </p>
+                                            </div>
+                                        </article>
+                                    </Link>
+                                ))}
+                            </div>
+                        </div>
+                    </section>
                 )}
             </main>
+
+            <Footer />
         </div>
     );
 }

@@ -32,7 +32,7 @@ export function UsageBadge({ count, plan, className }: UsageBadgeProps) {
 
             <div className="flex flex-col">
                 <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-black uppercase tracking-widest text-black">Explorations</span>
+                    <span className="text-[10px] font-black uppercase tracking-widest text-black">Analyses</span>
                     <span className="text-[10px] font-bold text-[#6e6e73]">{remaining} restantes</span>
                 </div>
 
