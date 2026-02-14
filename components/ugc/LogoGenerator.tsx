@@ -81,7 +81,16 @@ export function LogoGenerator({ brandId }: LogoGeneratorProps) {
 
     return (
         <div className="space-y-6">
-            <GenerationLoadingPopup open={isGenerating} title="Création de votre logo en cours..." />
+            <GenerationLoadingPopup
+                open={isGenerating}
+                title="Création de votre logo en cours..."
+                messages={[
+                    "Esquisse des premières formes...",
+                    "Application de la colorimétrie...",
+                    "Affinage de la typographie...",
+                    "Optimisation du rendu vectoriel...",
+                ]}
+            />
 
             <div className="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
                 {/* Colonne Gauche : Formulaire */}

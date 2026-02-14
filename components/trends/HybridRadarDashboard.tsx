@@ -174,10 +174,46 @@ export function HybridRadarDashboard() {
 
   return (
     <div className="space-y-8">
-      <GenerationLoadingPopup open={uploading} title="Analyse de l'image en cours…" />
-      <GenerationLoadingPopup open={!!generatingAnalysis} title="Génération de l'analyse business…" />
-      <GenerationLoadingPopup open={scanning} title="Scan des tendances en cours…" />
-      <GenerationLoadingPopup open={scrapingOnly} title="Récupération des données…" />
+      <GenerationLoadingPopup
+        open={uploading}
+        title="Analyse de l'image en cours…"
+        messages={[
+          "Scan des bases de données mondiales...",
+          "Analyse de la récurrence visuelle...",
+          "Calcul du score de viralité...",
+          "Détection des signaux faibles...",
+        ]}
+      />
+      <GenerationLoadingPopup
+        open={!!generatingAnalysis}
+        title="Génération de l'analyse business…"
+        messages={[
+          "Étude des volumes de recherche...",
+          "Analyse de la saturation marché...",
+          "Calcul des marges prévisionnelles...",
+          "Extraction des opportunités locales...",
+        ]}
+      />
+      <GenerationLoadingPopup
+        open={scanning}
+        title="Scan des tendances en cours…"
+        messages={[
+          "Inspection des boutiques leaders...",
+          "Filtrage des nouveaux produits...",
+          "Détection des ruptures de stock...",
+          "Correlation multi-marchés...",
+        ]}
+      />
+      <GenerationLoadingPopup
+        open={scrapingOnly}
+        title="Récupération des données…"
+        messages={[
+          "Connexion aux sources mondiales...",
+          "Capture des visuels produits...",
+          "Collecte des métadonnées techniques...",
+          "Normalisation des informations...",
+        ]}
+      />
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Globe className="w-7 h-7" />

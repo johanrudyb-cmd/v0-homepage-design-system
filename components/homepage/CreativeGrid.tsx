@@ -48,8 +48,8 @@ export function CreativeGrid() {
       icon: Image,
       href: '#pricing-section',
       isFree: false,
-      color: 'bg-[#34C759]/10',
-      iconColor: 'text-[#34C759]',
+      color: 'bg-[#007AFF]/20',
+      iconColor: 'text-[#007AFF]',
     },
     {
       title: 'Scripts Marketing IA',
@@ -57,8 +57,8 @@ export function CreativeGrid() {
       icon: FileText,
       href: '#pricing-section',
       isFree: false,
-      color: 'bg-[#FF9500]/10',
-      iconColor: 'text-[#FF9500]',
+      color: 'bg-[#007AFF]/10',
+      iconColor: 'text-[#007AFF]',
     },
     {
       title: 'Scanner visuel IA',
@@ -66,8 +66,8 @@ export function CreativeGrid() {
       icon: Camera,
       href: '/trends/visual',
       isFree: false,
-      color: 'bg-[#5856D6]/10',
-      iconColor: 'text-[#5856D6]',
+      color: 'bg-[#007AFF]/20',
+      iconColor: 'text-[#007AFF]',
     },
   ];
 

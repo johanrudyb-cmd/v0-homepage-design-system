@@ -48,6 +48,8 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
   const [totalTrends, setTotalTrends] = useState<number>(initialData?.summary?.total || 0);
   const [trendsLoading, setTrendsLoading] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const cache = useState<Record<string, { trends: HybridTrend[], total: number }>>({})[0]; // Simple persistent session cache
+
   const { data: session } = useSession();
   const user = session?.user as any;
   const [zone, setZone] = useState<string>('EU');
@@ -80,27 +82,14 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
   }, [ageRange, segment]);
 
   const loadTrends = useCallback(async () => {
-    // Prevent unnecessary reload if initial data matches default filters on mount
-    const isDefault = segment === 'homme' && ageRange === '18-24' && sortBy === 'best' && zone === 'EU' && !globalOnly && !brandFromUrl;
+    const cacheKey = `${segment}-${ageRange}-${sortBy}-${zone}-${globalOnly}-${brandFromUrl || ''}`;
 
-    /* 
-     * FIX: Removed the check that prevents reloading when filters match default.
-     * Previous logic caused a bug where switching back to "Homme" or "18-24" (defaults) 
-     * would not trigger a refresh if trends were already loaded from a previous non-default state.
-     */
-    if (initialData && !isRefreshing && trends.length === 0 && isDefault) {
-      // Only skip if we have no trends yet and we have initial data?
-      // Actually simpler to just rely on initialData being set in useState.
-      // But if we want to avoid double fetch on mount:
-      // The `useEffect` calls `loadTrends` on mount.
-      // We can just check if we just mounted?
-      // For now, let's allow re-fetch to ensure consistency, or check if trends deeply equal initialData (too expensive).
-      // To avoid flash, we can check if trends[0] matches.
+    // Check cache first for instant display
+    if (cache[cacheKey]) {
+      setTrends(cache[cacheKey].trends);
+      setTotalTrends(cache[cacheKey].total);
+      return;
     }
-
-    // We remove the return early to force update. To avoid double fetch on mount,
-    // we could use a ref, but `trends` is initialized with `initialData`.
-    // If we fetch again, it's fine.
 
     if (trends.length > 0) {
       setIsRefreshing(true);
@@ -116,21 +105,25 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
       params.set('sortBy', sortBy);
       if (globalOnly) params.set('globalOnly', 'true');
       if (brandFromUrl) params.set('brand', brandFromUrl);
-      params.set('limit', '60');
+      params.set('limit', '15');
 
       const res = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
       const data = res.ok ? await res.json().catch(() => ({})) : {};
 
-      setTrends(Array.isArray(data.trends) ? data.trends : []);
-      setTotalTrends(data.summary?.total || 0);
+      const newTrends = Array.isArray(data.trends) ? data.trends : [];
+      const newTotal = data.summary?.total || 0;
+
+      // Update state and cache
+      setTrends(newTrends);
+      setTotalTrends(newTotal);
+      cache[cacheKey] = { trends: newTrends, total: newTotal };
     } catch (e) {
       console.error(e);
-      // Don't clear trends on error if we already have some
     } finally {
       setTrendsLoading(false);
       setIsRefreshing(false);
     }
-  }, [zone, ageRange, segment, sortBy, globalOnly, brandFromUrl, initialData, trends.length]);
+  }, [zone, ageRange, segment, sortBy, globalOnly, brandFromUrl, initialData, trends.length, cache]);
 
   useEffect(() => {
     loadTrends();
@@ -192,15 +185,13 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
             <div className="flex items-center gap-4">
               <h2 className="text-2xl font-black tracking-tight text-black">
                 Radar Elite
-                {!trendsLoading && totalTrends > 0 && (
-                  <span className="ml-3 text-[10px] bg-[#FF3B30] text-white px-2.5 py-1 rounded-full font-black tracking-widest uppercase">
-                    {totalTrends} Produits
-                  </span>
-                )}
+                <span className="ml-3 text-[10px] bg-[#007AFF] text-white px-2.5 py-1 rounded-full font-black tracking-widest uppercase shadow-lg shadow-[#007AFF]/20">
+                  60 Produits
+                </span>
               </h2>
               <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-black/5 rounded-full border border-black/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#6e6e73]">LIVE EU</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-[#007AFF] animate-pulse" />
+                <span className="text-[10px] font-black uppercase tracking-widest text-[#007AFF]">LIVE EU</span>
               </div>
             </div>
 
@@ -209,14 +200,6 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
                 featureKey="trends_hybrid_scan"
                 isFree={user?.plan === 'free'}
               />
-              <Button
-                variant="ghost"
-                size="sm"
-                className="rounded-full bg-black/5 hover:bg-black/10 h-10 px-6 text-[11px] font-black uppercase tracking-widest"
-                onClick={() => setAdvancedFiltersOpen((v) => !v)}
-              >
-                {advancedFiltersOpen ? 'Masquer Filtres' : 'Filtres Avancés'}
-              </Button>
             </div>
           </div>
 
@@ -273,38 +256,9 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
         </div>
       </div>
 
-      <AnimatePresence mode="wait">
-        {advancedFiltersOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            className="overflow-hidden"
-          >
-            <div className="p-6 rounded-[32px] bg-[#F5F5F7] border border-black/[0.03] space-y-6">
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div className="space-y-1">
-                  <h4 className="text-sm font-black uppercase tracking-widest text-black">Alertes Globales</h4>
-                  <p className="text-xs text-[#6e6e73]">Afficher uniquement les produits qui tendent simultanément sur 2+ marchés mondiaux.</p>
-                </div>
-                <button
-                  onClick={() => setGlobalOnly(!globalOnly)}
-                  className={cn(
-                    "h-12 px-8 rounded-full text-xs font-black uppercase tracking-widest transition-all",
-                    globalOnly ? "bg-black text-white shadow-apple" : "bg-white text-black border border-black/5"
-                  )}
-                >
-                  {globalOnly ? 'Filtre Activé' : 'Activer le Filtre'}
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className="flex items-center gap-3 text-sm text-[#6e6e73]">
         <Flame className="w-5 h-5 text-[#FF3B30] fill-[#FF3B30]" />
-        <span className="font-bold tracking-tight">Le Top 60 des tendances validées par nos algorithmes de viralité sociale.</span>
+        <span className="font-bold tracking-tight">Le Top 15 des tendances validées par nos algorithmes de viralité sociale.</span>
       </div>
 
       {/* Trends Grid or Loading State */}
@@ -345,7 +299,7 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
             layout
             className={cn(
               "grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8 transition-all duration-500",
-              isRefreshing ? "opacity-30 blur-sm scale-[0.98] pointer-events-none" : "opacity-100 blur-0 scale-100"
+              isRefreshing ? "opacity-60 pointer-events-none" : "opacity-100"
             )}
           >
             <AnimatePresence mode="popLayout">
@@ -409,8 +363,8 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
                               </span>
                             )}
                             {((t as any).outfityIVS || t.trendScore) > 85 && (
-                              <span className="px-1.5 py-0.5 sm:px-3 sm:py-1.5 rounded-full bg-black text-white text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
-                                <div className="w-1 h-1 rounded-full bg-[#34C759] animate-pulse" />
+                              <span className="px-1.5 py-0.5 sm:px-3 sm:py-1.5 rounded-full bg-[#007AFF] text-white text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
+                                <div className="w-1 h-1 rounded-full bg-white animate-pulse" />
                                 Elite
                               </span>
                             )}
@@ -434,7 +388,7 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
                               </h3>
                             </div>
                             <div className="flex items-center gap-2 sm:gap-3">
-                              <span className="text-[8px] sm:text-[10px] font-black text-[#6e6e73] bg-black/5 px-1.5 py-0.5 rounded-md uppercase tracking-widest">
+                              <span className="text-[8px] sm:text-[10px] font-black text-[#007AFF] bg-[#007AFF]/10 px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-[#007AFF]/10">
                                 {t.category}
                               </span>
                               <span className="text-[9px] sm:text-[11px] font-bold text-black/20 italic truncate">

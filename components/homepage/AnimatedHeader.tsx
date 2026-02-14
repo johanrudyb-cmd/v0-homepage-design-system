@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
+import { usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Menu, X } from 'lucide-react';
@@ -11,16 +12,22 @@ export function AnimatedHeader() {
   const { data: session } = useSession();
   const isLoggedIn = !!session?.user;
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const pathname = usePathname();
+
+  // Fermer le menu sur changement de route
+  useEffect(() => {
+    setIsMenuOpen(false);
+  }, [pathname]);
 
   // Empêcher le scroll quand le menu est ouvert
   useEffect(() => {
     if (isMenuOpen) {
       document.body.style.overflow = 'hidden';
     } else {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     }
     return () => {
-      document.body.style.overflow = 'unset';
+      document.body.style.overflow = '';
     };
   }, [isMenuOpen]);
 
@@ -73,7 +80,7 @@ export function AnimatedHeader() {
           </Link>
           <Link
             href="/auth/signup"
-            className="hidden sm:block px-5 py-2.5 rounded-full text-sm font-bold bg-[#007AFF] text-white hover:bg-[#0056CC] transition-colors shadow-sm whitespace-nowrap"
+            className="px-3 py-2 sm:px-5 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold bg-[#007AFF] text-white hover:bg-[#0056CC] transition-colors shadow-sm whitespace-nowrap"
           >
             S'inscrire
           </Link>

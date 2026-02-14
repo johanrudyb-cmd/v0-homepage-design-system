@@ -181,9 +181,7 @@ export function PricingSection() {
                 <Button
                   className={cn(
                     'w-full h-12 font-semibold transition-all duration-300',
-                    plan.popular
-                      ? 'bg-[#007AFF] hover:bg-[#0056CC] text-white'
-                      : 'bg-black hover:bg-[#1D1D1F] text-white'
+                    'bg-[#007AFF] hover:bg-[#0056CC] text-white shadow-lg shadow-[#007AFF]/10'
                   )}
                 >
                   {plan.cta}

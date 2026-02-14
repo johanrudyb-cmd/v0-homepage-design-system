@@ -98,7 +98,7 @@ export function TechPackShowcase() {
                   element.scrollIntoView({ behavior: 'smooth' });
                 }
               }}
-              className="inline-flex items-center gap-3 px-6 py-3 bg-[#000000] text-white rounded-full font-medium hover:bg-[#1a1a1a] transition-all duration-200 group"
+              className="inline-flex items-center gap-3 px-6 py-3 bg-[#007AFF] text-white rounded-full font-medium hover:bg-[#0056CC] transition-all duration-200 group shadow-lg shadow-[#007AFF]/20"
             >
               Créer mon tech pack
               <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />

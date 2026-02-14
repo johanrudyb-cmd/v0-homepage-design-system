@@ -584,6 +584,17 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
       <GenerationLoadingPopup
         open={isGenerating}
         title={shootingMode === 'product' ? 'Développement de votre catalogue...' : 'Capture de votre vision créative...'}
+        messages={shootingMode === 'product' ? [
+          "Mise en place du setup studio...",
+          "Ajustement de l'éclairage produit...",
+          "Capture des 4 angles de vue...",
+          "Optimisation des ombres et reflets...",
+        ] : [
+          "Installation du décor et mannequins...",
+          "Préparation du stylisme IA...",
+          "Capture de la pose idéale...",
+          "Rendu haute définition du shooting...",
+        ]}
       />
       <Card className="border-2">
         <CardHeader>

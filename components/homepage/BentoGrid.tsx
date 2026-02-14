@@ -78,7 +78,7 @@ export function BentoGrid() {
               Stratégie de marque IA
             </h3>
             <p className="text-lg text-[#6e6e73] leading-relaxed mb-6">
-              Définissez votre identité, positionnement et stratégie marketing avec l'intelligence artificielle. 
+              Définissez votre identité, positionnement et stratégie marketing avec l'intelligence artificielle.
               Analysez vos concurrents et identifiez les opportunités de marché.
             </p>
             <div className="flex items-center gap-2">
@@ -119,7 +119,7 @@ export function BentoGrid() {
                   <div className="flex-1">
                     <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                       <div
-                        className="h-full bg-[#000000] rounded-full transition-all duration-500"
+                        className="h-full bg-[#007AFF] rounded-full transition-all duration-500"
                         style={{ width: `${75 - i * 10}%` }}
                       />
                     </div>
@@ -239,7 +239,7 @@ export function BentoGrid() {
                   </div>
                   <div className="h-1.5 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                      className="h-full bg-[#000000] rounded-full transition-all duration-500"
+                      className="h-full bg-[#007AFF] rounded-full transition-all duration-500"
                       style={{ width: `${(item.value / item.max) * 100}%` }}
                     />
                   </div>

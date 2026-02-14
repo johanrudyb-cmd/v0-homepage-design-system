@@ -333,7 +333,17 @@ export function ScriptGenerator({ brandId, brandName }: ScriptGeneratorProps) {
             </CardContent>
           </Card>
 
-          <GenerationLoadingPopup open={isGenerating} title="Écriture de vos scénarios viraux..." />
+          <GenerationLoadingPopup
+            open={isGenerating}
+            title="Écriture de vos scénarios viraux..."
+            messages={[
+              "Analyse des hooks les plus performants...",
+              "Rédaction de la structure narrative...",
+              "Optimisation du rythme social media...",
+              "Intégration des appels à l'action...",
+              "Affinage du ton de marque...",
+            ]}
+          />
           <ConfirmGenerateModal
             open={showConfirmGenerate}
             onClose={() => setShowConfirmGenerate(false)}

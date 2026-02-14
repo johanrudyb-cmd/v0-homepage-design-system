@@ -225,7 +225,7 @@ export function FashionGallery() {
                 element.scrollIntoView({ behavior: 'smooth' });
               }
             }}
-            className="inline-flex items-center gap-2 sm:gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-[#000000] text-white rounded-full font-semibold text-base sm:text-lg hover:bg-[#1a1a1a] transition-all duration-200 group"
+            className="inline-flex items-center gap-2 sm:gap-3 px-6 py-3 sm:px-8 sm:py-4 bg-[#007AFF] text-white rounded-full font-semibold text-base sm:text-lg hover:bg-[#0056CC] transition-all duration-200 group shadow-lg shadow-[#007AFF]/20"
           >
             Créer mes shootings photo
             <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

@@ -212,7 +212,16 @@ export function VirtualTryOn({ brandId, designs }: VirtualTryOnProps) {
 
   return (
     <div className="space-y-6">
-      <GenerationLoadingPopup open={isGenerating} title="Génération du mannequin en cours…" />
+      <GenerationLoadingPopup
+        open={isGenerating}
+        title="Génération du mannequin en cours…"
+        messages={[
+          "Génération des traits du visage...",
+          "Ajustement de la morphologie...",
+          "Calcul du rendu photoréaliste...",
+          "Finalisation du profil mannequin...",
+        ]}
+      />
       <Card className="border-2">
         <CardHeader>
           <CardTitle className="text-xl font-bold flex items-center gap-2">

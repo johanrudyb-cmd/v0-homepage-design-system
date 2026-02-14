@@ -6,42 +6,42 @@ import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
 
 const plans = [
-    {
-      name: 'Gratuit',
-      price: 0,
-      period: 'Gratuit',
-      description: 'Parfait pour tester la plateforme et créer vos premiers designs',
-      features: [
-        '3 analyses de tendances par mois',
-        'Calculateur de marge',
-      ],
-      cta: 'Commencer gratuitement',
-      ctaStyle: 'border',
-      popular: false,
-    },
-    {
-      name: 'Créateur',
-      price: 34,
-      period: '/mois',
-      description: 'Tout ce dont vous avez besoin pour créer et lancer votre marque',
-      features: [
-        'Accès à l\'intégralité des fonctionnalités de l\'app',
-        '10 analyses de tendances par mois',
-        '10 stratégies de marque par mois',
-        'Générateur de logo',
-        'Packs de mockup',
-        'Génération de tech pack',
-        '10 lots de scripts marketing IA (5 scripts/lot)',
-        '5 shootings photo par mois',
-        '1 shooting produit par mois (4 images)',
-        'Sourcing Hub complet (envoi de devis)',
-        'Formation',
-        'Support prioritaire',
-      ],
-      cta: 'S\'abonner',
-      ctaStyle: 'solid',
-      popular: true,
-    },
+  {
+    name: 'Gratuit',
+    price: 0,
+    period: 'Gratuit',
+    description: 'Parfait pour tester la plateforme et créer vos premiers designs',
+    features: [
+      '3 analyses de tendances par mois',
+      'Calculateur de marge',
+    ],
+    cta: 'Commencer gratuitement',
+    ctaStyle: 'border',
+    popular: false,
+  },
+  {
+    name: 'Créateur',
+    price: 34,
+    period: '/mois',
+    description: 'Tout ce dont vous avez besoin pour créer et lancer votre marque',
+    features: [
+      'Accès à l\'intégralité des fonctionnalités de l\'app',
+      '10 analyses de tendances par mois',
+      '10 stratégies de marque par mois',
+      'Générateur de logo',
+      'Packs de mockup',
+      'Génération de tech pack',
+      '10 lots de scripts marketing IA (5 scripts/lot)',
+      '5 shootings photo par mois',
+      '1 shooting produit par mois (4 images)',
+      'Sourcing Hub complet (envoi de devis)',
+      'Formation',
+      'Support prioritaire',
+    ],
+    cta: 'S\'abonner',
+    ctaStyle: 'solid',
+    popular: true,
+  },
 ];
 
 export function SalesPricing() {
@@ -92,7 +92,7 @@ export function SalesPricing() {
               className={cn(
                 'relative bg-white rounded-[32px] p-10 border',
                 plan.popular
-                  ? 'border-[#000000]'
+                  ? 'border-[#007AFF] shadow-xl shadow-[#007AFF]/10'
                   : 'border-[#F2F2F2]',
                 'transition-all duration-500',
                 'hover:scale-[1.01]',
@@ -106,7 +106,7 @@ export function SalesPricing() {
               {/* Badge populaire discret */}
               {plan.popular && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                  <div className="bg-[#000000] text-white px-3 py-1 rounded-full text-xs font-semibold">
+                  <div className="bg-[#007AFF] text-white px-3 py-1 rounded-full text-xs font-semibold">
                     Plus Populaire
                   </div>
                 </div>
@@ -143,8 +143,8 @@ export function SalesPricing() {
                     key={featureIndex}
                     className="flex items-start gap-3"
                   >
-                    <div className="w-5 h-5 rounded-full bg-[#000000] flex items-center justify-center flex-shrink-0 mt-0.5">
-                      <Check className="w-3 h-3 text-white" />
+                    <div className="w-5 h-5 rounded-full bg-[#007AFF]/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <Check className="w-3 h-3 text-[#007AFF]" />
                     </div>
                     <span className="text-sm text-[#6e6e73] font-normal">
                       {feature}
@@ -159,13 +159,13 @@ export function SalesPricing() {
                 className={cn(
                   'block w-full text-center py-4 rounded-xl text-base font-semibold transition-all duration-200',
                   plan.ctaStyle === 'solid'
-                    ? 'bg-[#000000] text-white hover:bg-[#1D1D1F]'
-                    : 'bg-white text-[#000000] border-2 border-[#F2F2F2] hover:border-[#000000]'
+                    ? 'bg-[#007AFF] text-white hover:bg-[#0056CC] shadow-lg shadow-[#007AFF]/25'
+                    : 'bg-white text-[#1D1D1F] border-2 border-[#F2F2F2] hover:border-[#007AFF] hover:text-[#007AFF]'
                 )}
               >
                 {plan.cta}
               </Link>
-              
+
               {/* Note pour plan gratuit */}
               {plan.price === 0 && (
                 <p className="text-xs text-[#6e6e73] font-normal text-center mt-3">

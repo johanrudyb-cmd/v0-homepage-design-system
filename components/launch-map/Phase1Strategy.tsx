@@ -685,6 +685,24 @@ export function Phase1Strategy({ brandId, brand, brandName, onComplete, demoMode
                 ? 'Chargement de la stratégie…'
                 : 'Génération de la stratégie…'
         }
+        messages={
+          logoGenerating ? [
+            "Ciselage de vos emblèmes...",
+            "Calcul des variantes chromatiques...",
+            "Optimisation du rendu vectoriel...",
+            "Génération des détourages...",
+          ] : validateLoading ? [
+            "Sécurisation de vos choix...",
+            "Mise à jour de votre Launch Map...",
+            "Préparation du studio créatif...",
+            "Finalisation de l'étape 1...",
+          ] : [
+            "Extraction de l'ADN de la marque...",
+            "Fusion avec votre identité créative...",
+            "Rédaction du plan d'attaque complet...",
+            "Calcul de viabilité stratégique...",
+          ]
+        }
       />
       <Card className="border-2 border-primary/20 bg-primary/5">
         <CardContent className="pt-6">

@@ -67,7 +67,7 @@ export function CTASection() {
 
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 pt-6 sm:pt-8">
             <Link href="/auth/signup" className="w-full sm:w-auto">
-              <button type="button" className="w-full sm:w-auto min-h-[44px] px-6 sm:px-8 py-3.5 sm:py-4 bg-white text-[#000000] rounded-full text-base font-medium hover:bg-gray-100 transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] touch-manipulation">
+              <button type="button" className="w-full sm:w-auto min-h-[44px] px-6 sm:px-8 py-3.5 sm:py-4 bg-[#007AFF] text-white rounded-full text-base font-semibold hover:bg-[#0056CC] transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] touch-manipulation shadow-lg shadow-[#007AFF]/20">
                 Créer mon compte gratuit
               </button>
             </Link>

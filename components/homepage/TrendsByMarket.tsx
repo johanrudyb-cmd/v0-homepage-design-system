@@ -204,8 +204,8 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
               Tendances de la semaine
             </h2>
             <div className="flex items-center gap-3">
-              <div className="w-2 h-2 rounded-full bg-[#34C759] animate-pulse" />
-              <span className="text-[12px] font-bold uppercase tracking-widest text-[#6e6e73]">
+              <div className="w-2 h-2 rounded-full bg-[#007AFF] animate-pulse" />
+              <span className="text-[12px] font-bold uppercase tracking-widest text-[#007AFF]">
                 Radar Elite : Validé sur TikTok & Instagram
               </span>
             </div>
@@ -225,8 +225,8 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                 className={cn(
                   'flex-1 sm:flex-none h-12 px-8 rounded-full text-sm font-bold transition-all duration-300',
                   selectedAge === age
-                    ? 'bg-black text-white shadow-apple-lg scale-105'
-                    : 'text-[#6e6e73] hover:text-black'
+                    ? 'bg-[#007AFF] text-white shadow-apple-lg scale-105'
+                    : 'text-[#6e6e73] hover:text-[#007AFF]'
                 )}
               >
                 {age}
@@ -242,8 +242,8 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                 className={cn(
                   'flex-1 sm:flex-none h-12 px-8 rounded-full text-sm font-bold transition-all duration-300',
                   selectedGender === gender
-                    ? 'bg-black text-white shadow-apple-lg'
-                    : 'text-[#6e6e73] hover:text-black'
+                    ? 'bg-[#007AFF] text-white shadow-apple-lg'
+                    : 'text-[#6e6e73] hover:text-[#007AFF]'
                 )}
               >
                 {gender}
@@ -316,8 +316,8 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                               {segmentLabel}
                             </span>
                             {product.trendScore && product.trendScore > 85 && (
-                              <span className="px-2 py-1 rounded-xl bg-black text-white text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 animate-pulse">
-                                <div className="w-1 h-1 rounded-full bg-[#FF3B30]" />
+                              <span className="px-2 py-1 rounded-xl bg-[#007AFF] text-white text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 animate-pulse">
+                                <div className="w-1 h-1 rounded-full bg-white" />
                                 Trending Now
                               </span>
                             )}
@@ -349,7 +349,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                           </div>
 
                           <div className="flex items-center gap-2 mb-6">
-                            <span className="text-[10px] font-black text-[#6e6e73] bg-black/5 px-2 py-1 rounded-md uppercase tracking-widest">
+                            <span className="text-[10px] font-black text-[#007AFF] bg-[#007AFF]/10 px-2 py-1 rounded-md uppercase tracking-widest border border-[#007AFF]/10">
                               {product.category}
                             </span>
                             <span className="text-[11px] font-bold text-black/20 italic">
@@ -376,7 +376,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
         <div className="mt-16 lg:mt-24 text-center">
           <Link
             href="/trends"
-            className="inline-flex items-center gap-4 bg-white border border-black/5 px-10 py-5 rounded-full text-black font-black uppercase tracking-widest text-sm shadow-apple hover:shadow-apple-lg hover:-translate-y-1 transition-all group"
+            className="inline-flex items-center gap-4 bg-[#007AFF] px-10 py-5 rounded-full text-white font-black uppercase tracking-widest text-sm shadow-apple hover:shadow-apple-lg hover:-translate-y-1 transition-all group shadow-lg shadow-[#007AFF]/20"
           >
             Analyser le Radar Complet
             <motion.div

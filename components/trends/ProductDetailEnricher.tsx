@@ -75,15 +75,16 @@ export function ProductDetailEnricher({ productId, product, children }: ProductD
           router.refresh();
         }
       })
-      .catch(() => {})
+      .catch(() => { })
       .finally(() => setEnriching(false));
   }, [productId, product, router]);
 
   if (enriching) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[400px] gap-4">
-        <Loader2 className="w-10 h-10 text-primary animate-spin" />
-        <p className="text-sm text-muted-foreground">L&apos;IA complète les informations du produit…</p>
+        <div className="w-12 h-12 border-2 border-[#007AFF]/20 border-t-[#007AFF] rounded-full animate-apple-spin" />
+        <p className="text-sm font-medium text-[#1D1D1F]/70 italic">Analyse approfondie du produit en cours…</p>
+        <p className="text-xs text-[#1D1D1F]/50">Extraction des matières, coupes et spécifications techniques.</p>
       </div>
     );
   }

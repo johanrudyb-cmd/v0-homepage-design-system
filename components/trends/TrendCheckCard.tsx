@@ -86,7 +86,17 @@ export function TrendCheckCard({ fullWidth }: TrendCheckCardProps = {}) {
 
   return (
     <>
-      <GenerationLoadingPopup open={uploading} title="Vérification tendance en cours…" />
+      <GenerationLoadingPopup
+        open={uploading}
+        title="Vérification tendance en cours…"
+        messages={[
+          "Scan des bases de données mondiales...",
+          "Analyse de la récurrence visuelle...",
+          "Comparaison avec les collections leaders...",
+          "Calcul du score de viralité potentielle...",
+          "Détection des signaux faibles par zone...",
+        ]}
+      />
       <Card className={`border-2 w-full overflow-hidden ${fullWidth ? 'max-w-none' : 'max-w-2xl'}`}>
         <CardContent className="p-0">
           <div

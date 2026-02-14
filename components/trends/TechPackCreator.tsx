@@ -99,7 +99,7 @@ export function TechPackCreator({ preSelectedId }: { preSelectedId?: string | nu
       await navigator.clipboard.writeText(value.trim());
       setCopiedField(label);
       setTimeout(() => setCopiedField(null), 2000);
-    } catch (_) {}
+    } catch (_) { }
   };
 
   const copyFullTechPack = async () => {
@@ -118,7 +118,7 @@ export function TechPackCreator({ preSelectedId }: { preSelectedId?: string | nu
       await navigator.clipboard.writeText(lines.join('\n'));
       setCopiedField('tout');
       setTimeout(() => setCopiedField(null), 2000);
-    } catch (_) {}
+    } catch (_) { }
   };
 
   return (
@@ -127,9 +127,10 @@ export function TechPackCreator({ preSelectedId }: { preSelectedId?: string | nu
         open={loading}
         title="Chargement des tendances…"
         messages={[
-          'Veuillez patienter…',
-          'Récupération des produits tendance en cours.',
-          'Ne fermez pas cette page.',
+          "Scan des catalogues fournisseurs...",
+          "Extraction des fiches techniques...",
+          "Récupération des visuels HD...",
+          "Analyse des spécifications tissus...",
         ]}
       />
       <div className="flex items-center gap-4">
@@ -235,9 +236,8 @@ export function TechPackCreator({ preSelectedId }: { preSelectedId?: string | nu
                       key={t.id}
                       type="button"
                       onClick={() => setSelectedId(t.id)}
-                      className={`rounded-lg border-2 overflow-hidden text-left transition-colors ${
-                        selectedId === t.id ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-transparent hover:border-muted-foreground/30 hover:bg-muted/50'
-                      }`}
+                      className={`rounded-lg border-2 overflow-hidden text-left transition-colors ${selectedId === t.id ? 'border-primary bg-primary/5 ring-2 ring-primary/20' : 'border-transparent hover:border-muted-foreground/30 hover:bg-muted/50'
+                        }`}
                     >
                       <div className="aspect-[3/4] bg-muted relative">
                         {src ? (

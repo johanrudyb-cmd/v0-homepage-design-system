@@ -257,6 +257,17 @@ export function BrandAnalyzer({ initialBrand = '' }: BrandAnalyzerProps) {
       <GenerationLoadingPopup
         open={loading || strategyLoading}
         title={loading ? 'Analyse de la marque en cours…' : 'Génération de la stratégie…'}
+        messages={loading ? [
+          "Extraction de l'ADN de la marque...",
+          "Analyse du positionnement marché...",
+          "Décryptage des codes visuels...",
+          "Identification de la cible principale...",
+        ] : [
+          "Fusion des concepts créatifs...",
+          "Rédaction du plan d'attaque...",
+          "Calcul de viabilité stratégique...",
+          "Extraction des messages clés...",
+        ]}
       />
       {/* Résultat : même présentation que les marques tendances (StrategyPresentationView) */}
       {analysis && (

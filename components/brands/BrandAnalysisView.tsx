@@ -548,7 +548,17 @@ export function BrandAnalysisView({ slug }: BrandAnalysisViewProps) {
   if (!analysis && !error) {
     return (
       <div className="p-8 max-w-xl mx-auto space-y-6">
-        <GenerationLoadingPopup open={launching} title="Analyse de la marque en cours…" />
+        <GenerationLoadingPopup
+          open={launching}
+          title="Analyse de la marque en cours…"
+          messages={[
+            "Extraction de l'ADN de la marque...",
+            "Analyse du positionnement marché...",
+            "Décryptage des codes visuels...",
+            "Évaluation du potentiel de croissance...",
+            "Identification de la cible principale...",
+          ]}
+        />
         <p className="text-muted-foreground text-center">
           Aucune analyse pour cette marque. Lancez l&apos;analyse IA pour générer le rapport.
         </p>
@@ -609,6 +619,17 @@ export function BrandAnalysisView({ slug }: BrandAnalysisViewProps) {
       <GenerationLoadingPopup
         open={strategyLoading || calquerLoading}
         title={calquerLoading ? 'Calquage de la stratégie…' : 'Génération de la stratégie…'}
+        messages={calquerLoading ? [
+          "Mise à jour de votre profil marque...",
+          "Alignement des nouveaux objectifs...",
+          "Réinitialisation du guide de lancement...",
+          "Application des codes de succès...",
+        ] : [
+          "Fusion des concepts créatifs...",
+          "Rédaction du plan d'attaque...",
+          "Calcul de viabilité stratégique...",
+          "Extraction des messages clés...",
+        ]}
       />
       <StrategyPresentationView
         strategyText={analysis ?? ''}

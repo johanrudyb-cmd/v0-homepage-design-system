@@ -78,21 +78,22 @@ export default async function DashboardPage() {
             <div className="space-y-3">
               <div className="flex items-center gap-3">
                 <h1 className="text-4xl sm:text-5xl font-bold tracking-tight text-foreground">
-                  Hello, {user.name?.split(' ')[0] || 'Créateur'}
+                  Hello, {(() => {
+                    const parts = user.name?.split(' ') || [];
+                    // Chercher le premier mot qui n'est pas tout en majuscules (souvent le prénom en France si format NOM Prénom)
+                    const firstName = parts.find(p => p.length > 1 && !/^[A-ZÀ-Ÿ\s-]{2,}$/.test(p)) || parts[0] || 'Créateur';
+                    // Capitaliser proprement
+                    return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+                  })()}
                 </h1>
-                {isFree ? (
+                {isFree && (
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 border border-gray-200">
                     Free
                   </span>
-                ) : (
-                  <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary border border-primary/20">
-                    <Crown className="w-3 h-3" /> Pro
-                  </span>
                 )}
               </div>
-              <p className="text-lg text-muted-foreground flex items-center gap-2">
-                Voici l'avancée de <span className="font-semibold text-foreground">{brand.name}</span>.
-                {!isFree && <span className="text-sm text-green-600 font-medium bg-green-50 px-2 py-0.5 rounded-md">Succès en vue 🚀</span>}
+              <p className="text-lg text-muted-foreground">
+                Voici l'avancée de <span className="font-semibold text-[#007AFF]">{brand.name}</span>.
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -239,10 +240,10 @@ export default async function DashboardPage() {
               )}
 
               {/* Calendar */}
-              <div className="bg-white rounded-3xl shadow-sm border border-border/50 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <h2 className="font-bold flex items-center gap-2">
-                    <CalendarIcon className="w-5 h-5 text-primary" />
+              <div className="bg-white rounded-3xl shadow-sm border border-border/50 p-5">
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="font-bold text-sm flex items-center gap-2">
+                    <CalendarIcon className="w-4 h-4 text-primary" />
                     Cette semaine
                   </h2>
                   <Link href="/launch-map/calendar" className="text-xs text-primary font-medium hover:underline">
