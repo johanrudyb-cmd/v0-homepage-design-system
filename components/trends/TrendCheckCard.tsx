@@ -7,6 +7,8 @@ import { Upload, Loader2, TrendingUp, X } from 'lucide-react';
 import { ConfirmGenerateModal } from '@/components/ui/confirm-generate-modal';
 import { GenerationLoadingPopup } from '@/components/ui/generation-loading-popup';
 import { useQuota } from '@/lib/hooks/useQuota';
+import { FeatureUsageBadge } from '@/components/usage/FeatureUsageBadge';
+import { useSession } from 'next-auth/react';
 
 interface TrendCheckCardProps {
   /** Afficher sur toute la largeur (ex. page détail produit) */
@@ -24,6 +26,8 @@ export function TrendCheckCard({ fullWidth }: TrendCheckCardProps = {}) {
   const [showPopup, setShowPopup] = useState(false);
   const [showConfirmAnalyze, setShowConfirmAnalyze] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { data: session } = useSession();
+  const isFree = (session?.user as any)?.plan === 'free';
   const trendsCheckQuota = useQuota('trends_check_image');
 
   const handleUpload = async () => {
@@ -86,9 +90,8 @@ export function TrendCheckCard({ fullWidth }: TrendCheckCardProps = {}) {
       <Card className={`border-2 w-full overflow-hidden ${fullWidth ? 'max-w-none' : 'max-w-2xl'}`}>
         <CardContent className="p-0">
           <div
-            className={`relative flex flex-col items-center justify-center p-12 min-h-[320px] transition-colors ${
-              uploadFile && !showPopup ? 'bg-primary/5' : 'bg-muted/20 hover:bg-muted/30'
-            }`}
+            className={`relative flex flex-col items-center justify-center p-12 min-h-[320px] transition-colors ${uploadFile && !showPopup ? 'bg-primary/5' : 'bg-muted/20 hover:bg-muted/30'
+              }`}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
           >
@@ -111,25 +114,28 @@ export function TrendCheckCard({ fullWidth }: TrendCheckCardProps = {}) {
             <p className="text-muted-foreground text-center max-w-md mb-6">
               Glissez une image produit ou cliquez pour sélectionner. Le système indique si c&apos;est une tendance (Europe, USA, Asie).
             </p>
-            <div className="flex flex-wrap gap-3 items-center justify-center">
-              <Button
-                variant="outline"
-                size="lg"
-                onClick={() => inputRef.current?.click()}
-                disabled={uploading}
-                className="gap-2"
-              >
-                {uploadFile ? uploadFile.name : 'Choisir une image'}
-              </Button>
-              <Button
-                onClick={() => setShowConfirmAnalyze(true)}
-                disabled={!uploadFile || uploading}
-                size="lg"
-                className="gap-2"
-              >
-                {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <TrendingUp className="w-4 h-4" />}
-                {uploading ? 'Analyse…' : 'Analyser'}
-              </Button>
+            <div className="flex flex-col items-center gap-4">
+              <FeatureUsageBadge featureKey="trends_check_image" isFree={isFree} />
+              <div className="flex flex-wrap gap-3 items-center justify-center">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  onClick={() => inputRef.current?.click()}
+                  disabled={uploading}
+                  className="gap-2"
+                >
+                  {uploadFile ? uploadFile.name : 'Choisir une image'}
+                </Button>
+                <Button
+                  onClick={() => setShowConfirmAnalyze(true)}
+                  disabled={!uploadFile || uploading || trendsCheckQuota?.isExhausted}
+                  size="lg"
+                  className="gap-2"
+                >
+                  {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <TrendingUp className="w-4 h-4" />}
+                  {uploading ? 'Analyse…' : 'Analyser'}
+                </Button>
+              </div>
             </div>
           </div>
         </CardContent>

@@ -148,11 +148,13 @@ export async function getHybridRadarTrends(params: {
 
     const sourceBrands = (AGE_SOURCE_BRANDS as any)[ageRange] || AGE_SOURCE_BRANDS['25-34'];
 
+    const segmentFilter = segment === 'femme' ? ['femme', 'fille'] : ['homme', 'garcon'];
+
     const where: any = {
         sourceBrand: { in: sourceBrands },
         sourceUrl: { not: null },
         marketZone: 'EU',
-        segment: segment === 'femme' ? 'femme' : 'homme',
+        segment: { in: segmentFilter },
     };
 
     if (globalOnly) {

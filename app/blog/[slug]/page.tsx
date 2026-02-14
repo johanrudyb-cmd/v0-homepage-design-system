@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { ArrowLeft, Calendar, User, Clock, ArrowRight, Sparkles, Share2 } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Clock, ArrowRight, Sparkles } from 'lucide-react';
+import { ShareButton } from '@/components/blog/ShareButton';
 import { prisma } from '@/lib/prisma';
 import Markdown from 'react-markdown';
 import { AnimatedHeader } from '@/components/homepage/AnimatedHeader';
@@ -96,9 +97,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                     </p>
                                 </div>
                             </div>
-                            <button className="w-12 h-12 rounded-full border border-black/5 flex items-center justify-center hover:bg-black hover:text-white transition-all shadow-apple-sm">
-                                <Share2 className="w-5 h-5" />
-                            </button>
+                            <ShareButton
+                                title={post.title}
+                                text={post.excerpt}
+                                className="w-12 h-12 hover:bg-black hover:text-white"
+                                iconClassName="w-5 h-5"
+                            />
                         </div>
                     </div>
                 </section>
@@ -139,9 +143,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                 </div>
                                 <div className="space-y-4 pt-8 border-t border-black/5">
                                     <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6e6e73]/50">Partage</p>
-                                    <button className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center hover:bg-[#007AFF] hover:text-white transition-all shadow-apple-sm group">
-                                        <Share2 className="w-4 h-4" />
-                                    </button>
+                                    <ShareButton
+                                        title={post.title}
+                                        text={post.excerpt}
+                                        className="w-10 h-10 hover:bg-[#007AFF] hover:text-white group"
+                                        iconClassName="w-4 h-4"
+                                    />
                                 </div>
                             </div>
 
@@ -186,9 +193,12 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                                 <p className="text-sm font-black text-black uppercase">{post.author}</p>
                                             </div>
                                         </div>
-                                        <button className="w-10 h-10 rounded-full border border-black/5 flex items-center justify-center">
-                                            <Share2 className="w-4 h-4" />
-                                        </button>
+                                        <ShareButton
+                                            title={post.title}
+                                            text={post.excerpt}
+                                            className="w-10 h-10"
+                                            iconClassName="w-4 h-4"
+                                        />
                                     </div>
                                 </div>
 

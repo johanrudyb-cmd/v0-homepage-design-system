@@ -10,6 +10,7 @@ import { LayoutList, Image as ImageIcon, Camera, Sparkles, PenTool } from 'lucid
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
+import { FeatureUsageBadge } from '@/components/usage/FeatureUsageBadge';
 
 /** Design pour UGC (Virtual Try-On, Shooting). Compatible avec les designs renvoyés par /api/designs. */
 interface Design {
@@ -148,10 +149,11 @@ export function UGCLab({ brandId, brandName, designs = [], brand, userPlan = 'fr
         {activeTab === 'tryon' && (
           <div className="space-y-3">
             <div className="px-4 py-2 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
+              <div className="flex flex-1 items-center gap-2">
                 <Sparkles className="w-4 h-4 text-amber-600" />
                 <p className="text-xs font-medium text-amber-800">Le Virtual Try-On Premium est payant à l&apos;unité (7,90€ / essai).</p>
               </div>
+              <FeatureUsageBadge featureKey="ugc_virtual_tryon" className="bg-white/50 px-3 py-1 rounded-lg" isFree={userPlan === 'free'} />
               <Link href="/usage" className="text-[10px] font-bold text-amber-700 underline hover:no-underline shrink-0">CRÉDITS</Link>
             </div>
             <VirtualTryOn brandId={brandId} designs={designs} />
@@ -159,19 +161,34 @@ export function UGCLab({ brandId, brandName, designs = [], brand, userPlan = 'fr
         )}
 
         {activeTab === 'shooting' && (
-          <ShootingPhoto
-            brandId={brandId}
-            designs={designs}
-            onSwitchToTryOn={() => setActiveTab('tryon')}
-          />
+          <div className="space-y-3">
+            <div className="px-4">
+              <FeatureUsageBadge featureKey="ugc_shooting_photo" isFree={userPlan === 'free'} />
+            </div>
+            <ShootingPhoto
+              brandId={brandId}
+              designs={designs}
+              onSwitchToTryOn={() => setActiveTab('tryon')}
+            />
+          </div>
         )}
 
         {activeTab === 'logo' && (
-          <LogoGenerator brandId={brandId} />
+          <div className="space-y-3">
+            <div className="px-4">
+              <FeatureUsageBadge featureKey="brand_logo" isFree={userPlan === 'free'} />
+            </div>
+            <LogoGenerator brandId={brandId} />
+          </div>
         )}
 
         {activeTab === 'scripts' && (
-          <StructuredPostCreator brandId={brandId} brandName={brandName} />
+          <div className="space-y-3">
+            <div className="px-4">
+              <FeatureUsageBadge featureKey="ugc_scripts" isFree={userPlan === 'free'} />
+            </div>
+            <StructuredPostCreator brandId={brandId} brandName={brandName} />
+          </div>
         )}
       </div>
     </div>

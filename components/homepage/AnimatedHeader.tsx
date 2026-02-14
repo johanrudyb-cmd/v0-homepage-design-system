@@ -88,9 +88,9 @@ export function AnimatedHeader() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.2 }}
-            className="fixed inset-x-0 top-[56px] sm:top-[64px] bottom-0 z-40 bg-white/95 backdrop-blur-xl border-t border-[#F2F2F2] overflow-y-auto md:hidden"
+            className="absolute top-full left-0 w-full h-[calc(100vh-3.5rem)] sm:h-[calc(100vh-4rem)] lg:h-[calc(100vh-5rem)] z-40 bg-white border-t border-[#F2F2F2] overflow-y-auto md:hidden"
           >
-            <div className="flex flex-col px-6 py-8 space-y-6">
+            <div className="flex flex-col px-6 py-8 space-y-6 pb-24">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}

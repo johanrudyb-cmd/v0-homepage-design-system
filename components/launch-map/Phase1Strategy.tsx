@@ -27,6 +27,7 @@ import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
 import { useQuota } from '@/lib/hooks/useQuota';
 import { useSurplusModal } from '@/components/usage/SurplusModalContext';
 import { STRATEGY_VIEW_ONBOARDING_LIMIT } from '@/lib/quota-config';
+import { FeatureUsageBadge } from '@/components/usage/FeatureUsageBadge';
 
 interface Phase1StrategyProps {
   brandId: string;
@@ -782,17 +783,11 @@ export function Phase1Strategy({ brandId, brand, brandName, onComplete, demoMode
             </Card>
           )}
 
-          {/* Bandeau "Presque fini" stratégie */}
-          {(strategyQuota?.isAlmostFinished || strategyViewQuota?.isAlmostFinished) && !demoMode && (
-            <div className="flex items-center justify-between gap-2 rounded-md bg-amber-500/15 px-3 py-2 text-amber-800 dark:text-amber-200 mb-6">
-              <span className="text-xs font-medium">Stock épuisé bientôt !</span>
-              <button
-                type="button"
-                onClick={openSurplusModal}
-                className="text-xs font-semibold underline hover:no-underline"
-              >
-                Prendre une recharge
-              </button>
+          {/* Quotas */}
+          {!demoMode && (
+            <div className="flex flex-col sm:flex-row gap-4 mb-6">
+              <FeatureUsageBadge featureKey="brand_strategy" isFree={userPlan === 'free'} />
+              <FeatureUsageBadge featureKey="strategy_view" isFree={userPlan === 'free'} />
             </div>
           )}
 

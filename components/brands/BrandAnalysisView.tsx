@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useParams, useSearchParams, useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -40,6 +41,7 @@ import { BrandLogo } from './BrandLogo';
 import { StrategyPresentationView } from '@/components/launch-map/StrategyPresentationView';
 import { GenerationLoadingPopup } from '@/components/ui/generation-loading-popup';
 import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
+import { FeatureUsageBadge } from '@/components/usage/FeatureUsageBadge';
 
 function parseSections(analysis: string): { title: string; content: string }[] {
   const blocks = analysis.split(/\n(?=## )/).filter(Boolean);
@@ -171,6 +173,10 @@ export function BrandAnalysisView({ slug }: BrandAnalysisViewProps) {
   const nameParam = searchParams?.get('name')?.trim();
   const curatedBrand = slugToCuratedBrand(resolvedSlug);
   const brand = curatedBrand ?? (nameParam ? { brand: nameParam } as CuratedBrand : null);
+
+  const { data: session } = useSession();
+  const user = session?.user;
+  const isFree = (user as any)?.plan === 'free';
 
   const [analysis, setAnalysis] = useState<string | null>(null);
   const [visualIdentity, setVisualIdentity] = useState<{
@@ -546,7 +552,8 @@ export function BrandAnalysisView({ slug }: BrandAnalysisViewProps) {
         <p className="text-muted-foreground text-center">
           Aucune analyse pour cette marque. Lancez l&apos;analyse IA pour générer le rapport.
         </p>
-        <div className="flex justify-center">
+        <div className="flex flex-col items-center gap-4">
+          <FeatureUsageBadge featureKey="brand_analyze" isFree={isFree} />
           <Button onClick={() => setShowConfirmAnalyze(true)} disabled={launching} className="gap-2">
             {launching ? (
               <>

@@ -3,14 +3,16 @@
 import { useState, useEffect } from 'react';
 import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
 import { useQuota } from '@/lib/hooks/useQuota';
+import { useSession } from 'next-auth/react';
 import { useSurplusModal } from '@/components/usage/SurplusModalContext';
 import { GenerationCostBadge } from '@/components/ui/generation-cost-badge';
 import { ConfirmGenerateModal } from '@/components/ui/confirm-generate-modal';
 import { GenerationLoadingPopup } from '@/components/ui/generation-loading-popup';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Loader2, Camera, UserPlus, Upload, Download, Image as ImageIcon, Shirt, Info, CheckCircle2, X, ZoomIn } from 'lucide-react';
+import { Loader2, Camera, UserPlus, Upload, Download, Image as ImageIcon, Shirt, Info, CheckCircle2, X, ZoomIn, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FeatureUsageBadge } from '@/components/usage/FeatureUsageBadge';
 
 /** Design enregistré dans la collection (même source que mockup/tech pack). */
 export interface ShootingDesign {
@@ -290,6 +292,8 @@ type ShootingMode = 'product' | 'mannequin';
 export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryOn }: ShootingPhotoProps) {
   const photoQuota = useQuota('ugc_shooting_photo');
   const productQuota = useQuota('ugc_shooting_product');
+  const { data: session } = useSession();
+  const isFree = (session?.user as any)?.plan === 'free';
   const openSurplusModal = useSurplusModal();
   const [shootingMode, setShootingMode] = useState<ShootingMode>('mannequin');
   const [designs, setDesigns] = useState<ShootingDesign[]>(initialDesigns ?? []);
@@ -733,39 +737,27 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
                   </div>
                 </CardContent>
               </Card>
-              {productQuota?.isExhausted ? (
-                <Button onClick={openSurplusModal} className="w-full gap-2 bg-gradient-to-r from-primary to-primary/80 shadow-lg">
-                  <Camera className="w-4 h-4" />
-                  Recharger ce module
-                </Button>
-              ) : (
-                <>
-                  {productQuota?.isAlmostFinished && (
-                    <div className="flex items-center justify-between gap-2 rounded-md bg-amber-500/15 px-3 py-2 text-amber-800 dark:text-amber-200 mb-3">
-                      <span className="text-xs font-medium">Stock épuisé bientôt !</span>
-                      <button type="button" onClick={openSurplusModal} className="text-xs font-semibold underline hover:no-underline">Prendre une recharge</button>
-                    </div>
+
+              <div className="flex flex-col gap-4">
+                <FeatureUsageBadge featureKey="ugc_shooting_product" isFree={isFree} />
+                <Button
+                  onClick={() => setShowConfirmProduct(true)}
+                  disabled={isGenerating || (!selectedDesignId && !uploadedFile) || productQuota?.isExhausted}
+                  className="w-full gap-2"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Développement des clichés...
+                    </>
+                  ) : (
+                    <>
+                      <Camera className="w-4 h-4" />
+                      Générer les 4 photos produit
+                    </>
                   )}
-                  <Button
-                    onClick={() => setShowConfirmProduct(true)}
-                    disabled={isGenerating || (!selectedDesignId && !uploadedFile)}
-                    className="w-full gap-2"
-                  >
-                    {isGenerating ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Développement des clichés...
-                      </>
-                    ) : (
-                      <>
-                        <Camera className="w-4 h-4" />
-                        Générer les 4 photos produit
-                        <GenerationCostBadge feature="ugc_shooting_product" />
-                      </>
-                    )}
-                  </Button>
-                </>
-              )}
+                </Button>
+              </div>
             </>
           )}
 
@@ -1208,39 +1200,26 @@ export function ShootingPhoto({ brandId, designs: initialDesigns, onSwitchToTryO
               )}
 
               {shootingMode === 'mannequin' && (
-                photoQuota?.isExhausted ? (
-                  <Button onClick={openSurplusModal} className="w-full gap-2 bg-gradient-to-r from-primary to-primary/80 shadow-lg">
-                    <Camera className="w-4 h-4" />
-                    Recharger ce module
-                  </Button>
-                ) : (
-                  <>
-                    {photoQuota?.isAlmostFinished && (
-                      <div className="flex items-center justify-between gap-2 rounded-md bg-amber-500/15 px-3 py-2 text-amber-800 dark:text-amber-200 mb-3">
-                        <span className="text-xs font-medium">Stock épuisé bientôt !</span>
-                        <button type="button" onClick={openSurplusModal} className="text-xs font-semibold underline hover:no-underline">Prendre une recharge</button>
-                      </div>
+                <div className="flex flex-col gap-4">
+                  <FeatureUsageBadge featureKey="ugc_shooting_photo" isFree={isFree} />
+                  <Button
+                    onClick={() => setShowConfirmPhoto(true)}
+                    disabled={isGenerating || (!selectedDesignId && !uploadedFile) || photoQuota?.isExhausted}
+                    className="w-full gap-2 h-12 text-base font-bold shadow-modern-lg"
+                  >
+                    {isGenerating ? (
+                      <>
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                        Capture en cours...
+                      </>
+                    ) : (
+                      <>
+                        <Camera className="w-4 h-4" />
+                        Prendre le cliché
+                      </>
                     )}
-                    <Button
-                      onClick={() => setShowConfirmPhoto(true)}
-                      disabled={isGenerating || selectedMannequinIds.length === 0 || (!selectedDesignId && !uploadedFile)}
-                      className="w-full gap-2"
-                    >
-                      {isGenerating ? (
-                        <>
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                          Mise au point de l'objectif...
-                        </>
-                      ) : (
-                        <>
-                          <Camera className="w-4 h-4" />
-                          Générer la photo de shooting (mannequin)
-                          <GenerationCostBadge feature="ugc_shooting_photo" />
-                        </>
-                      )}
-                    </Button>
-                  </>
-                )
+                  </Button>
+                </div>
               )}
             </>
           )}

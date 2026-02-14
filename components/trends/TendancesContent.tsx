@@ -12,7 +12,7 @@ import { Loader2, AlertTriangle, Flame, Globe, Lock } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUOTA_CONFIG } from '@/lib/quota-config';
-import { UsageBadge } from '@/components/trends/UsageBadge';
+import { FeatureUsageBadge } from '@/components/usage/FeatureUsageBadge';
 import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
 
 
@@ -205,10 +205,9 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
             </div>
 
             <div className="flex items-center gap-3">
-              <UsageBadge
-                count={analysesCount}
-                plan={user?.plan || 'free'}
-                limit={user?.plan === 'free' ? QUOTA_CONFIG.free.trends_hybrid_scan_limit : undefined}
+              <FeatureUsageBadge
+                featureKey="trends_hybrid_scan"
+                isFree={user?.plan === 'free'}
               />
               <Button
                 variant="ghost"
@@ -397,62 +396,66 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
                             }}
                           />
 
-                          <div className="absolute top-4 left-4 flex flex-col gap-2 z-20">
+                          <div className="absolute top-1.5 left-1.5 sm:top-4 sm:left-4 flex flex-col gap-1 sm:gap-2 z-20">
                             {t.segment && (
-                              <span className="px-3 py-1.5 rounded-2xl bg-white/90 backdrop-blur-md text-black text-[10px] font-black uppercase tracking-widest shadow-apple-sm">
+                              <span className="px-1.5 py-0.5 sm:px-3 sm:py-1.5 rounded-full bg-white/90 backdrop-blur-md text-black text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-apple-sm border border-black/5">
                                 {t.segment}
                               </span>
                             )}
                             {t.isGlobalTrendAlert && (
-                              <span className="px-3 py-1.5 rounded-2xl bg-[#007AFF] text-white text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5">
-                                <Globe className="w-3 h-3" />
+                              <span className="px-1.5 py-0.5 sm:px-3 sm:py-1.5 rounded-full bg-[#007AFF] text-white text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
+                                <Globe className="w-2 h-2 sm:w-3 sm:h-3" />
                                 Global
                               </span>
                             )}
                             {((t as any).outfityIVS || t.trendScore) > 85 && (
-                              <span className="px-3 py-1.5 rounded-2xl bg-black text-white text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5">
-                                <div className="w-1.5 h-1.5 rounded-full bg-[#FF3B30] animate-pulse" />
-                                Elite Trend
+                              <span className="px-1.5 py-0.5 sm:px-3 sm:py-1.5 rounded-full bg-black text-white text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
+                                <div className="w-1 h-1 rounded-full bg-[#34C759] animate-pulse" />
+                                Elite
                               </span>
                             )}
                           </div>
 
                           {((t as any).outfityIVS || t.trendScore) && (
-                            <div className="absolute bottom-4 right-4 z-20">
-                              <div className="px-4 py-2 rounded-2xl bg-black/80 backdrop-blur-xl text-white border border-white/20 shadow-apple-lg text-right">
-                                <div className="text-[9px] font-bold uppercase tracking-tight text-white/50 mb-[-2px]">IVS Index</div>
-                                <div className="text-lg font-black tracking-tight">{(t as any).outfityIVS || t.trendScore}%</div>
+                            <div className="absolute bottom-1.5 right-1.5 sm:bottom-4 sm:right-4 z-20">
+                              <div className="px-2 py-0.5 sm:px-4 sm:py-2 rounded-xl bg-black/80 backdrop-blur-xl text-white border border-white/10 shadow-apple-lg text-right">
+                                <div className="text-[7px] sm:text-[9px] font-bold uppercase tracking-tight text-white/50 mb-[-2px]">IVS</div>
+                                <div className="text-[11px] sm:text-lg font-black tracking-tight">{(t as any).outfityIVS || t.trendScore}%</div>
                               </div>
                             </div>
                           )}
                         </div>
 
-                        <div className="p-6 flex flex-col flex-grow">
+                        <div className="p-3 sm:p-6 flex flex-col flex-grow">
                           <div className="mb-4">
-                            <h3 className="text-[17px] font-bold text-black leading-tight line-clamp-2 transition-colors group-hover:text-[#007AFF] mb-2">
-                              {t.name}
-                            </h3>
-                            <div className="flex items-center gap-3">
-                              <span className="text-[10px] font-black text-[#6e6e73] bg-black/5 px-2 py-1 rounded-md uppercase tracking-widest">
+                            <div className="h-[34px] sm:h-[48px] mb-1 sm:mb-2 overflow-hidden">
+                              <h3 className="text-[13px] sm:text-[17px] font-bold text-black leading-tight line-clamp-2 transition-colors group-hover:text-[#007AFF]">
+                                {t.name}
+                              </h3>
+                            </div>
+                            <div className="flex items-center gap-2 sm:gap-3">
+                              <span className="text-[8px] sm:text-[10px] font-black text-[#6e6e73] bg-black/5 px-1.5 py-0.5 rounded-md uppercase tracking-widest">
                                 {t.category}
                               </span>
-                              <span className="text-[11px] font-bold text-black/20 italic">
-                                By {(t as any).productBrand || t.sourceBrand || 'Brand'}
+                              <span className="text-[9px] sm:text-[11px] font-bold text-black/20 italic truncate">
+                                By {((t as any).productBrand || t.sourceBrand || 'Brand').substring(0, 15)}
                               </span>
                             </div>
                           </div>
 
                           {t.businessAnalysis && (
-                            <p className="text-[12px] text-[#6e6e73] line-clamp-2 mb-6 italic leading-relaxed font-medium">
-                              "{t.businessAnalysis}"
-                            </p>
+                            <div className="hidden sm:block">
+                              <p className="text-[12px] text-[#6e6e73] line-clamp-2 mb-6 italic leading-relaxed font-medium">
+                                "{t.businessAnalysis}"
+                              </p>
+                            </div>
                           )}
 
                           <div className="mt-auto">
                             <Link
                               href={`/trends/${t.id}`}
                               onClick={handleAnalyzeClick}
-                              className="w-full h-12 rounded-full flex items-center justify-center text-xs font-black uppercase tracking-widest bg-black text-white shadow-apple hover:bg-[#1D1D1F] active:scale-95 transition-all duration-300"
+                              className="w-full h-9 sm:h-12 rounded-full flex items-center justify-center text-[9px] sm:text-xs font-black uppercase tracking-widest bg-black text-white shadow-apple hover:bg-[#1D1D1F] active:scale-95 transition-all duration-300"
                             >
                               Analyse complète
                             </Link>
