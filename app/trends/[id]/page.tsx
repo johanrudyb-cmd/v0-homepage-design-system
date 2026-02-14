@@ -173,7 +173,8 @@ export default async function ProductDetailPage({
         <div className="min-h-screen bg-[#F5F5F7] pb-24">
           {/* Main Sticky Header - Apple Style */}
           <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.05] px-6 py-4">
-            <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
+            <div className="max-w-6xl mx-auto flex items-center gap-4">
+              <BackToTrendsButton />
               <div className="flex items-center gap-4 min-w-0">
                 <div className="min-w-0">
                   <h1 className="text-xl font-bold tracking-tight text-[#1D1D1F] truncate leading-tight">

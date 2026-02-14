@@ -190,246 +190,256 @@ export function BrandsContent() {
         <BrandAnalyzer />
       ) : (
         <div className="space-y-4">
-          {/* Version Mobile / Cartes (masqué sur desktop) */}
-          <div className="grid grid-cols-1 gap-4 lg:hidden">
-            {brands.map((brand) => {
-              const websiteUrl = brand.websiteUrl || getBrandUrl(brand.brand);
-              const domain = getDomain(websiteUrl);
-              const isLoading = loadingBrand === brand.brand;
+          {loadingInitial ? (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+              {[1, 2, 3, 4].map(i => (
+                <Card key={i} className="border-2 p-6 h-40 animate-pulse bg-muted/20" />
+              ))}
+            </div>
+          ) : (
+            <>
+              {/* Version Mobile / Cartes (masqué sur desktop) */}
+              <div className="grid grid-cols-1 gap-4 lg:hidden">
+                {brands.map((brand) => {
+                  const websiteUrl = brand.websiteUrl || getBrandUrl(brand.brand);
+                  const domain = getDomain(websiteUrl);
+                  const isLoading = loadingBrand === brand.brand;
 
-              return (
-                <Card key={brand.brand} className="border-2 overflow-hidden">
-                  <CardContent className="p-4 space-y-4">
-                    {/* Header: Logo + Rang + Nom */}
-                    <div className="flex items-start justify-between">
-                      <div className="flex items-center gap-3">
-                        <BrandLogo
-                          logoUrl={getBrandLogoUrl(brand.brand, websiteUrl)}
-                          brandName={brand.brand}
-                          className="w-12 h-12"
-                        />
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="font-bold text-primary text-sm">#{brand.rank}</span>
-                            <p className="font-bold text-lg">{brand.brand}</p>
-                          </div>
-                          <a
-                            href={websiteUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 mt-0.5"
-                          >
-                            {domain}
-                            <ExternalLink className="w-3 h-3" />
-                          </a>
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Score</p>
-                        <span className="inline-flex items-center gap-1 font-bold text-lg text-green-600">
-                          {brand.score}
-                          <span className="text-sm">↑</span>
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Tags / Badges */}
-                    <div className="flex flex-wrap gap-2">
-                      <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${brand.cyclePhase === 'emergent'
-                          ? 'bg-blue-100 text-blue-700'
-                          : brand.cyclePhase === 'croissance'
-                            ? 'bg-green-100 text-green-700'
-                            : brand.cyclePhase === 'pic'
-                              ? 'bg-amber-100 text-amber-700'
-                              : 'bg-slate-100 text-slate-700'
-                          }`}
-                      >
-                        {CYCLE_PHASE_LABELS[brand.cyclePhase]}
-                      </span>
-                      <span
-                        className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${brand.launchPotential === 'opportunite'
-                          ? 'bg-emerald-100 text-emerald-700'
-                          : brand.launchPotential === 'a_surveiller'
-                            ? 'bg-amber-100 text-amber-700'
-                            : 'bg-red-100 text-red-700'
-                          }`}
-                      >
-                        {LAUNCH_POTENTIAL_LABELS[brand.launchPotential]}
-                      </span>
-                      <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide">
-                        {brand.dominantStyle}
-                      </span>
-                    </div>
-
-                    {/* Détails secondaires */}
-                    <div className="grid grid-cols-2 gap-4 py-3 border-y border-dashed">
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase font-semibold">Prix moyen</p>
-                        <p className="text-sm font-bold">{brand.indicativePrice}</p>
-                      </div>
-                      <div>
-                        <p className="text-[10px] text-muted-foreground uppercase font-semibold">Pièce phare</p>
-                        <p className="text-sm font-medium truncate">{brand.signaturePiece}</p>
-                      </div>
-                    </div>
-
-                    {/* Actions */}
-                    <div className="grid grid-cols-2 gap-2 pt-1">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        className="w-full gap-2 rounded-xl h-10"
-                        onClick={() => { setBrandToAnalyze(brand); setShowConfirmAnalyze(true); }}
-                        disabled={!!loadingBrand}
-                      >
-                        {isLoading ? (
-                          <Loader2 className="w-4 h-4 animate-spin" />
-                        ) : (
-                          <Sparkles className="w-4 h-4" />
-                        )}
-                        Analyser
-                      </Button>
-                      <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="w-full">
-                        <Button variant="ghost" size="sm" className="w-full gap-2 rounded-xl h-10 bg-muted/30">
-                          <ExternalLink className="w-4 h-4" />
-                          Visiter
-                        </Button>
-                      </a>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-
-          {/* Version Desktop / Tableau (masqué sur mobile) */}
-          <Card className="border-2 overflow-hidden hidden lg:block">
-            <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b bg-muted/50">
-                      <th className="text-left py-4 px-4 font-semibold text-sm">Rang</th>
-                      <th className="text-left py-4 px-4 font-semibold text-sm">Marque</th>
-                      <th className="text-left py-4 px-4 font-semibold text-sm">Score</th>
-                      <th className="text-left py-4 px-4 font-semibold text-sm">Phase</th>
-                      <th className="text-left py-4 px-4 font-semibold text-sm">Potentiel</th>
-                      <th className="text-left py-4 px-4 font-semibold text-sm">Prix</th>
-                      <th className="text-left py-4 px-4 font-semibold text-sm">Pièce maîtresse</th>
-                      <th className="text-left py-4 px-4 font-semibold text-sm">Style</th>
-                      <th className="text-right py-4 px-4 font-semibold text-sm">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {brands.map((brand) => {
-                      const websiteUrl = brand.websiteUrl || getBrandUrl(brand.brand);
-                      const domain = getDomain(websiteUrl);
-                      const isLoading = loadingBrand === brand.brand;
-                      return (
-                        <tr
-                          key={brand.brand}
-                          className="border-b last:border-b-0 transition-colors hover:bg-muted/30"
-                        >
-                          <td className="py-4 px-4">
-                            <span className="font-bold text-primary">#{brand.rank}</span>
-                          </td>
-                          <td className="py-4 px-4">
-                            <div className="flex items-center gap-3">
-                              <BrandLogo
-                                logoUrl={getBrandLogoUrl(brand.brand, websiteUrl)}
-                                brandName={brand.brand}
-                                className="w-10 h-10"
-                              />
-                              <div>
-                                <p className="font-semibold text-sm">{brand.brand}</p>
-                                <a
-                                  href={websiteUrl}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-0.5"
-                                >
-                                  {domain}
-                                  <ExternalLink className="w-2.5 h-2.5" />
-                                </a>
+                  return (
+                    <Card key={brand.brand} className="border-2 overflow-hidden">
+                      <CardContent className="p-4 space-y-4">
+                        {/* Header: Logo + Rang + Nom */}
+                        <div className="flex items-start justify-between">
+                          <div className="flex items-center gap-3">
+                            <BrandLogo
+                              logoUrl={getBrandLogoUrl(brand.brand, websiteUrl)}
+                              brandName={brand.brand}
+                              className="w-12 h-12"
+                            />
+                            <div>
+                              <div className="flex items-center gap-2">
+                                <span className="font-bold text-primary text-sm">#{brand.rank}</span>
+                                <p className="font-bold text-lg">{brand.brand}</p>
                               </div>
-                            </div>
-                          </td>
-                          <td className="py-4 px-4">
-                            <span className="inline-flex items-center gap-1 font-semibold text-green-600">
-                              {brand.score}
-                              <span className="text-green-500">↑</span>
-                            </span>
-                          </td>
-                          <td className="py-4 px-4">
-                            <span
-                              className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${brand.cyclePhase === 'emergent'
-                                ? 'bg-blue-100 text-blue-700'
-                                : brand.cyclePhase === 'croissance'
-                                  ? 'bg-green-100 text-green-700'
-                                  : brand.cyclePhase === 'pic'
-                                    ? 'bg-amber-100 text-amber-700'
-                                    : 'bg-slate-100 text-slate-700'
-                                }`}
-                            >
-                              {CYCLE_PHASE_LABELS[brand.cyclePhase]}
-                            </span>
-                          </td>
-                          <td className="py-4 px-4">
-                            <span
-                              className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${brand.launchPotential === 'opportunite'
-                                ? 'bg-emerald-100 text-emerald-700'
-                                : brand.launchPotential === 'a_surveiller'
-                                  ? 'bg-amber-100 text-amber-700'
-                                  : 'bg-red-100 text-red-700'
-                                }`}
-                            >
-                              {LAUNCH_POTENTIAL_LABELS[brand.launchPotential]}
-                            </span>
-                          </td>
-                          <td className="py-4 px-4 text-xs font-bold">
-                            {brand.indicativePrice}
-                          </td>
-                          <td className="py-4 px-4 text-xs text-muted-foreground max-w-[140px] truncate">
-                            {brand.signaturePiece}
-                          </td>
-                          <td className="py-4 px-4 text-xs">
-                            <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold uppercase tracking-wider">
-                              {brand.dominantStyle}
-                            </span>
-                          </td>
-                          <td className="py-4 px-4 text-right">
-                            <div className="flex justify-end gap-1 flex-wrap">
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="h-8 gap-1.5 text-[10px]"
-                                onClick={() => { setBrandToAnalyze(brand); setShowConfirmAnalyze(true); }}
-                                disabled={!!loadingBrand}
+                              <a
+                                href={websiteUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs text-muted-foreground hover:text-primary flex items-center gap-1 mt-0.5"
                               >
-                                {isLoading ? (
-                                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                                ) : (
-                                  <Sparkles className="w-3.5 h-3.5" />
-                                )}
-                                Analyser
-                              </Button>
-                              <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
-                                <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-[10px]">
-                                  <ExternalLink className="w-3.5 h-3.5" />
-                                  Visiter
-                                </Button>
+                                {domain}
+                                <ExternalLink className="w-3 h-3" />
                               </a>
                             </div>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Score</p>
+                            <span className="inline-flex items-center gap-1 font-bold text-lg text-green-600">
+                              {brand.score}
+                              <span className="text-sm">↑</span>
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Tags / Badges */}
+                        <div className="flex flex-wrap gap-2">
+                          <span
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${brand.cyclePhase === 'emergent'
+                              ? 'bg-blue-100 text-blue-700'
+                              : brand.cyclePhase === 'croissance'
+                                ? 'bg-green-100 text-green-700'
+                                : brand.cyclePhase === 'pic'
+                                  ? 'bg-amber-100 text-amber-700'
+                                  : 'bg-slate-100 text-slate-700'
+                              }`}
+                          >
+                            {CYCLE_PHASE_LABELS[brand.cyclePhase]}
+                          </span>
+                          <span
+                            className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wide ${brand.launchPotential === 'opportunite'
+                              ? 'bg-emerald-100 text-emerald-700'
+                              : brand.launchPotential === 'a_surveiller'
+                                ? 'bg-amber-100 text-amber-700'
+                                : 'bg-red-100 text-red-700'
+                              }`}
+                          >
+                            {LAUNCH_POTENTIAL_LABELS[brand.launchPotential]}
+                          </span>
+                          <span className="px-3 py-1 rounded-full bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide">
+                            {brand.dominantStyle}
+                          </span>
+                        </div>
+
+                        {/* Détails secondaires */}
+                        <div className="grid grid-cols-2 gap-4 py-3 border-y border-dashed">
+                          <div>
+                            <p className="text-[10px] text-muted-foreground uppercase font-semibold">Prix moyen</p>
+                            <p className="text-sm font-bold">{brand.indicativePrice}</p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] text-muted-foreground uppercase font-semibold">Pièce phare</p>
+                            <p className="text-sm font-medium truncate">{brand.signaturePiece}</p>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="grid grid-cols-2 gap-2 pt-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full gap-2 rounded-xl h-10"
+                            onClick={() => { setBrandToAnalyze(brand); setShowConfirmAnalyze(true); }}
+                            disabled={!!loadingBrand}
+                          >
+                            {isLoading ? (
+                              <Loader2 className="w-4 h-4 animate-spin" />
+                            ) : (
+                              <Sparkles className="w-4 h-4" />
+                            )}
+                            Analyser
+                          </Button>
+                          <a href={websiteUrl} target="_blank" rel="noopener noreferrer" className="w-full">
+                            <Button variant="ghost" size="sm" className="w-full gap-2 rounded-xl h-10 bg-muted/30">
+                              <ExternalLink className="w-4 h-4" />
+                              Visiter
+                            </Button>
+                          </a>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
-            </CardContent>
-          </Card>
+
+              {/* Version Desktop / Tableau (masqué sur mobile) */}
+              <Card className="border-2 overflow-hidden hidden lg:block">
+                <CardContent className="p-0">
+                  <div className="overflow-x-auto">
+                    <table className="w-full">
+                      <thead>
+                        <tr className="border-b bg-muted/50">
+                          <th className="text-left py-4 px-4 font-semibold text-sm">Rang</th>
+                          <th className="text-left py-4 px-4 font-semibold text-sm">Marque</th>
+                          <th className="text-left py-4 px-4 font-semibold text-sm">Score</th>
+                          <th className="text-left py-4 px-4 font-semibold text-sm">Phase</th>
+                          <th className="text-left py-4 px-4 font-semibold text-sm">Potentiel</th>
+                          <th className="text-left py-4 px-4 font-semibold text-sm">Prix</th>
+                          <th className="text-left py-4 px-4 font-semibold text-sm">Pièce maîtresse</th>
+                          <th className="text-left py-4 px-4 font-semibold text-sm">Style</th>
+                          <th className="text-right py-4 px-4 font-semibold text-sm">Action</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {brands.map((brand) => {
+                          const websiteUrl = brand.websiteUrl || getBrandUrl(brand.brand);
+                          const domain = getDomain(websiteUrl);
+                          const isLoading = loadingBrand === brand.brand;
+                          return (
+                            <tr
+                              key={brand.brand}
+                              className="border-b last:border-b-0 transition-colors hover:bg-muted/30"
+                            >
+                              <td className="py-4 px-4">
+                                <span className="font-bold text-primary">#{brand.rank}</span>
+                              </td>
+                              <td className="py-4 px-4">
+                                <div className="flex items-center gap-3">
+                                  <BrandLogo
+                                    logoUrl={getBrandLogoUrl(brand.brand, websiteUrl)}
+                                    brandName={brand.brand}
+                                    className="w-10 h-10"
+                                  />
+                                  <div>
+                                    <p className="font-semibold text-sm">{brand.brand}</p>
+                                    <a
+                                      href={websiteUrl}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="text-[10px] text-muted-foreground hover:text-primary flex items-center gap-0.5"
+                                    >
+                                      {domain}
+                                      <ExternalLink className="w-2.5 h-2.5" />
+                                    </a>
+                                  </div>
+                                </div>
+                              </td>
+                              <td className="py-4 px-4">
+                                <span className="inline-flex items-center gap-1 font-semibold text-green-600">
+                                  {brand.score}
+                                  <span className="text-green-500">↑</span>
+                                </span>
+                              </td>
+                              <td className="py-4 px-4">
+                                <span
+                                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${brand.cyclePhase === 'emergent'
+                                    ? 'bg-blue-100 text-blue-700'
+                                    : brand.cyclePhase === 'croissance'
+                                      ? 'bg-green-100 text-green-700'
+                                      : brand.cyclePhase === 'pic'
+                                        ? 'bg-amber-100 text-amber-700'
+                                        : 'bg-slate-100 text-slate-700'
+                                    }`}
+                                >
+                                  {CYCLE_PHASE_LABELS[brand.cyclePhase]}
+                                </span>
+                              </td>
+                              <td className="py-4 px-4">
+                                <span
+                                  className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider ${brand.launchPotential === 'opportunite'
+                                    ? 'bg-emerald-100 text-emerald-700'
+                                    : brand.launchPotential === 'a_surveiller'
+                                      ? 'bg-amber-100 text-amber-700'
+                                      : 'bg-red-100 text-red-700'
+                                    }`}
+                                >
+                                  {LAUNCH_POTENTIAL_LABELS[brand.launchPotential]}
+                                </span>
+                              </td>
+                              <td className="py-4 px-4 text-xs font-bold">
+                                {brand.indicativePrice}
+                              </td>
+                              <td className="py-4 px-4 text-xs text-muted-foreground max-w-[140px] truncate">
+                                {brand.signaturePiece}
+                              </td>
+                              <td className="py-4 px-4 text-xs">
+                                <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary font-bold uppercase tracking-wider">
+                                  {brand.dominantStyle}
+                                </span>
+                              </td>
+                              <td className="py-4 px-4 text-right">
+                                <div className="flex justify-end gap-1 flex-wrap">
+                                  <Button
+                                    variant="outline"
+                                    size="sm"
+                                    className="h-8 gap-1.5 text-[10px]"
+                                    onClick={() => { setBrandToAnalyze(brand); setShowConfirmAnalyze(true); }}
+                                    disabled={!!loadingBrand}
+                                  >
+                                    {isLoading ? (
+                                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                                    ) : (
+                                      <Sparkles className="w-3.5 h-3.5" />
+                                    )}
+                                    Analyser
+                                  </Button>
+                                  <a href={websiteUrl} target="_blank" rel="noopener noreferrer">
+                                    <Button variant="ghost" size="sm" className="h-8 gap-1.5 text-[10px]">
+                                      <ExternalLink className="w-3.5 h-3.5" />
+                                      Visiter
+                                    </Button>
+                                  </a>
+                                </div>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                </CardContent>
+              </Card>
+            </>
+          )}
         </div>
       )}
 
