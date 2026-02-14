@@ -48,37 +48,42 @@ export async function GET() {
     };
 
     const features = Object.keys(featureLimitMap) as QuotaFeatureKey[];
-    const usage: Record<
-      QuotaFeatureKey,
-      { limit: number; used: number; remaining: number; label: string; isUnlimited?: boolean }
-    > = {} as Record<QuotaFeatureKey, { limit: number; used: number; remaining: number; label: string; isUnlimited?: boolean }>;
+    const usage: any = {};
 
     for (const key of features) {
       const baseLimit = featureLimitMap[key];
-      const aiFeature = QUOTA_TO_AI_FEATURE[key] as AIFeatureKey;
-      let used = 0;
-      try {
-        used = baseLimit !== 0 ? await getFeatureCountThisMonth(user.id, aiFeature) : 0;
-      } catch {
-        used = 0;
-      }
+      // For free plan, limits are strict. For paid plan (-1), it's unlimited.
+      // Special case: some features are limited even in paid plan (like tokens), but here we deal with counts.
 
-      // ugc_virtual_tryon : limit -1 = premium, surplus = crédits achetés (pay per use)
+      // Special case: ugc_virtual_tryon (premium)
       if (key === 'ugc_virtual_tryon') {
         const surplusRemaining = await getSurplusRemaining(user.id, key);
         usage[key] = {
-          limit: surplusRemaining > 0 ? surplusRemaining : 999,
+          limit: surplusRemaining > 0 ? surplusRemaining : 999, // placeholder for unlimited
           used: 0,
           remaining: surplusRemaining,
           label: QUOTA_LABELS[key],
-          isUnlimited: surplusRemaining <= 0,
+          isUnlimited: surplusRemaining <= 0
         };
         continue;
       }
 
+      let used = 0;
+      if (baseLimit > 0) {
+        try {
+          used = await getFeatureCountThisMonth(user.id, QUOTA_TO_AI_FEATURE[key] as any);
+        } catch {
+          used = 0;
+        }
+      }
+
       const surplus = await getSurplusAddedToLimit(user.id, key);
-      const effectiveLimit = baseLimit >= 0 ? baseLimit + surplus : 999;
-      const isUnlimited = baseLimit < 0 && surplus <= 0;
+      // If baseLimit is -1 (unlimited for paid plan), it remains unlimited unless specific logic overrides it.
+      // But here, -1 means unlimited.
+      const isUnlimitedBase = baseLimit === -1;
+
+      const effectiveLimit = isUnlimitedBase ? 999 : baseLimit + surplus;
+      const isUnlimited = isUnlimitedBase;
       const remaining = isUnlimited ? 999 : Math.max(0, effectiveLimit - used);
 
       usage[key] = {
@@ -86,9 +91,11 @@ export async function GET() {
         used,
         remaining,
         label: QUOTA_LABELS[key],
-        isUnlimited,
+        isUnlimited
       };
     }
+
+    // End of loop processing
 
     return NextResponse.json({
       usage,
