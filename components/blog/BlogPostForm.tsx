@@ -116,10 +116,38 @@ export function BlogPostForm({ initialData }: BlogPostFormProps) {
                     <ArrowLeft className="w-4 h-4" />
                     Retour à la liste
                 </Link>
-                <Button type="submit" disabled={loading}>
-                    {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
-                    {initialData ? 'Mettre à jour' : 'Créer l\'article'}
-                </Button>
+                <div className="flex items-center gap-3">
+                    {initialData?.id && (
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            disabled={loading}
+                            onClick={async () => {
+                                if (confirm('Voulez-vous vraiment supprimer cet article ?')) {
+                                    setLoading(true);
+                                    try {
+                                        const res = await fetch(`/api/blog/${initialData.id}`, { method: 'DELETE' });
+                                        if (res.ok) {
+                                            toast({ title: 'Article supprimé', message: 'L\'article a été retiré avec succès.', type: 'success' });
+                                            router.push('/admin/blog');
+                                            router.refresh();
+                                        }
+                                    } catch (e) {
+                                        toast({ title: 'Erreur', message: 'Impossible de supprimer', type: 'error' });
+                                    } finally {
+                                        setLoading(false);
+                                    }
+                                }
+                            }}
+                        >
+                            Supprimer
+                        </Button>
+                    )}
+                    <Button type="submit" disabled={loading}>
+                        {loading && <Loader2 className="w-4 h-4 animate-spin mr-2" />}
+                        {initialData ? 'Mettre à jour' : 'Créer l\'article'}
+                    </Button>
+                </div>
             </div>
 
             <div className="space-y-4 bg-white p-6 rounded-xl border shadow-sm">
@@ -149,6 +177,28 @@ export function BlogPostForm({ initialData }: BlogPostFormProps) {
                     </div>
                 </div>
 
+                <div className="grid gap-4 md:grid-cols-2">
+                    <div className="space-y-2">
+                        <Label htmlFor="coverImage">URL Image de couverture</Label>
+                        <Input
+                            id="coverImage"
+                            value={formData.coverImage || ''}
+                            onChange={(e) => handleChange('coverImage', e.target.value)}
+                            placeholder="https://..."
+                        />
+                    </div>
+
+                    <div className="space-y-2">
+                        <Label htmlFor="sourceUrl">URL Source (Optionnel)</Label>
+                        <Input
+                            id="sourceUrl"
+                            value={(formData as any).sourceUrl || ''}
+                            onChange={(e) => handleChange('sourceUrl' as any, e.target.value)}
+                            placeholder="https://..."
+                        />
+                    </div>
+                </div>
+
                 <div className="space-y-2">
                     <Label htmlFor="excerpt">Extrait (SEO & Liste)</Label>
                     <Textarea
@@ -157,16 +207,6 @@ export function BlogPostForm({ initialData }: BlogPostFormProps) {
                         onChange={(e) => handleChange('excerpt', e.target.value)}
                         placeholder="Un court résumé qui donne envie de lire..."
                         rows={3}
-                    />
-                </div>
-
-                <div className="space-y-2">
-                    <Label htmlFor="coverImage">URL Image de couverture</Label>
-                    <Input
-                        id="coverImage"
-                        value={formData.coverImage || ''}
-                        onChange={(e) => handleChange('coverImage', e.target.value)}
-                        placeholder="https://..."
                     />
                 </div>
 

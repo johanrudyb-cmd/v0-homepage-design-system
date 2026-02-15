@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth-helpers';
+import { revalidatePath } from 'next/cache';
 
 export async function POST(req: Request) {
     try {
         const user = await getCurrentUser();
-        // Simple admin check : email admin ou domaine biangory.com
         const isAdmin = user?.email === 'johanrudyb@gmail.com' || user?.email?.endsWith('@biangory.com');
 
         if (!isAdmin) {
@@ -13,7 +13,7 @@ export async function POST(req: Request) {
         }
 
         const body = await req.json();
-        const { title, slug, excerpt, content, coverImage, published, tags, relatedBrands } = body;
+        const { title, slug, excerpt, content, coverImage, published, tags, relatedBrands, sourceUrl } = body;
 
         // Check slug uniqueness
         const existing = await prisma.blogPost.findUnique({
@@ -36,8 +36,13 @@ export async function POST(req: Request) {
                 tags: tags || [],
                 relatedBrands: relatedBrands || [],
                 coverImage,
+                sourceUrl,
             },
         });
+
+        // Force revalidation of public pages
+        revalidatePath('/');
+        revalidatePath('/blog');
 
         return NextResponse.json(post);
     } catch (error) {

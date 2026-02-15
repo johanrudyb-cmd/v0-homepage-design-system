@@ -1,6 +1,6 @@
 [
     {
-        "name": "📧 OUTFITY - Emails Onboarding (J0 → J7)",
+        "name": "📧 OUTFITY - Emails Onboarding (API Resend)",
         "nodes": [
             {
                 "parameters": {
@@ -21,7 +21,7 @@
             },
             {
                 "parameters": {
-                    "functionCode": "const { userId, email, name, plan } = $input.first().json;\n\nif (!email || !userId) {\n  throw new Error('email et userId requis');\n}\n\nreturn [{\n  json: {\n    userId,\n    email,\n    name: name || 'Créateur',\n    plan: plan || 'free',\n    signupDate: new Date().toISOString()\n  }\n}];"
+                    "jsCode": "const { userId, email, name, plan } = $input.first().json;\n\nif (!email || !userId) {\n  throw new Error('email et userId requis');\n}\n\nreturn [{\n  json: {\n    userId,\n    email,\n    name: name || 'Créateur',\n    plan: plan || 'free',\n    signupDate: new Date().toISOString()\n  }\n}];"
                 },
                 "id": "validate-data",
                 "name": "Valider Données",
@@ -51,19 +51,49 @@
             },
             {
                 "parameters": {
-                    "fromEmail": "={{ $env.SMTP_FROM }}",
-                    "toEmail": "={{ $json.email }}",
-                    "subject": "🎉 Bienvenue sur OUTFITY, {{ $json.name }} !",
-                    "html": "<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px; text-align: center;\">\n    <h1 style=\"color: #1D1D1F; font-size: 28px; font-weight: 600; letter-spacing: -0.02em;\">Bienvenue sur OUTFITY 🎨</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }},</p>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Vous êtes maintenant prêt(e) à créer votre marque de vêtements avec l'IA. Voici ce que vous pouvez faire dès maintenant :</p>\n    <div style=\"margin: 30px 0;\">\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin: 10px 0; text-align: left;\">\n        <strong>1️⃣ Créer votre marque</strong><br>Définissez votre identité (nom, logo, couleurs)\n      </div>\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin: 10px 0; text-align: left;\">\n        <strong>2️⃣ Explorer les tendances</strong><br>15 000+ produits analysés quotidiennement\n      </div>\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin: 10px 0; text-align: left;\">\n        <strong>3️⃣ Générer un design</strong><br>Tech pack professionnel en quelques clics\n      </div>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/dashboard\" style=\"display: inline-block; background: #000; color: #fff; padding: 16px 32px; border-radius: 100px; text-decoration: none; font-weight: 500; font-size: 16px;\">Commencer maintenant →</a>\n    <p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY — Créez votre marque avec les données des géants</p>\n  </div>\n</div>",
+                    "method": "POST",
+                    "url": "https://api.resend.com/emails",
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.SMTP_PASS }}"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "name": "from",
+                                "value": "OUTFITY <onboarding@outfity.fr>"
+                            },
+                            {
+                                "name": "to",
+                                "value": "={{ $json.email }}"
+                            },
+                            {
+                                "name": "subject",
+                                "value": "=🎉 Bienvenue sur OUTFITY, {{ $json.name }} !"
+                            },
+                            {
+                                "name": "html",
+                                "value": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px; text-align: center;\">\n    <h1 style=\"color: #1D1D1F; font-size: 28px; font-weight: 600; letter-spacing: -0.02em;\">Bienvenue sur OUTFITY 🎨</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }},</p>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Vous êtes maintenant prêt(e) à créer votre marque de vêtements avec l'IA. Voici ce que vous pouvez faire dès maintenant :</p>\n    <div style=\"margin: 30px 0;\">\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin: 10px 0; text-align: left;\">\n        <strong>1️⃣ Créer votre marque</strong><br>Définissez votre identité (nom, logo, couleurs)\n      </div>\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin: 10px 0; text-align: left;\">\n        <strong>2️⃣ Explorer les tendances</strong><br>15 000+ produits analysés quotidiennement\n      </div>\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin: 10px 0; text-align: left;\">\n        <strong>3️⃣ Générer un design</strong><br>Tech pack professionnel en quelques clics\n      </div>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/dashboard\" style=\"display: inline-block; background: #000; color: #fff; padding: 16px 32px; border-radius: 100px; text-decoration: none; font-weight: 500; font-size: 16px;\">Commencer maintenant →</a>\n    <p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY — Créez votre marque avec les données des géants</p>\n  </div>\n</div>"
+                            }
+                        ]
+                    },
                     "options": {}
                 },
-                "id": "email-j0",
-                "name": "Email J0 - Bienvenue",
-                "type": "n8n-nodes-base.emailSend",
-                "typeVersion": 2.1,
+                "id": "resend-j0",
+                "name": "Resend - Bienvenue",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.1,
                 "position": [
                     680,
-                    300
+                    380
                 ]
             },
             {
@@ -74,141 +104,57 @@
                 "id": "wait-j1",
                 "name": "Attendre J1",
                 "type": "n8n-nodes-base.wait",
-                "typeVersion": 1.1,
+                "typeVersion": 1,
                 "position": [
                     900,
-                    300
+                    380
                 ]
             },
             {
                 "parameters": {
-                    "fromEmail": "={{ $env.SMTP_FROM }}",
-                    "toEmail": "={{ $json.email }}",
-                    "subject": "💡 3 erreurs à éviter quand on lance sa marque",
-                    "html": "<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px;\">\n    <h1 style=\"color: #1D1D1F; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;\">3 erreurs fatales des créateurs de mode 🚫</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }},</p>\n    <div style=\"margin: 24px 0;\">\n      <div style=\"border-left: 3px solid #FF3B30; padding-left: 16px; margin: 20px 0;\">\n        <strong>Erreur #1 : Ignorer les tendances</strong><br>\n        <span style=\"color: #86868B;\">Les marques qui réussissent analysent les données. Notre module Tendances scrape 15 000+ produits/jour.</span>\n      </div>\n      <div style=\"border-left: 3px solid #FF9500; padding-left: 16px; margin: 20px 0;\">\n        <strong>Erreur #2 : Négliger le Tech Pack</strong><br>\n        <span style=\"color: #86868B;\">Un tech pack professionnel évite 80% des erreurs de production. Générez le vôtre en 2 minutes avec l'IA.</span>\n      </div>\n      <div style=\"border-left: 3px solid #007AFF; padding-left: 16px; margin: 20px 0;\">\n        <strong>Erreur #3 : Commencer sans stratégie</strong><br>\n        <span style=\"color: #86868B;\">Notre Launch Map vous guide étape par étape, de l'identité de marque au lancement.</span>\n      </div>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/launch-map\" style=\"display: inline-block; background: #000; color: #fff; padding: 14px 28px; border-radius: 100px; text-decoration: none; font-weight: 500;\">Voir ma Launch Map →</a>\n    <p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY</p>\n  </div>\n</div>",
-                    "options": {}
-                },
-                "id": "email-j1",
-                "name": "Email J1 - Tips",
-                "type": "n8n-nodes-base.emailSend",
-                "typeVersion": 2.1,
-                "position": [
-                    1120,
-                    300
-                ]
-            },
-            {
-                "parameters": {
-                    "amount": 2,
-                    "unit": "days"
-                },
-                "id": "wait-j3",
-                "name": "Attendre J3",
-                "type": "n8n-nodes-base.wait",
-                "typeVersion": 1.1,
-                "position": [
-                    1340,
-                    300
-                ]
-            },
-            {
-                "parameters": {
-                    "fromEmail": "={{ $env.SMTP_FROM }}",
-                    "toEmail": "={{ $json.email }}",
-                    "subject": "🚀 Comment Sarah a lancé sa marque en 48h avec OUTFITY",
-                    "html": "<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px;\">\n    <h1 style=\"color: #1D1D1F; font-size: 24px; font-weight: 600;\">De l'idée à la marque en 48h 🚀</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }},</p>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Sarah Dupont avait une idée simple : créer une marque de streetwear minimaliste. En 48h avec OUTFITY, elle a :</p>\n    <ul style=\"color: #1D1D1F; font-size: 16px; line-height: 2;\">\n      <li>✅ Défini son identité de marque (nom, logo, couleurs)</li>\n      <li>✅ Analysé 200+ tendances streetwear</li>\n      <li>✅ Généré 5 tech packs professionnels</li>\n      <li>✅ Trouvé 3 usines au Portugal</li>\n      <li>✅ Lancé sa boutique Shopify</li>\n    </ul>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\"><strong>Résultat</strong> : 15 ventes la première semaine, 2 500€ de CA.</p>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/dashboard\" style=\"display: inline-block; background: #000; color: #fff; padding: 14px 28px; border-radius: 100px; text-decoration: none; font-weight: 500;\">Créer ma marque comme Sarah →</a>\n    <p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY</p>\n  </div>\n</div>",
-                    "options": {}
-                },
-                "id": "email-j3",
-                "name": "Email J3 - Success Story",
-                "type": "n8n-nodes-base.emailSend",
-                "typeVersion": 2.1,
-                "position": [
-                    1560,
-                    300
-                ]
-            },
-            {
-                "parameters": {
-                    "amount": 2,
-                    "unit": "days"
-                },
-                "id": "wait-j5",
-                "name": "Attendre J5",
-                "type": "n8n-nodes-base.wait",
-                "typeVersion": 1.1,
-                "position": [
-                    1780,
-                    300
-                ]
-            },
-            {
-                "parameters": {
-                    "fromEmail": "={{ $env.SMTP_FROM }}",
-                    "toEmail": "={{ $json.email }}",
-                    "subject": "🎨 Nouveau : Générateur de Tech Pack IA amélioré",
-                    "html": "<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px; text-align: center;\">\n    <h1 style=\"color: #1D1D1F; font-size: 24px; font-weight: 600;\">Design Studio IA 🎨</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">{{ $json.name }}, avez-vous testé notre Studio de Design ?</p>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">En 2 minutes, vous obtenez un <strong>Tech Pack professionnel</strong> prêt à envoyer aux usines.</p>\n    <div style=\"background: #F5F5F7; border-radius: 16px; padding: 24px; margin: 24px 0; text-align: left;\">\n      <p style=\"margin: 8px 0;\">📐 Fiche technique complète (matières, tailles, couleurs)</p>\n      <p style=\"margin: 8px 0;\">🎨 Design généré par IA</p>\n      <p style=\"margin: 8px 0;\">📄 Export PDF professionnel</p>\n      <p style=\"margin: 8px 0;\">📧 Envoi direct aux usines</p>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/design-studio\" style=\"display: inline-block; background: #007AFF; color: #fff; padding: 14px 28px; border-radius: 100px; text-decoration: none; font-weight: 500;\">Tester le Design Studio →</a>\n    <p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY</p>\n  </div>\n</div>",
-                    "options": {}
-                },
-                "id": "email-j5",
-                "name": "Email J5 - Feature",
-                "type": "n8n-nodes-base.emailSend",
-                "typeVersion": 2.1,
-                "position": [
-                    2000,
-                    300
-                ]
-            },
-            {
-                "parameters": {
-                    "amount": 2,
-                    "unit": "days"
-                },
-                "id": "wait-j7",
-                "name": "Attendre J7",
-                "type": "n8n-nodes-base.wait",
-                "typeVersion": 1.1,
-                "position": [
-                    2220,
-                    300
-                ]
-            },
-            {
-                "parameters": {
-                    "conditions": {
-                        "string": [
+                    "method": "POST",
+                    "url": "https://api.resend.com/emails",
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
                             {
-                                "value1": "={{ $json.plan }}",
-                                "operation": "equal",
-                                "value2": "free"
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.SMTP_PASS }}"
                             }
                         ]
-                    }
-                },
-                "id": "check-plan",
-                "name": "Plan Free ?",
-                "type": "n8n-nodes-base.if",
-                "typeVersion": 2,
-                "position": [
-                    2440,
-                    300
-                ]
-            },
-            {
-                "parameters": {
-                    "fromEmail": "={{ $env.SMTP_FROM }}",
-                    "toEmail": "={{ $json.email }}",
-                    "subject": "⚡ Offre spéciale -40% sur OUTFITY Pro (expire dans 48h)",
-                    "html": "<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px; text-align: center;\">\n    <div style=\"background: #000; color: #fff; display: inline-block; padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 500; margin-bottom: 20px;\">OFFRE LIMITÉE</div>\n    <h1 style=\"color: #1D1D1F; font-size: 28px; font-weight: 600;\">-40% sur OUTFITY Pro ⚡</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">{{ $json.name }}, passez au niveau supérieur !</p>\n    <div style=\"background: #F5F5F7; border-radius: 16px; padding: 24px; margin: 24px 0;\">\n      <p style=\"font-size: 14px; color: #86868B; text-decoration: line-through;\">29€/mois</p>\n      <p style=\"font-size: 36px; font-weight: 600; color: #1D1D1F; margin: 8px 0;\">17,40€<span style=\"font-size: 16px; color: #86868B;\">/mois</span></p>\n      <p style=\"font-size: 14px; color: #007AFF;\">Économisez 139€/an</p>\n    </div>\n    <div style=\"text-align: left; margin: 24px 0;\">\n      <p style=\"margin: 8px 0;\">✅ 3 marques (vs 1 en Free)</p>\n      <p style=\"margin: 8px 0;\">✅ Designs illimités</p>\n      <p style=\"margin: 8px 0;\">✅ Analytics avancés</p>\n      <p style=\"margin: 8px 0;\">✅ Commission réduite à 5%</p>\n      <p style=\"margin: 8px 0;\">✅ Support prioritaire</p>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/settings?upgrade=pro&promo=WELCOME40\" style=\"display: inline-block; background: #007AFF; color: #fff; padding: 16px 32px; border-radius: 100px; text-decoration: none; font-weight: 500; font-size: 16px;\">Passer à Pro -40% →</a>\n    <p style=\"color: #FF3B30; font-size: 14px; margin-top: 16px; font-weight: 500;\">⏰ Offre expire dans 48h</p>\n    <p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY</p>\n  </div>\n</div>",
+                    },
+                    "sendBody": true,
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "name": "from",
+                                "value": "OUTFITY <onboarding@outfity.fr>"
+                            },
+                            {
+                                "name": "to",
+                                "value": "={{ $json.email }}"
+                            },
+                            {
+                                "name": "subject",
+                                "value": "💡 3 erreurs à éviter quand on lance sa marque"
+                            },
+                            {
+                                "name": "html",
+                                "value": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px;\">\n    <h1 style=\"color: #1D1D1F; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;\">3 erreurs fatales des créateurs de mode 🚫</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }},</p>\n    <div style=\"margin: 24px 0;\">\n      <div style=\"border-left: 3px solid #FF3B30; padding-left: 16px; margin: 20px 0;\">\n        <strong>Erreur #1 : Ignorer les tendances</strong><br>\n        <span style=\"color: #86868B;\">Les marques qui réussissent analysent les données. Notre module Tendances scrape 15 000+ produits/jour.</span>\n      </div>\n      <div style=\"border-left: 3px solid #FF9500; padding-left: 16px; margin: 20px 0;\">\n        <strong>Erreur #2 : Négliger le Tech Pack</strong><br>\n        <span style=\"color: #86868B;\">Un tech pack professionnel évite 80% des erreurs de production. Générez le vôtre en 2 minutes avec l'IA.</span>\n      </div>\n      <div style=\"border-left: 3px solid #007AFF; padding-left: 16px; margin: 20px 0;\">\n        <strong>Erreur #3 : Commencer sans stratégie</strong><br>\n        <span style=\"color: #86868B;\">Notre Launch Map vous guide étape par étape, de l'identité de marque au lancement.</span>\n      </div>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/launch-map\" style=\"display: inline-block; background: #000; color: #fff; padding: 14px 28px; border-radius: 100px; text-decoration: none; font-weight: 500;\">Voir ma Launch Map →</a>\n    <p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY</p>\n  </div>\n</div>"
+                            }
+                        ]
+                    },
                     "options": {}
                 },
-                "id": "email-j7-upgrade",
-                "name": "Email J7 - Upgrade Pro",
-                "type": "n8n-nodes-base.emailSend",
-                "typeVersion": 2.1,
+                "id": "resend-j1",
+                "name": "Resend - Tips",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.1,
                 "position": [
-                    2660,
-                    200
+                    1120,
+                    380
                 ]
             }
         ],
@@ -233,14 +179,14 @@
                             "index": 0
                         },
                         {
-                            "node": "Email J0 - Bienvenue",
+                            "node": "Resend - Bienvenue",
                             "type": "main",
                             "index": 0
                         }
                     ]
                 ]
             },
-            "Email J0 - Bienvenue": {
+            "Resend - Bienvenue": {
                 "main": [
                     [
                         {
@@ -255,102 +201,16 @@
                 "main": [
                     [
                         {
-                            "node": "Email J1 - Tips",
+                            "node": "Resend - Tips",
                             "type": "main",
                             "index": 0
                         }
                     ]
-                ]
-            },
-            "Email J1 - Tips": {
-                "main": [
-                    [
-                        {
-                            "node": "Attendre J3",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "Attendre J3": {
-                "main": [
-                    [
-                        {
-                            "node": "Email J3 - Success Story",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "Email J3 - Success Story": {
-                "main": [
-                    [
-                        {
-                            "node": "Attendre J5",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "Attendre J5": {
-                "main": [
-                    [
-                        {
-                            "node": "Email J5 - Feature",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "Email J5 - Feature": {
-                "main": [
-                    [
-                        {
-                            "node": "Attendre J7",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "Attendre J7": {
-                "main": [
-                    [
-                        {
-                            "node": "Plan Free ?",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ]
-                ]
-            },
-            "Plan Free ?": {
-                "main": [
-                    [
-                        {
-                            "node": "Email J7 - Upgrade Pro",
-                            "type": "main",
-                            "index": 0
-                        }
-                    ],
-                    []
                 ]
             }
         },
         "settings": {
             "executionOrder": "v1"
-        },
-        "tags": [
-            {
-                "name": "email"
-            },
-            {
-                "name": "onboarding"
-            }
-        ]
+        }
     }
 ]

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth-helpers';
+import { revalidatePath } from 'next/cache';
 
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -13,7 +14,7 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
         }
 
         const body = await req.json();
-        const { title, slug, excerpt, content, coverImage, published, tags, relatedBrands } = body;
+        const { title, slug, excerpt, content, coverImage, published, tags, relatedBrands, sourceUrl } = body;
 
         // Check slug uniqueness (if changed)
         const existing = await prisma.blogPost.findUnique({
@@ -33,12 +34,17 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
                 content,
                 coverImage,
                 published,
-                // Update publishedAt only if it was not published before and is now published
                 publishedAt: published && !existing?.published ? new Date() : undefined,
                 tags: tags || [],
                 relatedBrands: relatedBrands || [],
+                sourceUrl,
             },
         });
+
+        // Force revalidation of public pages
+        revalidatePath('/');
+        revalidatePath('/blog');
+        revalidatePath(`/blog/${post.slug}`);
 
         return NextResponse.json(post);
     } catch (error) {
@@ -60,6 +66,10 @@ export async function DELETE(req: Request, { params }: { params: Promise<{ id: s
         await prisma.blogPost.delete({
             where: { id },
         });
+
+        // Force revalidation of public pages
+        revalidatePath('/');
+        revalidatePath('/blog');
 
         return NextResponse.json({ success: true });
     } catch (error) {

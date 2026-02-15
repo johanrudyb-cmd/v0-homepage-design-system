@@ -58,6 +58,22 @@ export async function POST(request: Request) {
             data: { id: user.id, email: user.email, plan: user.plan }
         });
 
+        // Déclencher le workflow n8n Onboarding (Emails J0 -> J7)
+        try {
+            fetch('http://localhost:5678/webhook/outfity-onboarding', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    userId: user.id,
+                    email: user.email,
+                    name: user.name,
+                    plan: user.plan
+                }),
+            }).catch(e => console.error('[Signup] Erreur Webhook n8n onboarding:', e));
+        } catch (e) {
+            console.error('[Signup] Erreur critique déclenchement n8n:', e);
+        }
+
         return NextResponse.json(
             { message: 'Compte créé avec succès', userId: user.id },
             { status: 201 }

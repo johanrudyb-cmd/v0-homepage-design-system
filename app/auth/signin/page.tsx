@@ -77,15 +77,25 @@ function SignInContent() {
                 autoComplete="email"
               />
 
-              <Input
-                type="password"
-                label="Mot de passe"
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                autoComplete="current-password"
-              />
+              <div className="space-y-2">
+                <Input
+                  type="password"
+                  label="Mot de passe"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  autoComplete="current-password"
+                />
+                <div className="flex justify-end px-1">
+                  <Link
+                    href="/auth/forgot-password"
+                    className="text-xs font-medium text-muted-foreground hover:text-primary transition-colors"
+                  >
+                    Mot de passe oublié ?
+                  </Link>
+                </div>
+              </div>
 
               <Button
                 type="submit"

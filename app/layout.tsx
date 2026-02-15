@@ -108,8 +108,8 @@ export default function RootLayout({
   return (
     <html lang="fr" className={inter.variable}>
       <head>
-        <link rel="icon" type="image/png" href="/apple-icon.png" />
-        <link rel="shortcut icon" href="/apple-icon.png" />
+        <link rel="icon" type="image/png" href="/icon.png" />
+        <link rel="shortcut icon" href="/icon.png" />
         <link rel="apple-touch-icon" href="/apple-icon.png" />
       </head>
       <body className="font-sans antialiased min-h-screen safe-area-padding">

@@ -15,6 +15,8 @@ import { CTASection } from '@/components/homepage/CTASection';
 import { Footer } from '@/components/homepage/Footer';
 import { getFeaturedTrends } from '@/lib/trends-data';
 
+export const revalidate = 60; // Revalider toutes les minutes
+
 export default async function Home() {
   const initialTrends = await getFeaturedTrends();
 

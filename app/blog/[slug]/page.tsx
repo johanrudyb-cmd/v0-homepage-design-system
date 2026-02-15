@@ -242,6 +242,32 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                         </div>
                                     </div>
                                 )}
+
+                                {/* Source and CTA Section */}
+                                <div className="mt-20 p-8 sm:p-12 bg-black rounded-[40px] text-white overflow-hidden relative group">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#007AFF]/20 blur-[100px] -mr-32 -mt-32 group-hover:bg-[#007AFF]/40 transition-all duration-1000" />
+
+                                    <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:justify-between text-center md:text-left">
+                                        <div className="flex-1">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#007AFF]/20 border border-[#007AFF]/30 mb-6">
+                                                <Sparkles className="w-4 h-4 text-[#007AFF]" />
+                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#007AFF]">Propulsé par BIANGORY</span>
+                                            </div>
+                                            <h3 className="text-2xl sm:text-3xl font-black tracking-tight mb-4">
+                                                Prêt à lancer votre propre marque de vêtement ?
+                                            </h3>
+                                            <p className="text-white/60 text-base font-medium max-w-lg">
+                                                Utilisez la data des leaders mondiaux pour bâtir une collection rentable, sourcer les meilleures usines et automatiser votre marketing.
+                                            </p>
+                                        </div>
+                                        <Link
+                                            href="/"
+                                            className="px-8 py-5 bg-[#007AFF] text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#007AFF]/25 shrink-0"
+                                        >
+                                            Découvrir OUTFITY
+                                        </Link>
+                                    </div>
+                                </div>
                             </article>
                         </div>
                     </div>
@@ -300,10 +326,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                             </div>
                         </div>
                     </section>
-                )}
-            </main>
+                )
+                }
+            </main >
 
             <Footer />
-        </div>
+        </div >
     );
 }

@@ -39,7 +39,8 @@ export async function POST(req: Request) {
             published = true,
             tags = [],
             author = 'OUTFITY Intelligence',
-            relatedBrands = []
+            relatedBrands = [],
+            sourceUrl
         } = body;
 
         // 3. Validation des champs requis
@@ -64,6 +65,7 @@ export async function POST(req: Request) {
                     tags,
                     author,
                     relatedBrands,
+                    sourceUrl
                 },
                 create: {
                     title,
@@ -76,6 +78,7 @@ export async function POST(req: Request) {
                     publishedAt: published ? new Date() : undefined,
                     tags,
                     relatedBrands,
+                    sourceUrl
                 },
             });
 
