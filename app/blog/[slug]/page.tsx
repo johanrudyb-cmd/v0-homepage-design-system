@@ -8,7 +8,7 @@ import { AnimatedHeader } from '@/components/homepage/AnimatedHeader';
 import { Footer } from '@/components/homepage/Footer';
 import { cn } from '@/lib/utils';
 
-export const revalidate = 3600;
+export const revalidate = 0;
 
 interface BlogPostPageProps {
     params: Promise<{

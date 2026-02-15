@@ -34,6 +34,8 @@ const nextConfig: NextConfig = {
 
       // Développement local
       { protocol: 'http', hostname: 'localhost' },
+      { protocol: 'https', hostname: '**.higgsfield.ai' },
+      { protocol: 'https', hostname: 'images.unsplash.com' },
     ],
   },
   async rewrites() {

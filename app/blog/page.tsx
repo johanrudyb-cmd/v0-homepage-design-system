@@ -11,6 +11,8 @@ export const metadata = {
   description: 'Tout l\'actualité du secteur, tendances et stratégies des marques qui réussissent.',
 };
 
+export const revalidate = 0;
+
 export default async function BlogPage() {
   const posts = await prisma.blogPost.findMany({
     where: { published: true },
