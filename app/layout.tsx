@@ -18,30 +18,46 @@ export const viewport = {
   width: 'device-width',
   initialScale: 1,
   maximumScale: 5,
-  viewportFit: 'cover' as const, // safe-area pour encoches (téléphone/tablette)
+  viewportFit: 'cover' as const,
+  themeColor: '#000000',
 };
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  icons: {
-    icon: '/apple-icon.png',
-    apple: '/apple-icon.png',
-  },
   title: {
     default: 'OUTFITY - Créez votre marque avec les données des géants',
     template: '%s | OUTFITY',
   },
   description:
-    'Donnez à votre marque indépendante la puissance des leaders mondiaux. Tendances 15 000+ références, sourcing usines, studio IA et stratégie. Par BIANGORY.',
+    'Donnez à votre marque indépendante la puissance des leaders mondiaux. Tendances extraites de 15 000+ références, sourcing usines certifiées, studio de création IA et stratégie retail par BIANGORY.',
   keywords: [
     'OUTFITY',
-    'marque mode',
-    'tendances mode',
-    'sourcing textile',
-    'tech pack',
-    'création marque vêtements',
     'BIANGORY',
+    'création marque mode',
+    'marques streetwear',
+    'sourcing textile usine',
+    'analyse tendances mode',
+    'intelligence artificielle mode',
+    'tech pack vêtements',
+    'lancer sa marque 2026'
   ],
+  authors: [{ name: 'BIANGORY', url: 'https://biangory.com' }],
+  creator: 'BIANGORY',
+  publisher: 'OUTFITY',
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
+  icons: {
+    icon: [
+      { url: '/icon.png' },
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
@@ -49,18 +65,34 @@ export const metadata: Metadata = {
     siteName: 'OUTFITY',
     title: 'OUTFITY - Créez votre marque avec les données des géants',
     description:
-      'Donnez à votre marque indépendante la puissance des leaders mondiaux. Mêmes données. Mêmes usines. Mêmes stratégies.',
-    images: [{ url: '/apple-icon.png', width: 512, height: 512, alt: 'OUTFITY' }],
+      'La plateforme tout-en-un pour bâtir une marque de mode rentable grâce à la data. Mêmes données. Mêmes usines. Mêmes stratégies.',
+    images: [
+      {
+        url: '/apple-icon.png',
+        width: 512,
+        height: 512,
+        alt: 'OUTFITY - Intelligence Mode',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OUTFITY - Créez votre marque avec les données des géants',
+    title: 'OUTFITY - Bâtissez le futur de la mode',
     description:
-      'Donnez à votre marque indépendante la puissance des leaders mondiaux. Par BIANGORY.',
+      'La puissance des leaders mondiaux au service des marques indépendantes. Propulsé par BIANGORY.',
+    images: ['/apple-icon.png'],
+    creator: '@biangory',
   },
   robots: {
     index: true,
     follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-video-preview': -1,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+    },
   },
 };
 
