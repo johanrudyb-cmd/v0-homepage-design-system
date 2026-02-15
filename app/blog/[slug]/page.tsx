@@ -24,10 +24,34 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
 
     if (!post) return { title: 'Article non trouvé | OUTFITY' };
 
+    const siteUrl = 'https://outfity.fr';
+
     return {
-        title: `${post.title} | Blog OUTFITY`,
+        title: `${post.title} | OUTFITY Radar`,
         description: post.excerpt,
+        alternates: {
+            canonical: `${siteUrl}/blog/${post.slug}`,
+        },
         openGraph: {
+            title: post.title,
+            description: post.excerpt,
+            url: `${siteUrl}/blog/${post.slug}`,
+            siteName: 'OUTFITY',
+            images: post.coverImage ? [
+                {
+                    url: post.coverImage,
+                    width: 1200,
+                    height: 630,
+                    alt: post.title,
+                }
+            ] : [],
+            locale: 'fr_FR',
+            type: 'article',
+            publishedTime: post.publishedAt.toISOString(),
+            authors: [post.author],
+        },
+        twitter: {
+            card: 'summary_large_image',
             title: post.title,
             description: post.excerpt,
             images: post.coverImage ? [post.coverImage] : [],

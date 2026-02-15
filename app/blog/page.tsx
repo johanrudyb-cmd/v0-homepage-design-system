@@ -7,8 +7,20 @@ import { cn } from '@/lib/utils';
 import { Card, CardContent } from '@/components/ui/card';
 
 export const metadata = {
-  title: 'Blog Mode & Stratégie | OUTFITY',
-  description: 'Tout l\'actualité du secteur, tendances et stratégies des marques qui réussissent.',
+  title: 'Le Radar OUTFITY | Intelligence Mode & Stratégie',
+  description: 'Analyses quotidiennes des tendances mode, stratégies retail et innovations tech par l\'intelligence OUTFITY.',
+  openGraph: {
+    title: 'Le Radar OUTFITY | Intelligence Mode & Stratégie',
+    description: 'Décryptez le futur de la mode avec nos analyses data et tendances.',
+    images: [{ url: '/og-image.jpg', width: 1200, height: 630, alt: 'OUTFITY Blog' }],
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Le Radar OUTFITY | Intelligence Mode & Stratégie',
+    description: 'Analyses quotidiennes des tendances mode.',
+    images: ['/og-image.jpg'],
+  }
 };
 
 export const revalidate = 0;
