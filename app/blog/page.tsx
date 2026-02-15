@@ -44,31 +44,34 @@ export default async function BlogPage() {
 
         {/* Featured Story - Magazine Style */}
         {posts.length > 0 && (
-          <section className="py-12 px-6 max-w-7xl mx-auto">
-            <Link href={`/blog/${posts[0].slug}`} className="group relative block overflow-hidden rounded-[60px] bg-black aspect-[21/10]">
+          <section className="py-8 px-4 sm:py-12 sm:px-6 max-w-7xl mx-auto">
+            <Link
+              href={`/blog/${posts[0].slug}`}
+              className="group relative block overflow-hidden rounded-[40px] sm:rounded-[60px] bg-black aspect-[4/5] sm:aspect-[21/10]"
+            >
               {posts[0].coverImage && (
                 <img
                   src={posts[0].coverImage}
                   alt={posts[0].title}
-                  className="absolute inset-0 w-full h-full object-cover opacity-70 transition-transform duration-[2000ms] group-hover:scale-105"
+                  className="absolute inset-0 w-full h-full object-cover opacity-60 sm:opacity-70 transition-transform duration-[2000ms] group-hover:scale-105"
                 />
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
-              <div className="absolute inset-0 flex flex-col justify-end p-12 sm:p-24 lg:p-32">
-                <div className="max-w-4xl space-y-8">
-                  <div className="flex items-center gap-4 text-white/60 text-xs font-black uppercase tracking-widest">
-                    <span className="px-3 py-1 rounded bg-[#007AFF] text-white">À LA UNE</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
+              <div className="absolute inset-0 flex flex-col justify-end p-8 sm:p-24 lg:p-32">
+                <div className="max-w-4xl space-y-4 sm:space-y-8">
+                  <div className="flex items-center gap-3 sm:gap-4 text-white/60 text-[10px] font-black uppercase tracking-widest">
+                    <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded bg-[#007AFF] text-white">À LA UNE</span>
                     <span>•</span>
                     <span>{posts[0].author}</span>
                   </div>
-                  <h2 className="text-4xl sm:text-6xl lg:text-7xl font-black text-white leading-none tracking-tighter group-hover:text-[#007AFF] transition-colors">
+                  <h2 className="text-3xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.1] tracking-tighter group-hover:text-[#007AFF] transition-colors">
                     {posts[0].title}
                   </h2>
-                  <p className="text-white/60 text-xl font-medium line-clamp-2 max-w-2xl">
+                  <p className="text-white/60 text-sm sm:text-xl font-medium line-clamp-2 max-w-2xl">
                     {posts[0].excerpt}
                   </p>
-                  <div className="inline-flex items-center gap-4 text-white font-black uppercase tracking-widest text-sm pt-4">
-                    Explorer l'analyse <ArrowRight className="w-5 h-5 group-hover:translate-x-4 transition-all" />
+                  <div className="inline-flex items-center gap-4 text-white font-black uppercase tracking-widest text-[10px] sm:text-sm pt-2 sm:pt-4">
+                    Explorer l'analyse <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-4 transition-all" />
                   </div>
                 </div>
               </div>
