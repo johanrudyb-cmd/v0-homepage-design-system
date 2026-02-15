@@ -25,23 +25,23 @@ export const viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'OUTFITY - Créez votre marque avec les données des géants',
+    default: 'Créer sa marque de vêtement avec la Data des géants | OUTFITY',
     template: '%s | OUTFITY',
   },
   description:
-    'Donnez à votre marque indépendante la puissance des leaders mondiaux. Tendances extraites de 15 000+ références, sourcing usines certifiées, studio de création IA et stratégie retail par BIANGORY.',
+    'La solution n°1 pour créer sa marque de vêtement en 2026. Accédez aux tendances mondiales, au sourcing d\'usines certifiées et à une stratégie retail automatisée par IA. Propulsé par BIANGORY.',
   keywords: [
     'OUTFITY',
     'BIANGORY',
-    'création marque mode',
-    'marques streetwear',
-    'sourcing textile usine',
-    'analyse tendances mode',
+    'créer sa marque de vêtement',
+    'lancer une marque de mode',
+    'devenir créateur de mode',
+    'sourcing usine textile',
     'intelligence artificielle mode',
-    'tech pack vêtements',
-    'lancer sa marque 2026'
+    'brand strategy mode',
+    'streetwear business'
   ],
-  authors: [{ name: 'BIANGORY', url: 'https://biangory.com' }],
+  authors: [{ name: 'BIANGORY', url: 'https://outfity.fr' }],
   creator: 'BIANGORY',
   publisher: 'OUTFITY',
   formatDetection: {
@@ -63,23 +63,23 @@ export const metadata: Metadata = {
     locale: 'fr_FR',
     url: siteUrl,
     siteName: 'OUTFITY',
-    title: 'OUTFITY - Créez votre marque avec les données des géants',
+    title: 'Créer sa marque de vêtement avec la Data des géants | OUTFITY',
     description:
-      'La plateforme tout-en-un pour bâtir une marque de mode rentable grâce à la data. Mêmes données. Mêmes usines. Mêmes stratégies.',
+      'Ne lancez pas votre marque de vêtement à l\'aveugle. Utilisez la data d\'OUTFITY pour bâtir une collection rentable avec les meilleures usines mondiales.',
     images: [
       {
         url: '/apple-icon.png',
         width: 512,
         height: 512,
-        alt: 'OUTFITY - Intelligence Mode',
+        alt: 'OUTFITY - Créer sa marque de vêtement',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'OUTFITY - Bâtissez le futur de la mode',
+    title: 'Créer sa marque de vêtement : La méthode OUTFITY',
     description:
-      'La puissance des leaders mondiaux au service des marques indépendantes. Propulsé par BIANGORY.',
+      'Bâtissez votre marque de mode avec les outils des leaders mondiaux. Sourcing, Trends, IA.',
     images: ['/apple-icon.png'],
     creator: '@biangory',
   },
