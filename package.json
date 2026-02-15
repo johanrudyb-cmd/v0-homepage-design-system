@@ -22,6 +22,7 @@
     "db:seed-factories": "node scripts/seed-factories.js",
     "db:seed-products": "node scripts/seed-products.js",
     "test:e2e": "node scripts/test-e2e.js",
+    "test:blog": "npx tsx scripts/test-blog-flow.ts",
     "test:scraper": "node scripts/test-scraper.mjs",
     "reset:analyses": "node scripts/reset-analyses.js",
     "upgrade:plan": "node scripts/upgrade-user-plan.js",
