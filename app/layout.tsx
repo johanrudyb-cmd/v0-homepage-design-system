@@ -24,6 +24,12 @@ export const viewport = {
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'OUTFITY',
+  },
   title: {
     default: 'Créer sa marque de vêtement avec la Data des géants | OUTFITY',
     template: '%s | OUTFITY',
@@ -97,6 +103,7 @@ export const metadata: Metadata = {
 };
 
 import { Providers } from '@/components/providers/Providers';
+import { IOSInstallPrompt } from '@/components/layout/IOSInstallPrompt';
 
 // export const dynamic = 'force-dynamic';
 
@@ -116,6 +123,7 @@ export default function RootLayout({
         <ErrorBoundary>
           <Providers>
             <SurplusModalProvider>{children}</SurplusModalProvider>
+            <IOSInstallPrompt />
           </Providers>
           <BackToTop />
         </ErrorBoundary>

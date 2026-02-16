@@ -15,15 +15,26 @@ function getTutorialDone(): boolean {
 }
 
 const TUTORIAL_STEPS: { target: string; title: string; body: string }[] = [
-  { target: 'tour-dashboard', title: 'Dashboard', body: 'Vue d\'ensemble de votre activité : stats, parcours et accès rapide aux outils.' },
-  { target: 'tour-trends', title: 'Tendances de la semaine', body: 'Les nouveautés chaque semaine pour rester inspiré.' },
-  { target: 'tour-brands', title: 'Marques tendances', body: 'Découvrez les marques les plus tendances du moment.' },
-  { target: 'tour-spy', title: 'Analyseur de tendances', body: 'Analysez les tendances et prévisions avec l\'IA.' },
-  { target: 'tour-analyze-brand', title: 'Analyse de marque', body: 'Analyse IA par recherche : marketing et opportunités.' },
-  { target: 'tour-design-studio', title: 'Design Studio', body: 'Créez vos tech packs et designs avec l\'IA.' },
-  { target: 'tour-ugc', title: 'UGC Lab', body: 'Générez vos contenus marketing et scripts UGC avec l\'IA.' },
-  { target: 'tour-launch-map', title: 'Gérer ma marque', body: 'Guide complet de lancement : stratégie, identité, design, sourcing, marketing.' },
-  { target: 'tour-dashboard-content', title: 'Contenu principal', body: 'Ici : votre parcours vers la première vente, statistiques et accès rapide aux outils.' },
+  {
+    target: 'tour-dashboard',
+    title: 'Tableau de Bord',
+    body: 'Votre centre de commande pour suivre l\'évolution de votre marque et accéder à tous vos outils.'
+  },
+  {
+    target: 'tour-trends',
+    title: 'Radar Elite',
+    body: 'C\'est ici que vous captez les tendances virales avant tout le monde pour créer des produits qui se vendent.'
+  },
+  {
+    target: 'tour-spy',
+    title: 'Scanner IVS IA',
+    body: 'Utilisez la puissance de notre IA pour analyser la viralité de n\'importe quel vêtement en une seconde.'
+  },
+  {
+    target: 'tour-launch-map',
+    title: 'Guide de Lancement',
+    body: 'Votre mentor pas à pas : de l\'idée au design, du sourcing à la première vente. Tout est ici.'
+  },
 ];
 
 const STORAGE_KEY = 'dashboard_tutorial_done';
@@ -78,7 +89,7 @@ export function DashboardTutorial() {
     if (isLast) {
       try {
         localStorage.setItem(STORAGE_KEY, '1');
-      } catch (_) {}
+      } catch (_) { }
       router.replace('/dashboard');
       return;
     }
@@ -88,7 +99,7 @@ export function DashboardTutorial() {
   const handleSkip = () => {
     try {
       localStorage.setItem(STORAGE_KEY, '1');
-    } catch (_) {}
+    } catch (_) { }
     router.replace('/dashboard');
   };
 

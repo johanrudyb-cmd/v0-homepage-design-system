@@ -43,6 +43,7 @@ export function OnboardingFlowExistingBrand({ onBack, demoMode = false, prefille
   const [instagram, setInstagram] = useState(prefilledData?.socialHandles?.instagram || '');
   const [twitter, setTwitter] = useState(prefilledData?.socialHandles?.twitter || '');
   const [tagline, setTagline] = useState('');
+  const [story, setStory] = useState('');
   const recommendation = useMemo(() => getSeasonalRecommendation(), []);
   const [productType, setProductType] = useState<ProductTypeId>(recommendation.productType);
   const [productWeight, setProductWeight] = useState(recommendation.weight);
@@ -58,30 +59,14 @@ export function OnboardingFlowExistingBrand({ onBack, demoMode = false, prefille
   const handleCreateBrand = async () => {
     const trimmedName = name.trim();
     if (!trimmedName || trimmedName.length < 2) {
-      setCreateError('Le nom de la marque est requis (2 caractères minimum).');
+      setCreateError('Le nom de la marque est requis.');
       return;
     }
     setCreateError('');
     setCreateLoading(true);
     try {
       if (demoMode) {
-        await new Promise((r) => setTimeout(r, 400));
-        const fakeBrand: BrandIdentity = {
-          id: DEMO_BRAND_ID,
-          name: trimmedName,
-          logo: logoUrl.trim() || null,
-          domain: domain.trim() || null,
-          socialHandles: instagram.trim() || twitter.trim() ? { instagram: instagram.trim() || undefined, twitter: twitter.trim() || undefined } : null,
-          styleGuide: {
-            mainProduct: getProductTypeLabel(productType),
-            productType,
-            productWeight,
-            noLogo: !logoUrl.trim(),
-            tagline: tagline.trim() || undefined,
-          },
-        };
         setBrandId(DEMO_BRAND_ID);
-        setBrand(fakeBrand);
         setStep(1);
         setCreateLoading(false);
         return;
@@ -104,192 +89,106 @@ export function OnboardingFlowExistingBrand({ onBack, demoMode = false, prefille
             productWeight,
             noLogo: !logoUrl.trim(),
             tagline: tagline.trim() || undefined,
+            story: story.trim() || undefined,
           },
           creationMode: 'onboarding',
           status: 'in_progress',
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Erreur création marque');
-      const created = data.brand as { id: string; name: string; logo?: string | null; styleGuide?: unknown; domain?: string | null; socialHandles?: unknown };
-      setBrandId(created.id);
-      setBrand(created as unknown as BrandIdentity);
+      if (!res.ok) throw new Error(data.error);
+      setBrandId(data.brand.id);
+      setBrand(data.brand);
       setStep(1);
     } catch (e) {
-      setCreateError(e instanceof Error ? e.message : 'Une erreur est survenue');
+      setCreateError('Une erreur est survenue lors de l\'enregistrement.');
     } finally {
       setCreateLoading(false);
     }
   };
 
-  const stepLabels = [
-    'Identité — Nom, logo, site, réseaux',
-    'Compléter et valider',
-    'Validation',
-  ] as const;
-
   return (
     <div className="space-y-6 max-w-3xl">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={onBack} aria-label="Retour" disabled={step > 0}>
+        <Button variant="ghost" size="icon" onClick={onBack} disabled={step > 0}>
           <ArrowLeft className="w-5 h-5" />
         </Button>
         <div>
-          <h1 className="text-xl font-bold text-foreground">J&apos;ai déjà ma marque</h1>
+          <h1 className="text-xl font-bold text-foreground">Importer votre univers</h1>
           <p className="text-sm text-muted-foreground">
-            Étape {step + 1} sur 3 — {stepLabels[step]}
+            {step === 0 && "Présentez-moi votre marque actuelle pour que je puisse vous guider au mieux."}
+            {step === 1 && "Vérifions ensemble les détails de votre identité."}
           </p>
         </div>
       </div>
 
-      {/* Étape 0 : Identité — infos de la marque */}
+      {/* Étape 0 : Formulaire Rapide */}
       {step === 0 && (
-        <Card className="border-2">
+        <Card className="border-2 border-primary/10 shadow-lg">
           <CardHeader>
-            <CardTitle className="text-lg">Identité — Nom, logo, site, réseaux</CardTitle>
-            <CardDescription>
-              Renseignez les infos de votre marque. Elles seront réutilisées dans le Guide de lancement (stratégie, design, sourcing, UGC). Même structure que pour les marques créées avec nous.
-            </CardDescription>
+            <CardTitle className="text-lg">Les Fondations</CardTitle>
           </CardHeader>
-          <CardContent className="space-y-6">
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground">Nom de la marque *</label>
-              <Input
-                value={name}
-                onChange={(e) => { setName(e.target.value); setCreateError(''); }}
-                placeholder="Ex. Ma Marque"
-                className="border-2"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground">Logo (URL)</label>
-              <Input
-                value={logoUrl}
-                onChange={(e) => setLogoUrl(e.target.value)}
-                placeholder="https://... (optionnel)"
-                className="border-2 font-mono"
-              />
-            </div>
-            <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground">Site web</label>
-              <Input
-                value={domain}
-                onChange={(e) => setDomain(e.target.value)}
-                placeholder="ex. votremarque.com"
-                className="border-2"
-              />
-            </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+          <CardContent className="space-y-6 text-2xl font-bold">
+            <div className="grid gap-6 sm:grid-cols-2 text-2xl">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">Instagram</label>
-                <Input
-                  value={instagram}
-                  onChange={(e) => setInstagram(e.target.value)}
-                  placeholder="@mamarque"
-                  className="border-2"
-                />
+                <label className="text-sm font-semibold">Nom de la marque *</label>
+                <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex. Zenith Apparel" className="border-2 rounded-xl" />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">Twitter / X</label>
-                <Input
-                  value={twitter}
-                  onChange={(e) => setTwitter(e.target.value)}
-                  placeholder="@mamarque"
-                  className="border-2"
-                />
+                <label className="text-sm font-semibold">Site web (Optionnel)</label>
+                <Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="www.zenith.com" className="border-2 rounded-xl" />
               </div>
             </div>
+
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-foreground">Slogan / baseline</label>
-              <Input
-                value={tagline}
-                onChange={(e) => setTagline(e.target.value)}
-                placeholder="Ex. La marque qui vous ressemble"
-                className="border-2"
-              />
+              <label className="text-sm font-semibold">Votre histoire en 1 phrase</label>
+              <Input value={story} onChange={(e) => setStory(e.target.value)} placeholder="Nous créons des vêtements durables pour..." className="border-2 rounded-xl" />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+
+            <div className="grid gap-6 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">Type de produit principal</label>
+                <label className="text-sm font-semibold">Instagram</label>
+                <Input value={instagram} onChange={(e) => setInstagram(e.target.value)} placeholder="@zenith" className="border-2 rounded-xl" />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-semibold">Type de produit phare</label>
                 <select
                   value={productType}
-                  onChange={(e) => {
-                    const v = e.target.value as ProductTypeId;
-                    setProductType(v);
-                    const opts = getWeightOptions(v);
-                    setProductWeight(opts[0]?.value ?? '180 g/m²');
-                  }}
-                  className="w-full rounded-md border-2 border-input bg-background px-3 py-2 text-sm"
+                  onChange={(e) => setProductType(e.target.value as ProductTypeId)}
+                  className="w-full h-10 px-3 text-sm bg-background border-2 rounded-xl"
                 >
                   {PRODUCT_TYPE_IDS.map((id) => (
                     <option key={id} value={id}>{getProductTypeLabel(id)}</option>
                   ))}
                 </select>
               </div>
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-foreground">Grammage</label>
-                <select
-                  value={productWeight}
-                  onChange={(e) => setProductWeight(e.target.value)}
-                  className="w-full rounded-md border-2 border-input bg-background px-3 py-2 text-sm"
-                >
-                  {weightOptions.map((opt) => (
-                    <option key={opt.value} value={opt.value}>{opt.label}</option>
-                  ))}
-                </select>
-              </div>
             </div>
-            {createError && <p className="text-sm text-destructive font-medium">{createError}</p>}
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={onBack} disabled={createLoading}>
-                Retour
-              </Button>
-              <Button
-                onClick={handleCreateBrand}
-                disabled={createLoading || name.trim().length < 2}
-              >
-                {createLoading ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                    Enregistrement…
-                  </>
-                ) : (
-                  "Enregistrer et continuer"
-                )}
+
+            {createError && <p className="text-sm text-destructive">{createError}</p>}
+
+            <div className="pt-4">
+              <Button onClick={handleCreateBrand} disabled={createLoading || name.length < 2} className="w-full h-12 text-lg">
+                {createLoading ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "C'est tout bon, on continue !"}
               </Button>
             </div>
           </CardContent>
         </Card>
       )}
 
-      {/* Étape 1 : Phase 0 Identité (compléter / modifier) */}
-      {step === 1 && brandId && brand && (
-        <Card className="border-2">
-          <CardHeader>
-            <CardTitle className="text-lg">Compléter et valider</CardTitle>
-            <CardDescription>
-              Modifiez ou complétez les infos (description, produit principal, etc.) puis valider. Votre marque sera disponible dans le tableau de bord et le Guide de lancement.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <Phase0Identity
-              brandId={brandId}
-              brand={brand}
-              onComplete={() => setStep(2)}
-              hideNameField
-              demoMode={demoMode}
-            />
-          </CardContent>
-        </Card>
+      {/* Étape 1 : Validation finale */}
+      {step === 1 && brandId && (
+        <Phase0Identity
+          brandId={brandId}
+          brand={brand}
+          onComplete={() => setStep(2)}
+          hideNameField
+          demoMode={demoMode}
+        />
       )}
 
-      {/* Étape 2 : Animation puis dashboard */}
+      {/* Étape 2 : Animation */}
       {step === 2 && (
-        <Card className="border-2">
-          <CardContent className="p-0">
-            <WelcomeValidationAnimation />
-          </CardContent>
-        </Card>
+        <WelcomeValidationAnimation />
       )}
     </div>
   );

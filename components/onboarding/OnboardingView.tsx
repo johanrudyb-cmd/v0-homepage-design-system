@@ -76,16 +76,16 @@ function OnboardingContent({ userPlan }: OnboardingViewProps) {
         <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/30 flex items-center gap-3">
           <CheckCircle className="w-6 h-6 text-green-600 shrink-0" />
           <p className="text-sm font-medium text-green-800">
-            Votre abonnement est activé. Tous les quotas ont été réinitialisés. Complétez votre profil pour accéder à toutes les fonctionnalités.
+            Félicitations ! Votre Plan Créateur est activé. Je suis prêt à vous guider pour vos premiers pas.
           </p>
         </div>
       )}
       <div className="text-center mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-foreground">
-          Bienvenue sur votre guide de lancement
+          Bienvenue dans l'aventure OUTFITY
         </h1>
         <p className="text-muted-foreground mt-2 font-medium">
-          Créez ou enregistrez votre marque, puis lancez-vous avec identité, stratégie, design, sourcing et contenu.
+          Je suis votre mentor. Choisissez comment vous souhaitez commencer aujourd'hui.
         </p>
       </div>
 
@@ -98,17 +98,17 @@ function OnboardingContent({ userPlan }: OnboardingViewProps) {
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-2">
               <Sparkles className="w-6 h-6 text-primary" />
             </div>
-            <CardTitle className="text-xl">Je crée ma marque de zéro</CardTitle>
+            <CardTitle className="text-xl">Créer mon concept</CardTitle>
             <CardDescription>
               {userPlan === 'free'
-                ? "Définissez votre positionnement et votre cible manuellement. Nous vous aidons à structurer votre projet étape par étape pour un lancement réussi."
-                : "Inspirez-vous d'une marque tendance, copiez sa stratégie, puis l'IA vous propose un nom et une identité. Vous poursuivez dans le Guide de lancement."
+                ? "Je n'ai pas encore de nom ou d'idée précise. Guidez-moi pour poser les bases de ma future marque."
+                : "L'IA m'aide à transformer ma vision en une marque concrète avec un nom expert et un univers visuel."
               }
             </CardDescription>
           </CardHeader>
           <CardContent>
             <Button className="w-full gap-2" variant="default">
-              Commencer
+              Démarrer le guide
               <ArrowRight className="w-4 h-4" />
             </Button>
           </CardContent>
@@ -122,9 +122,9 @@ function OnboardingContent({ userPlan }: OnboardingViewProps) {
             <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center mb-2">
               <Store className="w-6 h-6 text-primary" />
             </div>
-            <CardTitle className="text-xl">J&apos;ai déjà ma marque</CardTitle>
+            <CardTitle className="text-xl">Importer ma marque</CardTitle>
             <CardDescription>
-              Enregistrez le nom, logo, site et réseaux. Accédez directement au Guide de lancement, tendances, calendrier et UGC.
+              J'ai déjà un nom et un logo. Je souhaite utiliser les outils OUTFITY pour mes prochaines étapes.
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -136,21 +136,17 @@ function OnboardingContent({ userPlan }: OnboardingViewProps) {
         </Card>
       </div>
 
-      <p className="text-xs text-muted-foreground mt-8 text-center max-w-md">
-        Mode démo : parcours sans enregistrement. Vous pouvez refaire l&apos;onboarding autant de fois que vous voulez.
+      <p className="text-xs text-muted-foreground mt-8 text-center max-w-md italic">
+        "Chaque empire a commencé par un premier pas. Le vôtre commence ici."
       </p>
       <div className="mt-6 flex flex-wrap items-center justify-center gap-4">
         <Link href="/dashboard" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground font-medium transition-colors">
           <LayoutDashboard className="w-4 h-4" />
-          Tableau de bord
+          Dashboard
         </Link>
         <Link href="/launch-map" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground font-medium transition-colors">
           <Map className="w-4 h-4" />
-          Gérer ma marque
-        </Link>
-        <Link href="/usage" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground font-medium transition-colors">
-          <Coins className="w-4 h-4" />
-          Mes quotas
+          Launch Map
         </Link>
       </div>
     </div>
