@@ -732,3 +732,17 @@ model BlogPost {
   @@index([published, publishedAt])
   @@index([slug])
 }
+
+model AdminLog {
+  id        String   @id @default(cuid())
+  type      String   // signup, payment, error, etc.
+  title     String
+  message   String   @db.Text
+  level     String   @default("info") // info, warning, error, critical
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  @@index([type])
+  @@index([level])
+  @@index([createdAt])
+}

@@ -16,9 +16,14 @@ export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
-    // Vérifier que l'utilisateur est admin (optionnel, pour sécurité)
-    const user = await getCurrentUser();
-    if (!user) {
+    // Sécurisation : Autoriser soit l'utilisateur admin, soit n8n via le secret
+    const { searchParams } = new URL(request.url);
+    const secret = request.headers.get('x-n8n-secret') || searchParams.get('secret');
+    const isN8n = secret && secret === process.env.N8N_WEBHOOK_SECRET;
+
+    const user = !isN8n ? await getCurrentUser() : null;
+
+    if (!isN8n && !user) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
@@ -27,9 +32,9 @@ export async function POST(request: Request) {
     const products = await scrapeAllTrendingProducts();
 
     if (products.length === 0) {
-      return NextResponse.json({ 
+      return NextResponse.json({
         message: 'Aucun produit trouvé',
-        count: 0 
+        count: 0
       });
     }
 

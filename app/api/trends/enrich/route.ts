@@ -12,12 +12,16 @@ export const maxDuration = 300;
 
 export async function POST(request: Request) {
   try {
-    const user = await getCurrentUser();
-    if (!user) {
+    // Sécurisation : Autoriser n8n secret
+    const { searchParams } = new URL(request.url);
+    const secret = request.headers.get('x-n8n-secret') || searchParams.get('secret');
+    const isN8n = secret && secret === process.env.N8N_WEBHOOK_SECRET;
+
+    const user = !isN8n ? await getCurrentUser() : null;
+    if (!isN8n && !user) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    const { searchParams } = new URL(request.url);
     const limit = Math.min(parseInt(searchParams.get('limit') || '20', 10), 30);
 
     const { enriched, errors } = await enrichTrends(limit);

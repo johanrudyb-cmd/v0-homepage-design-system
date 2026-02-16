@@ -37,7 +37,8 @@ export interface RefreshZalandoTrendsResult {
  * Scrape toutes les sources Zalando (homme + femme, 10 villes) et enregistre les tendances en base.
  * Les tendances "Tendances de la semaine" s'actualisent ainsi automatiquement.
  */
-export async function refreshZalandoTrends(): Promise<RefreshZalandoTrendsResult> {
+export async function refreshZalandoTrends(options: { simulate?: boolean } = {}): Promise<RefreshZalandoTrendsResult> {
+  const { simulate = false } = options;
   const allSources = getAllSources();
   const zalandoSources = allSources.filter(
     (s): s is HybridRadarSource =>
@@ -87,6 +88,11 @@ export async function refreshZalandoTrends(): Promise<RefreshZalandoTrendsResult
           stockOutRisk: item.stockOutRisk ?? null,
           productBrand: productBrand ?? null,
         };
+
+        if (simulate) {
+          savedCount++;
+          continue;
+        }
 
         const existing = await prisma.trendProduct.findFirst({
           where: {

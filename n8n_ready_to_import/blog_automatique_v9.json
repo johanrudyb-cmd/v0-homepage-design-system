@@ -1,5 +1,5 @@
 {
-    "name": "📰 OUTFITY - Pilote Automatique (V8 - Ultra Stable)",
+    "name": "📰 OUTFITY - Pilote Automatique (V9 - Focus Unique)",
     "nodes": [
         {
             "parameters": {
@@ -13,7 +13,7 @@
                 }
             },
             "id": "trigger",
-            "name": "Toutes les 6 heures",
+            "name": "Toutes les 4 heures",
             "type": "n8n-nodes-base.scheduleTrigger",
             "typeVersion": 1.1,
             "position": [
@@ -23,35 +23,35 @@
         },
         {
             "parameters": {
-                "url": "https://fashionunited.fr/rss/news?local_newsboard=fr"
+                "url": "https://fr.fashionnetwork.com/rss/feed/fr,1.xml"
             },
-            "id": "rss1",
-            "name": "FashionUnited",
+            "id": "rss-fn",
+            "name": "FashionNetwork FR",
             "type": "n8n-nodes-base.rssFeedRead",
             "typeVersion": 1,
             "position": [
                 260,
-                180
+                250
             ]
         },
         {
             "parameters": {
-                "url": "https://hypebeast.com/feed"
+                "url": "https://journalduluxe.fr/fr/rss"
             },
-            "id": "rss2",
-            "name": "Hypebeast",
+            "id": "rss-jdl",
+            "name": "Journal du Luxe",
             "type": "n8n-nodes-base.rssFeedRead",
             "typeVersion": 1,
             "position": [
                 260,
-                360
+                450
             ]
         },
         {
             "parameters": {
                 "jsCode": "const allItems = $input.all().map(i => i.json);\nreturn [{ json: { items: allItems } }];"
             },
-            "id": "aggregate_news",
+            "id": "aggregate",
             "name": "Rassembler News",
             "type": "n8n-nodes-base.code",
             "typeVersion": 2,
@@ -80,7 +80,7 @@
             "typeVersion": 4.1,
             "position": [
                 500,
-                740
+                550
             ]
         },
         {
@@ -95,13 +95,13 @@
                     ]
                 }
             },
-            "id": "merge_all",
-            "name": "Tout Fusionner",
+            "id": "merge",
+            "name": "Fusionner",
             "type": "n8n-nodes-base.merge",
             "typeVersion": 3,
             "position": [
                 720,
-                500
+                450
             ]
         },
         {
@@ -112,23 +112,23 @@
                     "values": [
                         {
                             "role": "system",
-                            "content": "Tu es le Rédacteur en Chef d'OUTFITY. \nTA MISSION : Sélectionner LE sujet le plus stratégique (business, innovation, luxe) parmi les news fournies et rédiger UN SEUL article approfondi.\n\nCONSIGNES STRICTES :\n- NE JAMAIS mélanger plusieurs actualités différentes.\n- Focus sur un seul sujet majeur.\n- Style : Expert, Premium, Streetwear.\n- Format sortie : JSON strict {title, slug, excerpt, content, tags[], coverImage, sourceUrl}"
+                            "content": "Tu es le Rédacteur en Chef d'OUTFITY.\n\nTA MISSION :\n1. Analyser la liste des actualités fournies.\n2. Sélectionner LE sujet le plus stratégique (business, innovation, luxe).\n3. Rédiger UN SEUL article approfondi sur ce sujet unique.\n\nCONSIGNES STRICTES :\n- NE JAMAIS croiser plusieurs actualités différentes dans le même article.\n- Exception : Si plusieurs sources traitent du MÊME événement, regroupe les informations.\n- Utilise les données 'OUTFITY Trends' pour enrichir l'article SEULEMENT si elles sont pertinentes pour le sujet choisi.\n- Titre : Accrocheur, style magazine premium.\n- Style : Professionnel, expert, analytique.\n- Format : JSON {title, slug, excerpt, content, tags[], coverImage, sourceUrl}"
                         },
                         {
                             "role": "user",
-                            "content": "=News Actualité :\n{{ JSON.stringify($node[\"Rassembler News\"].json.items) }}\n\nTendances Internes :\n{{ JSON.stringify($node[\"OUTFITY Trends\"].json) }}"
+                            "content": "=ACTUALITÉS DISPONIBLES :\n{{ JSON.stringify($node[\"Rassembler News\"].json.items) }}\n\nDONNÉES TENDANCES OUTFITY :\n{{ JSON.stringify($node[\"OUTFITY Trends\"].json) }}"
                         }
                     ]
                 },
                 "jsonOutput": true
             },
             "id": "ai_editor",
-            "name": "IA - Rédacteur",
+            "name": "IA - Expert Rédacteur",
             "type": "n8n-nodes-base.openAi",
             "typeVersion": 1.1,
             "position": [
                 940,
-                500
+                450
             ]
         },
         {
@@ -172,38 +172,37 @@
                             "value": "={{ $json.message.content.sourceUrl }}"
                         },
                         {
+                            "name": "coverImage",
+                            "value": "={{ $json.message.content.coverImage }}"
+                        },
+                        {
                             "name": "author",
                             "value": "OUTFITY Intelligence"
                         }
                     ]
                 }
             },
-            "id": "publish_blog",
+            "id": "publish",
             "name": "Publication",
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.1,
             "position": [
                 1160,
-                500
+                450
             ]
         }
     ],
     "connections": {
-        "Toutes les 6 heures": {
+        "Toutes les 4 heures": {
             "main": [
                 [
                     {
-                        "node": "FashionUnited",
+                        "node": "FashionNetwork FR",
                         "type": "main",
                         "index": 0
                     },
                     {
-                        "node": "Hypebeast",
-                        "type": "main",
-                        "index": 0
-                    },
-                    {
-                        "node": "Highsnobiety",
+                        "node": "Journal du Luxe",
                         "type": "main",
                         "index": 0
                     },
@@ -215,7 +214,7 @@
                 ]
             ]
         },
-        "FashionUnited": {
+        "FashionNetwork FR": {
             "main": [
                 [
                     {
@@ -226,18 +225,7 @@
                 ]
             ]
         },
-        "Hypebeast": {
-            "main": [
-                [
-                    {
-                        "node": "Rassembler News",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "Highsnobiety": {
+        "Journal du Luxe": {
             "main": [
                 [
                     {
@@ -252,7 +240,7 @@
             "main": [
                 [
                     {
-                        "node": "Tout Fusionner",
+                        "node": "Fusionner",
                         "type": "main",
                         "index": 0
                     }
@@ -263,25 +251,25 @@
             "main": [
                 [
                     {
-                        "node": "Tout Fusionner",
+                        "node": "Fusionner",
                         "type": "main",
                         "index": 1
                     }
                 ]
             ]
         },
-        "Tout Fusionner": {
+        "Fusionner": {
             "main": [
                 [
                     {
-                        "node": "IA - Rédacteur",
+                        "node": "IA - Expert Rédacteur",
                         "type": "main",
                         "index": 0
                     }
                 ]
             ]
         },
-        "IA - Rédacteur": {
+        "IA - Expert Rédacteur": {
             "main": [
                 [
                     {

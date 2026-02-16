@@ -1,6 +1,6 @@
 [
     {
-        "name": "📧 OUTFITY - Emails Onboarding (API Resend)",
+        "name": "📧 OUTFITY - Onboarding Stratégique (7 Jours)",
         "nodes": [
             {
                 "parameters": {
@@ -35,7 +35,7 @@
             {
                 "parameters": {
                     "respondWith": "json",
-                    "responseBody": "={ \"success\": true, \"message\": \"Onboarding sequence started\" }",
+                    "responseBody": "={ \"success\": true, \"message\": \"Sequence d'onboarding lancée pour {{ $json.email }}\" }",
                     "options": {
                         "responseCode": 200
                     }
@@ -60,7 +60,7 @@
                         "parameters": [
                             {
                                 "name": "Authorization",
-                                "value": "=Bearer {{ $env.SMTP_PASS }}"
+                                "value": "=Bearer {{ $env.RESEND_API_KEY || 're_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb' }}"
                             }
                         ]
                     },
@@ -77,11 +77,11 @@
                             },
                             {
                                 "name": "subject",
-                                "value": "=🎉 Bienvenue sur OUTFITY, {{ $json.name }} !"
+                                "value": "=🎉 Bienvenue dans l'élite, {{ $json.name }} !"
                             },
                             {
                                 "name": "html",
-                                "value": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px; text-align: center;\">\n    <h1 style=\"color: #1D1D1F; font-size: 28px; font-weight: 600; letter-spacing: -0.02em;\">Bienvenue sur OUTFITY 🎨</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }},</p>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Vous êtes maintenant prêt(e) à créer votre marque de vêtements avec l'IA. Voici ce que vous pouvez faire dès maintenant :</p>\n    <div style=\"margin: 30px 0;\">\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin: 10px 0; text-align: left;\">\n        <strong>1️⃣ Créer votre marque</strong><br>Définissez votre identité (nom, logo, couleurs)\n      </div>\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin: 10px 0; text-align: left;\">\n        <strong>2️⃣ Explorer les tendances</strong><br>15 000+ produits analysés quotidiennement\n      </div>\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin: 10px 0; text-align: left;\">\n        <strong>3️⃣ Générer un design</strong><br>Tech pack professionnel en quelques clics\n      </div>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/dashboard\" style=\"display: inline-block; background: #000; color: #fff; padding: 16px 32px; border-radius: 100px; text-decoration: none; font-weight: 500; font-size: 16px;\">Commencer maintenant →</a>\n    <p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY — Créez votre marque avec les données des géants</p>\n  </div>\n</div>"
+                                "value": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 32px; padding: 48px; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05);\">\n    <img src=\"{{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/icon.png\" width=\"80\" height=\"80\" style=\"margin-bottom: 24px;\">\n    <h1 style=\"color: #1D1D1F; font-size: 32px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 16px;\">Bienvenue dans le futur de la mode.</h1>\n    <p style=\"color: #6E6E73; font-size: 18px; line-height: 1.6; margin-bottom: 32px;\">Bonjour {{ $json.name }}, vous venez de rejoindre l'élite des créateurs qui ne devinent plus, mais qui savent.</p>\n    <div style=\"background: #F5F5F7; border-radius: 24px; padding: 32px; margin-bottom: 32px; text-align: left;\">\n      <h2 style=\"font-size: 14px; text-transform: uppercase; letter-spacing: 0.1em; color: #007AFF; margin-bottom: 20px;\">VOS 3 PREMIÈRES ÉTAPES</h2>\n      <div style=\"margin-bottom: 16px;\"><strong>🚀 Lancez votre Map</strong> — Le guide pas-à-pas pour votre marque.</div>\n      <div style=\"margin-bottom: 16px;\"><strong>🔎 Scan Radar Elite</strong> — Découvrez ce qui va buzzer demain.</div>\n      <div><strong>🤖 Design Studio AI</strong> — Votre premier vêtement en 2 minutes.</div>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/dashboard\" style=\"display: inline-block; background: #007AFF; color: #fff; padding: 20px 40px; border-radius: 100px; text-decoration: none; font-weight: 600; font-size: 16px; transition: all 0.2s;\">Accéder à mon Dashboard</a>\n    <p style=\"color: #86868B; font-size: 12px; margin-top: 40px;\">© 2026 OUTFITY Intelligence — Données, Stratégie & Influence.</p>\n  </div>\n</div>"
                             }
                         ]
                     },
@@ -121,7 +121,7 @@
                         "parameters": [
                             {
                                 "name": "Authorization",
-                                "value": "=Bearer {{ $env.SMTP_PASS }}"
+                                "value": "=Bearer {{ $env.RESEND_API_KEY || 're_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb' }}"
                             }
                         ]
                     },
@@ -138,22 +138,83 @@
                             },
                             {
                                 "name": "subject",
-                                "value": "💡 3 erreurs à éviter quand on lance sa marque"
+                                "value": "⚠️ Pourquoi 90% des marques échouent (et comment l'éviter)"
                             },
                             {
                                 "name": "html",
-                                "value": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px;\">\n    <h1 style=\"color: #1D1D1F; font-size: 24px; font-weight: 600; letter-spacing: -0.02em;\">3 erreurs fatales des créateurs de mode 🚫</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }},</p>\n    <div style=\"margin: 24px 0;\">\n      <div style=\"border-left: 3px solid #FF3B30; padding-left: 16px; margin: 20px 0;\">\n        <strong>Erreur #1 : Ignorer les tendances</strong><br>\n        <span style=\"color: #86868B;\">Les marques qui réussissent analysent les données. Notre module Tendances scrape 15 000+ produits/jour.</span>\n      </div>\n      <div style=\"border-left: 3px solid #FF9500; padding-left: 16px; margin: 20px 0;\">\n        <strong>Erreur #2 : Négliger le Tech Pack</strong><br>\n        <span style=\"color: #86868B;\">Un tech pack professionnel évite 80% des erreurs de production. Générez le vôtre en 2 minutes avec l'IA.</span>\n      </div>\n      <div style=\"border-left: 3px solid #007AFF; padding-left: 16px; margin: 20px 0;\">\n        <strong>Erreur #3 : Commencer sans stratégie</strong><br>\n        <span style=\"color: #86868B;\">Notre Launch Map vous guide étape par étape, de l'identité de marque au lancement.</span>\n      </div>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/launch-map\" style=\"display: inline-block; background: #000; color: #fff; padding: 14px 28px; border-radius: 100px; text-decoration: none; font-weight: 500;\">Voir ma Launch Map →</a>\n    <p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY</p>\n  </div>\n</div>"
+                                "value": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #000; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 32px; padding: 48px;\">\n    <span style=\"background: #FF3B30; color: white; padding: 4px 12px; border-radius: 100px; font-size: 12px; font-weight: 700;\">ATTENTION</span>\n    <h1 style=\"color: #1D1D1F; font-size: 28px; font-weight: 700; letter-spacing: -0.04em; margin-top: 20px;\">L'erreur à 10 000€.</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }}, la plupart des créateurs lancent des produits basés sur leur intuition. C'est le moyen le plus rapide de perdre du stock.</p>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\"><strong>La solution OUTFITY :</strong> L'analyse IVS (Industry Viral Score). Nous scannons TikTok et Instagram pour vous dire exactement ce qui va se vendre avant même que vous ne lanciez la prod.</p>\n    <div style=\"border-left: 4px solid #007AFF; padding-left: 20px; margin: 30px 0;\">\n      <p style=\"font-style: italic; color: #6E6E73;\">\"J'ai économisé 3000€ sur ma première collection en changeant une coupe de pantalon grâce au Radar.\" — Sarah, Créatrice.</p>\n    </div>\n    <a href=\"{{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/trends\" style=\"display: inline-block; background: #000; color: #fff; padding: 18px 36px; border-radius: 100px; text-decoration: none; font-weight: 600;\">Voir le Radar Elite →</a>\n  </div>\n</div>"
                             }
                         ]
                     },
                     "options": {}
                 },
                 "id": "resend-j1",
-                "name": "Resend - Tips",
+                "name": "Resend - Strategie",
                 "type": "n8n-nodes-base.httpRequest",
                 "typeVersion": 4.1,
                 "position": [
                     1120,
+                    380
+                ]
+            },
+            {
+                "parameters": {
+                    "amount": 2,
+                    "unit": "days"
+                },
+                "id": "wait-j3",
+                "name": "Attendre J3",
+                "type": "n8n-nodes-base.wait",
+                "typeVersion": 1,
+                "position": [
+                    1340,
+                    380
+                ]
+            },
+            {
+                "parameters": {
+                    "method": "POST",
+                    "url": "https://api.resend.com/emails",
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.RESEND_API_KEY || 're_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb' }}"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "name": "from",
+                                "value": "OUTFITY <onboarding@outfity.fr>"
+                            },
+                            {
+                                "name": "to",
+                                "value": "={{ $json.email }}"
+                            },
+                            {
+                                "name": "subject",
+                                "value": "👗 Du design au Sourcing : La boucle est bouclée"
+                            },
+                            {
+                                "name": "html",
+                                "value": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 32px; padding: 48px; text-align: center;\">\n    <h1 style=\"color: #1D1D1F; font-size: 28px; font-weight: 700; margin-bottom: 16px;\">Besoin de fournisseurs ? 🧵</h1>\n    <p style=\"color: #6E6E73; font-size: 16px; line-height: 1.6;\">Trouver le bon atelier est un cauchemar. C'est pourquoi nous avons intégré un <strong>Hub de Sourcing</strong> directement dans OUTFITY.</p>\n    <img src=\"{{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/images/onboarding/sourcing.svg\" style=\"width: 100%; border-radius: 16px; margin: 24px 0;\">\n    <p style=\"color: #1D1D1F; text-align: left;\">Utilisez votre Tech Pack généré par l'IA pour envoyer des demandes de devis claires et professionnelles. Gagnez en crédibilité auprès des usines dès le premier jour.</p>\n    <a href=\"{{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/launch-map/sourcing\" style=\"display: inline-block; background: #007AFF; color: #fff; padding: 18px 36px; border-radius: 100px; text-decoration: none; font-weight: 600; margin-top: 24px;\">Explorer le Hub Sourcing</a>\n  </div>\n</div>"
+                            }
+                        ]
+                    },
+                    "options": {}
+                },
+                "id": "resend-j3",
+                "name": "Resend - Sourcing",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.1,
+                "position": [
+                    1560,
                     380
                 ]
             }
@@ -201,7 +262,29 @@
                 "main": [
                     [
                         {
-                            "node": "Resend - Tips",
+                            "node": "Resend - Strategie",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Resend - Strategie": {
+                "main": [
+                    [
+                        {
+                            "node": "Attendre J3",
+                            "type": "main",
+                            "index": 0
+                        }
+                    ]
+                ]
+            },
+            "Attendre J3": {
+                "main": [
+                    [
+                        {
+                            "node": "Resend - Sourcing",
                             "type": "main",
                             "index": 0
                         }

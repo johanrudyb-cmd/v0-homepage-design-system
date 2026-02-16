@@ -1,6 +1,6 @@
 [
     {
-        "name": "📊 OUTFITY - Rapport Hebdomadaire",
+        "name": "📊 OUTFITY - Rapport Hebdomadaire (Resend Optimized)",
         "nodes": [
             {
                 "parameters": {
@@ -25,13 +25,13 @@
             {
                 "parameters": {
                     "method": "GET",
-                    "url": "={{ $env.OUTFITY_APP_URL }}/api/n8n/weekly-stats",
+                    "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/n8n/weekly-stats",
                     "sendHeaders": true,
                     "headerParameters": {
                         "parameters": [
                             {
                                 "name": "Authorization",
-                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET || 'bb22261869ad2d5d33ee928260aa8511125172498917d380bb70f545bfc7d1d6' }}"
                             }
                         ]
                     },
@@ -50,7 +50,7 @@
             },
             {
                 "parameters": {
-                    "functionCode": "const stats = $input.first().json;\n\nconst weekStart = new Date();\nweekStart.setDate(weekStart.getDate() - 7);\n\nreturn [{\n  json: {\n    period: `${weekStart.toLocaleDateString('fr-FR')} - ${new Date().toLocaleDateString('fr-FR')}`,\n    users: {\n      total: stats.totalUsers || 0,\n      new: stats.newUsers || 0,\n      active: stats.activeUsers || 0\n    },\n    trends: {\n      scraped: stats.trendsScraped || 0,\n      confirmed: stats.trendsConfirmed || 0\n    },\n    designs: {\n      created: stats.designsCreated || 0,\n      techPacks: stats.techPacks || 0\n    },\n    revenue: {\n      total: stats.revenue || 0,\n      subscriptions: stats.newSubscriptions || 0\n    },\n    ai: {\n      requests: stats.aiRequests || 0,\n      cost: stats.aiCost || 0\n    }\n  }\n}];"
+                    "jsCode": "const stats = $input.first().json;\n\nconst weekStart = new Date();\nweekStart.setDate(weekStart.getDate() - 7);\n\nreturn [{\n  json: {\n    period: `${weekStart.toLocaleDateString('fr-FR')} - ${new Date().toLocaleDateString('fr-FR')}`,\n    users: {\n      total: stats.totalUsers || 0,\n      new: stats.newUsers || 0,\n      active: stats.activeUsers || 0\n    },\n    trends: {\n      scraped: stats.trendsScraped || 0,\n      confirmed: stats.trendsConfirmed || 0\n    },\n    designs: {\n      created: stats.designsCreated || 0,\n      techPacks: stats.techPacks || 0\n    },\n    revenue: {\n      total: stats.revenue || 0,\n      subscriptions: stats.newSubscriptions || 0\n    },\n    ai: {\n      requests: stats.aiRequests || 0,\n      cost: stats.aiCost || 0\n    }\n  }\n}];"
                 },
                 "id": "format-report",
                 "name": "Formater Rapport",
@@ -63,16 +63,46 @@
             },
             {
                 "parameters": {
-                    "fromEmail": "={{ $env.SMTP_FROM }}",
-                    "toEmail": "admin@outfity.fr",
-                    "subject": "=📊 Rapport Hebdomadaire OUTFITY — {{ $json.period }}",
-                    "html": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 24px; padding: 40px;\">\n    <h1 style=\"color: #1D1D1F; font-size: 24px; font-weight: 600; text-align: center;\">📊 Rapport Hebdomadaire</h1>\n    <p style=\"color: #86868B; text-align: center;\">{{ $json.period }}</p>\n\n    <div style=\"display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 24px 0;\">\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; text-align: center;\">\n        <p style=\"color: #86868B; font-size: 13px; margin: 0;\">Utilisateurs</p>\n        <p style=\"font-size: 28px; font-weight: 600; color: #1D1D1F; margin: 8px 0;\">{{ $json.users.total }}</p>\n        <p style=\"color: #34C759; font-size: 14px; margin: 0;\">+{{ $json.users.new }} nouveaux</p>\n      </div>\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; text-align: center;\">\n        <p style=\"color: #86868B; font-size: 13px; margin: 0;\">Revenus</p>\n        <p style=\"font-size: 28px; font-weight: 600; color: #1D1D1F; margin: 8px 0;\">{{ $json.revenue.total }}€</p>\n        <p style=\"color: #34C759; font-size: 14px; margin: 0;\">{{ $json.revenue.subscriptions }} abonnements</p>\n      </div>\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; text-align: center;\">\n        <p style=\"color: #86868B; font-size: 13px; margin: 0;\">Tendances</p>\n        <p style=\"font-size: 28px; font-weight: 600; color: #1D1D1F; margin: 8px 0;\">{{ $json.trends.scraped }}</p>\n        <p style=\"color: #007AFF; font-size: 14px; margin: 0;\">{{ $json.trends.confirmed }} confirmées</p>\n      </div>\n      <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; text-align: center;\">\n        <p style=\"color: #86868B; font-size: 13px; margin: 0;\">Designs</p>\n        <p style=\"font-size: 28px; font-weight: 600; color: #1D1D1F; margin: 8px 0;\">{{ $json.designs.created }}</p>\n        <p style=\"color: #007AFF; font-size: 14px; margin: 0;\">{{ $json.designs.techPacks }} tech packs</p>\n      </div>\n    </div>\n\n    <div style=\"background: #F5F5F7; border-radius: 16px; padding: 20px; margin-top: 16px;\">\n      <h3 style=\"font-size: 16px; margin: 0 0 12px;\">🤖 Utilisation IA</h3>\n      <p style=\"margin: 4px 0;\">Requêtes: <strong>{{ $json.ai.requests }}</strong></p>\n      <p style=\"margin: 4px 0;\">Coût estimé: <strong>{{ $json.ai.cost }}€</strong></p>\n    </div>\n\n    <div style=\"text-align: center; margin-top: 24px;\">\n      <a href=\"{{ $env.OUTFITY_APP_URL }}/dashboard\" style=\"display: inline-block; background: #000; color: #fff; padding: 12px 24px; border-radius: 100px; text-decoration: none; font-weight: 500;\">Voir le Dashboard →</a>\n    </div>\n\n    <p style=\"color: #86868B; font-size: 13px; text-align: center; margin-top: 24px;\">OUTFITY — Rapport automatique généré par n8n</p>\n  </div>\n</div>",
+                    "method": "POST",
+                    "url": "https://api.resend.com/emails",
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.RESEND_API_KEY || 're_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb' }}"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "name": "from",
+                                "value": "OUTFITY Intelligence <contact@outfity.fr>"
+                            },
+                            {
+                                "name": "to",
+                                "value": "contact@outfity.fr"
+                            },
+                            {
+                                "name": "subject",
+                                "value": "=📊 OUTFITY Weekly — {{ $json.period }}"
+                            },
+                            {
+                                "name": "html",
+                                "value": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #000; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 32px; padding: 48px;\">\n    <h1 style=\"color: #1D1D1F; font-size: 24px; font-weight: 700; text-align: center; letter-spacing: -0.04em;\">Performance Hebdomadaire</h1>\n    <p style=\"color: #86868B; text-align: center; margin-bottom: 32px;\">{{ $json.period }}</p>\n\n    <div style=\"background: #F5F5F7; border-radius: 24px; padding: 24px; margin-bottom: 12px;\">\n      <div style=\"display: flex; justify-content: space-between; align-items: center;\">\n        <span style=\"color: #86868B;\">Nouveaux Utilisateurs</span>\n        <strong style=\"color: #1D1D1F; font-size: 20px;\">+{{ $json.users.new }}</strong>\n      </div>\n    </div>\n\n    <div style=\"background: #F5F5F7; border-radius: 24px; padding: 24px; margin-bottom: 12px;\">\n      <div style=\"display: flex; justify-content: space-between; align-items: center;\">\n        <span style=\"color: #86868B;\">MRR Estimé</span>\n        <strong style=\"color: #34C759; font-size: 20px;\">{{ $json.revenue.total }}€</strong>\n      </div>\n    </div>\n\n    <div style=\"background: #F5F5F7; border-radius: 24px; padding: 24px; margin-bottom: 12px;\">\n      <div style=\"display: flex; justify-content: space-between; align-items: center;\">\n        <span style=\"color: #86868B;\">Tendances Radar</span>\n        <strong style=\"color: #1D1D1F; font-size: 20px;\">{{ $json.trends.scraped }}</strong>\n      </div>\n    </div>\n\n    <div style=\"background: #F5F5F7; border-radius: 24px; padding: 24px; margin-bottom: 32px;\">\n      <div style=\"display: flex; justify-content: space-between; align-items: center;\">\n        <span style=\"color: #86868B;\">Coût IA</span>\n        <strong style=\"color: #FF3B30; font-size: 20px;\">{{ $json.ai.cost }}€</strong>\n      </div>\n    </div>\n\n    <a href=\"{{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/dashboard\" style=\"display: block; width: 100%; padding: 18px 0; background: #000; color: #fff; text-align: center; border-radius: 100px; text-decoration: none; font-weight: 600;\">Vérifier sur OUTFITY</a>\n  </div>\n</div>"
+                            }
+                        ]
+                    },
                     "options": {}
                 },
                 "id": "send-report",
-                "name": "Envoyer Rapport",
-                "type": "n8n-nodes-base.emailSend",
-                "typeVersion": 2.1,
+                "name": "Resend - Rapport Admin",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.1,
                 "position": [
                     900,
                     300
@@ -80,33 +110,33 @@
             }
         ],
         "connections": {
-            "Lundi 9h": {
+            "cron-weekly": {
                 "main": [
                     [
                         {
-                            "node": "Récupérer Stats",
+                            "node": "get-stats",
                             "type": "main",
                             "index": 0
                         }
                     ]
                 ]
             },
-            "Récupérer Stats": {
+            "get-stats": {
                 "main": [
                     [
                         {
-                            "node": "Formater Rapport",
+                            "node": "format-report",
                             "type": "main",
                             "index": 0
                         }
                     ]
                 ]
             },
-            "Formater Rapport": {
+            "format-report": {
                 "main": [
                     [
                         {
-                            "node": "Envoyer Rapport",
+                            "node": "send-report",
                             "type": "main",
                             "index": 0
                         }
@@ -116,14 +146,6 @@
         },
         "settings": {
             "executionOrder": "v1"
-        },
-        "tags": [
-            {
-                "name": "reporting"
-            },
-            {
-                "name": "analytics"
-            }
-        ]
+        }
     }
 ]

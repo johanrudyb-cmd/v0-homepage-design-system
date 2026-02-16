@@ -29,16 +29,13 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    // Exécution locale optimisée
-    // Limitation du nombre d'items pour éviter le timeout Vercel Hobby (10s max)
-    console.log('[CRON Refresh Zalando] Début scraping (mode rapide)...');
+    const { searchParams } = new URL(request.url);
+    const simulate = searchParams.get('simulate') === 'true';
 
-    // On repasse en mode local car le webhook n8n n'est pas encore configuré
-    // TODO: Une fois le workflow n8n configuré avec un noeud Webhook "refresh-trends", décommenter la délégation
+    console.log(`[CRON Refresh Zalando] Début scraping${simulate ? ' (SIMULATION)' : ' (mode rapide)'}...`);
 
     const { refreshZalandoTrends } = await import('@/lib/refresh-zalando-trends');
-    // Idéalement, la fonction devrait accepter une option { limit: 5 }
-    const result = await refreshZalandoTrends();
+    const result = await refreshZalandoTrends({ simulate });
 
     return NextResponse.json({
       message: 'Tendances Zalando actualisées',

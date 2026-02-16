@@ -46,6 +46,14 @@ export const getCurrentUser = cache(async () => {
   }
 });
 
+/**
+ * Vérifie si l'utilisateur actuel a les droits admin
+ */
+export async function getIsAdmin() {
+  const user = await getCurrentUser();
+  return user?.email === 'contact@outfity.fr';
+}
+
 export async function requireAuth() {
   const user = await getCurrentUser();
   if (!user) {

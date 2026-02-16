@@ -21,12 +21,11 @@ export const metadata = {
 };
 
 export default async function AdminBlogPage() {
+    // Le layout gère déjà la protection admin, mais on peut garder un check pour getCurrentUser
     const user = await getCurrentUser();
-    // Protection basique : seul l'email admin peut accéder (à adapter selon votre logique admin)
-    const isAdmin = user?.email === 'johanrudyb@gmail.com' || user?.email?.endsWith('@biangory.com');
 
-    if (!isAdmin) {
-        redirect('/dashboard');
+    if (!user) {
+        redirect('/auth/signin');
     }
 
     const posts = await prisma.blogPost.findMany({

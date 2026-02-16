@@ -65,7 +65,8 @@ const EXCLUDE_BAG_KEYWORDS = [
   'sac à main', 'sac a main', 'sac à dos', 'sac a dos', 'sac bandoulière', 'sac bandouliere',
   'tote bag', 'backpack', 'portefeuille', 'porte-monnaie', 'porte monnaie',
   'cabas', 'sac cabas', 'shopping bag', 'sac shopping',
-  ' sac ', 'sac à ', 'sac a ', 'sac main',  // sac avec espace ou "sac à" pour sac à main/dos etc.
+  ' sac ', 'sac à ', 'sac a ', 'sac main', 'sac ', ' sac',
+  'bag ', ' bag ', ' bag', 'bags', 'handbag', 'handbags', 'clutch',
 ];
 
 /** Parfums à exclure. */
@@ -137,7 +138,8 @@ const EXCLUDE_BRAND_KEYWORDS = [
 
 /** Cosmétiques / produits de beauté / savon / crème / brosse à exclure (vêtements uniquement). */
 const EXCLUDE_COSMETICS_KEYWORDS = [
-  'rouge à lèvres', 'rouge a levres', 'lipstick', 'lip stick', 'gloss', 'lip gloss', 'gloss à lèvres', 'gloss a levres',
+  'rouge à lèvres', 'rouge a levres', 'rouge à lèvre', 'rouge a levre',
+  'lipstick', 'lip stick', 'gloss', 'lip gloss', 'gloss à lèvres', 'gloss a levres',
   'eyeshadow', 'fard', 'maquillage', 'mascara',
   'nail', 'vernis', 'crème', 'creme', 'cream', 'brush', 'brosse',
   'brosse à cheveux', 'brosse a cheveux', 'brosse cheveux', 'hair brush',

@@ -135,16 +135,44 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 <div className="max-w-5xl mx-auto px-6 -mt-16 relative z-20 pb-20">
                     <div className="bg-white rounded-[40px] shadow-2xl border border-black/[0.02] overflow-hidden">
                         {/* Huge Cover Image */}
-                        {post.coverImage && (
-                            <div className="aspect-[21/10] w-full relative overflow-hidden">
-                                <img
-                                    src={post.coverImage}
-                                    alt={post.title}
-                                    className="w-full h-full object-cover"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-white/10 to-transparent" />
-                            </div>
-                        )}
+                        {/* Smart Cover Image */}
+                        <div className="aspect-[21/10] w-full relative overflow-hidden bg-[#F5F5F7]">
+                            {post.coverImage ? (
+                                <>
+                                    <img
+                                        src={`https://wsrv.nl/?url=${encodeURIComponent(post.coverImage.trim())}&w=1200&q=80&output=jpg`}
+                                        alt={post.title}
+                                        className="w-full h-full object-cover relative z-10"
+                                        onError={(e) => {
+                                            e.currentTarget.style.display = 'none'; // Cache l'image cassée
+                                            e.currentTarget.parentElement?.classList.add('fallback-mode'); // Active le fallback
+                                        }}
+                                    />
+                                    {/* Fallback qui apparait si l'image est cachée */}
+                                    <div className="absolute inset-0 flex items-center justify-center p-12 text-center z-0">
+                                        <div className="max-w-3xl">
+                                            <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-black leading-[1.1] mb-6">
+                                                {post.title}
+                                            </h1>
+                                            <div className="w-24 h-2 bg-[#007AFF] mx-auto rounded-full" />
+                                        </div>
+                                        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5" />
+                                    </div>
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none z-20" />
+                                </>
+                            ) : (
+                                /* Cas où il n'y a PAS d'image du tout dans la DB */
+                                <div className="absolute inset-0 flex items-center justify-center p-12 text-center">
+                                    <div className="max-w-3xl">
+                                        <h1 className="text-4xl sm:text-6xl font-black tracking-tight text-black leading-[1.1] mb-6">
+                                            {post.title}
+                                        </h1>
+                                        <div className="w-24 h-2 bg-[#007AFF] mx-auto rounded-full" />
+                                    </div>
+                                    <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-5" />
+                                </div>
+                            )}
+                        </div>
 
                         <div className="p-8 sm:p-16 lg:px-24 lg:py-20 relative">
                             {/* Floating Sidebar Info (Desktop) */}
@@ -244,27 +272,27 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                 )}
 
                                 {/* Source and CTA Section */}
-                                <div className="mt-20 p-8 sm:p-12 bg-black rounded-[40px] text-white overflow-hidden relative group">
-                                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#007AFF]/20 blur-[100px] -mr-32 -mt-32 group-hover:bg-[#007AFF]/40 transition-all duration-1000" />
+                                <div className="mt-20 p-8 sm:p-12 bg-black rounded-[40px] text-white overflow-hidden relative group border border-white/10 shadow-2xl">
+                                    <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 blur-[100px] -mr-32 -mt-32 group-hover:bg-white/10 transition-all duration-1000" />
 
                                     <div className="relative z-10 flex flex-col md:flex-row items-center gap-8 md:justify-between text-center md:text-left">
                                         <div className="flex-1">
-                                            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#007AFF]/20 border border-[#007AFF]/30 mb-6">
-                                                <Sparkles className="w-4 h-4 text-[#007AFF]" />
-                                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#007AFF]">Propulsé par BIANGORY</span>
+                                            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/20 mb-6 backdrop-blur-md">
+                                                <Sparkles className="w-4 h-4 text-white" />
+                                                <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white">OUTFITY INTELLIGENCE</span>
                                             </div>
-                                            <h3 className="text-2xl sm:text-3xl font-black tracking-tight mb-4">
-                                                Prêt à lancer votre propre marque de vêtement ?
+                                            <h3 className="text-2xl sm:text-4xl font-black tracking-tighter mb-4 uppercase">
+                                                Dominez votre marché <br className="hidden sm:block" /> avec la Data.
                                             </h3>
-                                            <p className="text-white/60 text-base font-medium max-w-lg">
-                                                Utilisez la data des leaders mondiaux pour bâtir une collection rentable, sourcer les meilleures usines et automatiser votre marketing.
+                                            <p className="text-white/50 text-base font-medium max-w-lg leading-relaxed">
+                                                L'IA BIANGORY analyse des millions de points de données pour vous donner une longueur d'avance sur vos concurrents.
                                             </p>
                                         </div>
                                         <Link
                                             href="/"
-                                            className="px-8 py-5 bg-[#007AFF] text-white rounded-2xl font-black uppercase tracking-widest text-xs hover:scale-105 active:scale-95 transition-all shadow-xl shadow-[#007AFF]/25 shrink-0"
+                                            className="px-10 py-5 bg-white text-black rounded-2xl font-black uppercase tracking-widest text-xs hover:bg-[#F5F5F7] hover:scale-105 active:scale-95 transition-all shadow-2xl shrink-0"
                                         >
-                                            Découvrir OUTFITY
+                                            Intégrer OUTFITY
                                         </Link>
                                     </div>
                                 </div>

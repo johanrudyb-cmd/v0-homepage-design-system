@@ -169,7 +169,6 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
   },
   // EU — Zalando Trend Spotter (Trend Alert) : femme + homme, 10 villes actives. Enrich "Voir l'article" pour toutes.
   ...(['paris', 'berlin', 'milan', 'copenhagen', 'stockholm', 'antwerp', 'zurich', 'london', 'amsterdam', 'warsaw'] as const).flatMap((city) => {
-    const withEnrich = true;
     return [
       {
         id: `zalando-trend-femme-${city}`,
@@ -180,11 +179,10 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
         newInPath: `/trend-spotter/${city}?gender=WOMEN`,
         section: 'new_in' as const,
         selectors: ZALANDO_SELECTORS,
-        limit: city === 'paris' ? 8 : 80,
+        limit: 80,
         initialWaitMs: 14000,
         preScrollSteps: 25,
         zalandoMainPageOnly: true,
-        ...(withEnrich ? { zalandoTrendingItemsEnrich: true as const } : {}),
       },
       {
         id: `zalando-trend-homme-${city}`,
@@ -195,11 +193,10 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
         newInPath: `/trend-spotter/${city}?gender=MEN`,
         section: 'new_in' as const,
         selectors: ZALANDO_SELECTORS,
-        limit: city === 'paris' ? 8 : 80,
+        limit: 80,
         initialWaitMs: 14000,
         preScrollSteps: 25,
         zalandoMainPageOnly: true,
-        ...(withEnrich ? { zalandoTrendingItemsEnrich: true as const } : {}),
       },
     ];
   }),

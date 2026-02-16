@@ -30,7 +30,10 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('[CRON Scan Trends] Début du scan automatique...');
+    const { searchParams } = new URL(request.url);
+    const simulate = searchParams.get('simulate') === 'true';
+
+    console.log(`[CRON Scan Trends] Début du scan automatique${simulate ? ' (SIMULATION)' : ''}...`);
 
     // Scraper toutes les marques actives (Zara, Nike, H&M, etc.)
     const products = await scrapeAllBigBrands(true);
@@ -40,6 +43,14 @@ export async function GET(request: Request) {
       return NextResponse.json({
         message: 'Aucun produit trouvé',
         count: 0,
+      });
+    }
+
+    if (simulate) {
+      return NextResponse.json({
+        message: 'Simulation terminée (rien n\'a été enregistré)',
+        productsCount: products.length,
+        sample: products.slice(0, 3),
       });
     }
 

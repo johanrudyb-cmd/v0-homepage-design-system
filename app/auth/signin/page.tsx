@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { ArrowLeft } from 'lucide-react';
 
 function SignInContent() {
   const router = useRouter();
@@ -47,8 +48,15 @@ function SignInContent() {
   };
 
   return (
-    <div className="min-h-screen min-h-[100dvh] flex items-center justify-center bg-gradient-to-br from-background via-muted/20 to-background px-4 py-8 safe-area-padding overflow-y-auto">
-      <div className="w-full max-w-md my-auto">
+    <div className="min-h-screen min-h-[100dvh] flex flex-col justify-center items-center bg-gradient-to-br from-background via-muted/20 to-background px-4 py-12 safe-area-padding overflow-y-auto">
+      <div className="w-full max-w-md space-y-4 py-4">
+        <Link
+          href="/"
+          className="inline-flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-2 ml-1"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Retour à l'accueil
+        </Link>
         <Card className="w-full border-2 shadow-modern-lg">
           <CardHeader className="space-y-4 text-center px-4 sm:px-6 pt-6 sm:pt-8">
             <div>

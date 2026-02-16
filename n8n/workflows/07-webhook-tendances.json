@@ -114,7 +114,7 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "http://localhost:3000/api/webhooks/n8n-trend-save",
+                "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/webhooks/n8n-trend-save",
                 "authentication": "genericCredentialType",
                 "genericAuthType": "httpHeaderAuth",
                 "sendHeaders": true,

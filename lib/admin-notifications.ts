@@ -26,6 +26,7 @@ export type AdminNotificationType =
     | 'scrape_success' // Succès scraping
     | 'scrape_error'   // Erreur scraping
     | 'quota_warning'  // Quota IA faible
+    | 'billing'        // Action manuelle facturation
     | 'system_error';  // Bug critique
 
 export interface AdminNotificationPayload {
@@ -53,7 +54,7 @@ export async function notifyAdmin(payload: AdminNotificationPayload): Promise<vo
         const safeMessage = sanitizeErrorMessage(payload.message);
 
         // Envoi asynchrone (retourne la promesse pour permettre l'await si nécessaire)
-        await fetch(ADMIN_WEBHOOK_URL, {
+        const fetchPromise = fetch(ADMIN_WEBHOOK_URL, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -66,9 +67,28 @@ export async function notifyAdmin(payload: AdminNotificationPayload): Promise<vo
                 timestamp: new Date().toISOString(),
             }),
         }).catch(err => {
-            // Si le webhook échoue, on log juste en console serveur, on ne crash pas l'app
             console.warn('[Admin Notify] Failed to send webhook:', err.message);
         });
+
+        // Sauvegarde additionnelle en Base de Données (AdminLog)
+        const dbPromise = (async () => {
+            try {
+                const { prisma } = await import('./prisma');
+                await prisma.adminLog.create({
+                    data: {
+                        type: payload.type,
+                        title: payload.title,
+                        message: safeMessage,
+                        level: payload.priority === 'critical' || payload.priority === 'high' ? 'error' : 'info',
+                        metadata: (payload.data as any) || {},
+                    }
+                });
+            } catch (dbErr) {
+                console.warn('[Admin Notify] Failed to save to DB:', dbErr);
+            }
+        })();
+
+        await Promise.allSettled([fetchPromise, dbPromise]);
     } catch (e) {
         console.warn('[Admin Notify] Unexpected error:', e);
     }

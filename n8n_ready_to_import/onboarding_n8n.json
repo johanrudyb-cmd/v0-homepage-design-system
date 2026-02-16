@@ -1,0 +1,831 @@
+{
+    "name": "📧 OUTFITY - Onboarding Stratégique Complet (J0-J7)",
+    "nodes": [
+        {
+            "parameters": {
+                "httpMethod": "POST",
+                "path": "outfity-onboarding",
+                "responseMode": "responseNode",
+                "options": {}
+            },
+            "id": "webhook-signup",
+            "name": "Webhook Signup1",
+            "type": "n8n-nodes-base.webhook",
+            "typeVersion": 2,
+            "position": [
+                200,
+                300
+            ],
+            "webhookId": "outfity-onboarding"
+        },
+        {
+            "parameters": {
+                "jsCode": "const data = $input.first().json;\nconst email = data.email || (data.body ? data.body.email : null);\nconst name = data.name || (data.body ? data.body.name : 'Créateur');\nlet plan = data.plan || (data.body ? data.body.plan : 'free');\nreturn [{ json: { userId: data.userId || (data.body ? data.body.userId : null), email, name, plan } }];"
+            },
+            "id": "validate-data",
+            "name": "Valider Données1",
+            "type": "n8n-nodes-base.code",
+            "typeVersion": 2,
+            "position": [
+                400,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "respondWith": "json",
+                "responseBody": "={ \"success\": true }",
+                "options": {
+                    "responseCode": 200
+                }
+            },
+            "id": "respond-ok",
+            "name": "Réponse OK1",
+            "type": "n8n-nodes-base.respondToWebhook",
+            "typeVersion": 1,
+            "position": [
+                600,
+                160
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer re_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "OUTFITY <onboarding@outfity.fr>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "=🎉 Bienvenue chez OUTFITY, {{ $json.name }} !"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=<div style=\"font-family: sans-serif; padding: 40px;\"><h1>VOTRE MARQUE COMMENCE ICI.</h1><p>Bonjour {{ $json.name }}, bienvenue dans l'élite.</p><a href=\"https://outfity.fr/dashboard\" style=\"display: inline; background: #000; color: #fff; padding: 15px 30px; border-radius: 50px; text-decoration: none;\">Accédder au Dashboard</a></div>"
+                        }
+                    ]
+                }
+            },
+            "id": "email-j0",
+            "name": "Email J0 - Bienvenue",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                600,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "days"
+            },
+            "id": "wait-j1",
+            "name": "Attendre J1",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                800,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer re_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "OUTFITY <onboarding@outfity.fr>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $node[\"Valider Données1\"].json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "🚀 Radar Elite : Scannez le futur"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=<div style=\"font-family: sans-serif; padding: 30px;\"><h1>Dominez le marché.</h1><p>Utilisez le Radar Elite pour identifier les produits gagnants avant tout le monde.</p></div>"
+                        }
+                    ]
+                }
+            },
+            "id": "email-j1",
+            "name": "Email J1 - Stratégie",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1000,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "days"
+            },
+            "id": "wait-j2",
+            "name": "Attendre J2",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                1200,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer re_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "OUTFITY <onboarding@outfity.fr>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $node[\"Valider Données1\"].json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "🎨 Studio IA : Votre premier design"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=<div style=\"font-family: sans-serif; padding: 30px;\"><h1>L'IA à votre service.</h1><p>Générez vos premiers modèles en 2 minutes avec notre Design Studio.</p></div>"
+                        }
+                    ]
+                }
+            },
+            "id": "email-j2",
+            "name": "Email J2 - Design Studio",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1400,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "days"
+            },
+            "id": "wait-j3",
+            "name": "Attendre J3",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                1600,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer re_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "OUTFITY <onboarding@outfity.fr>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $node[\"Valider Données1\"].json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "👗 Hub Sourcing : Ateliers vérifiés"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=<div style=\"font-family: sans-serif; padding: 30px;\"><h1>Passez à la production.</h1><p>Découvrez notre annuaire exclusif des meilleures usines européennes.</p></div>"
+                        }
+                    ]
+                }
+            },
+            "id": "email-j3",
+            "name": "Email J3 - Sourcing",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                1800,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "days"
+            },
+            "id": "wait-j4",
+            "name": "Attendre J4",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                2000,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer re_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "OUTFITY <onboarding@outfity.fr>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $node[\"Valider Données1\"].json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "📈 Rentabilité : Calculez vos marges"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=<div style=\"font-family: sans-serif; padding: 30px;\"><h1>Maximisez vos profits.</h1><p>Utilisez nos outils d'analyse de coûts pour une marque rentable dès le premier jour.</p></div>"
+                        }
+                    ]
+                }
+            },
+            "id": "email-j4",
+            "name": "Email J4 - Scalabilité",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                2200,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "days"
+            },
+            "id": "wait-j5",
+            "name": "Attendre J5",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                2400,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer re_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "OUTFITY <onboarding@outfity.fr>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $node[\"Valider Données1\"].json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "⚡️ Marketing Viral : Le pouvoir de l'UGC"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=<div style=\"font-family: sans-serif; padding: 30px;\"><h1>Vendez sans vendre.</h1><p>Apprenez à générer du contenu qui transforme vos abonnés en clients.</p></div>"
+                        }
+                    ]
+                }
+            },
+            "id": "email-j5",
+            "name": "Email J5 - Marketing",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                2600,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "days"
+            },
+            "id": "wait-j6",
+            "name": "Attendre J6",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                2800,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer re_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "OUTFITY <onboarding@outfity.fr>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $node[\"Valider Données1\"].json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "✨ Prêt pour le grand saut ?"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=<div style=\"font-family: sans-serif; padding: 30px;\"><h1>Une semaine déjà.</h1><p>Vous avez maintenant tous les outils pour bâtir votre empire. Demain, une surprise vous attend.</p></div>"
+                        }
+                    ]
+                }
+            },
+            "id": "email-j6",
+            "name": "Email J6 - Recap",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                3000,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "amount": 1,
+                "unit": "days"
+            },
+            "id": "wait-j7",
+            "name": "Attendre J7",
+            "type": "n8n-nodes-base.wait",
+            "typeVersion": 1,
+            "position": [
+                3200,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "method": "GET",
+                "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/admin/user-status",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET || 'bb22261869ad2d5d33ee928260aa8511125172498917d380bb70f545bfc7d1d6' }}"
+                        }
+                    ]
+                },
+                "sendQueryParameters": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "userId",
+                            "value": "={{ $node[\"Valider Données1\"].json.userId }}"
+                        }
+                    ]
+                }
+            },
+            "id": "live-check",
+            "name": "Vérifier Statut Live",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.2,
+            "position": [
+                3400,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "conditions": {
+                    "string": [
+                        {
+                            "value1": "={{ $json.plan }}",
+                            "value2": "creator"
+                        }
+                    ]
+                }
+            },
+            "id": "if-creator",
+            "name": "Est-il Créateur ?",
+            "type": "n8n-nodes-base.if",
+            "typeVersion": 1,
+            "position": [
+                3600,
+                380
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer re_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "OUTFITY <onboarding@outfity.fr>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $node[\"live-check\"].json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "🎁 Cadeau Créateur : -40% sur la Formation Branding"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=<div style=\"font-family: sans-serif; padding: 40px; background: #000; color: #fff; border-radius: 24px;\"><h2>MERCI POUR VOTRE CONFIANCE.</h2><p>Passez au Personal Branding avec -40%.</p><a href=\"https://outfity.fr/formation\">Découvrir le Coaching →</a></div>"
+                        }
+                    ]
+                }
+            },
+            "id": "email-j7-reward",
+            "name": "Email J7 - Cadeau",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                3850,
+                280
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://api.resend.com/emails",
+                "authentication": "genericCredentialType",
+                "genericAuthType": "httpHeaderAuth",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "Authorization",
+                            "value": "Bearer re_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb"
+                        }
+                    ]
+                },
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "from",
+                            "value": "OUTFITY <onboarding@outfity.fr>"
+                        },
+                        {
+                            "name": "to",
+                            "value": "={{ $node[\"live-check\"].json.email }}"
+                        },
+                        {
+                            "name": "subject",
+                            "value": "🚀 Prochaine étape : Devenez membre Créateur"
+                        },
+                        {
+                            "name": "html",
+                            "value": "=<div style=\"font-family: sans-serif; padding: 40px; border: 2px solid #000; border-radius: 24px;\"><h2>LA SEMAINE S'ACHÈVE...</h2><p>...mais votre aventure ne fait que commencer. Passez au Plan Créateur maintenant.</p><a href=\"https://outfity.fr/pricing\">Upgrade →</a></div>"
+                        }
+                    ]
+                }
+            },
+            "id": "email-j7-upsell",
+            "name": "Email J7 - Upsell",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                3850,
+                480
+            ]
+        }
+    ],
+    "connections": {
+        "Webhook Signup1": {
+            "main": [
+                [
+                    {
+                        "node": "Valider Données1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Valider Données1": {
+            "main": [
+                [
+                    {
+                        "node": "Réponse OK1",
+                        "type": "main",
+                        "index": 0
+                    },
+                    {
+                        "node": "Email J0 - Bienvenue",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "Email J0 - Bienvenue": {
+            "main": [
+                [
+                    {
+                        "node": "wait-j1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "wait-j1": {
+            "main": [
+                [
+                    {
+                        "node": "email-j1",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "email-j1": {
+            "main": [
+                [
+                    {
+                        "node": "wait-j2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "wait-j2": {
+            "main": [
+                [
+                    {
+                        "node": "email-j2",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "email-j2": {
+            "main": [
+                [
+                    {
+                        "node": "wait-j3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "wait-j3": {
+            "main": [
+                [
+                    {
+                        "node": "email-j3",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "email-j3": {
+            "main": [
+                [
+                    {
+                        "node": "wait-j4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "wait-j4": {
+            "main": [
+                [
+                    {
+                        "node": "email-j4",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "email-j4": {
+            "main": [
+                [
+                    {
+                        "node": "wait-j5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "wait-j5": {
+            "main": [
+                [
+                    {
+                        "node": "email-j5",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "email-j5": {
+            "main": [
+                [
+                    {
+                        "node": "wait-j6",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "wait-j6": {
+            "main": [
+                [
+                    {
+                        "node": "email-j6",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "email-j6": {
+            "main": [
+                [
+                    {
+                        "node": "wait-j7",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "wait-j7": {
+            "main": [
+                [
+                    {
+                        "node": "live-check",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "live-check": {
+            "main": [
+                [
+                    {
+                        "node": "if-creator",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "if-creator": {
+            "main": [
+                [
+                    {
+                        "node": "email-j7-reward",
+                        "type": "main",
+                        "index": 0
+                    }
+                ],
+                [
+                    {
+                        "node": "email-j7-upsell",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "settings": {
+        "executionOrder": "v1"
+    }
+}

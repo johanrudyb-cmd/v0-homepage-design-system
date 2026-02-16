@@ -52,7 +52,7 @@ export function AnimatedHeader() {
             {isMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
 
-          <Link href={isLoggedIn ? '/dashboard' : '/'} className="shrink-0">
+          <Link href="/" className="shrink-0">
             <Image src="/icon.png" alt="Logo" width={140} height={140} className="h-16 w-16 sm:h-20 sm:w-20 md:h-24 md:w-24 lg:h-28 lg:w-28 xl:h-32 xl:w-32 object-contain bg-transparent" unoptimized />
           </Link>
         </div>

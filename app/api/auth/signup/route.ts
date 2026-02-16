@@ -60,7 +60,9 @@ export async function POST(request: Request) {
 
         // Déclencher le workflow n8n Onboarding (Emails J0 -> J7)
         try {
-            fetch('http://localhost:5678/webhook/outfity-onboarding', {
+            const ONBOARDING_WEBHOOK_URL = process.env.ONBOARDING_WEBHOOK_URL || 'http://localhost:5678/webhook/outfity-onboarding';
+
+            fetch(ONBOARDING_WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

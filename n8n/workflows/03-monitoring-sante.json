@@ -112,7 +112,7 @@
             {
                 "parameters": {
                     "fromEmail": "={{ $env.SMTP_FROM }}",
-                    "toEmail": "admin@outfity.fr",
+                    "toEmail": "contact@outfity.fr",
                     "subject": "🚨 OUTFITY ALERTE - Service indisponible !",
                     "html": "<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;\">\n  <div style=\"background: #FF3B30; color: white; border-radius: 16px; padding: 24px; text-align: center;\">\n    <h1 style=\"font-size: 24px; margin: 0;\">⚠️ ALERTE OUTFITY</h1>\n    <p>Un ou plusieurs services sont indisponibles</p>\n  </div>\n  <div style=\"background: white; border-radius: 16px; padding: 24px; margin-top: 16px;\">\n    <h2 style=\"font-size: 18px;\">Détails</h2>\n    <pre style=\"background: #F5F5F7; padding: 16px; border-radius: 8px; overflow: auto; font-size: 13px;\">{{ JSON.stringify($json.services, null, 2) }}</pre>\n    <p style=\"color: #86868B; font-size: 13px;\">Heure: {{ $json.timestamp }}</p>\n    <a href=\"{{ $env.OUTFITY_APP_URL }}/api/health\" style=\"display: inline-block; background: #007AFF; color: #fff; padding: 10px 20px; border-radius: 100px; text-decoration: none; font-size: 14px;\">Vérifier maintenant</a>\n  </div>\n</div>",
                     "options": {}

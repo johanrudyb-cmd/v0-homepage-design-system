@@ -1,0 +1,146 @@
+{
+    "name": "🕵️ OUTFITY - Radar à Tendances Complet (Scrape + IA)",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "days",
+                            "daysInterval": 1
+                        }
+                    ]
+                }
+            },
+            "id": "trigger",
+            "name": "Chaque jour à 3h",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1.1,
+            "position": [
+                0,
+                360
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/trends/scrape",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "x-n8n-secret",
+                            "value": "bmad_n8n_secret_2024_ultra_secure"
+                        }
+                    ]
+                }
+            },
+            "id": "scrape",
+            "name": "1. Scraper les stores",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                220,
+                360
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/trends/enrich",
+                "sendHeaders": true,
+                "headerParameters": {
+                    "parameters": [
+                        {
+                            "name": "x-n8n-secret",
+                            "value": "bmad_n8n_secret_2024_ultra_secure"
+                        }
+                    ]
+                },
+                "sendQueryParameters": true,
+                "queryParameters": {
+                    "parameters": [
+                        {
+                            "name": "limit",
+                            "value": "20"
+                        }
+                    ]
+                }
+            },
+            "id": "enrich",
+            "name": "2. IA Enrichissement",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                440,
+                360
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "https://n8n.srv1384912.hstgr.cloud/webhook/admin-notifications",
+                "sendBody": true,
+                "bodyParameters": {
+                    "parameters": [
+                        {
+                            "name": "type",
+                            "value": "info"
+                        },
+                        {
+                            "name": "title",
+                            "value": "🕵️ Radar Tendances Mis à jour"
+                        },
+                        {
+                            "name": "message",
+                            "value": "=Scraping terminé : {{ $node[\"1. Scraper les stores\"].json.created }} nouveaux produits. Enrichissement : {{ $node[\"2. IA Enrichissement\"].json.enriched }} produits magnifiés."
+                        }
+                    ]
+                }
+            },
+            "id": "notify",
+            "name": "3. Notification Admin",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                660,
+                360
+            ]
+        }
+    ],
+    "connections": {
+        "Chaque jour à 3h": {
+            "main": [
+                [
+                    {
+                        "node": "1. Scraper les stores",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "1. Scraper les stores": {
+            "main": [
+                [
+                    {
+                        "node": "2. IA Enrichissement",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        },
+        "2. IA Enrichissement": {
+            "main": [
+                [
+                    {
+                        "node": "3. Notification Admin",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    }
+}

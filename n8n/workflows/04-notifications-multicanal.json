@@ -1,6 +1,6 @@
 [
     {
-        "name": "🔔 OUTFITY - Notifications Multi-Canal",
+        "name": "🔔 OUTFITY - Notifications Multi-Canal (Resend Optimized)",
         "nodes": [
             {
                 "parameters": {
@@ -21,7 +21,7 @@
             },
             {
                 "parameters": {
-                    "functionCode": "const { userId, email, name, eventType, data } = $input.first().json;\n\nconst eventTemplates = {\n  'trend_alert': {\n    subject: '📈 Nouvelle tendance détectée !',\n    title: 'Tendance Mode Détectée',\n    body: `Une nouvelle tendance a été identifiée : ${data?.trendName || 'Nouveau style'}`,\n    cta: 'Voir les tendances',\n    ctaUrl: '/trends'\n  },\n  'design_ready': {\n    subject: '🎨 Votre Tech Pack est prêt !',\n    title: 'Tech Pack Terminé',\n    body: `Votre tech pack \"${data?.designName || 'Design'}\" est prêt à télécharger.`,\n    cta: 'Voir mon Tech Pack',\n    ctaUrl: `/designs/${data?.designId || ''}`\n  },\n  'factory_match': {\n    subject: '🏭 Nouveau match usine trouvé !',\n    title: 'Match Usine',\n    body: `Nous avons trouvé ${data?.count || 1} usine(s) correspondant à votre recherche.`,\n    cta: 'Voir les usines',\n    ctaUrl: '/sourcing'\n  },\n  'payment_success': {\n    subject: '✅ Paiement confirmé',\n    title: 'Paiement Accepté',\n    body: `Votre paiement de ${data?.amount || '0'}€ a été accepté. Votre plan ${data?.plan || 'Pro'} est actif.`,\n    cta: 'Voir mon compte',\n    ctaUrl: '/settings'\n  },\n  'weekly_report': {\n    subject: '📊 Votre rapport hebdomadaire OUTFITY',\n    title: 'Rapport Hebdomadaire',\n    body: `Cette semaine : ${data?.newTrends || 0} nouvelles tendances, ${data?.designs || 0} designs créés.`,\n    cta: 'Voir le dashboard',\n    ctaUrl: '/dashboard'\n  }\n};\n\nconst template = eventTemplates[eventType] || {\n  subject: '🔔 Notification OUTFITY',\n  title: 'Notification',\n  body: data?.message || 'Vous avez une nouvelle notification.',\n  cta: 'Voir sur OUTFITY',\n  ctaUrl: '/dashboard'\n};\n\nreturn [{\n  json: {\n    userId, email, name: name || 'Créateur',\n    eventType, template, data\n  }\n}];"
+                    "jsCode": "const { userId, email, name, eventType, data } = $input.first().json;\n\nconst eventTemplates = {\n  'trend_alert': {\n    subject: '📈 Nouvelle tendance détectée !',\n    title: 'Tendance Mode Détectée',\n    body: `Une nouvelle tendance a été identifiée : ${data?.trendName || 'Nouveau style'}`,\n    cta: 'Voir les tendances',\n    ctaUrl: '/trends'\n  },\n  'design_ready': {\n    subject: '🎨 Votre Tech Pack est prêt !',\n    title: 'Tech Pack Terminé',\n    body: `Votre tech pack \"${data?.designName || 'Design'}\" est prêt à télécharger.`,\n    cta: 'Voir mon Tech Pack',\n    ctaUrl: `/designs/${data?.designId || ''}`\n  },\n  'factory_match': {\n    subject: '🏭 Nouveau match usine trouvé !',\n    title: 'Match Usine',\n    body: `Nous avons trouvé ${data?.count || 1} usine(s) correspondant à votre recherche.`,\n    cta: 'Voir les usines',\n    ctaUrl: '/sourcing'\n  },\n  'payment_success': {\n    subject: '✅ Paiement confirmé',\n    title: 'Paiement Accepté',\n    body: `Votre paiement de ${data?.amount || '0'}€ a été accepté. Votre plan ${data?.plan || 'Pro'} est actif.`,\n    cta: 'Voir mon compte',\n    ctaUrl: '/settings'\n  }\n};\n\nconst template = eventTemplates[eventType] || {\n  subject: '🔔 Notification OUTFITY',\n  title: 'Notification',\n  body: data?.message || 'Vous avez une nouvelle notification.',\n  cta: 'Voir sur OUTFITY',\n  ctaUrl: '/dashboard'\n};\n\nreturn [{\n  json: {\n    userId, email, name: name || 'Créateur',\n    eventType, template, data\n  }\n}];"
                 },
                 "id": "build-template",
                 "name": "Construire Template",
@@ -52,17 +52,13 @@
             {
                 "parameters": {
                     "method": "POST",
-                    "url": "={{ $env.OUTFITY_APP_URL }}/api/notifications",
+                    "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/notifications",
                     "sendHeaders": true,
                     "headerParameters": {
                         "parameters": [
                             {
                                 "name": "Authorization",
-                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
-                            },
-                            {
-                                "name": "Content-Type",
-                                "value": "application/json"
+                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET || 'bb22261869ad2d5d33ee928260aa8511125172498917d380bb70f545bfc7d1d6' }}"
                             }
                         ]
                     },
@@ -99,19 +95,49 @@
             },
             {
                 "parameters": {
-                    "fromEmail": "={{ $env.SMTP_FROM }}",
-                    "toEmail": "={{ $json.email }}",
-                    "subject": "={{ $json.template.subject }}",
-                    "html": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\"><div style=\"background: white; border-radius: 24px; padding: 40px; text-align: center;\"><h1 style=\"color: #1D1D1F; font-size: 24px; font-weight: 600;\">{{ $json.template.title }}</h1><p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }},</p><p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">{{ $json.template.body }}</p><a href=\"{{ $env.OUTFITY_APP_URL }}{{ $json.template.ctaUrl }}\" style=\"display: inline-block; background: #000; color: #fff; padding: 14px 28px; border-radius: 100px; text-decoration: none; font-weight: 500; margin-top: 20px;\">{{ $json.template.cta }} →</a><p style=\"color: #86868B; font-size: 13px; margin-top: 30px;\">OUTFITY par BIANGORY</p></div></div>",
+                    "method": "POST",
+                    "url": "https://api.resend.com/emails",
+                    "authentication": "genericCredentialType",
+                    "genericAuthType": "httpHeaderAuth",
+                    "sendHeaders": true,
+                    "headerParameters": {
+                        "parameters": [
+                            {
+                                "name": "Authorization",
+                                "value": "=Bearer {{ $env.RESEND_API_KEY || 're_HxzF3dkH_LAvcMEzP6Tmfs7HUbXpseuRb' }}"
+                            }
+                        ]
+                    },
+                    "sendBody": true,
+                    "bodyParameters": {
+                        "parameters": [
+                            {
+                                "name": "from",
+                                "value": "OUTFITY <onboarding@outfity.fr>"
+                            },
+                            {
+                                "name": "to",
+                                "value": "={{ $json.email }}"
+                            },
+                            {
+                                "name": "subject",
+                                "value": "={{ $json.template.subject }}"
+                            },
+                            {
+                                "name": "html",
+                                "value": "=<div style=\"font-family: -apple-system, Inter, sans-serif; max-width: 600px; margin: 0 auto; background: #F5F5F7; padding: 40px 20px;\">\n  <div style=\"background: white; border-radius: 32px; padding: 48px; text-align: center;\">\n    <h1 style=\"color: #1D1D1F; font-size: 24px; font-weight: 700; letter-spacing: -0.04em; margin-bottom: 20px;\">{{ $json.template.title }}</h1>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6;\">Bonjour {{ $json.name }},</p>\n    <p style=\"color: #1D1D1F; font-size: 16px; line-height: 1.6; margin-bottom: 32px;\">{{ $json.template.body }}</p>\n    <a href=\"{{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}{{ $json.template.ctaUrl }}\" style=\"display: inline-block; background: #000; color: #fff; padding: 18px 36px; border-radius: 100px; text-decoration: none; font-weight: 600;\">{{ $json.template.cta }} →</a>\n    <p style=\"color: #86868B; font-size: 12px; margin-top: 40px;\">OUTFITY par BIANGORY</p>\n  </div>\n</div>"
+                            }
+                        ]
+                    },
                     "options": {}
                 },
                 "id": "send-email",
-                "name": "Email Notification",
-                "type": "n8n-nodes-base.emailSend",
-                "typeVersion": 2.1,
+                "name": "Resend - Notification",
+                "type": "n8n-nodes-base.httpRequest",
+                "typeVersion": 4.1,
                 "position": [
-                    680,
-                    440
+                    900,
+                    300
                 ]
             }
         ],
@@ -120,28 +146,28 @@
                 "main": [
                     [
                         {
-                            "node": "Construire Template",
+                            "node": "build-template",
                             "type": "main",
                             "index": 0
                         }
                     ]
                 ]
             },
-            "Construire Template": {
+            "build-template": {
                 "main": [
                     [
                         {
-                            "node": "Réponse OK",
+                            "node": "respond-ok",
                             "type": "main",
                             "index": 0
                         },
                         {
-                            "node": "Notif In-App",
+                            "node": "create-notification",
                             "type": "main",
                             "index": 0
                         },
                         {
-                            "node": "Email Notification",
+                            "node": "send-email",
                             "type": "main",
                             "index": 0
                         }
@@ -151,14 +177,6 @@
         },
         "settings": {
             "executionOrder": "v1"
-        },
-        "tags": [
-            {
-                "name": "notifications"
-            },
-            {
-                "name": "email"
-            }
-        ]
+        }
     }
 ]
