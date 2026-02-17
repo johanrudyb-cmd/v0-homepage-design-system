@@ -13,6 +13,7 @@ import { scrapeAllTrendingProducts } from '@/lib/trends-scraper';
 import { getCurrentUser } from '@/lib/auth-helpers';
 
 export const runtime = 'nodejs';
+export const maxDuration = 300; // 5 minutes pour Puppeteer
 
 export async function POST(request: Request) {
   try {
@@ -27,24 +28,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    // Scraper les produits
-    console.log('[Trends Scrape] Début du scraping...');
-    const products = await scrapeAllTrendingProducts();
+    // 1. Scraper les produits Shopify (Méthode légère)
+    console.log('[Trends Scrape] Début du scraping Shopify...');
+    const shopifyProducts = await scrapeAllTrendingProducts();
 
-    if (products.length === 0) {
-      return NextResponse.json({
-        message: 'Aucun produit trouvé',
-        count: 0
-      });
-    }
+    // 2. Scraper les sources hybrides (Zalando, ASOS, Zara - Méthode lourde Puppeteer)
+    console.log('[Trends Scrape] Début du scraping Hybride (Zalando/ASOS)...');
+    const { refreshAllTrends } = await import('@/lib/refresh-all-trends');
+    const hybridResult = await refreshAllTrends();
 
-    // Importer dans la base de données
+    // Importer les produits Shopify dans la base de données
     let created = 0;
     let skipped = 0;
 
-    for (const product of products) {
+    for (const product of shopifyProducts) {
       try {
-        // Vérifier si le produit existe déjà (par nom)
         const existing = await prisma.trendProduct.findFirst({
           where: { name: product.name },
         });
@@ -54,7 +52,6 @@ export async function POST(request: Request) {
           continue;
         }
 
-        // Créer le produit
         await prisma.trendProduct.create({
           data: {
             name: product.name,
@@ -66,6 +63,7 @@ export async function POST(request: Request) {
             saturability: product.saturability,
             imageUrl: product.imageUrl,
             description: product.description,
+            sourceBrand: 'Shopify Store',
           },
         });
 
@@ -77,10 +75,17 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({
-      message: 'Scraping terminé',
-      created,
-      skipped,
-      total: products.length,
+      message: 'Scraping complet terminé (Shopify + Zalando/ASOS/Zara)',
+      shopify: {
+        created,
+        skipped,
+        total: shopifyProducts.length,
+      },
+      hybrid: {
+        savedCount: hybridResult.savedCount,
+        sourcesCount: hybridResult.sourcesCount,
+        errors: hybridResult.errors,
+      },
     });
   } catch (error: any) {
     console.error('[Trends Scrape] Erreur:', error);

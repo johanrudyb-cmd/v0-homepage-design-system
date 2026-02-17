@@ -12,35 +12,26 @@ import { fetchShopifyProducts, isStorefrontApiAvailable } from './shopify-storef
 // Stores mode populaires à scraper (publics, Storefront API disponible)
 // Note: Certains stores peuvent ne pas avoir Storefront API activé
 const POPULAR_FASHION_STORES = [
-  // Stores streetwear internationaux (plus susceptibles d'avoir Storefront API)
+  // Streetwear Internationaux (Shopify confirmés)
   'kith.com',
-  'supreme.com',
-  'palace.com',
   'stussy.com',
-  'carhartt-wip.com',
-  
-  // Stores mode française
-  'ami-paris.com',
-  'sandro-paris.com',
-  'maje.com',
-  'ba-sh.com',
-  'sezane.com',
-  
-  // Stores streetwear européens
+  'palaceskateboards.com',
+  'aimeleondore.com',
+  'jjjjound.com',
+  'fearofgod.com',
+  'octobersveryown.com',
+
+  // Streetwear Européen / Français (Shopify confirmés)
   'corteiz.com',
   'representclo.com',
-  'cpcompany.com',
-  'stoneisland.com',
-  
-  // Stores mode accessible
-  'asos.com',
-  'zara.com',
-  'hm.com',
-  
-  // Stores indépendants (à vérifier Storefront API)
-  'octobersveryown.com',
-  'fearofgod.com',
-  'awge.com',
+  'drole-de-monsieur.com',
+  'uniforme-paris.com',
+  'satisfyrunning.com',
+  'mki.store',
+  'patta.nl',
+
+  // Note: Les grands groupes (Zara, H&M, etc.) n'utilisent pas Shopify 
+  // et nécessiteraient des scrapers spécifiques ou des APIs partenaires.
 ];
 
 interface TrendProductData {
@@ -69,26 +60,26 @@ export async function scrapeStoreProducts(storeUrl: string): Promise<TrendProduc
 
     // Récupérer les produits
     const products = await fetchShopifyProducts(storeUrl, 50);
-    
+
     // Convertir en format TrendProduct
     const trendProducts: TrendProductData[] = products.map((product) => {
       // Déterminer la catégorie (Haut/Bas/Accessoires)
       const category = determineCategory(product.title, product.productType);
-      
+
       // Déterminer le style (Streetwear/Minimaliste/Luxe/Y2K)
       const style = determineStyle(product.title, product.tags);
-      
+
       // Déterminer le matériau
       const material = determineMaterial(product.title, product.description);
-      
+
       // Calculer le prix moyen
       const averagePrice = product.variants.length > 0
         ? product.variants.reduce((sum, v) => sum + v.price, 0) / product.variants.length
         : product.price;
-      
+
       // Calculer saturabilité (basé sur nombre de variantes, tags, etc.)
       const saturability = calculateSaturability(product);
-      
+
       // TrendScore sera calculé avec Google Trends en Phase 2
       // Pour l'instant, utiliser un score basé sur la qualité perçue
       const trendScore = 0; // Sera calculé avec Google Trends API plus tard
@@ -125,14 +116,14 @@ export async function scrapeAllTrendingProducts(): Promise<TrendProductData[]> {
     try {
       console.log(`[Trends Scraper] Scraping ${store}...`);
       const products = await scrapeStoreProducts(store);
-      
+
       if (products.length > 0) {
         console.log(`[Trends Scraper] ✅ ${products.length} produits trouvés sur ${store}`);
         allProducts.push(...products);
       } else {
         console.log(`[Trends Scraper] ⚠️  Aucun produit trouvé sur ${store} (Storefront API peut-être indisponible)`);
       }
-      
+
       // Rate limiting : attendre 3 secondes entre chaque store (pour Google Trends aussi)
       await new Promise(resolve => setTimeout(resolve, 3000));
     } catch (error) {
@@ -152,22 +143,22 @@ function determineCategory(title: string, productType: string | null): string {
   const titleLower = title.toLowerCase();
   const typeLower = (productType || '').toLowerCase();
 
-  if (titleLower.includes('hoodie') || titleLower.includes('sweatshirt') || 
-      titleLower.includes('t-shirt') || titleLower.includes('tshirt') ||
-      titleLower.includes('polo') || titleLower.includes('veste') ||
-      titleLower.includes('bomber') || titleLower.includes('jacket')) {
+  if (titleLower.includes('hoodie') || titleLower.includes('sweatshirt') ||
+    titleLower.includes('t-shirt') || titleLower.includes('tshirt') ||
+    titleLower.includes('polo') || titleLower.includes('veste') ||
+    titleLower.includes('bomber') || titleLower.includes('jacket')) {
     return 'Haut';
   }
 
   if (titleLower.includes('pantalon') || titleLower.includes('jean') ||
-      titleLower.includes('cargo') || titleLower.includes('short') ||
-      titleLower.includes('jogging')) {
+    titleLower.includes('cargo') || titleLower.includes('short') ||
+    titleLower.includes('jogging')) {
     return 'Bas';
   }
 
   if (titleLower.includes('chaussure') || titleLower.includes('sneaker') ||
-      titleLower.includes('sac') || titleLower.includes('bag') ||
-      titleLower.includes('casquette') || titleLower.includes('cap')) {
+    titleLower.includes('sac') || titleLower.includes('bag') ||
+    titleLower.includes('casquette') || titleLower.includes('cap')) {
     return 'Accessoires';
   }
 
@@ -187,22 +178,22 @@ function determineStyle(title: string, tags: string[]): string {
   const tagsLower = tags.map(t => t.toLowerCase()).join(' ');
 
   if (titleLower.includes('streetwear') || tagsLower.includes('streetwear') ||
-      titleLower.includes('urban') || tagsLower.includes('urban')) {
+    titleLower.includes('urban') || tagsLower.includes('urban')) {
     return 'Streetwear';
   }
 
   if (titleLower.includes('y2k') || tagsLower.includes('y2k') ||
-      titleLower.includes('vintage') || tagsLower.includes('vintage')) {
+    titleLower.includes('vintage') || tagsLower.includes('vintage')) {
     return 'Y2K';
   }
 
   if (titleLower.includes('luxe') || tagsLower.includes('luxury') ||
-      titleLower.includes('premium') || tagsLower.includes('premium')) {
+    titleLower.includes('premium') || tagsLower.includes('premium')) {
     return 'Luxe';
   }
 
   if (titleLower.includes('minimal') || tagsLower.includes('minimal') ||
-      titleLower.includes('basic') || tagsLower.includes('essential')) {
+    titleLower.includes('basic') || tagsLower.includes('essential')) {
     return 'Minimaliste';
   }
 
