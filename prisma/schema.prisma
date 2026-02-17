@@ -19,7 +19,7 @@ model User {
   plan            String    @default("free") // free, pro, enterprise
   
   // Relations Clean (Retour aux bases)
-  referredByCode  String?   // Code du parrain (Optionnel, on peut le garder sans risque)
+  // referredByCode  String?   // Code du parrain (Optionnel, on peut le garder sans risque)
   
   subscribedAt    DateTime? 
   stripeCustomerId String?   @unique
@@ -36,7 +36,7 @@ model User {
   fashionBrands   FashionBrand[]
   aiUsages        AIUsage[]
   surplusCredits  SurplusCredits[]
-  posts           BlogPost[]
+  // posts           BlogPost[]
   affiliateProfile AffiliateProfile?
 }
 
@@ -643,15 +643,15 @@ model BlogPost {
   relatedBrands String[]
   published   Boolean  @default(false)
   publishedAt DateTime @default(now())
-  authorId    String
-  categoryId  String?
+  // authorId    String?
+  // categoryId  String?
   
-  seoTitle       String?
-  seoDescription String?
-  seoKeywords    String?
+  // seoTitle       String?
+  // seoDescription String?
+  // seoKeywords    String?
 
-  author    User     @relation(fields: [authorId], references: [id])
-  category  BlogCategory? @relation(fields: [categoryId], references: [id])
+  // author    User?     @relation(fields: [authorId], references: [id])
+  // category  BlogCategory? @relation(fields: [categoryId], references: [id])
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -666,7 +666,7 @@ model BlogCategory {
   slug        String   @unique
   description String?
   
-  posts       BlogPost[]
+  // posts       BlogPost[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

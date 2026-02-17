@@ -32,7 +32,12 @@ export default async function AdminBlogPage() {
 
     const posts = await prisma.blogPost.findMany({
         orderBy: { createdAt: 'desc' },
-    }).catch(() => []);
+    }).catch((e) => {
+        console.error('ERREUR GESTION BLOG:', e);
+        return [];
+    });
+
+    console.log(`[AdminBlog] Found ${posts.length} posts`);
 
     return (
         <div className="min-h-screen bg-[#F5F5F7]">

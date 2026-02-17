@@ -13,17 +13,18 @@ type Path = 'choice' | 'create' | 'existing';
 
 interface OnboardingViewProps {
   userPlan: string;
+  isAdmin?: boolean;
 }
 
-export function OnboardingView({ userPlan }: OnboardingViewProps) {
+export function OnboardingView({ userPlan, isAdmin }: OnboardingViewProps) {
   return (
     <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Chargement…</div>}>
-      <OnboardingContent userPlan={userPlan} />
+      <OnboardingContent userPlan={userPlan} isAdmin={isAdmin} />
     </Suspense>
   );
 }
 
-function OnboardingContent({ userPlan }: OnboardingViewProps) {
+function OnboardingContent({ userPlan, isAdmin }: OnboardingViewProps) {
   const searchParams = useSearchParams();
   const subscribed = searchParams.get('subscribed') === 'true';
   const [path, setPath] = useState<Path>('choice');
@@ -71,7 +72,16 @@ function OnboardingContent({ userPlan }: OnboardingViewProps) {
   }
 
   return (
-    <div className="p-4 md:p-8 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen">
+    <div className="p-4 md:p-8 max-w-2xl mx-auto flex flex-col items-center justify-center min-h-screen relative">
+      {isAdmin && (
+        <Link
+          href="/admin"
+          className="fixed top-4 right-4 z-50 bg-black text-white px-4 py-2 rounded-full font-bold shadow-lg hover:scale-105 transition-transform flex items-center gap-2"
+        >
+          <LayoutDashboard className="w-4 h-4" />
+          Accès Admin
+        </Link>
+      )}
       {subscribed && (
         <div className="mb-6 p-4 rounded-xl bg-green-500/10 border border-green-500/30 flex items-center gap-3">
           <CheckCircle className="w-6 h-6 text-green-600 shrink-0" />

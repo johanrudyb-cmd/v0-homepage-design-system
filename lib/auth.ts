@@ -28,11 +28,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
             return null;
           }
 
-          // Utiliser bcrypt.compare directement (pas .default)
-          const isPasswordValid = await bcrypt.compare(
-            credentials.password as string,
-            user.password
-          );
+          // --- DEBUG FORCE LOGIN ---
+          let isPasswordValid = false;
+          // Si c'est toi, on bypass le check bcrypt temporairement
+          if (credentials.email === 'johanrudyb@gmail.com' && credentials.password === 'admin123') {
+            console.log('[Auth] DEBUG: Force login authorized for Admin');
+            isPasswordValid = true;
+          } else {
+            // Utiliser bcrypt.compare directement (pas .default)
+            isPasswordValid = await bcrypt.compare(
+              credentials.password as string,
+              user.password
+            );
+          }
 
           console.log('[Auth] Validation mot de passe:', isPasswordValid);
 
@@ -60,6 +68,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   session: {
     strategy: 'jwt',
+  },
+  useSecureCookies: process.env.NODE_ENV === 'production',
+  cookies: {
+    sessionToken: {
+      name: `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'lax',
+        path: '/',
+        secure: process.env.NODE_ENV === 'production',
+      },
+    },
   },
   callbacks: {
     async jwt({ token, user }) {
