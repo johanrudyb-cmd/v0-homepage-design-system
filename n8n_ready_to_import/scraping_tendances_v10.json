@@ -1,5 +1,5 @@
 {
-    "name": "🕵️ OUTFITY - Radar à Tendances Complet (Scrape + IA)",
+    "name": "🕵️ OUTFITY - Radar Hybride (Simple Trigger)",
     "nodes": [
         {
             "parameters": {
@@ -24,7 +24,7 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "https://outfity.fr/api/trends/scrape",
+                "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/trends/scrape",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
@@ -36,74 +36,11 @@
                 }
             },
             "id": "scrape",
-            "name": "1. Scraper les stores",
+            "name": "🚀 Déclencher Radar Hybride",
             "type": "n8n-nodes-base.httpRequest",
             "typeVersion": 4.1,
             "position": [
-                220,
-                360
-            ]
-        },
-        {
-            "parameters": {
-                "method": "POST",
-                "url": "https://outfity.fr/api/trends/enrich",
-                "sendHeaders": true,
-                "headerParameters": {
-                    "parameters": [
-                        {
-                            "name": "x-n8n-secret",
-                            "value": "bmad_n8n_secret_2024_ultra_secure"
-                        }
-                    ]
-                },
-                "sendQueryParameters": true,
-                "queryParameters": {
-                    "parameters": [
-                        {
-                            "name": "limit",
-                            "value": "20"
-                        }
-                    ]
-                }
-            },
-            "id": "enrich",
-            "name": "2. IA Enrichissement",
-            "type": "n8n-nodes-base.httpRequest",
-            "typeVersion": 4.1,
-            "position": [
-                440,
-                360
-            ]
-        },
-        {
-            "parameters": {
-                "method": "POST",
-                "url": "https://n8n.srv1384912.hstgr.cloud/webhook/admin-notifications",
-                "sendBody": true,
-                "bodyParameters": {
-                    "parameters": [
-                        {
-                            "name": "type",
-                            "value": "info"
-                        },
-                        {
-                            "name": "title",
-                            "value": "🕵️ Radar Tendances Mis à jour"
-                        },
-                        {
-                            "name": "message",
-                            "value": "=Scraping terminé : {{ $node[\"1. Scraper les stores\"].json.created }} nouveaux produits. Enrichissement : {{ $node[\"2. IA Enrichissement\"].json.enriched }} produits magnifiés."
-                        }
-                    ]
-                }
-            },
-            "id": "notify",
-            "name": "3. Notification Admin",
-            "type": "n8n-nodes-base.httpRequest",
-            "typeVersion": 4.1,
-            "position": [
-                660,
+                250,
                 360
             ]
         }
@@ -113,29 +50,7 @@
             "main": [
                 [
                     {
-                        "node": "1. Scraper les stores",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "1. Scraper les stores": {
-            "main": [
-                [
-                    {
-                        "node": "2. IA Enrichissement",
-                        "type": "main",
-                        "index": 0
-                    }
-                ]
-            ]
-        },
-        "2. IA Enrichissement": {
-            "main": [
-                [
-                    {
-                        "node": "3. Notification Admin",
+                        "node": "🚀 Déclencher Radar Hybride",
                         "type": "main",
                         "index": 0
                     }

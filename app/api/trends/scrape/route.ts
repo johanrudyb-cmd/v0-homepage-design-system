@@ -28,19 +28,35 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    // 1. Uniquement le scraping Hybride (Zalando, ASOS, Zara - Puppeteer)
-    console.log('[Trends Scrape] Début du scraping Radar Hybride exclusif (Zalando/ASOS/Zara)...');
+    // 1. Scraping Radar Hybride (Zalando, ASOS, Zara)
+    console.log('[Trends Scrape] Début du scraping Radar Hybride...');
     const { refreshAllTrends } = await import('@/lib/refresh-all-trends');
     const hybridResult = await refreshAllTrends();
 
-    return NextResponse.json({
-      message: 'Scraping Radar Hybride terminé',
-      results: {
-        savedCount: hybridResult.savedCount,
-        deletedCount: hybridResult.deletedCount,
-        sourcesCount: hybridResult.sourcesCount,
+    // 2. Enrichissement automatique (IA GPT + Higgsfield)
+    console.log('[Trends Scrape] Début de l\'enrichissement IA...');
+    const { enrichTrends } = await import('@/lib/trend-enricher');
+    const enrichResult = await enrichTrends(10); // Enrichir les 10 dernières tendances
+
+    // 3. Notification Admin automatique
+    const { notifyAdmin } = await import('@/lib/admin-notifications');
+    await notifyAdmin({
+      type: 'scrape_success',
+      title: '🕵️ Radar Tendances Mis à jour',
+      message: `Scraping terminé : ${hybridResult.savedCount} nouveaux produits Hybrides. Enrichissement : ${enrichResult.enriched} produits magnifiés.`,
+      emoji: '🕵️',
+      data: {
+        sources: hybridResult.sourcesCount,
         totalItems: hybridResult.totalItems,
-        errors: hybridResult.errors.length > 0 ? hybridResult.errors : undefined,
+        errors: hybridResult.errors.length,
+      }
+    });
+
+    return NextResponse.json({
+      message: 'Processus Radar complet terminé (Scrape + Enrich + Notify)',
+      results: {
+        scrape: hybridResult,
+        enrich: enrichResult
       }
     });
   } catch (error: any) {
