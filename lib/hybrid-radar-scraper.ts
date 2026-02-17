@@ -100,6 +100,12 @@ const EXCLUDE_JEWELRY_KEYWORDS = [
   'collier', 'necklace', 'bracelet', 'bracelets', 'anklet', 'chevillère', 'bijoux',
 ];
 
+/** Lots / Packs à exclure (on veut des articles unitaires). */
+const EXCLUDE_LOTS_KEYWORDS = [
+  ' lot ', 'lot de ', 'lots de ', ' lot', 'lot ', ' pack ', 'pack de ', ' pack', 'pack ',
+  'set de ', ' set ', 'kit ', ' x2', ' x3', ' x4', ' x5', ' x6', ' x10',
+];
+
 /** Pulls / sweats rouges à exclure (demande utilisateur). */
 const EXCLUDE_RED_PULL_KEYWORDS = [
   'pull rouge', 'pull red', 'sweat rouge', 'sweat red', 'pullover rouge', 'pullover red',
@@ -191,6 +197,7 @@ export function isExcludedProduct(name: string, extraExcludeKeywords: string[] =
     ...EXCLUDE_PERFUME_KEYWORDS,
     ...EXCLUDE_ACCESSORIES_KEYWORDS,
     ...EXCLUDE_JEWELRY_KEYWORDS,
+    ...EXCLUDE_LOTS_KEYWORDS, // Added this line
     ...EXCLUDE_EQUIPMENT_KEYWORDS,
     ...EXCLUDE_HAIR_KEYWORDS,
     ...EXCLUDE_POCHETTE_KEYWORDS,
@@ -583,7 +590,7 @@ async function scrapeZalandoTrendSpotter(source: HybridRadarSource): Promise<Hyb
                     const ol = document.querySelector(`ol[aria-labelledby="${hid}"]`);
                     if (!ol) return false;
                     const btns = Array.from(ol.querySelectorAll('a, button')).filter((el) =>
-                      /voir\s*l['\u2019]?article|voir l'article/i.test((el as HTMLElement).textContent || '')
+                      /voir\s*l['\u2019']?article|voir l'article/i.test((el as HTMLElement).textContent || '')
                     );
                     if (index >= btns.length) return false;
                     const btn = btns[index] as HTMLElement;
@@ -684,7 +691,7 @@ async function scrapeZalandoTrendSpotter(source: HybridRadarSource): Promise<Hyb
                       }
                       if (price < MIN) {
                         var metaPrice = document.querySelector('meta[property="product:price:amount"]');
-                        if (metaPrice && metaPrice.getAttribute('content')) { var v = parseFloat(metaPrice.getAttribute('content').replace(',', '.')); if (v >= MIN) price = v; }
+                        if (metaPrice) { var v = parseFloat(metaPrice.getAttribute('content').replace(',', '.')); if (v >= MIN) price = v; }
                       }
                       if (price < MIN) {
                         var ldScripts = document.querySelectorAll('script[type="application/ld+json"]');

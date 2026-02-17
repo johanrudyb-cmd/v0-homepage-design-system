@@ -381,8 +381,7 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
                                     <Flame key={i} className="w-2 h-2 sm:w-3.5 sm:h-3.5 fill-current" />
                                   ))}
                                 </div>
-                                <div className="text-[7px] sm:text-[9px] font-black uppercase tracking-widest text-white/40 leading-none">Potentiel</div>
-                                <div className="text-[11px] sm:text-lg font-black tracking-tight leading-none mt-0.5">{(t as any).outfityIVS || t.trendScore}%</div>
+                                <div className="text-[9px] font-black uppercase tracking-widest text-white/50 mb-0.5 leading-none">Potentiel Viral</div>
                               </div>
                             </div>
                           )}

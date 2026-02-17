@@ -237,7 +237,6 @@ export default async function ProductDetailPage({
                         ))}
                       </div>
                       <div className="text-[9px] font-black uppercase tracking-widest text-white/50 mb-0.5 leading-none">Potentiel Viral</div>
-                      <div className="text-2xl font-black text-white tracking-tighter leading-none">{displayTrendScore}%</div>
                     </div>
                   )}
                 </div>

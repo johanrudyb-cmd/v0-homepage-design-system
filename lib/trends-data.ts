@@ -250,15 +250,16 @@ export async function getHybridRadarTrends(params: {
     const diversified: any[] = [];
     const brands = Array.from(groupedByBrand.keys());
 
+    // On trie les marques par la meilleure note de leur produit
     brands.sort((a, b) => {
         const bestA = groupedByBrand.get(a)![0].outfityIVS || 0;
         const bestB = groupedByBrand.get(b)![0].outfityIVS || 0;
         return bestB - bestA;
     });
 
+    // On remplit diversified avec les meilleurs de chaque marque d'abord
     const finalLimit = limit;
-    const topBrands = brands.slice(0, 4);
-    for (const b of topBrands) {
+    for (const b of brands) {
         const list = groupedByBrand.get(b)!;
         if (list.length > 0) {
             diversified.push(list[0]);
@@ -280,10 +281,13 @@ export async function getHybridRadarTrends(params: {
         }
     }
 
+    // TRI FINAL PAR SCORE DE VIRALITÉ pour répondre à "mis dans l'ordre"
+    const finalSorted = diversified.sort((a, b) => (b.outfityIVS || 0) - (a.outfityIVS || 0));
+
     const totalCount = await prisma.trendProduct.count({ where });
 
     return {
-        trends: diversified,
+        trends: finalSorted,
         summary: {
             total: totalCount,
             byZone: filtered.reduce((acc: any, p) => {
