@@ -1,3 +1,4 @@
+
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft, Calendar, User, Clock, ArrowRight, Sparkles } from 'lucide-react';
@@ -7,6 +8,7 @@ import Markdown from 'react-markdown';
 import { AnimatedHeader } from '@/components/homepage/AnimatedHeader';
 import { Footer } from '@/components/homepage/Footer';
 import { cn } from '@/lib/utils';
+import { Metadata } from 'next';
 
 export const revalidate = 0;
 
@@ -16,15 +18,17 @@ interface BlogPostPageProps {
     }>;
 }
 
-export async function generateMetadata({ params }: BlogPostPageProps) {
+export async function generateMetadata({ params }: BlogPostPageProps): Promise<Metadata> {
     const { slug } = await params;
     const post = await prisma.blogPost.findUnique({
         where: { slug },
+        include: { author: true },
     });
 
     if (!post) return { title: 'Article non trouvé | OUTFITY' };
 
     const siteUrl = 'https://outfity.fr';
+    const authorName = post.author?.name || 'OUTFITY Team';
 
     return {
         title: `${post.title} | OUTFITY Radar`,
@@ -48,7 +52,7 @@ export async function generateMetadata({ params }: BlogPostPageProps) {
             locale: 'fr_FR',
             type: 'article',
             publishedTime: post.publishedAt.toISOString(),
-            authors: [post.author],
+            authors: [{ name: authorName }],
         },
         twitter: {
             card: 'summary_large_image',
@@ -63,6 +67,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     const { slug } = await params;
     const post = await prisma.blogPost.findUnique({
         where: { slug },
+        include: { author: true },
     });
 
     const isProd = process.env.NODE_ENV === 'production';
@@ -76,6 +81,8 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         orderBy: { publishedAt: 'desc' },
         take: 3,
     });
+
+    const authorName = post.author?.name || 'OUTFITY Team';
 
     return (
         <div className="min-h-screen bg-[#F5F5F7]">
@@ -114,7 +121,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                     <User className="w-7 h-7 text-[#007AFF]" />
                                 </div>
                                 <div>
-                                    <p className="text-base font-black text-black uppercase tracking-tight">{post.author}</p>
+                                    <p className="text-base font-black text-black uppercase tracking-tight">{authorName}</p>
                                     <p className="text-[10px] font-bold text-[#6e6e73] uppercase tracking-widest flex items-center gap-1.5">
                                         <Clock className="w-3.5 h-3.5" />
                                         {Math.max(2, Math.ceil(post.content.length / 800))} min de lecture
@@ -183,7 +190,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                         <div className="w-10 h-10 rounded-full bg-[#007AFF]/10 flex items-center justify-center">
                                             <User className="w-5 h-5 text-[#007AFF]" />
                                         </div>
-                                        <p className="text-sm font-black text-black leading-tight uppercase">{post.author}</p>
+                                        <p className="text-sm font-black text-black leading-tight uppercase">{authorName}</p>
                                     </div>
                                 </div>
                                 <div className="space-y-4 pt-8 border-t border-black/5">
@@ -242,7 +249,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                             </div>
                                             <div>
                                                 <p className="text-xs font-black uppercase text-[#6e6e73]">Rédigé par</p>
-                                                <p className="text-sm font-black text-black uppercase">{post.author}</p>
+                                                <p className="text-sm font-black text-black uppercase">{authorName}</p>
                                             </div>
                                         </div>
                                         <ShareButton
