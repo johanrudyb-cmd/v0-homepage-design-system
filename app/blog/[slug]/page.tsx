@@ -10,6 +10,7 @@ import { Footer } from '@/components/homepage/Footer';
 import { cn } from '@/lib/utils';
 import { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 interface BlogPostPageProps {
