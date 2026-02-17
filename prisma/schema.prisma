@@ -624,6 +624,9 @@ model BlogPost {
   excerpt     String   @db.Text
   content     String   @db.Text
   coverImage  String?
+  sourceUrl   String?
+  tags        String[]
+  relatedBrands String[]
   published   Boolean  @default(false)
   publishedAt DateTime @default(now())
   authorId    String
