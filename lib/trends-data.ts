@@ -214,9 +214,10 @@ export async function getHybridRadarTrends(params: {
             });
 
         const ivsScore = computeTrendScore(
-            p.trendGrowthPercent ?? null,
+            effectiveTrendGrowthPercent,
             p.trendLabel ?? null,
-            p.trendScoreVisual ?? null
+            p.trendScoreVisual ?? null,
+            p.name ?? ''
         );
 
         return {

@@ -105,7 +105,7 @@ export default async function ProductDetailPage({
     ? computeSaturability(effectiveTrendGrowthPercent, product.trendLabel ?? null, daysInRadar)
     : product.saturability;
   const displayTrendScore = (product.trendScoreVisual == null || product.trendScoreVisual === 50)
-    ? computeTrendScore(effectiveTrendGrowthPercent, product.trendLabel ?? null)
+    ? computeTrendScore(effectiveTrendGrowthPercent, product.trendLabel ?? null, null, product.name ?? '')
     : (product.trendScoreVisual ?? product.trendScore ?? 50);
 
   const getSaturabilityStyle = (score: number) => {

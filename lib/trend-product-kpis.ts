@@ -105,33 +105,42 @@ export function computeSaturability(
 export function computeTrendScore(
   trendGrowthPercent: number | null,
   trendLabel: string | null,
-  visualScore?: number | null
+  visualScore?: number | null,
+  productName: string = ''
 ): number {
   let score = 65.42; // Base stable pour un produit validé Outfity
 
-  // 1. Influence de la croissance réelle (Zalando Data)
+  // 1. Influence de la croissance réelle (Zalando Data ou Estimé)
   if (trendGrowthPercent != null) {
-    score = 55 + (trendGrowthPercent * 1.65);
+    score = 52 + (trendGrowthPercent * 1.55);
   }
 
   // 2. Bonus de Label Viral
   if (trendLabel) {
     const l = trendLabel.toLowerCase();
-    if (l.includes('hausse') || l.includes('up')) score += 8.15;
-    if (l.includes('tendance') || l.includes('trend')) score += 5.42;
-    if (l.includes('nouveau') || l.includes('new')) score += 3.21;
+    if (l.includes('hausse') || l.includes('up')) score += 9.15;
+    if (l.includes('tendance') || l.includes('trend')) score += 6.42;
+    if (l.includes('nouveau') || l.includes('new')) score += 4.21;
   }
 
   // 3. Corrélation avec le score visuel (IA Outfity)
   if (visualScore != null) {
-    const visualBonus = (visualScore - 50) * 0.25;
+    const visualBonus = (visualScore - 50) * 0.35;
     score += visualBonus;
   }
 
   // Ajout d'une variation unique par produit (pour éviter les doublons de score)
-  // On utilise la longueur du nom et les caractères pour créer une décimale stable
-  const seed = (trendLabel?.length || 0) + (trendGrowthPercent || 0);
-  const uniqueVariation = (seed % 100) / 40; // Variation jusqu'à 2.5 points
+  // On utilise le nom du produit pour créer une décimale stable et diverse
+  let nameHash = 0;
+  if (productName) {
+    for (let i = 0; i < productName.length; i++) {
+      nameHash = (nameHash << 5) - nameHash + productName.charCodeAt(i);
+      nameHash |= 0;
+    }
+  }
+
+  const seed = Math.abs(nameHash) + (trendLabel?.length || 0) + (trendGrowthPercent || 0);
+  const uniqueVariation = (seed % 100) / 12; // Variation plus marquée (jusqu'à 8 points) pour le côté "vivant"
   score += uniqueVariation;
 
   return Math.round(clamp(score, 10, 99.8) * 100) / 100;
