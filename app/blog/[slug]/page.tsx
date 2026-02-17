@@ -151,10 +151,6 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                                         src={`https://wsrv.nl/?url=${encodeURIComponent(post.coverImage.trim())}&w=1200&q=80&output=jpg`}
                                         alt={post.title}
                                         className="w-full h-full object-cover relative z-10"
-                                        onError={(e) => {
-                                            e.currentTarget.style.display = 'none'; // Cache l'image cassée
-                                            e.currentTarget.parentElement?.classList.add('fallback-mode'); // Active le fallback
-                                        }}
                                     />
                                     {/* Fallback qui apparait si l'image est cachée */}
                                     <div className="absolute inset-0 flex items-center justify-center p-12 text-center z-0">
