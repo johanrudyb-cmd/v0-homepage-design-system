@@ -137,17 +137,24 @@ export default async function AdminDashboardPage() {
                         ) : (
                             logs.map((log) => (
                                 <div key={log.id} className="flex gap-4">
-                                    <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${log.level === 'error' ? 'bg-red-500' :
-                                        log.level === 'warning' ? 'bg-orange-500' :
-                                            'bg-[#007AFF]'
+                                    <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${(log.status && (log.status.includes('error') || log.status.includes('failed'))) ? 'bg-red-500' :
+                                            (log.status && log.status.includes('warning')) ? 'bg-orange-500' :
+                                                'bg-[#007AFF]'
                                         }`} />
                                     <div>
-                                        <p className="text-sm font-semibold text-[#1D1D1F] line-clamp-1">{log.title}</p>
-                                        <p className="text-xs text-[#6e6e73] line-clamp-2 mt-0.5">{log.message}</p>
-                                        <p className="text-[10px] text-[#86868b] mt-1 flex items-center gap-1 uppercase tracking-tight font-bold">
-                                            <Clock className="w-3 h-3" />
-                                            {new Date(log.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                        <p className="text-sm font-semibold text-[#1D1D1F] line-clamp-1">{log.action}</p>
+                                        <p className="text-xs text-[#6e6e73] line-clamp-2 mt-0.5">
+                                            {typeof log.details === 'string' ? log.details : JSON.stringify(log.details)}
                                         </p>
+                                        <div className="flex items-center gap-2 mt-1">
+                                            <p className="text-[10px] text-[#86868b] flex items-center gap-1 uppercase tracking-tight font-bold">
+                                                <Clock className="w-3 h-3" />
+                                                {new Date(log.createdAt).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' })}
+                                            </p>
+                                            <span className="text-[10px] bg-gray-100 px-1.5 py-0.5 rounded text-gray-600 font-medium uppercase">
+                                                {log.status}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
                             ))
