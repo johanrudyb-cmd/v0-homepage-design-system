@@ -30,11 +30,11 @@ export async function POST(req: Request) {
                 slug,
                 excerpt,
                 content,
-                /* author: {
+                author: {
                     connect: {
                         id: user!.id
                     }
-                }, */
+                },
                 published,
                 publishedAt: published ? new Date() : undefined,
                 tags: tags || [],

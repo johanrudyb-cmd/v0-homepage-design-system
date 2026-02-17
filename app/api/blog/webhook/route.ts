@@ -63,7 +63,7 @@ export async function POST(req: Request) {
                     published,
                     publishedAt: published ? new Date() : undefined,
                     tags,
-                    author,
+
                     relatedBrands,
                     sourceUrl
                 },
@@ -73,7 +73,7 @@ export async function POST(req: Request) {
                     excerpt,
                     content,
                     coverImage,
-                    author,
+
                     published,
                     publishedAt: published ? new Date() : undefined,
                     tags,
