@@ -28,64 +28,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    // 1. Scraper les produits Shopify (Méthode légère)
-    console.log('[Trends Scrape] Début du scraping Shopify...');
-    const shopifyProducts = await scrapeAllTrendingProducts();
-
-    // 2. Scraper les sources hybrides (Zalando, ASOS, Zara - Méthode lourde Puppeteer)
-    console.log('[Trends Scrape] Début du scraping Hybride (Zalando/ASOS)...');
+    // 1. Uniquement le scraping Hybride (Zalando, ASOS, Zara - Puppeteer)
+    console.log('[Trends Scrape] Début du scraping Radar Hybride exclusif (Zalando/ASOS/Zara)...');
     const { refreshAllTrends } = await import('@/lib/refresh-all-trends');
     const hybridResult = await refreshAllTrends();
 
-    // Importer les produits Shopify dans la base de données
-    let created = 0;
-    let skipped = 0;
-
-    for (const product of shopifyProducts) {
-      try {
-        const existing = await prisma.trendProduct.findFirst({
-          where: { name: product.name },
-        });
-
-        if (existing) {
-          skipped++;
-          continue;
-        }
-
-        await prisma.trendProduct.create({
-          data: {
-            name: product.name,
-            category: product.category,
-            style: product.style,
-            material: product.material,
-            averagePrice: product.averagePrice,
-            trendScore: product.trendScore,
-            saturability: product.saturability,
-            imageUrl: product.imageUrl,
-            description: product.description,
-            sourceBrand: 'Shopify Store',
-          },
-        });
-
-        created++;
-      } catch (error: any) {
-        console.error(`[Trends Scrape] Erreur lors de la création de "${product.name}":`, error);
-        skipped++;
-      }
-    }
-
     return NextResponse.json({
-      message: 'Scraping complet terminé (Shopify + Zalando/ASOS/Zara)',
-      shopify: {
-        created,
-        skipped,
-        total: shopifyProducts.length,
-      },
-      hybrid: {
+      message: 'Scraping Radar Hybride terminé',
+      results: {
         savedCount: hybridResult.savedCount,
+        deletedCount: hybridResult.deletedCount,
         sourcesCount: hybridResult.sourcesCount,
-        errors: hybridResult.errors,
-      },
+        totalItems: hybridResult.totalItems,
+        errors: hybridResult.errors.length > 0 ? hybridResult.errors : undefined,
+      }
     });
   } catch (error: any) {
     console.error('[Trends Scrape] Erreur:', error);
