@@ -9,7 +9,7 @@ on:
 jobs:
   scrape-trends:
     runs-on: ubuntu-latest
-    timeout-minutes: 30 # Large marge pour Puppeteer
+    timeout-minutes: 60 # Augmenté à 60 minutes car 27 sources c'est long
 
     steps:
       - name: 📥 Récupération du code
@@ -21,8 +21,8 @@ jobs:
           node-version: '20'
           cache: 'npm'
 
-      - name: 📦 Installation des dépendances
-        run: npm install
+      - name: 📦 Installation des dépendances (via cache)
+        run: npm ci || npm install
 
       - name: 🌐 Installation de Puppeteer & Chrome
         run: npx puppeteer browsers install chrome
@@ -32,7 +32,6 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           ADMIN_NOTIFY_WEBHOOK_URL: ${{ secrets.ADMIN_NOTIFY_WEBHOOK_URL }}
-          # On peut rajouter d'autres clés si besoin
         run: |
           npx tsx -e "
             import { refreshAllTrends } from './lib/refresh-all-trends';
@@ -40,31 +39,40 @@ jobs:
             import { notifyAdmin } from './lib/admin-notifications';
 
             async function runFullProcess() {
-              console.log('--- DEBUT DU RADAR HYBRIDE ---');
+              console.log('🚀 Démarrage du Radar Hybride pour OUTFITY (v2026)');
+              const start = Date.now();
               
               // 1. Scraping
+              console.log('--- ETAPE 1 : SCRAPING EN COURS ---');
               const scrapeResult = await refreshAllTrends();
-              console.log('Scrape terminé:', scrapeResult.savedCount, 'produits sauvés');
+              console.log('✅ Scrape fini en ' + ((Date.now() - start)/1000).toFixed(0) + 's');
+              console.log('📊 Stats : ' + scrapeResult.savedCount + ' produits enregistrés.');
 
               // 2. Enrichissement
-              console.log('Début enrichissement IA...');
-              const enrichResult = await enrichTrends(10);
-              console.log('Enrichissement terminé:', enrichResult.enriched, 'produits analysés');
+              console.log('--- ETAPE 2 : ENRICHISSEMENT IA ---');
+              const enrichResult = await enrichTrends(12);
+              console.log('✅ IA finie. Produits analysés : ' + enrichResult.enriched);
 
               // 3. Notification
+              console.log('--- ETAPE 3 : NOTIFICATION ---');
               await notifyAdmin({
                 type: 'scrape_success',
-                title: '🕵️ Radar Hebdomadaire (GitHub Actions)',
-                message: 'Le Radar de mardi midi a bien fonctionné. ' + scrapeResult.savedCount + ' nouveaux produits détectés.',
-                emoji: '🕵️',
-                data: { scrapeResult, enrichResult }
+                title: '🕵️ Radar OUTFITY Terminé',
+                message: 'Le Radar a bien mouliné. ' + scrapeResult.savedCount + ' produits trouvés, ' + enrichResult.enriched + ' enrichis.',
+                emoji: '�',
+                data: { 
+                  total: scrapeResult.totalItems,
+                  saved: scrapeResult.savedCount,
+                  enriched: enrichResult.enriched,
+                  duration: ((Date.now() - start)/60000).toFixed(1) + ' min'
+                }
               });
               
-              console.log('--- PROCESSUS TERMINE ---');
+              console.log('✨ Tout est en base de données. Mission accomplie.');
             }
 
             runFullProcess().catch(err => {
-              console.error('Erreur Critique:', err);
+              console.error('❌ ERREUR CRITIQUE:', err);
               process.exit(1);
             });
           "
