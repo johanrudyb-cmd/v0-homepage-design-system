@@ -25,14 +25,11 @@ async function main() {
                 where: { email },
                 data: {
                     password: hashedPassword,
-                    role: 'ADMIN', // Hardcoded string to bypass enum import issues
-                    isBrandCreator: true,
                     emailVerified: new Date(),
                 },
             });
             console.log(`✅ Password updated for existing user ${user.email}`);
             console.log(`🔑 New password: ${newPassword}`);
-            console.log(`👑 Role set to: ADMIN`);
         } else {
             // Create new user
             console.log(`User ${email} not found. Creating new Admin user...`);
@@ -41,14 +38,11 @@ async function main() {
                     name: 'Admin User',
                     email: email,
                     password: hashedPassword,
-                    role: 'ADMIN',
-                    isBrandCreator: true,
                     emailVerified: new Date(),
                 }
             });
             console.log(`✅ User created: ${newUser.email}`);
             console.log(`🔑 Password: ${newPassword}`);
-            console.log(`👑 Role set to: ADMIN`);
         }
 
     } catch (error) {

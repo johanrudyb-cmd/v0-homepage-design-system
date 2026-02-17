@@ -1,5 +1,5 @@
 
-import { PrismaClient, UserRole } from '@prisma/client';
+import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -21,17 +21,15 @@ async function main() {
             data: {
                 password: hashedPassword,
                 // On s'assure qu'il est bien ADMIN au passage
-                role: UserRole.ADMIN,
-                isBrandCreator: true,
                 emailVerified: new Date(),
             },
         });
 
         console.log(`✅ Password updated for user ${user.email}`);
         console.log(`🔑 New password: ${newPassword}`);
-        console.log(`👑 Role set to: ADMIN`);
+
     } catch (error) {
-        if (error.code === 'P2025') {
+        if ((error as any).code === 'P2025') {
             // User not found, let's create it
             console.log(`User ${email} not found. Creating new Admin user...`);
             const newUser = await prisma.user.create({
@@ -39,8 +37,6 @@ async function main() {
                     name: 'Admin User',
                     email: email,
                     password: hashedPassword,
-                    role: UserRole.ADMIN,
-                    isBrandCreator: true,
                     emailVerified: new Date(),
                 }
             });

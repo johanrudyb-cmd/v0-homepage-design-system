@@ -8,10 +8,6 @@ async function main() {
         select: {
             id: true,
             email: true,
-            role: true,
-            isBrandCreator: true,
-            isInfluencer: true,
-            isAffiliate: true,
         }
     });
 
@@ -21,7 +17,6 @@ async function main() {
     } else {
         users.forEach(user => {
             console.log(`Email: ${user.email} | ID: ${user.id}`);
-            console.log(`Roles: Admin=${user.role}, BrandCreator=${user.isBrandCreator}, Influencer=${user.isInfluencer}, Affiliate=${user.isAffiliate}`);
             console.log('-------------------------');
         });
     }
