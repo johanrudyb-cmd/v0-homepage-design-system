@@ -6,7 +6,7 @@ import { Prisma } from '@prisma/client';
 
 const AGE_SOURCE_BRANDS: Record<string, string[]> = {
     '18-24': ['ASOS', 'Zara', 'Global Partner'],
-    '25-34': ['Zalando', 'Zara', 'ASOS'],
+    '25-34': ['Zalando', 'Zara'],
 };
 
 const SORT_OPTIONS: Record<string, { orderBy: Prisma.TrendProductOrderByWithRelationInput[] }> = {
@@ -153,7 +153,7 @@ export async function getHybridRadarTrends(params: {
     const where: any = {
         sourceBrand: { in: sourceBrands },
         sourceUrl: { not: null },
-        marketZone: 'EU',
+        marketZone: marketZone || 'EU',
         segment: { in: segmentFilter },
     };
 

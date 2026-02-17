@@ -105,7 +105,7 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
       params.set('sortBy', sortBy);
       if (globalOnly) params.set('globalOnly', 'true');
       if (brandFromUrl) params.set('brand', brandFromUrl);
-      params.set('limit', '60');
+      params.set('limit', '15');
 
       const res = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
       const data = res.ok ? await res.json().catch(() => ({})) : {};
@@ -372,9 +372,17 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
 
                           {((t as any).outfityIVS || t.trendScore) && (
                             <div className="absolute bottom-1.5 right-1.5 sm:bottom-4 sm:right-4 z-20">
-                              <div className="px-2 py-0.5 sm:px-4 sm:py-2 rounded-xl bg-black/80 backdrop-blur-xl text-white border border-white/10 shadow-apple-lg text-right">
-                                <div className="text-[7px] sm:text-[9px] font-bold uppercase tracking-tight text-white/50 mb-[-2px]">IVS</div>
-                                <div className="text-[11px] sm:text-lg font-black tracking-tight">{(t as any).outfityIVS || t.trendScore}%</div>
+                              <div className="px-2 py-1 sm:px-4 sm:py-2.5 rounded-[20px] bg-black/85 backdrop-blur-xl text-white border border-white/10 shadow-apple-lg text-right flex flex-col items-end">
+                                <div className="flex gap-0.5 mb-1 text-[#FF3B30]">
+                                  {[...Array(
+                                    ((t as any).outfityIVS || t.trendScore) >= 90 ? 3 :
+                                      ((t as any).outfityIVS || t.trendScore) >= 80 ? 2 : 1
+                                  )].map((_, i) => (
+                                    <Flame key={i} className="w-2 h-2 sm:w-3.5 sm:h-3.5 fill-current" />
+                                  ))}
+                                </div>
+                                <div className="text-[7px] sm:text-[9px] font-black uppercase tracking-widest text-white/40 leading-none">Potentiel</div>
+                                <div className="text-[11px] sm:text-lg font-black tracking-tight leading-none mt-0.5">{(t as any).outfityIVS || t.trendScore}%</div>
                               </div>
                             </div>
                           )}

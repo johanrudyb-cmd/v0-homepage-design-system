@@ -69,7 +69,7 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
   {
     id: 'asos-homme-fr',
     brand: 'Global Partner',
-    marketZone: 'FR',
+    marketZone: 'EU',
     segment: 'homme',
     baseUrl: 'https://www.asos.com',
     newInPath: '/fr/homme/nouveau/cat/?cid=27110&ctaref=hp|mw|prime|feature|1|category|latestdrops',
@@ -81,7 +81,7 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
   {
     id: 'asos-femme-fr',
     brand: 'Global Partner',
-    marketZone: 'FR',
+    marketZone: 'EU',
     segment: 'femme',
     baseUrl: 'https://www.asos.com',
     newInPath: '/fr/femme/nouveau/nouveau-vetements/cat/?cid=2623',
@@ -93,7 +93,7 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
   {
     id: 'asos-fille-fr',
     brand: 'Global Partner',
-    marketZone: 'FR',
+    marketZone: 'EU',
     segment: 'fille',
     baseUrl: 'https://www.asos.com',
     newInPath: '/fr/fille/nouveau/cat/?cid=27111',
@@ -129,7 +129,7 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
   {
     id: 'zara-homme-fr',
     brand: 'Zara',
-    marketZone: 'FR',
+    marketZone: 'EU',
     segment: 'homme',
     baseUrl: 'https://www.zara.com',
     newInPath: '/fr/fr/homme-tout-l7465.html?v1=2458839',
@@ -143,7 +143,7 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
   {
     id: 'zara-kids-garcon-fr',
     brand: 'Zara',
-    marketZone: 'FR',
+    marketZone: 'EU',
     segment: 'garcon',
     baseUrl: 'https://www.zara.com',
     newInPath: '/fr/fr/kids-boy-collection-l5413.html?v1=2426702',

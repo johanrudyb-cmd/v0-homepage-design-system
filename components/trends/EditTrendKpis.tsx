@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { TrendingUp } from 'lucide-react';
+import { TrendingUp, Flame } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function EditTrendKpis({
@@ -27,10 +27,10 @@ export function EditTrendKpis({
       <CardHeader className="pb-3 border-b border-black/[0.03]">
         <div className="flex items-center justify-between">
           <CardTitle className="text-[15px] font-bold flex items-center gap-2.5 text-black">
-            <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center">
-              <TrendingUp className="w-4 h-4 text-black" />
+            <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-[#FF3B30]">
+              <Flame className="w-4 h-4 fill-current" />
             </div>
-            Données tendance
+            Statistiques de Viralité
           </CardTitle>
           <div className="px-2 py-1 rounded-md bg-[#007AFF]/10 text-[#007AFF] text-[10px] font-bold uppercase tracking-wider">
             Live Radar
@@ -56,7 +56,7 @@ export function EditTrendKpis({
 
         <div className="pt-2">
           <div className="flex items-center justify-between mb-2">
-            <p className="text-[10px] font-bold text-[#6e6e73] uppercase tracking-widest">Niveau de Saturation</p>
+            <p className="text-[10px] font-bold text-[#6e6e73] uppercase tracking-widest">Opportunité Marché</p>
             <span className="text-[10px] font-black text-black">{displaySaturability.toFixed(0)}%</span>
           </div>
           <div className="w-full h-1.5 bg-black/5 rounded-full overflow-hidden mb-3">

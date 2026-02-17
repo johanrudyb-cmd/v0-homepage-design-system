@@ -13,6 +13,7 @@ import {
   Factory,
   ImageIcon,
   Lock,
+  Flame,
 } from 'lucide-react';
 import Link from 'next/link';
 import { ProductDetailImage } from '@/components/trends/ProductDetailImage';
@@ -226,9 +227,17 @@ export default async function ProductDetailPage({
 
                   {/* Floating Score on Image */}
                   {!shouldLockTrend && displayTrendScore && (
-                    <div className="absolute bottom-6 right-6 px-4 py-2 bg-black/80 backdrop-blur-md rounded-2xl border border-white/20 shadow-apple-lg text-right">
-                      <div className="text-[9px] font-bold uppercase tracking-widest text-white/50 mb-[-2px]">IVS Index</div>
-                      <div className="text-xl font-black text-white tracking-tighter">{displayTrendScore}%</div>
+                    <div className="absolute bottom-6 right-6 px-4 py-3 bg-black/85 backdrop-blur-md rounded-[24px] border border-white/10 shadow-apple-lg text-right flex flex-col items-end">
+                      <div className="flex gap-0.5 mb-1.5 text-[#FF3B30]">
+                        {[...Array(
+                          displayTrendScore >= 90 ? 3 :
+                            displayTrendScore >= 80 ? 2 : 1
+                        )].map((_, i) => (
+                          <Flame key={i} className="w-4 h-4 fill-current" />
+                        ))}
+                      </div>
+                      <div className="text-[9px] font-black uppercase tracking-widest text-white/50 mb-0.5 leading-none">Potentiel Viral</div>
+                      <div className="text-2xl font-black text-white tracking-tighter leading-none">{displayTrendScore}%</div>
                     </div>
                   )}
                 </div>
