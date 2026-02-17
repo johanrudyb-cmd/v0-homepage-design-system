@@ -197,13 +197,12 @@ function zalandoExtractFromPage(
     var firstPriceRe = /\\b(\\d{1,3}[,.]\\d{2})\\s*[€$£]?/;
     function isOkHref(h) {
       if (!h || h.indexOf('faq') !== -1 || h.indexOf('corporate') !== -1 || h.indexOf('apps.') !== -1) return false;
-      if (h.indexOf('trending-items') !== -1 || h.indexOf('trend-details') !== -1) return false;
       // BAN SECTIONS BEAUTE / COSMETIQUES
       if (h.indexOf('/beaute') !== -1 || h.indexOf('/beauty') !== -1 || h.indexOf('/cosmetique') !== -1 || h.indexOf('/parfum') !== -1 || h.indexOf('/soin') !== -1) return false;
-      if (h.indexOf('/p/') === -1 && (h.indexOf('.html') === -1 || h.indexOf('zalando') === -1)) return false;
-      return h.indexOf('zalando') !== -1 || h.indexOf('zalando.fr') !== -1 || h.charAt(0) === '/' && h.indexOf('/p/') !== -1;
+      if (h.indexOf('/p/') === -1 && h.indexOf('/trend-spotter/trending-items/') === -1 && (h.indexOf('.html') === -1 || h.indexOf('zalando') === -1)) return false;
+      return h.indexOf('zalando') !== -1 || h.indexOf('zalando.fr') !== -1 || h.charAt(0) === '/' && (h.indexOf('/p/') !== -1 || h.indexOf('/trend-spotter/trending-items/') !== -1);
     }
-    var productLinkSel = 'a[href*="/p/"], a[href*="zalando.fr"][href*="/p/"], a[href*="zalando"][href*=".html"]';
+    var productLinkSel = 'a[href*="/p/"], a[href*="/trend-spotter/trending-items/"], a[href*="zalando.fr"][href*="/p/"], a[href*="zalando"][href*=".html"]';
     function extractFromCard(el, href) {
       var card = el.tagName === 'A' ? (el.closest('article, [class*="Article"], [class*="ProductCard"], [class*="product-card"], [class*="article"]') || el.parentElement || el) : el;
       var nameEl = card.querySelector('h3, h2, h4, [class*="name"], [class*="title"], [class*="Name"], [class*="Title"]');
@@ -364,7 +363,7 @@ async function scrapeZalandoTrendSpotter(source: HybridRadarSource): Promise<Hyb
     await new Promise((r) => setTimeout(r, 2000));
 
     try {
-      await page.waitForSelector('a[href*="/p/"], article a[href*="/p/"], [class*="article"] a[href*="/p/"], [class*="ProductCard"] a[href*="/p/"]', { timeout: 25000 });
+      await page.waitForSelector('a[href*="/p/"], a[href*="/trend-spotter/trending-items/"], article a[href*="/p/"], [class*="article"] a[href*="/p/"], [class*="ProductCard"] a[href*="/p/"]', { timeout: 25000 });
     } catch (_) {
       /* continuer même si le sélecteur n'apparaît pas */
     }
@@ -381,7 +380,7 @@ async function scrapeZalandoTrendSpotter(source: HybridRadarSource): Promise<Hyb
       const diag = await page.evaluate(`
         (function() {
           var articles = document.querySelectorAll('article');
-          var linksP = document.querySelectorAll('a[href*="/p/"]');
+          var linksP = document.querySelectorAll('a[href*="/p/"], a[href*="/trend-spotter/trending-items/"]');
           var linksZ = document.querySelectorAll('a[href*="zalando.fr"]');
           var hrefs = [];
           for (var i = 0; i < Math.min(linksP.length, 5); i++) hrefs.push((linksP[i].href || linksP[i].getAttribute('href') || ''));
@@ -417,7 +416,7 @@ async function scrapeZalandoTrendSpotter(source: HybridRadarSource): Promise<Hyb
       const diagEnrich = await page.evaluate(`
         (function() {
           var articles = document.querySelectorAll('article');
-          var linksP = document.querySelectorAll('a[href*="/p/"]');
+          var linksP = document.querySelectorAll('a[href*="/p/"], a[href*="/trend-spotter/trending-items/"]');
           var linksZ = document.querySelectorAll('a[href*="zalando.fr"]');
           var hrefs = [];
           for (var i = 0; i < Math.min(linksP.length, 5); i++) hrefs.push((linksP[i].href || linksP[i].getAttribute('href') || ''));
@@ -438,7 +437,7 @@ async function scrapeZalandoTrendSpotter(source: HybridRadarSource): Promise<Hyb
         sampleHrefs: string[];
         linksInArticles: Array<{ href: string; attr: string }>;
       };
-      console.log(`[Hybrid Radar] Zalando (${source.id}): article(s)=${diagEnrich.nArticles}, lien(s) /p/=${diagEnrich.nLinksP}, lien(s) zalando.fr=${diagEnrich.nLinksZ}`);
+      console.log(`[Hybrid Radar] Zalando (${source.id}): article(s)=${diagEnrich.nArticles}, lien(s) /p/ or trend=${diagEnrich.nLinksP}, lien(s) zalando.fr=${diagEnrich.nLinksZ}`);
       if (diagEnrich.linksInArticles.length > 0) {
         console.log(`[Hybrid Radar] Zalando (${source.id}): ex. liens dans articles`, diagEnrich.linksInArticles.slice(0, 5));
       }
