@@ -76,10 +76,9 @@ export async function notifyAdmin(payload: AdminNotificationPayload): Promise<vo
                 const { prisma } = await import('./prisma');
                 await prisma.adminLog.create({
                     data: {
-                        type: payload.type,
-                        title: payload.title,
-                        message: safeMessage,
-                        level: payload.priority === 'critical' || payload.priority === 'high' ? 'error' : 'info',
+                        action: payload.title,
+                        details: { message: safeMessage, type: payload.type },
+                        status: payload.priority === 'critical' || payload.priority === 'high' ? 'error' : 'success',
                         metadata: (payload.data as any) || {},
                     }
                 });

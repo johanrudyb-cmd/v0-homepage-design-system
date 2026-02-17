@@ -37,6 +37,7 @@ model User {
   aiUsages        AIUsage[]
   surplusCredits  SurplusCredits[]
   posts           BlogPost[]
+  affiliateProfile AffiliateProfile?
 }
 
 model Account {
@@ -726,4 +727,19 @@ model AdminLog {
   @@index([action])
   @@index([userId])
   @@index([createdAt])
+}
+
+model AffiliateProfile {
+  id           String   @id @default(cuid())
+  userId       String   @unique
+  referralCode String   @unique
+  earnings     Float    @default(0)
+  clicks       Int      @default(0)
+  conversions  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([referralCode])
 }

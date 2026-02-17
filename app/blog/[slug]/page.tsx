@@ -52,7 +52,7 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
             locale: 'fr_FR',
             type: 'article',
             publishedTime: post.publishedAt.toISOString(),
-            authors: [{ name: authorName }],
+            authors: [authorName],
         },
         twitter: {
             card: 'summary_large_image',
