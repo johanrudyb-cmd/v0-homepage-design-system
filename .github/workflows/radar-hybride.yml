@@ -1,0 +1,70 @@
+name: 🕵️ OUTFITY - Radar Hybride Automatique
+
+on:
+  schedule:
+    # Tous les mardis à 12:00 UTC (13h ou 14h en France selon l'heure d'été/hiver)
+    - cron: '0 12 * * 2'
+  workflow_dispatch: # Permet de lancer le scrape manuellement depuis l'interface GitHub
+
+jobs:
+  scrape-trends:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30 # Large marge pour Puppeteer
+
+    steps:
+      - name: 📥 Récupération du code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Configuration de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Installation des dépendances
+        run: npm install
+
+      - name: 🌐 Installation de Puppeteer & Chrome
+        run: npx puppeteer browsers install chrome
+
+      - name: 🚀 Lancement du Scrape Radar Hybride
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          ADMIN_NOTIFY_WEBHOOK_URL: ${{ secrets.ADMIN_NOTIFY_WEBHOOK_URL }}
+          # On peut rajouter d'autres clés si besoin
+        run: |
+          npx tsx -e "
+            import { refreshAllTrends } from './lib/refresh-all-trends';
+            import { enrichTrends } from './lib/trend-enricher';
+            import { notifyAdmin } from './lib/admin-notifications';
+
+            async function runFullProcess() {
+              console.log('--- DEBUT DU RADAR HYBRIDE ---');
+              
+              // 1. Scraping
+              const scrapeResult = await refreshAllTrends();
+              console.log('Scrape terminé:', scrapeResult.savedCount, 'produits sauvés');
+
+              // 2. Enrichissement
+              console.log('Début enrichissement IA...');
+              const enrichResult = await enrichTrends(10);
+              console.log('Enrichissement terminé:', enrichResult.enriched, 'produits analysés');
+
+              // 3. Notification
+              await notifyAdmin({
+                type: 'scrape_success',
+                title: '🕵️ Radar Hebdomadaire (GitHub Actions)',
+                message: 'Le Radar de mardi midi a bien fonctionné. ' + scrapeResult.savedCount + ' nouveaux produits détectés.',
+                emoji: '🕵️',
+                data: { scrapeResult, enrichResult }
+              });
+              
+              console.log('--- PROCESSUS TERMINE ---');
+            }
+
+            runFullProcess().catch(err => {
+              console.error('Erreur Critique:', err);
+              process.exit(1);
+            });
+          "
