@@ -76,6 +76,7 @@ const EXCLUDE_BAG_KEYWORDS = [
 const EXCLUDE_PERFUME_KEYWORDS = [
   'parfum', 'parfums', 'perfume', 'perfumes', 'eau de toilette', 'eau de parfum',
   'fragrance', 'fragrances', 'flacon', 'spray', 'scent', 'cologne', 'mist', 'brume',
+  ' edp', ' edt', 'edp ', 'edt ', ' eau ',
 ];
 
 /** Accessoires à exclure (on garde vêtements uniquement). */
@@ -1664,29 +1665,30 @@ export async function scrapeHybridSource(
 
     // Fonction d'extraction en chaîne pour éviter transformation par tsx/bundler (__name)
     const extractProductsFn = `
-      function getUrlFromImg(img) {
         if (!img) return null;
-        var badRe = new RegExp('placeholder|1x1|blank|data:image\\\\/svg|spacer|pixel', 'i');
+        var badRe = new RegExp('placeholder|1x1|blank|data:image\\\\/svg|spacer|pixel|transparent-background', 'i');
         var s = img.src || img.getAttribute('src');
         if (s && typeof s === 'string' && s.indexOf('http') === 0 && !badRe.test(s)) return s;
         if (s && typeof s === 'string' && s.indexOf('//') === 0) return 'https:' + s;
+        
+        // Zara spécifique : chercher l'image haute résolution
         var d = img.getAttribute('data-src') || img.getAttribute('data-lazy-src') || img.getAttribute('data-image-url') || img.getAttribute('data-srcset');
         if (d && typeof d === 'string') {
           if (d.indexOf('http') === 0 && !badRe.test(d)) return d;
           if (d.indexOf('//') === 0) return 'https:' + d;
           var fromSet = d.split(',')[0].trim().split(/\\\\s+/)[0];
-          if (fromSet && fromSet.indexOf('http') === 0) return fromSet;
-          if (fromSet && fromSet.indexOf('//') === 0) return 'https:' + fromSet;
+          if (fromSet && fromSet.indexOf('http') === 0 && !badRe.test(fromSet)) return fromSet;
         }
+
         var set = img.getAttribute('srcset') || img.getAttribute('data-srcset');
         if (set) {
-          var first = set.split(',')[0].trim().split(/\\\\s+/)[0];
-          if (first && first.indexOf('http') === 0) return first;
-          if (first && first.indexOf('//') === 0) return 'https:' + first;
+          var sources = set.split(',').map(s => s.trim().split(/\\\\s+/)[0]);
+          for (var k = 0; k < sources.length; k++) {
+            if (sources[k] && sources[k].indexOf('http') === 0 && !badRe.test(sources[k])) return sources[k];
+          }
         }
-        if (s && typeof s === 'string' && s.indexOf('http') === 0) return s;
+        
         return null;
-      }
       var products = Array.from(document.querySelectorAll(prodSel)).slice(0, 120);
       if (products.length === 0) return [];
       return products.map(function(el) {
