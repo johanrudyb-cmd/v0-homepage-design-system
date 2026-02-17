@@ -23,6 +23,7 @@ export const metadata = {
   }
 };
 
+export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
 export default async function BlogPage() {
@@ -31,7 +32,10 @@ export default async function BlogPage() {
     orderBy: { publishedAt: 'desc' },
     include: { author: true },
     take: 20,
-  }).catch(() => []);
+  }).catch((e) => {
+    console.error('Error fetching blog posts:', e);
+    return [];
+  });
 
   return (
     <div className="min-h-screen bg-white">
