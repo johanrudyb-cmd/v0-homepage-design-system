@@ -4,7 +4,7 @@ import { redirect } from 'next/navigation';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Copy, Download, DollarSign, TrendingUp, Users, ArrowUpRight } from 'lucide-react';
+import { Copy, Download, DollarSign, TrendingUp, Users, ArrowUpRight, Video } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 
 // Cette action sera exécutée côté serveur
