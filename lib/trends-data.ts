@@ -5,8 +5,8 @@ import { estimateInternalTrendPercent, computeTrendScore } from './trend-product
 import { Prisma } from '@prisma/client';
 
 const AGE_SOURCE_BRANDS: Record<string, string[]> = {
-    '18-24': ['ASOS', 'Global Partner'],
-    '25-34': ['Zalando'],
+    '18-24': ['ASOS', 'Zara', 'Global Partner'],
+    '25-34': ['Zalando', 'Zara', 'ASOS'],
 };
 
 const SORT_OPTIONS: Record<string, { orderBy: Prisma.TrendProductOrderByWithRelationInput[] }> = {
@@ -230,7 +230,7 @@ export async function getHybridRadarTrends(params: {
         };
     });
 
-    const validatedEnriched = enriched.filter(p => p.outfityIVS >= 70);
+    const validatedEnriched = enriched.filter(p => p.outfityIVS >= 65);
 
     const seenSignatures = new Set<string>();
     const uniqueEnriched = validatedEnriched.filter(p => {

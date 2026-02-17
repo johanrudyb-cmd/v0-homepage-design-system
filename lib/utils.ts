@@ -30,18 +30,24 @@ export function sanitizeErrorMessage(message: string): string {
 export function stripPriceFromTitle(title: string): string {
   if (!title || typeof title !== 'string') return title;
   let out = title.trim();
-  // Prix : 49,99 € | 29.99€ | À partir de 29,99 € | from 19.99 £ | (49,99)
+
+  // 1. Remove prices even if attached to a word (ex: "Marron55,00 €")
+  // Regex: matches (optional text) + number + comma/dot + 2 digits + optional space + currency symbol
+  out = out.replace(/\d{1,4}[,.]\d{2}\s*[€$£]\s*(?:EUR|USD|GBP)?/gi, '');
+
+  // 2. Remove other price patterns
   out = out
     .replace(/\s*[-–|·]\s*\d{1,4}[,.]\d{2}\s*[€$£]?\s*(?:EUR|USD|GBP)?\s*$/i, '')
     .replace(/^\s*[-–|·]\s*\d{1,4}[,.]\d{2}\s*[€$£]?\s*(?:EUR|USD|GBP)?\s*/i, '')
     .replace(/(?:à partir de|a partir de|from)\s*\d{1,4}[,.]\d{2}\s*[€$£]?\s*/gi, '')
-    .replace(/\d{1,4}[,.]\d{2}\s*[€$£]\s*(?:EUR|USD|GBP)?/gi, '')
+    .replace(/\s*[|]\s*\d{1,4}[,.]\d{2}\s*[€$£]?/gi, '') // " | 55.00€"
     .replace(/\d{1,4}[,.]\d{2}\s*(?:EUR|USD|GBP)/gi, '')
     .replace(/[([]\s*\d{1,4}[,.]\d{2}\s*[€$£]?\s*[)\]]/g, '')
     .replace(/\s{2,}/g, ' ')
     .replace(/^\s*[-–|·]\s*|\s*[-–|·]\s*$/g, '')
     .trim();
-  return out.slice(0, 500);
+
+  return out;
 }
 
 /** Phrases promo / urgence à retirer (titre au-dessus du prix uniquement — Homme et Femme). */
@@ -67,6 +73,14 @@ const TITLE_PROMO_PHRASES = [
   'PROMO',
   'OFFRE LIMITÉE',
   'OFFRE LIMITEE',
+  'UNISEX',
+  'ESSENTIAL',
+  'EXCLUSIVITÉ',
+  'EXCLUSIVITE',
+  'PRÊT À TEINDRE',
+  'PRET A TEINDRE',
+  'BASIC',
+  'BASIQUE',
 ];
 
 /** Couleurs courantes à retirer en fin de titre (après " - "). */
@@ -139,9 +153,41 @@ export function getBaseUrl(): string {
 }
 
 /**
- * Nettoie un titre produit : prix, puis couleur et phrases promo.
+ * Nettoie en profondeur un titre produit (Zalando, ASOS, Zara).
+ * Retire les marques en préfixe, les prix, les couleurs et les segments redondants.
  */
 export function cleanProductTitle(title: string): string {
   if (!title || typeof title !== 'string') return title;
-  return stripColorAndPromoFromTitle(stripPriceFromTitle(title)) || title.trim().slice(0, 500);
+
+  // 1. D'abord on retire les prix
+  let out = stripPriceFromTitle(title);
+
+  // 2. Découpage par séparateurs (Nike - Sweat - Noir -> [Nike, Sweat, Noir])
+  const parts = out.split(/\s*[-–|·]\s*/).map(p => p.trim()).filter(Boolean);
+
+  if (parts.length > 1) {
+    // Si la première partie ressemble à une marque ou un segment connu, on tente de l'isoler
+    const firstPart = parts[0].toUpperCase();
+
+    // Si la première partie est "COLLUSION UNISEX" ou "ADIDAS ORIGINALS", on l'enlève du titre
+    // car elle sera affichée dans le champ "marque"
+    const knownPrefixes = ['COLLUSION', 'ADIDAS', 'NIKE', 'ZARA', 'ASOS', 'PUMA', 'REEBOK', 'NEW BALANCE'];
+    const isKnownBrand = knownPrefixes.some(b => firstPart.includes(b));
+    const isKnownSegment = ['UNISEX', 'FEMME', 'HOMME', 'ESSENTIAL', 'BASIQUE'].some(s => firstPart === s);
+
+    if (isKnownBrand || isKnownSegment) {
+      // On garde tout sauf la première partie
+      out = parts.slice(1).join(' - ');
+    }
+  }
+
+  // 3. Finalement on retire les couleurs et promo résiduels
+  out = stripColorAndPromoFromTitle(out);
+
+  // 4. Si après tout ça le titre est trop court ou vide, on revient au titre original nettoyé de son prix
+  if (!out || out.length < 3) {
+    return stripPriceFromTitle(title);
+  }
+
+  return out.replace(/\s{2,}/g, ' ').trim().slice(0, 500);
 }

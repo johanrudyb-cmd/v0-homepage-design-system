@@ -672,15 +672,24 @@ function normalizeEnrichedFields(parsed: Record<string, unknown>): EnrichedProdu
   if (typeof parsed.description === 'string' && parsed.description.trim()) out.description = parsed.description.trim().slice(0, 2000);
   if (typeof parsed.cut === 'string' && parsed.cut.trim()) out.cut = parsed.cut.trim().slice(0, 60);
   if (typeof parsed.productBrand === 'string' && parsed.productBrand.trim()) {
-    const brand = parsed.productBrand.trim().replace(/^\._\.\s*/i, '').slice(0, 80);
-    if (brand.length >= 2 && !/^[._\-\s]+$/.test(brand)) out.productBrand = brand;
+    // Nettoyage marque : on retire les points, tirets ou mentions 'Zalando'
+    let brand = parsed.productBrand.trim()
+      .replace(/^(Zalando|ASOS|Zara|Retailer)\s*[-|–]?\s*/i, '')
+      .replace(/[._\-]+$/g, '')
+      .trim();
+    if (brand.length >= 2) out.productBrand = brand.slice(0, 80);
   }
   if (typeof parsed.estimatedCogsPercent === 'number') out.estimatedCogsPercent = Math.min(50, Math.max(15, Math.round(parsed.estimatedCogsPercent)));
-  if (typeof parsed.complexityScore === 'string' && ['Facile', 'Moyen', 'Complexe', 'Différent'].includes(parsed.complexityScore)) out.complexityScore = parsed.complexityScore === 'Différent' ? 'Complexe' : parsed.complexityScore;
+  if (typeof parsed.complexityScore === 'string' && ['Facile', 'Moyen', 'Complexe', 'Différent'].includes(parsed.complexityScore)) {
+    out.complexityScore = parsed.complexityScore === 'Différent' ? 'Complexe' : parsed.complexityScore as any;
+  }
   if (typeof parsed.sustainabilityScore === 'number') out.sustainabilityScore = Math.min(100, Math.max(0, Math.round(parsed.sustainabilityScore)));
   if (typeof parsed.visualAttractivenessScore === 'number') out.visualAttractivenessScore = Math.min(100, Math.max(0, Math.round(parsed.visualAttractivenessScore)));
   if (typeof parsed.dominantAttribute === 'string' && parsed.dominantAttribute.trim()) out.dominantAttribute = parsed.dominantAttribute.trim().slice(0, 300);
-  if (typeof parsed.businessAnalysis === 'string' && parsed.businessAnalysis.trim()) out.businessAnalysis = parsed.businessAnalysis.trim().slice(0, 1500);
+  if (typeof parsed.businessAnalysis === 'string' && parsed.businessAnalysis.trim()) {
+    // S'assurer que l'analyse est pro et pas trop longue
+    out.businessAnalysis = parsed.businessAnalysis.trim().slice(0, 1500);
+  }
   return out;
 }
 
@@ -731,19 +740,19 @@ Voici les signaux de marché actuels à utiliser pour ta validation (Base de Vé
 ${marketSignals}
 
 Règles JSON strictes:
-- "businessAnalysis": Analyse stratégique focalisée sur la Vitesse Sociale et la demande (TikTok trends, Aesthetics). Pourquoi l'algorithme Outfity a-t-il détecté ce produit ? (en français).
-- "dominantAttribute": Le "Killer Detail" qui déclenche l'achat impulsif ou la viralité (ex: "Le délavage Vintage Wash qui domine actuellement sur TikTok").
+- "businessAnalysis": Analyse stratégique ELITE focalisée sur la Vitesse Sociale (TikTok trends, Aesthetics). Pourquoi ce produit est-il une pépite ? Sois pro, expert, et évite les banalités de styliste. (en français).
+- "dominantAttribute": Le "Killer Detail" viral (ex: "Le délavage Vintage Wash qui domine actuellement sur TikTok").
 - "style": Style précis (Streetwear, Minimaliste, Luxury, Y2K, Gorpcore, Workwear, Old Money, Clean Girl, Quiet Luxury).
-- "complexityScore": "Facile" | "Moyen" | "Complexe". Estéme la difficulté technique réelle.
+- "complexityScore": "Facile" | "Moyen" | "Complexe".
 - "estimatedCogsPercent": Coût de prod estimé (15-50%).
 - "sustainabilityScore": Note ESG (0-100).
-- "visualAttractivenessScore": Note IVS (Indice de Viralité Sociale) de 0 à 100 avec précision.
+- "visualAttractivenessScore": Note IVS (Indice de Viralité Sociale) de 0 à 100.
 - "category": Type exact (Hoodie, Cargo, Veste, etc.). Jamais "Autre".
-- "material": Si non spécifié, déduis la matière la plus probable selon le visuel (ex: "Coton lourd", "Nylon Ripstop", "Laine mélangée").
-- "careInstructions": Instructions d'entretien standard pour ce type d'article.
-- "shorten": Si vrai, rédige une analyse business très concise (1-2 phrases).
+- "material": Si non spécifié, déduis la matière probable (ex: "Coton lourd 400g", "Nylon Ripstop").
+- "productBrand": Extrait la marque réelle du produit (ex: "NIKE", "COLLUSION", "ADIDAS") et ignore le distributeur (Zalando/ASOS).
+- "shorten": Analyse business concise.
 
-IMPORTANT: Ne laisse JAMAIS de champ vide. Utilise ton expertise mode pour déduire les caractéristiques les plus probables si elles ne sont pas écrites explicitement. Ton analyse doit être "bold" (audacieuse) et experte.`;
+IMPORTANT: Ton analyse doit être "bold" (audacieuse) et experte. Ne répète jamais le nom de la marque dans le champ "businessAnalysis" ou "dominantAttribute" inutilement.`;
 
   const userContent = [
     `Produit: ${product.name}`,

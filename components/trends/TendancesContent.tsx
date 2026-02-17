@@ -105,7 +105,7 @@ export function TendancesContent({ initialData }: { initialData?: { trends: Hybr
       params.set('sortBy', sortBy);
       if (globalOnly) params.set('globalOnly', 'true');
       if (brandFromUrl) params.set('brand', brandFromUrl);
-      params.set('limit', '15');
+      params.set('limit', '60');
 
       const res = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
       const data = res.ok ? await res.json().catch(() => ({})) : {};

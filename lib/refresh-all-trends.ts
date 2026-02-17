@@ -87,7 +87,7 @@ export async function refreshAllTrends(): Promise<RefreshAllTrendsResult> {
         }
         if (!sourceUrl) continue;
 
-        const cleanName = source.brand === 'ASOS' ? cleanProductTitle(item.name) : item.name.slice(0, 500);
+        const cleanName = cleanProductTitle(item.name);
         const category = inferCategory(cleanName);
         const material = item.composition || 'Non spécifié';
         const descParts: string[] = [];
