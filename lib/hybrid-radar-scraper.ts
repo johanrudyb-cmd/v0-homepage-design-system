@@ -1397,18 +1397,19 @@ async function scrapeASOSWithDetailEnrichment(source: HybridRadarSource): Promis
           }
           return (s && s.indexOf('http') === 0) ? s : null;
         }
-        var links = Array.from(document.querySelectorAll('a[href*="/prd/"]'));
+        var links = Array.from(document.querySelectorAll('a[href*="/prd/"], a[href*="/p/"]'));
         var seen = new Set();
         var out = [];
         for (var i = 0; i < links.length; i++) {
           var a = links[i];
           var href = (a.href || a.getAttribute('href') || '').trim();
-          if (!href || href.indexOf('/prd/') === -1 || seen.has(href)) continue;
+          if (!href || (href.indexOf('/prd/') === -1 && href.indexOf('/p/') === -1) || seen.has(href)) continue;
           seen.add(href);
           var card = a.closest('li, article, [class*="productTile"], [class*="product-tile"]') || a;
-          var nameEl = card.querySelector('p, h2, h3, [class*="title"], [class*="name"], [class*="description"]');
+          var nameEl = card.querySelector('div[class*="productInfo"] p, p, h2, h3, [class*="title"], [class*="name"]');
           var name = (nameEl && nameEl.textContent ? nameEl.textContent : '').trim().replace(/\\s+/g, ' ').slice(0, 200);
           if (!name && a.textContent) name = (a.textContent || '').trim().slice(0, 200);
+          if (!name && a.getAttribute('aria-label')) name = a.getAttribute('aria-label').split('Prix')[0].trim();
           var imageUrl = null;
           var imgs = card.querySelectorAll('img[src*="asos"], img[src*="asos-media"], img[data-src*="asos"], img[data-srcset*="asos"], img');
           for (var j = 0; j < imgs.length; j++) {
@@ -1675,9 +1676,9 @@ export async function scrapeHybridSource(
       var products = Array.from(document.querySelectorAll(prodSel)).slice(0, 120);
       if (products.length === 0) return [];
       return products.map(function(el) {
-        var nameEl = el.querySelector(nameSel) || el.querySelector('h2, h3, [class*="title"], [class*="name"], a');
-        var priceEl = el.querySelector(priceSel) || el.querySelector('[class*="price"], [class*="Price"]');
-        var linkEl = el.querySelector('a[href*="/prd/"]') || el.querySelector('a') || el.closest && el.closest('a');
+        var nameEl = el.querySelector(nameSel) || el.querySelector('div[class*="productInfo"] p, h2, h3, [class*="title"], [class*="name"], a');
+        var priceEl = el.querySelector(priceSel) || el.querySelector('div[class*="productInfo"] p:nth-of-type(2), [class*="price"], [class*="Price"]');
+        var linkEl = el.querySelector('a[href*="/prd/"], a[href*="/p/"]') || el.querySelector('a') || el.closest && el.closest('a');
         var productName = (nameEl && nameEl.textContent ? nameEl.textContent : '').trim().slice(0, 200);
         var priceText = priceEl && priceEl.textContent ? priceEl.textContent.trim() : '';
         var priceRe = /[\\d,]+\\.?\\d*/;
@@ -1800,7 +1801,7 @@ export async function scrapeHybridSource(
       }
       var products = Array.from(document.querySelectorAll(prodSel)).slice(0, 200);
       return products.map(function(el) {
-        var linkEl = el.querySelector('a[href*="/prd/"]') || el.querySelector('a') || (el.closest && el.closest('a'));
+        var linkEl = el.querySelector('a[href*="/prd/"], a[href*="/p/"]') || el.querySelector('a') || (el.closest && el.closest('a'));
         var sourceUrl = (linkEl && linkEl.href) || '';
         var imageUrl = null;
         var imgs = el.querySelectorAll(imgSel + ', img[src*="asos"], img[data-src*="asos"], img[srcset*="asos"], img');

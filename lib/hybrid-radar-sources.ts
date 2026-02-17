@@ -44,10 +44,10 @@ export interface HybridRadarSource {
  * Marché français en premier, marque par marque (homme / femme).
  */
 const ASOS_SELECTORS = {
-  products: 'li[class*="productTile"], article[data-auto-id="productTile"], [data-auto-id="productTile"], [class*="productTile"]',
-  name: 'p[class*="productDescription"], h3[data-auto-id="productTileTitle"], [data-auto-id="productTileTitle"], [class*="productTileTitle"], a[class*="productLink"]',
-  price: 'span[class*="price_"], span[class*="price"], p[aria-label*="prix"] span, [class*="originalPrice"] span, span[data-auto-id="productTilePrice"], [data-auto-id="productTilePrice"], [class*="productTilePrice"]',
-  image: 'img[src*="asos-media"], img[srcset*="asos"], img[data-src*="asos"], img[data-auto-id="productTileImage"], [data-auto-id="productTileImage"] img, [class*="productTileImage"] img, img',
+  products: 'li[class*="productTile"], article[class*="productTile"], [class*="productTile"], article',
+  name: 'div[class*="productInfo"] p:nth-of-type(1), [class*="productDescription"], [class*="productTileTitle"], a[class*="productLink"]',
+  price: 'div[class*="productInfo"] p:nth-of-type(2) span, [class*="price_"], [class*="currentPrice"], [class*="originalPrice"] span',
+  image: 'a[class*="productLink"] img, img[src*="asos-media"], img[srcset*="asos"], img[data-src*="asos"]',
 };
 
 const ZARA_SELECTORS = {

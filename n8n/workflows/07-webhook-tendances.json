@@ -114,7 +114,7 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/webhooks/n8n-trend-save",
+                "url": "https://outfity.fr/api/webhooks/n8n-trend-save",
                 "authentication": "genericCredentialType",
                 "genericAuthType": "httpHeaderAuth",
                 "sendHeaders": true,
@@ -122,7 +122,7 @@
                     "parameters": [
                         {
                             "name": "x-api-key",
-                            "value": "={{ $env.OUTFITY_WEBHOOK_SECRET }}"
+                            "value": "bmad_n8n_secret_2024_ultra_secure"
                         }
                     ]
                 },
