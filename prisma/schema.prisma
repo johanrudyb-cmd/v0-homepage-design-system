@@ -698,3 +698,19 @@ model UserPreferences {
   
   @@index([userId])
 }
+
+model AdminLog {
+  id        String   @id @default(cuid())
+  userId    String?
+  action    String
+  details   Json?
+  status    String   @default("success") // success, error
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([action])
+  @@index([userId])
+  @@index([createdAt])
+}
