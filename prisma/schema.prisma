@@ -17,7 +17,11 @@ model User {
   name          String?
   password      String?   // Pour auth email/password
   plan            String    @default("free") // free, pro, enterprise
-  subscribedAt    DateTime? // Date d'abonnement pour reset mensuel des quotas
+  
+  // Relations Clean (Retour aux bases)
+  referredByCode  String?   // Code du parrain (Optionnel, on peut le garder sans risque)
+  
+  subscribedAt    DateTime? 
   stripeCustomerId String?   @unique
   image         String?
   createdAt     DateTime  @default(now())
@@ -32,37 +36,7 @@ model User {
   fashionBrands   FashionBrand[]
   aiUsages        AIUsage[]
   surplusCredits  SurplusCredits[]
-}
-
-/// Crédits surplus achetés via Stripe (packs logos+, photos+, etc.)
-model SurplusCredits {
-  id               String   @id @default(cuid())
-  userId           String
-  feature          String   // brand_logo, ugc_scripts, ugc_shooting_photo, etc.
-  amount           Int      // Nombre de crédits ajoutés
-  consumed         Int      @default(0) // Consommés (pour try-on qui a limit -1)
-  stripeSessionId  String?  @unique // Idempotence webhook
-  packId           String?  // logos-plus, photos-plus, etc.
-  createdAt        DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, feature])
-}
-
-/// Consommation IA par utilisateur (pour limite plan de base 5€/mois)
-model AIUsage {
-  id        String   @id @default(cuid())
-  userId    String
-  feature   String   // ex: ugc_scripts, design_generate, brand_logo
-  costEur   Float    // Coût estimé en euros
-  metadata  Json?    // ex: { brandId, designId } pour debug
-  createdAt DateTime @default(now())
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, createdAt])
-  @@index([userId])
+  posts           BlogPost[]
 }
 
 model Account {
@@ -100,25 +74,26 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+// ============== CORE BUSINESS ==============
+
 model Brand {
   id        String   @id @default(cuid())
   userId    String
   name      String
   
-  // Identité de marque (optionnel)
-  logo              String?  // URL du logo sélectionné
-  logoVariations    Json?    // { horizontal: url, vertical: url, icon: url }
-  colorPalette      Json?    // { primary: "#000", secondary: "#fff", accent: "#..." }
-  typography        Json?    // { heading: "Font Name", body: "Font Name" }
-  styleGuide        Json?    // { moodboard: [...], references: [...] }
-  domain            String?  // Domaine vérifié (.com, .fr)
-  socialHandles     Json?    // { instagram: "@nom", twitter: "@nom" }
-  templateBrandSlug String?  // Marque tendance d'inspiration pour la stratégie (slug)
+  // Identité de marque
+  logo              String?
+  logoVariations    Json?
+  colorPalette      Json?
+  typography        Json?
+  styleGuide        Json?
+  domain            String?
+  socialHandles     Json?
+  templateBrandSlug String?
   
-  // Métadonnées de création
-  creationMode      String   @default("quick") // "quick" | "deep"
-  autoApplyIdentity Boolean  @default(true)    // Toggle application auto
-  status            String   @default("draft") // "draft" | "in_progress" | "completed"
+  creationMode      String   @default("quick")
+  autoApplyIdentity Boolean  @default(true)
+  status            String   @default("draft")
   
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -137,72 +112,85 @@ model Brand {
   @@index([userId])
 }
 
-/// Mannequins créés dans Virtual Try-On ou uploadés, réutilisables dans Shooting photo (Higgsfield).
-model Mannequin {
-  id        String   @id @default(cuid())
-  brandId   String
-  name      String   // Nom affiché (ex. "Mannequin 1", "Emma")
-  imageUrl  String   @db.Text // Image de référence (résultat Try-On ou photo uploadée)
-  source    String   @default("virtual_tryon") // virtual_tryon | upload
-  gender    String   @default("female") // male, female, unisex
-  description String? @db.Text
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Design {
+  id          String   @id @default(cuid())
+  brandId     String
+  collectionId String?
+  isTemplate  Boolean  @default(false)
+  templateName String?
+  type        String
+  cut         String?
+  material    String?
+  flatSketchUrl String?
+  productImageUrl String?
+  mockupSpec  Json?
+  techPack    Json?
+  productDescription String?  @db.Text
+  prompt      String?
+  status      String   @default("pending")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  brand      Brand       @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  collection Collection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+
+  @@index([brandId])
+  @@index([collectionId])
+  @@index([isTemplate, brandId])
+  @@index([type])
+  @@index([status])
+}
+
+model Collection {
+  id          String   @id @default(cuid())
+  brandId     String
+  name        String
+  description String?
+  coverImage  String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  brand    Brand             @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  designs  Design[]
+  articles CollectionArticle[]
 
   @@index([brandId])
 }
 
-model StrategyGeneration {
-  id                 String   @id @default(cuid())
-  brandId            String
-  templateBrandSlug  String
-  templateBrandName  String
-  strategyText       String   @db.Text
-  positioning        String?
-  targetAudience     String?
-  visualIdentity     Json?    // Recommandations branding : { colorPalette: { primary?, secondary?, accent? }, typography: { heading?, body? } }
-  createdAt          DateTime @default(now())
+model CollectionArticle {
+  id           String   @id @default(cuid())
+  collectionId String
+  type         String   
+  label        String?
+  sortOrder    Int      @default(0)
+  payload      Json     
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
 
-  @@index([brandId])
-  @@index([brandId, createdAt])
-}
-
-// Stratégie template d'une marque de référence : générée une fois, visible par tous.
-model TemplateStrategy {
-  id                 String   @id @default(cuid())
-  templateBrandSlug  String   @unique
-  templateBrandName  String
-  strategyText       String   @db.Text
-  visualIdentity     Json?    // Identité visuelle marque ref : { colorPalette: { primary?, secondary?, accent? }, typography: { heading?, body? } }
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-
-  @@index([templateBrandSlug])
+  @@index([collectionId])
 }
 
 model LaunchMap {
   id        String   @id @default(cuid())
   brandId   String   @unique
-  phase1    Boolean  @default(false)  // Stratégie marketing (après Identité)
-  phase2    Boolean  @default(false)  // Calculatrice (rentabilité)
-  phase3    Boolean  @default(false)  // Design
-  phase4    Boolean  @default(false)  // Tech Pack (mockup → tech pack + dimensions)
-  phase5    Boolean  @default(false)  // Sourcing
-  phase6    Boolean  @default(false)  // Création de contenu (Go-to-Market)
-  phase7    Boolean  @default(false)  // Création du site (Shopify) — validé quand boutique connectée
-  shopifyShopDomain String?           // Domaine boutique Shopify (ex. mystore.myshopify.com) une fois connectée
-  phase1Data Json?   // Calculatrice : rentabilité par vêtement
-  baseMockupByProductType Json?   // { "tshirt": "imageUrl", "hoodie": "imageUrl", ... } — mockup de base sans design, généré une fois
-  phaseSummaries Json?   // { "0": "résumé identité", "1": "résumé stratégie", ... } — résumés modifiables par phase
-  recommendationsCache    Json?     // ["conseil 1", "conseil 2", ...] — recommandations conseil, régénérées au plus 1 fois / 24h
-  recommendationsCachedAt DateTime? // Dernière génération des recommandations
-  contentCalendar         Json?     // { events: ContentCalendarEvent[] } — calendrier contenu : tournage, post, scripts, CTA UGC
-  siteCreationTodo        Json?     // { steps: { id: string, label: string, done?: boolean }[] } — to-do création site Shopify générée par IA au calquage
-  shopifyAccessToken      String?   // Token d'accès Shopify (Custom App) pour push produit
+  phase1    Boolean  @default(false)
+  phase2    Boolean  @default(false)
+  phase3    Boolean  @default(false)
+  phase4    Boolean  @default(false)
+  phase5    Boolean  @default(false)
+  phase6    Boolean  @default(false)
+  phase7    Boolean  @default(false)
+  shopifyShopDomain String?
+  phase1Data Json?
+  baseMockupByProductType Json?
+  phaseSummaries Json?
+  recommendationsCache    Json?
+  recommendationsCachedAt DateTime?
+  contentCalendar         Json?
+  siteCreationTodo        Json?
+  shopifyAccessToken      String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -228,45 +216,12 @@ model MockShopifyProduct {
   @@index([brandId])
 }
 
-model Collection {
-  id          String   @id @default(cuid())
-  brandId     String
-  name        String
-  description String?
-  coverImage  String?  // URL image de couverture
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  brand    Brand             @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  designs  Design[]
-  articles CollectionArticle[] // Articles du fichier : rentabilité (calculatrice), scripts UGC
-
-  @@index([brandId])
-}
-
-// Article d'un fichier (collection) : rentabilité calculatrice ou script UGC (les designs sont liés via Design.collectionId)
-model CollectionArticle {
-  id           String   @id @default(cuid())
-  collectionId String
-  type         String   // "calculator" | "ugc"
-  label        String?  // Nom optionnel de l'article (ex. "T-shirt blanc", "Script promo été")
-  sortOrder    Int      @default(0)
-  payload      Json     // calculator: { sellingPrice, productionCost, netMarginPercent, productType, weight, quantity, ... }; ugc: { ugcContentId }
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
-
-  collection Collection @relation(fields: [collectionId], references: [id], onDelete: Cascade)
-
-  @@index([collectionId])
-}
-
-/// Brouillons de design générés (phase Design) — conservés quelques jours pour l’historique.
 model LaunchMapDesignDraft {
   id        String   @id @default(cuid())
   brandId   String
   imageUrl  String   @db.Text
   placement String?
-  source    String?  // ai | logo_only | logo_plus_ai
+  source    String?
   createdAt DateTime @default(now())
 
   brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
@@ -275,47 +230,63 @@ model LaunchMapDesignDraft {
   @@index([brandId, createdAt])
 }
 
-model Design {
-  id          String   @id @default(cuid())
-  brandId     String
-  collectionId String? // Optionnel : design peut être dans une collection
-  isTemplate  Boolean  @default(false) // Si true, c'est un template réutilisable
-  templateName String? // Nom du template si isTemplate = true
-  type        String   // T-shirt, Hoodie, etc.
-  cut         String?  // oversized, slim, etc.
-  material    String?
-  flatSketchUrl String?
-  productImageUrl String?  // Photo produit générée (ex. depuis questionnaire mockup)
-  mockupSpec  Json?    // Réponses au questionnaire mockup (MockupQuestionnaireAnswers)
-  techPack    Json?    // Composants du tech pack (texte + TechPackVisual)
-  productDescription String?  @db.Text // Description produit générée (marque + stratégie + identité)
-  prompt      String?
-  status      String   @default("pending") // pending, processing, completed, failed
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Mannequin {
+  id        String   @id @default(cuid())
+  brandId   String
+  name      String
+  imageUrl  String   @db.Text
+  source    String   @default("virtual_tryon")
+  gender    String   @default("female")
+  description String? @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  brand      Brand       @relation(fields: [brandId], references: [id], onDelete: Cascade)
-  collection Collection? @relation(fields: [collectionId], references: [id], onDelete: SetNull)
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
 
   @@index([brandId])
-  @@index([collectionId])
-  @@index([isTemplate, brandId])
-  @@index([type])
-  @@index([status])
+}
+
+model StrategyGeneration {
+  id                 String   @id @default(cuid())
+  brandId            String
+  templateBrandSlug  String
+  templateBrandName  String
+  strategyText       String   @db.Text
+  positioning        String?
+  targetAudience     String?
+  visualIdentity     Json?
+  createdAt          DateTime @default(now())
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+  @@index([brandId, createdAt])
+}
+
+model TemplateStrategy {
+  id                 String   @id @default(cuid())
+  templateBrandSlug  String   @unique
+  templateBrandName  String
+  strategyText       String   @db.Text
+  visualIdentity     Json?
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  @@index([templateBrandSlug])
 }
 
 model Factory {
   id          String   @id @default(cuid())
   name        String
   country     String
-  moq         Int      // Minimum Order Quantity
-  specialties String[] // ["Jersey", "Denim", etc.]
-  leadTime    Int      // Délai en jours
+  moq         Int
+  specialties String[]
+  leadTime    Int
   certifications String[]
   contactEmail String?
   contactPhone String?
-  website     String?  // URL du site web
-  rating      Float?   // Note moyenne calculée
+  website     String?
+  rating      Float?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
@@ -327,7 +298,6 @@ model Factory {
   @@index([specialties])
 }
 
-// Favoris fournisseurs par marque : affichés dans Sourcing (Gérer ma marque)
 model BrandFavoriteFactory {
   id         String   @id @default(cuid())
   brandId    String
@@ -347,7 +317,7 @@ model Quote {
   brandId   String
   factoryId String
   designId  String?
-  status    String   @default("pending") // pending, sent, responded, accepted
+  status    String   @default("pending")
   message   String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -362,69 +332,106 @@ model FactoryReview {
   id        String   @id @default(cuid())
   userId    String
   factoryId String
-  rating    Int      // 1-5 étoiles
+  rating    Int
   comment   String?  @db.Text
-  photos    String[] // URLs des photos de production
-  verified  Boolean  @default(false) // Vérifié si commande passée
+  photos    String[]
+  verified  Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   factory Factory @relation(fields: [factoryId], references: [id], onDelete: Cascade)
 
-  @@unique([userId, factoryId]) // Un utilisateur ne peut laisser qu'un avis par usine
+  @@unique([userId, factoryId])
   @@index([factoryId])
   @@index([userId])
 }
+
+model SurplusCredits {
+  id               String   @id @default(cuid())
+  userId           String
+  feature          String
+  amount           Int
+  consumed         Int      @default(0)
+  stripeSessionId  String?  @unique
+  packId           String?
+  createdAt        DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, feature])
+}
+
+model AIUsage {
+  id        String   @id @default(cuid())
+  userId    String
+  feature   String
+  costEur   Float
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+  @@index([userId])
+}
+
+model UGCContent {
+  id        String   @id @default(cuid())
+  brandId   String
+  type      String
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
+
+  @@index([brandId])
+}
+
+// ============== TRENDS & ANALYSIS ==============
 
 model BrandSpyAnalysis {
   id          String   @id @default(cuid())
   userId      String
   shopifyUrl  String
-  storeName   String?  // Nom de la boutique
-  category    String?  // Catégorie
-  launchDate  String?  // Date de lancement
-  country     String?  // Pays principal
+  storeName   String?
+  category    String?
+  launchDate  String?
+  country     String?
   
-  // Métriques principales
-  estimatedRevenue        Float?  // CA mensuel estimé (compatibilité)
-  estimatedDailyRevenue   Float?  // Ventes quotidiennes estimées
-  estimatedMonthlyRevenue  Float?  // Ventes mensuelles estimées
-  productCount            Int?    // Nombre de produits
-  averageOrdersPerMonth   Int?    // Commandes moyennes par mois
+  estimatedRevenue        Float?
+  estimatedDailyRevenue   Float?
+  estimatedMonthlyRevenue  Float?
+  productCount            Int?
+  averageOrdersPerMonth   Int?
   
-  // Données de trafic
-  trafficSources          Json?    // Sources de trafic avec pourcentages
-  markets                 Json?    // Marchés exploités avec pourcentages
-  monthlyTraffic          Json?    // Trafic mensuel (historique)
-  monthlyRevenue          Json?    // Revenus mensuels (historique)
+  trafficSources          Json?
+  markets                 Json?
+  monthlyTraffic          Json?
+  monthlyRevenue          Json?
   
-  // Stack technique
-  stack       Json?    // Apps installées
-  theme       Json?    // Thème (nom, version, polices, couleurs)
+  stack       Json?
+  theme       Json?
   
-  // Stratégie publicitaire
-  adStrategy  Json?    // Stratégie publicitaire (plateformes, nombre d'ads, etc.)
-  adsEvolution Json?   // Évolution du nombre de publicités
-  adTypes     Json?    // Types de publicités avec pourcentages
+  adStrategy  Json?
+  adsEvolution Json?
+  adTypes     Json?
   
-  // Analyse IA
-  aiAnalysis  Json?    // Analyse IA (score, recommandations, badges)
+  aiAnalysis  Json?
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
-// Analyse IA de marque partagee entre tous les utilisateurs
 model BrandAnalysis {
   id              String   @id @default(cuid())
-  brandKey        String   @unique // Clé normalisée (lowercase) pour déduplication
-  brandName       String   // Nom affiché (ex. "Arc'teryx")
+  brandKey        String   @unique
+  brandName       String
   analysis        String   @db.Text
-  visualIdentity  Json?    // Identité visuelle : { colorPalette: { primary?, secondary?, accent? }, typography: { heading?, body? } }
-  logoUrl         String?  // URL du logo (Brandfetch, favicon, etc.) pour affichage
+  visualIdentity  Json?
+  logoUrl         String?
   
-  // Métadonnées enrichies (pour transformer toute marque en référence)
   signaturePiece  String?
   dominantStyle   String?
   cyclePhase      String?
@@ -442,17 +449,17 @@ model FashionBrand {
   id              String   @id @default(cuid())
   userId          String
   name            String
-  url             String   // URL de la boutique Shopify
-  isTrackingActive Boolean @default(false) // Activer/désactiver le tracking
-  lastSales24h    Int      @default(0) // Nombre de ventes sur 24h
-  lastRevenue24h  Float    @default(0) // Revenu estimé sur 24h
+  url             String
+  isTrackingActive Boolean @default(false)
+  lastSales24h    Int      @default(0)
+  lastRevenue24h  Float    @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
   user       User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   snapshots  StoreSnapshot[]
 
-  @@unique([userId, url]) // Un utilisateur ne peut tracker qu'une fois la même URL
+  @@unique([userId, url])
   @@index([userId])
   @@index([isTrackingActive])
 }
@@ -461,9 +468,9 @@ model StoreSnapshot {
   id            String   @id @default(cuid())
   brandId       String
   timestamp     DateTime @default(now())
-  inventoryData Json    // État des stocks à l'instant T : { productId: { quantity, price, title } }
-  salesDiff     Int      @default(0) // Différence de ventes depuis le dernier snapshot
-  revenueDiff   Float    @default(0) // Différence de revenu depuis le dernier snapshot
+  inventoryData Json
+  salesDiff     Int      @default(0)
+  revenueDiff   Float    @default(0)
   createdAt     DateTime @default(now())
 
   brand FashionBrand @relation(fields: [brandId], references: [id], onDelete: Cascade)
@@ -472,32 +479,19 @@ model StoreSnapshot {
   @@index([brandId])
 }
 
-model UGCContent {
-  id        String   @id @default(cuid())
-  brandId   String
-  type      String   // virtual_tryon, script, video
-  content   String   @db.Text // URL image ou texte script
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  brand Brand @relation(fields: [brandId], references: [id], onDelete: Cascade)
-
-  @@index([brandId])
-}
-
 model TrendingBrand {
   id              String   @id @default(cuid())
   rank            Int
   brand           String
-  score           String   // ex. "98/100"
-  scoreValue      Int      // ex. 98
+  score           String
+  scoreValue      Int
   signaturePiece  String
   dominantStyle   String
-  cyclePhase      String   // emergent, croissance, pic, declin
-  launchPotential String   // opportunite, a_surveiller, sature
+  cyclePhase      String
+  launchPotential String
   indicativePrice String
-  websiteUrl      String?  // URL officielle de la marque
-  month           String   // Ex: "2026-02"
+  websiteUrl      String?
+  month           String
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
 
@@ -508,45 +502,42 @@ model TrendingBrand {
 model TrendProduct {
   id            String   @id @default(cuid())
   name          String
-  category      String   // Hoodie, T-shirt, Cargo, Accessoires
-  style         String   // Minimaliste, Streetwear, Luxe, Y2K
-  material      String   // Coton GSM élevé, Denim, Synthétique
+  category      String
+  style         String
+  material      String
   averagePrice  Float
-  trendScore    Float    // Score de tendance (0-100)
-  saturability  Float    // Score de saturabilité (0-100, plus bas = moins saturé)
+  trendScore    Float
+  saturability  Float
   imageUrl      String?
   description   String?  @db.Text
-  searchVolume  Int?     // Volume de recherche estimé
-  // Trend Radar Hybride (Mondial)
-  marketZone    String?  // EU | US | ASIA
-  cut           String?  // Boxy, Slim, Oversized (analyse visuelle IA)
-  visualTags    Json?    // { matière visible, type col, couleur exacte, etc. }
-  trendScoreVisual Float? // Score tendance basé sur récurrence visuelle (0-100)
-  productSignature String? // Signature pour corrélation multi-zones (ex: "veste-sans-manche_cargo")
-  isGlobalTrendAlert Boolean @default(false) // Présent en 2+ zones (EU+ASIA etc.)
-  sourceBrand   String?  // Source du scrape (Zalando, Zara, ASOS) — interne
-  productBrand  String?  // Marque de l'article (Nike, Zara, etc.) — affichée comme "Marque"
-  sourceUrl     String?  // URL page produit (interne, pas affiché)
-  brandWebsiteUrl String?  // Site principal de la marque (affiché comme source)
-  segment       String?  // homme | femme | garcon | fille (cible du scrape)
-  trendGrowthPercent Int?  // % croissance Zalando (ex. 15 pour "+15%")
-  trendLabel    String?  // Libellé Zalando (ex. "Tendance", "En hausse")
-  businessAnalysis String? @db.Text // Analyse business IA par zone
-  // Infos scrapées page produit (Zalando etc.)
-  color         String?  // Couleur
-  sizes         String?  // Tailles disponibles
-  countryOfOrigin String? // Pays d'origine
-  articleNumber String?  // Référence article
-  careInstructions String? @db.Text // Entretien
-  // KPIs détail (optionnels, renseignés par scrape ou IA)
-  daysInTop10   Int?     // Jours dans le top 10 ventes marque → tendance de fond
-  estimatedCogsPercent Float?  // Coût production estimé (% du prix) pour marge brute
-  complexityScore String?  // Facile | Moyen | Complexe (fabrication)
-  sustainabilityScore Float?  // 0-100 alignement ESG / durabilité
-  stockOutRisk  String?  // Rupture imminente | OK | —
-  markdownPercent Float?  // Taux remise % si en promo
-  visualAttractivenessScore Float?  // 0-100 attractivité visuelle IA
-  dominantAttribute String?  // Ex: "Coupe Boxy : 80% responsable de la performance"
+  searchVolume  Int?
+  marketZone    String?
+  cut           String?
+  visualTags    Json?
+  trendScoreVisual Float?
+  productSignature String?
+  isGlobalTrendAlert Boolean @default(false)
+  sourceBrand   String?
+  productBrand  String?
+  sourceUrl     String?
+  brandWebsiteUrl String?
+  segment       String?
+  trendGrowthPercent Int?
+  trendLabel    String?
+  businessAnalysis String? @db.Text
+  color         String?
+  sizes         String?
+  countryOfOrigin String?
+  articleNumber String?
+  careInstructions String? @db.Text
+  daysInTop10   Int?
+  estimatedCogsPercent Float?
+  complexityScore String?
+  sustainabilityScore Float?
+  stockOutRisk  String?
+  markdownPercent Float?
+  visualAttractivenessScore Float?
+  dominantAttribute String?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
@@ -569,91 +560,27 @@ model ProductFavorite {
   @@unique([userId, productId])
 }
 
-model Notification {
-  id        String   @id @default(cuid())
-  userId    String
-  title     String
-  message   String   @db.Text
-  type      String   @default("info") // info, success, warning, error
-  read      Boolean  @default(false)
-  link      String?  // URL optionnelle pour rediriger
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, read])
-  @@index([userId, createdAt])
-}
-
-model UserPreferences {
-  id        String   @id @default(cuid())
-  userId    String   @unique
-  
-  // Préférences géographiques
-  preferredCountry String?  // Pays principal pour les tendances et sourcing
-  preferredCountries String[] // Liste de pays d'intérêt
-  
-  // Préférences de tendances
-  preferredCategories String[] // Catégories de produits préférées (Hoodie, T-shirt, etc.)
-  preferredStyles     String[] // Styles préférés (Streetwear, Minimaliste, etc.)
-  priceRangeMin       Float?   // Prix minimum d'intérêt
-  priceRangeMax       Float?   // Prix maximum d'intérêt
-  
-  // Préférences de sourcing
-  preferredSourcingCountries String[] // Pays préférés pour le sourcing
-  preferredMOQ              Int?      // MOQ préféré
-  maxLeadTime               Int?      // Délai maximum accepté (en jours)
-  
-  // Préférences d'analyse
-  preferredMarkets          String[] // Marchés d'intérêt pour Brand Spy
-  
-  // Préférences générales
-  language                  String   @default("fr") // Langue de l'interface
-  currency                  String   @default("EUR") // Devise préférée
-  timezone                  String?  // Fuseau horaire
-  
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  @@index([userId])
-}
-
 model TrendSignal {
   id                String   @id @default(cuid())
-  
-  // Identification produit
-  productName       String   // Ex: "Loose Fit Cargo Pant"
-  productType       String   // Ex: "Pantalon", "Hoodie", "T-shirt"
-  cut               String?  // Ex: "Loose Fit", "Oversized", "Slim"
-  material          String?  // Ex: "Coton", "Denim"
-  color             String?  // Ex: "Noir", "Beige"
-  
-  // Source
-  brand             String   // "Zara", "ASOS", "Zalando", "H&M", "Uniqlo"
-  sourceUrl         String   // URL du produit
-  sourceSection     String   // "new_in" | "best_sellers"
-  country           String?  // "FR", "US", "UK", "DE", etc. (basé sur l'URL ou la marque)
-  style             String?  // "Streetwear", "Minimaliste", "Luxe", "Y2K", etc.
-  
-  // Métriques
-  price             Float    // Prix en EUR
+  productName       String
+  productType       String
+  cut               String?
+  material          String?
+  color             String?
+  brand             String
+  sourceUrl         String
+  sourceSection     String
+  country           String?
+  style             String?
+  price             Float
   priceCurrency     String   @default("EUR")
   imageUrl          String?
-  
-  // Détection tendance
-  appearanceCount   Int      @default(1) // Nombre de fois apparu cette semaine
+  appearanceCount   Int      @default(1)
   firstSeenAt       DateTime @default(now())
   lastSeenAt        DateTime @default(now())
-  
-  // Confirmation tendance
-  confirmedAt       DateTime? // Date de confirmation (3+ leaders)
+  confirmedAt       DateTime?
   isConfirmed       Boolean   @default(false)
-  confirmationScore Int       @default(0) // Nombre de leaders qui l'ont
-  
-  // Métadonnées
+  confirmationScore Int       @default(0)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
   
@@ -668,81 +595,103 @@ model TrendSignal {
 
 model ScrapableBrand {
   id              String   @id @default(cuid())
-  name            String   @unique // "Zara", "ASOS", etc.
-  baseUrl         String   // "https://www.zara.com"
-  newInUrl        String   // "/fr/fr/categorie/femme/nouveautes-c358009.html"
-  bestSellersUrl  String   // "/fr/fr/categorie/femme/c358009.html"
-  
-  // Sélecteurs CSS
-  productSelector String   // ".product-item, .product-card"
-  nameSelector    String   // ".product-name, h3"
-  priceSelector   String   // ".price, [data-price]"
-  imageSelector   String   // ".product-image img, img[data-src]"
-  
-  // Métadonnées
+  name            String   @unique
+  baseUrl         String
+  newInUrl        String
+  bestSellersUrl  String
+  productSelector String
+  nameSelector    String
+  priceSelector   String
+  imageSelector   String
   isActive        Boolean  @default(true)
-  country         String?  // "FR", "US", etc. (pays principal)
-  category        String?  // "fast_fashion", "luxury", "streetwear"
-  priority        Int      @default(5) // 1-10 (1 = haute priorité)
-  notes           String?  @db.Text // Notes pour debug/maintenance
-  
-  // Statistiques
+  country         String?
+  category        String?
+  priority        Int      @default(5)
+  notes           String?  @db.Text
   lastScrapedAt   DateTime?
   lastScrapeSuccess Boolean @default(true)
-  totalScraped    Int      @default(0) // Nombre total de produits scrapés
-  
+  totalScraped    Int      @default(0)
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
-  
-  @@index([isActive])
-  @@index([priority])
-  @@index([category])
 }
 
-// Enrichissement IA par tendance : conseils GPT + note + image Higgsfield (après scrape)
-model GeneratedProductImage {
-  id          String   @id @default(cuid())
-  trendKey    String   @unique // "productType|cut|material" pour réutilisation
-  promptText  String   @db.Text // Prompt image généré par GPT
-  imageUrl    String   // URL de l'image générée par Higgsfield
-  adviceText  String?  @db.Text // Conseils tendance (GPT) : bon ou pas, recommandations
-  rating      Int?     // Note 1-10 (GPT) : potentiel de la tendance
-  createdAt   DateTime @default(now())
+// ============== SYSTEME DE BLOG (VITAL) ==============
 
-  @@index([trendKey])
-}
-
-// Articles de blog pour SEO et mise à jour automatique des stratégies par IA
 model BlogPost {
-  id            String   @id @default(cuid())
-  title         String
-  slug          String   @unique
-  excerpt       String   @db.Text
-  content       String   @db.Text
-  coverImage    String?
-  author        String   @default("OUTFITY Team")
-  published     Boolean  @default(false)
-  publishedAt   DateTime @default(now())
-  tags          String[] // ex: ["Nike", "Streetwear", "Sustainability"]
-  relatedBrands String[] // Slugs des marques de référence concernées (ex: ["nike", "patagonia"])
-  sourceUrl     String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  excerpt     String   @db.Text
+  content     String   @db.Text
+  coverImage  String?
+  published   Boolean  @default(false)
+  publishedAt DateTime @default(now())
+  authorId    String
+  categoryId  String?
+  
+  seoTitle       String?
+  seoDescription String?
+  seoKeywords    String?
 
-  @@index([published, publishedAt])
+  author    User     @relation(fields: [authorId], references: [id])
+  category  BlogCategory? @relation(fields: [categoryId], references: [id])
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([published])
   @@index([slug])
 }
 
-model AdminLog {
+model BlogCategory {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  
+  posts       BlogPost[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Notification {
   id        String   @id @default(cuid())
-  type      String   // signup, payment, error, etc.
+  userId    String
   title     String
   message   String   @db.Text
-  level     String   @default("info") // info, warning, error, critical
-  metadata  Json?
+  type      String   @default("info")
+  read      Boolean  @default(false)
+  link      String?
   createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  @@index([type])
-  @@index([level])
-  @@index([createdAt])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, read])
+  @@index([userId, createdAt])
+}
+
+model UserPreferences {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  preferredCountry String?
+  preferredCountries String[]
+  preferredCategories String[]
+  preferredStyles     String[]
+  priceRangeMin       Float?
+  priceRangeMax       Float?
+  preferredSourcingCountries String[]
+  preferredMOQ              Int?
+  maxLeadTime               Int?
+  preferredMarkets          String[]
+  language                  String   @default("fr")
+  currency                  String   @default("EUR")
+  timezone                  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
 }

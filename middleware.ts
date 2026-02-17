@@ -16,8 +16,15 @@ export default auth((req) => {
     '/launch-map',
     '/design-studio',
     '/onboarding',
-    '/settings'
-  ].some(route => nextUrl.pathname.startsWith(route));
+    '/settings',
+    '/hub',        // Launcher
+    '/academy',    // Growth App
+    '/partners'    // Dashboard Affilié (MAIS PAS /partners/join)
+  ].some(route => {
+    // Exception pour la landing page publique d'affiliation
+    if (nextUrl.pathname === '/partners/join') return false;
+    return nextUrl.pathname.startsWith(route);
+  });
 
   if (isAuthPage) {
     // Commenté temporairement pour éviter les boucles après reset de DB

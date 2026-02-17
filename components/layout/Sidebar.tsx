@@ -62,6 +62,18 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
           <h2 className="px-4 mb-3 text-xs font-semibold text-[#1D1D1F]/40 uppercase tracking-wider">
             Navigation
           </h2>
+          {/* Switch Apps Button */}
+          <div className="mb-4">
+            <Link
+              href="/hub"
+              className="flex items-center gap-3 px-4 py-3 mx-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold shadow-lg hover:opacity-90 transition-all"
+            >
+              <div className="p-1 bg-white/20 rounded">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></svg>
+              </div>
+              <span>Changer d'App</span>
+            </Link>
+          </div>
           <div className="space-y-1">
             {navigation.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
