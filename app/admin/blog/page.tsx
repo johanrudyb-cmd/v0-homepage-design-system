@@ -6,6 +6,8 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 interface BlogPost {
     id: string;
     title: string;

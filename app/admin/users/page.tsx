@@ -12,6 +12,8 @@ import { Badge } from '@/components/ui/badge';
 
 import { PlanSelector } from './PlanSelector';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
     title: 'Gestion Utilisateurs | Admin',
 };

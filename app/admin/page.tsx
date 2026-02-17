@@ -1,4 +1,6 @@
 import { prisma } from '@/lib/prisma';
+
+export const dynamic = 'force-dynamic';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import {
     Users,
@@ -138,8 +140,8 @@ export default async function AdminDashboardPage() {
                             logs.map((log) => (
                                 <div key={log.id} className="flex gap-4">
                                     <div className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${(log.status && (log.status.includes('error') || log.status.includes('failed'))) ? 'bg-red-500' :
-                                            (log.status && log.status.includes('warning')) ? 'bg-orange-500' :
-                                                'bg-[#007AFF]'
+                                        (log.status && log.status.includes('warning')) ? 'bg-orange-500' :
+                                            'bg-[#007AFF]'
                                         }`} />
                                     <div>
                                         <p className="text-sm font-semibold text-[#1D1D1F] line-clamp-1">{log.action}</p>

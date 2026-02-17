@@ -1,5 +1,7 @@
 import { BlogPostForm } from '@/components/blog/BlogPostForm';
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
     title: 'Nouvel article | Admin Blog',
 };

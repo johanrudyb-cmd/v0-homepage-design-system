@@ -1,5 +1,7 @@
 import { getCurrentUser } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
+
+export const dynamic = 'force-dynamic';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
