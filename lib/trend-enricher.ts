@@ -21,10 +21,10 @@ export function buildTrendKey(
 }
 
 /**
- * Enrichit jusqu'à `limit` tendances qui n'ont pas encore advice + rating + image.
- * Pour chaque tendance : GPT (conseils + note + prompt image) → Higgsfield (image) → sauvegarde.
+ * Enrichit jusqu'à `limit` tendances qui n'ont pas encore advice + rating.
+ * Mission : GPT (conseils + note) et utilise l'image réelle du produit si présente.
  */
-export async function enrichTrends(limit: number = 10): Promise<{
+export async function enrichTrends(limit: number = 10, skipImageGeneration: boolean = true): Promise<{
   enriched: number;
   errors: string[];
 }> {
@@ -34,8 +34,10 @@ export async function enrichTrends(limit: number = 10): Promise<{
   if (!isChatGptConfigured()) {
     return { enriched: 0, errors: ['CHATGPT_API_KEY non configurée'] };
   }
-  if (!isIdeogramConfigured()) {
-    return { enriched: 0, errors: ['IDEogram_API_KEY non configurée'] };
+
+  // On ne vérifie l'Ideogram que si on a explicitement besoin de générer des images
+  if (!skipImageGeneration && !isIdeogramConfigured()) {
+    return { enriched: 0, errors: ['IDEogram_API_KEY non configurée pour la génération'] };
   }
 
   const trends = await getTrendsWithRecommendation(Math.min(limit * 3, 60), {});
@@ -49,6 +51,7 @@ export async function enrichTrends(limit: number = 10): Promise<{
   for (const t of trends) {
     const key = buildTrendKey(t.productType, t.cut, t.material);
     const row = existingByKey.get(key);
+    // On enrichit si pas de conseils ou pas de rating
     if (!row || row.adviceText == null) {
       toEnrich.push(t);
       if (toEnrich.length >= limit) break;
@@ -58,6 +61,7 @@ export async function enrichTrends(limit: number = 10): Promise<{
   for (const trend of toEnrich) {
     const key = buildTrendKey(trend.productType, trend.cut, trend.material);
     try {
+      // 1. Génération des conseils et de la note via GPT
       const { advice, rating, imagePrompt } = await generateTrendAdviceAndImagePrompt({
         productName: trend.productName,
         productType: trend.productType,
@@ -71,20 +75,27 @@ export async function enrichTrends(limit: number = 10): Promise<{
         country: trend.country,
       });
 
-      const imageUrl = await generateDesignImage(imagePrompt, { aspect_ratio: '1:1', transparent: false });
+      // 2. Gestion de l'image : on privilégie l'image réelle scrapée
+      let imageUrl = trend.imageUrl || '';
 
+      // Si pas d'image réelle et qu'on autorise la génération
+      if (!imageUrl && !skipImageGeneration) {
+        imageUrl = await generateDesignImage(imagePrompt, { aspect_ratio: '1:1', transparent: false });
+      }
+
+      // 3. Sauvegarde
       await prisma.generatedProductImage.upsert({
         where: { trendKey: key },
         create: {
           trendKey: key,
           promptText: imagePrompt,
-          imageUrl,
+          imageUrl: imageUrl || '', // On garde l'image réelle
           adviceText: advice,
           rating,
         },
         update: {
           promptText: imagePrompt,
-          imageUrl,
+          imageUrl: imageUrl || undefined, // Ne pas écraser par du vide si update
           adviceText: advice,
           rating,
         },

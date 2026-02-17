@@ -44,6 +44,7 @@ const EXCLUDE_SHOES_KEYWORDS = [
   'boot', 'boots', 'loafer', 'loafers', 'mule', 'mules', 'slip-on', 'tuff terra', 'snow boot',
   'chaussons', 'chausson', 'chaussette', 'chaussettes', 'sock', 'socks',
   'derby', 'derbies', 'ballerine', 'ballerines', 'mocassin', 'mocassins', 'bottillon', 'bottillons', 'richelieu', 'sabot', 'sabots',
+  'talons', 'heels', 'clog', 'clogs', 'tennis', 'pantoufle', 'slippers',
 ];
 
 /** Sous-vêtements et maillots de bain à exclure. */
@@ -67,12 +68,14 @@ const EXCLUDE_BAG_KEYWORDS = [
   'cabas', 'sac cabas', 'shopping bag', 'sac shopping',
   ' sac ', 'sac à ', 'sac a ', 'sac main', 'sac ', ' sac',
   'bag ', ' bag ', ' bag', 'bags', 'handbag', 'handbags', 'clutch',
+  'sacoche', 'shoulder bag', 'messenger bag', 'satchel', 'crossbody', 'waist bag', 'fanny pack', 'banane', 'bum bag',
+  'pochette', 'wallet', 'purse', 'trousse', 'case',
 ];
 
 /** Parfums à exclure. */
 const EXCLUDE_PERFUME_KEYWORDS = [
   'parfum', 'parfums', 'perfume', 'perfumes', 'eau de toilette', 'eau de parfum',
-  'fragrance', 'fragrances', 'flacon', 'spray',
+  'fragrance', 'fragrances', 'flacon', 'spray', 'scent', 'cologne', 'mist', 'brume',
 ];
 
 /** Accessoires à exclure (on garde vêtements uniquement). */
@@ -84,6 +87,8 @@ const EXCLUDE_ACCESSORIES_KEYWORDS = [
   'moufle', 'moufles', 'mitten', 'mittens',
   'bag bandoulière', 'sac bandoulière', 'autres accessoires', 'maroquinerie',
   'petite maroquinerie', 'cache-oreilles', 'cache oreilles',
+  'sunglasses', 'eyewear', 'beanie', 'bonnet', 'tie', 'cravate', 'umbrella', 'parapluie',
+  'casquettes', 'caps', 'hats', 'chapeaux', 'beret', 'bob ', 'bucket hat',
 ];
 
 /** Bijoux et non-vêtements à exclure (vêtements uniquement). */
@@ -91,6 +96,7 @@ const EXCLUDE_JEWELRY_KEYWORDS = [
   'boucle d\'oreille', 'boucles d\'oreille', 'boucles d’oreilles', 'earring', 'earrings',
   'bague', 'bagues', 'ring ', 'rings ', 'pendentif', 'pendentifs', 'pendant',
   'broche', 'broches', 'pin ', 'jewelry', 'jewellery', 'parure', 'parures',
+  'collier', 'necklace', 'bracelet', 'bracelets', 'anklet', 'chevillère', 'bijoux',
 ];
 
 /** Pulls / sweats rouges à exclure (demande utilisateur). */
@@ -99,8 +105,12 @@ const EXCLUDE_RED_PULL_KEYWORDS = [
   'rouge pull', 'red pull', 'rouge sweat', 'red sweat',
 ];
 
-/** Électroménager / aspirateurs à exclure (vêtements uniquement). */
-const EXCLUDE_APPLIANCE_KEYWORDS = ['dyson'];
+/** Électroménager / aspirateurs / équipements à exclure (vêtements uniquement). */
+const EXCLUDE_EQUIPMENT_KEYWORDS = [
+  'dyson', 'aspirateur', 'vacuum', 'équipement', 'equipment', 'gear', 'matériel',
+  'électronique', 'electronic', 'gadget', 'device', 'appliance', 'mousse', 'foam',
+  'yoga mat', 'tapis de yoga', 'dumbbells', 'haltères', 'poids',
+];
 
 /** Produits pour cheveux / capillaires à exclure (vêtements uniquement). */
 const EXCLUDE_HAIR_KEYWORDS = [
@@ -150,6 +160,10 @@ const EXCLUDE_COSMETICS_KEYWORDS = [
   'produit de beauté', 'produits de beauté', 'beauté', 'beauty', 'cosmétique', 'cosmetic', 'cosmetics',
   'soin visage', 'soin corps', 'skincare', 'skin care', 'make-up', 'makeup', 'soin ', 'soins ',
   'sérum', 'serum', 'huile ', 'oil ', 'démaquillant', 'cleanser', 'tonique', 'moisturizer',
+  'gel douche', 'shower gel', 'body wash', 'crayon à lèvres', 'crayon a levres', 'lip liner',
+  'crayon yeux', 'eyeliner', 'correcteur', 'concealer', 'face mask', 'masque visage',
+  'dentifrice', 'toothpaste', 'déodorant', 'deodorant', 'antiperspirant',
+  'mousse à raser', 'shaving foam', 'gel', 'lait corps', 'body lotion',
 ];
 
 /** Prix minimum plausible pour un vêtement (évite frais de livraison type 2,75 €). */
@@ -176,7 +190,7 @@ export function isExcludedProduct(name: string, extraExcludeKeywords: string[] =
     ...EXCLUDE_PERFUME_KEYWORDS,
     ...EXCLUDE_ACCESSORIES_KEYWORDS,
     ...EXCLUDE_JEWELRY_KEYWORDS,
-    ...EXCLUDE_APPLIANCE_KEYWORDS,
+    ...EXCLUDE_EQUIPMENT_KEYWORDS,
     ...EXCLUDE_HAIR_KEYWORDS,
     ...EXCLUDE_POCHETTE_KEYWORDS,
     ...EXCLUDE_BRAND_KEYWORDS,

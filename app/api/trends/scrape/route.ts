@@ -1,15 +1,16 @@
 /**
- * Route API pour scraper des produits tendances réels
+ * Route API pour le Radar à Tendances
  * 
  * POST /api/trends/scrape
  * 
- * Scrape les produits depuis des stores Shopify populaires
- * et les importe dans la base de données TrendProduct
+ * Déclenche le processus complet :
+ * 1. Scrape Zalando, ASOS et Zara (Hybrid Radar)
+ * 2. Analyse par IA (GPT) pour générer des conseils business
+ * 3. Notification Admin (WhatsApp/n8n)
  */
 
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { scrapeAllTrendingProducts } from '@/lib/trends-scraper';
 import { getCurrentUser } from '@/lib/auth-helpers';
 
 export const runtime = 'nodejs';
@@ -33,7 +34,7 @@ export async function POST(request: Request) {
     const { refreshAllTrends } = await import('@/lib/refresh-all-trends');
     const hybridResult = await refreshAllTrends();
 
-    // 2. Enrichissement automatique (IA GPT + Higgsfield)
+    // 2. Enrichissement automatique (IA GPT)
     console.log('[Trends Scrape] Début de l\'enrichissement IA...');
     const { enrichTrends } = await import('@/lib/trend-enricher');
     const enrichResult = await enrichTrends(10); // Enrichir les 10 dernières tendances
