@@ -24,7 +24,7 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/trends/scrape",
+                "url": "https://outfity.fr/api/trends/scrape",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [
@@ -47,7 +47,7 @@
         {
             "parameters": {
                 "method": "POST",
-                "url": "={{ $env.OUTFITY_APP_URL || 'https://outfity.fr' }}/api/trends/enrich",
+                "url": "https://outfity.fr/api/trends/enrich",
                 "sendHeaders": true,
                 "headerParameters": {
                     "parameters": [

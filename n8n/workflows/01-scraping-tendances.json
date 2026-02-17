@@ -25,13 +25,13 @@
             {
                 "parameters": {
                     "method": "GET",
-                    "url": "={{ $env.OUTFITY_APP_URL }}/api/cron/scan-trends",
+                    "url": "https://outfity.fr/api/cron/scan-trends",
                     "sendHeaders": true,
                     "headerParameters": {
                         "parameters": [
                             {
                                 "name": "Authorization",
-                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                                "value": "Bearer bb22261869ad2d5d33ee928260aa8511125172498917d380bb70f545bfc7d1d6"
                             }
                         ]
                     },
@@ -73,13 +73,13 @@
             {
                 "parameters": {
                     "method": "GET",
-                    "url": "={{ $env.OUTFITY_APP_URL }}/api/cron/refresh-zalando-trends",
+                    "url": "https://outfity.fr/api/cron/refresh-zalando-trends",
                     "sendHeaders": true,
                     "headerParameters": {
                         "parameters": [
                             {
                                 "name": "Authorization",
-                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                                "value": "Bearer bb22261869ad2d5d33ee928260aa8511125172498917d380bb70f545bfc7d1d6"
                             }
                         ]
                     },
@@ -125,13 +125,13 @@
             {
                 "parameters": {
                     "method": "POST",
-                    "url": "={{ $env.OUTFITY_APP_URL }}/api/n8n/log",
+                    "url": "https://outfity.fr/api/n8n/log",
                     "sendHeaders": true,
                     "headerParameters": {
                         "parameters": [
                             {
                                 "name": "Authorization",
-                                "value": "=Bearer {{ $env.OUTFITY_CRON_SECRET }}"
+                                "value": "Bearer bb22261869ad2d5d33ee928260aa8511125172498917d380bb70f545bfc7d1d6"
                             }
                         ]
                     },
