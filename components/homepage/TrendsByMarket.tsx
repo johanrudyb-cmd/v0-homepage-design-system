@@ -221,7 +221,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                       delay: index * 0.05,
                       ease: [0.23, 1, 0.32, 1]
                     }}
-                    className="group relative"
+                    className="group relative w-full mx-auto max-w-[360px] lg:max-w-full xl:max-w-[320px]"
                   >
                     <div className="bg-white rounded-[32px] overflow-hidden transition-all duration-500 shadow-apple border border-black/[0.03] flex flex-col h-full hover:shadow-apple-lg hover:-translate-y-2">
                       {isFree && !isPubliclyVisible && (
