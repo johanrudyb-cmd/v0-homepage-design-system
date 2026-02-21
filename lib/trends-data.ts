@@ -31,8 +31,8 @@ const getCachedRawTrends = unstable_cache(
         }
     },
     // Clé changée pour forcer le refresh
-    ['raw-trends-query-v3-DEBUG'],
-    { revalidate: 300, tags: ['trends'] } // Cache 5 min
+    ['raw-trends-query-v4'],
+    { revalidate: 300, tags: ['trends-v4'] } // Cache 5 min
 );
 
 export async function getFeaturedTrends() {
@@ -247,6 +247,8 @@ export async function getHybridRadarTrends(params: {
 
         return {
             ...p,
+            createdAt: p.createdAt ? new Date(p.createdAt).toISOString() : new Date(now).toISOString(),
+            updatedAt: p.updatedAt ? new Date(p.updatedAt).toISOString() : new Date(now).toISOString(),
             name: cleanName,
             effectiveTrendGrowthPercent,
             effectiveTrendLabel: p.trendGrowthPercent == null && effectiveTrendGrowthPercent > 0 ? 'Estimé' : p.trendLabel,
