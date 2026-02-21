@@ -1,7 +1,7 @@
 import { prisma, isDatabaseAvailable } from './prisma';
 import { unstable_cache } from 'next/cache';
 import { getProductBrand, brandsMatch, cleanProductName } from './brand-utils';
-import { isExcludedProduct } from './hybrid-radar-scraper';
+import { isExcludedProduct } from './trend-filters';
 import { estimateInternalTrendPercent, computeTrendScore } from './trend-product-kpis';
 import { Prisma } from '@prisma/client';
 
@@ -353,7 +353,7 @@ export async function getHybridRadarTrends(params: {
     }
 
     return {
-        trends: finalSorted,
+        trends: JSON.parse(JSON.stringify(finalSorted)),
         summary: {
             total: totalCount,
             byZone: filtered.reduce((acc: any, p) => {

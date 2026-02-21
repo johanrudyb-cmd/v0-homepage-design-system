@@ -12,9 +12,9 @@ export const metadata = {
 
 export default async function TrendsPage() {
   const user = await getCurrentUser();
-  if (!user) {
-    redirect('/auth/signin');
-  }
+  // if (!user) {
+  //   redirect('/auth/signin');
+  // }
 
   // Pré-charger les tendances par défaut (18-24 Homme par exemple) pour affichage instantané
   const initialData = await getHybridRadarTrends({
