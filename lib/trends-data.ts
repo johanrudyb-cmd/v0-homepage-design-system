@@ -102,7 +102,7 @@ export async function getFeaturedTrends() {
             const now = Date.now();
             const selected = selectedProducts.map((p) => {
                 const daysInRadar = p.createdAt
-                    ? Math.floor((now - p.createdAt.getTime()) / (24 * 60 * 60 * 1000))
+                    ? Math.floor((now - new Date(p.createdAt).getTime()) / (24 * 60 * 60 * 1000))
                     : 0;
                 const trendGrowthPercent =
                     p.trendGrowthPercent ??
