@@ -48,21 +48,8 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
   const [isVisible, setIsVisible] = useState(false);
   const [trends, setTrends] = useState<TrendProduct[]>(initialTrends || []);
   const [loading, setLoading] = useState(!initialTrends);
-  const [selectedAge, setSelectedAge] = useState<string>('18-24 ans');
-  const [selectedGender, setSelectedGender] = useState<string | null>(null);
   const [analysesCount, setAnalysesCount] = useState<number | null>(null);
   const [homepageIds, setHomepageIds] = useState<Set<string>>(new Set(initialTrends?.map(t => t.id).filter(Boolean) as string[] || []));
-  const [isSmallScreen, setIsSmallScreen] = useState(false);
-
-  // Détecter la taille de l'écran (Mobile vs Desktop)
-  useEffect(() => {
-    const checkScreen = () => {
-      setIsSmallScreen(window.innerWidth < 640);
-    };
-    checkScreen();
-    window.addEventListener('resize', checkScreen);
-    return () => window.removeEventListener('resize', checkScreen);
-  }, []);
 
   // Charger les tendances et les infos utilisateur
   useEffect(() => {
@@ -128,13 +115,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
     };
   }, []);
 
-  // Filtrer les tendances selon les sélections
-  const ageRange = selectedAge === '18-24 ans' ? '18-24' : '25-34';
-
   const displayedTrends = (() => {
-    // 1. Filtrer par âge
-    let ageMatch = trends.filter(t => t.ageRange === ageRange);
-
     // Fonction pour diversifier les marques (Round Robin simplifié)
     const diversifyByBrand = (list: TrendProduct[], limit: number) => {
       const result: TrendProduct[] = [];
@@ -170,19 +151,9 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
       return result;
     };
 
-    // 2. Calculer les limites (Mobile vs Desktop)
-    const limitPerSegment = isSmallScreen ? 2 : 4;
-
-    if (selectedGender === 'Homme') {
-      return diversifyByBrand(ageMatch.filter(t => t.segment === 'homme'), limitPerSegment * 2);
-    }
-    if (selectedGender === 'Femme') {
-      return diversifyByBrand(ageMatch.filter(t => t.segment === 'femme'), limitPerSegment * 2);
-    }
-
-    // Par défaut : Mix Homme / Femme
-    const men = diversifyByBrand(ageMatch.filter(t => t.segment === 'homme'), limitPerSegment);
-    const women = diversifyByBrand(ageMatch.filter(t => t.segment === 'femme'), limitPerSegment);
+    // Par défaut : Mix 2 Hommes / 2 Femmes (format fixe pour TikTok style)
+    const men = diversifyByBrand(trends.filter(t => t.segment === 'homme'), 2);
+    const women = diversifyByBrand(trends.filter(t => t.segment === 'femme'), 2);
 
     return [...men, ...women];
   })();
@@ -224,43 +195,6 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
           <UsageBadge count={analysesCount} plan={user?.plan || 'free'} />
         </div>
 
-        {/* Filtres modernisés */}
-        <div className="mb-12 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6 p-2 bg-[#F5F5F7] rounded-[32px] sm:rounded-full">
-          <div className="flex items-center gap-2 p-1 w-full sm:w-auto">
-            {['18-24 ans', '25-34 ans'].map((age) => (
-              <button
-                key={age}
-                onClick={() => setSelectedAge(age)}
-                className={cn(
-                  'flex-1 sm:flex-none h-12 px-8 rounded-full text-sm font-bold transition-all duration-300',
-                  selectedAge === age
-                    ? 'bg-[#007AFF] text-white shadow-apple-lg scale-105'
-                    : 'text-[#6e6e73] hover:text-[#007AFF]'
-                )}
-              >
-                {age}
-              </button>
-            ))}
-          </div>
-
-          <div className="flex items-center gap-2 p-1 w-full sm:w-auto border-t sm:border-t-0 sm:border-l border-black/5 sm:pl-4">
-            {['Homme', 'Femme'].map((gender) => (
-              <button
-                key={gender}
-                onClick={() => setSelectedGender(selectedGender === gender ? null : gender)}
-                className={cn(
-                  'flex-1 sm:flex-none h-12 px-8 rounded-full text-sm font-bold transition-all duration-300',
-                  selectedGender === gender
-                    ? 'bg-[#007AFF] text-white shadow-apple-lg'
-                    : 'text-[#6e6e73] hover:text-[#007AFF]'
-                )}
-              >
-                {gender}
-              </button>
-            ))}
-          </div>
-        </div>
-
         {/* Grille de produits animée */}
         {loading ? (
           <div className="flex flex-col items-center justify-center py-32 gap-4">
@@ -268,7 +202,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
             <p className="text-sm font-bold text-[#6e6e73] uppercase tracking-widest">Initialisation du Radar...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             <AnimatePresence mode="popLayout">
               {displayedTrends.map((product, index) => {
                 const segmentLabel = product.segment === 'homme' ? 'Homme' : 'Femme';
