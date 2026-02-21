@@ -191,18 +191,17 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
             </div>
           </div>
 
-          <div className="flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-[#F5F5F7] to-white rounded-full border border-black/5 mt-6 md:mt-0 shadow-[0_2px_10px_rgba(0,0,0,0.02)]">
-            <div className="w-7 h-7 rounded-full bg-black flex items-center justify-center text-white shadow-apple">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
+          <div className="flex items-center gap-3 px-4 py-2.5 bg-gradient-to-r from-red-50/50 to-white rounded-full border border-red-100 mt-6 md:mt-0 shadow-sm">
+            <div className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#FF2D55]"></span>
             </div>
             <div>
-              <div className="text-[12px] font-black tracking-tight text-black leading-none mb-0.5">
-                Outfity AI Engine v2.0
+              <div className="text-[12px] font-black tracking-widest text-[#FF2D55] uppercase leading-none mb-0.5">
+                Radar en Direct
               </div>
-              <div className="text-[9px] font-bold uppercase tracking-widest text-[#6e6e73]">
-                Avant-garde des tendances
+              <div className="text-[9px] font-bold uppercase tracking-widest text-black/60">
+                Mise à jour en temps réel
               </div>
             </div>
           </div>
