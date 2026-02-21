@@ -180,8 +180,8 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
         {/* En-tête avec titre et indicateur */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 lg:mb-20">
           <div className="space-y-6">
-            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-black leading-[0.9] max-w-2xl">
-              Tendances sur <span style={{ textShadow: '-2.5px 2px 0 #25F4EE, 2px -2px 0 #FE2C55' }}>TikTok</span>
+            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-black leading-[0.9] whitespace-nowrap">
+              Tendances sur TikTok
             </h2>
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-[#007AFF] animate-pulse" />
