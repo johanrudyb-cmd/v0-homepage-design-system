@@ -129,7 +129,7 @@ export async function getFeaturedTrends() {
                     trendScore: p.trendScore ?? 0,
                     trendGrowthPercent,
                     averagePrice: p.averagePrice ?? null,
-                    createdAt: p.createdAt?.getTime() ?? now,
+                    createdAt: p.createdAt ? new Date(p.createdAt).getTime() : now,
                 };
             });
 
@@ -169,7 +169,6 @@ export async function getHybridRadarTrends(params: {
 
     const where: any = {
         sourceBrand: { in: sourceBrands },
-        sourceUrl: { not: null },
         marketZone: marketZone || 'EU',
         segment: segmentFilter,
     };
@@ -215,7 +214,7 @@ export async function getHybridRadarTrends(params: {
 
     const now = Date.now();
     const enriched = filtered.map((p) => {
-        const daysInRadar = Math.floor((now - new Date(p.createdAt).getTime()) / 86400000);
+        const daysInRadar = p.createdAt ? Math.floor((now - new Date(p.createdAt).getTime()) / 86400000) : 0;
         const recurrenceInCategory = recurrenceByKey.get(`${p.category ?? ''}|${p.segment ?? ''}`) ?? 0;
         const effectiveTrendGrowthPercent =
             p.trendGrowthPercent ??
