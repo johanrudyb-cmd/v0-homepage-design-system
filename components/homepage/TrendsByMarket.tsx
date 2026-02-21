@@ -221,7 +221,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                       delay: index * 0.05,
                       ease: [0.23, 1, 0.32, 1]
                     }}
-                    className="group relative w-full mx-auto max-w-[360px] lg:max-w-full xl:max-w-[320px]"
+                    className="group relative w-full mx-auto max-w-[350px] sm:max-w-[320px] lg:max-w-[230px] xl:max-w-[250px]"
                   >
                     <div className="bg-white rounded-[32px] overflow-hidden transition-all duration-500 shadow-apple border border-black/[0.03] flex flex-col h-full hover:shadow-apple-lg hover:-translate-y-2">
                       {isFree && !isPubliclyVisible && (
@@ -257,9 +257,32 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent z-10" />
 
                           {(() => {
-                            const score = product.trendScore || 0;
+                            const score = product.trendScore || 50;
                             const badge = getViralityBadge(score);
                             const brand = safeDisplayBrand(product.brand) || product.brand || 'Marque Inconnue';
+
+                            // Realistic stats based on score
+                            const baseLikes = Math.floor(score * 1250 + (product.name.length * 100)); // Range ~ 80K - 150K
+                            const baseComments = Math.floor(baseLikes * 0.012);
+                            const baseBookmarks = Math.floor(baseLikes * 0.08);
+                            const baseShares = Math.floor(baseLikes * 0.035);
+
+                            const formatNum = (n: number) => {
+                              if (n >= 1000000) return (n / 1000000).toFixed(1).replace('.0', '') + 'M';
+                              if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'K';
+                              return n.toString();
+                            };
+
+                            // Realistic TikTok fashion usernames
+                            const creatorNames = [
+                              '@clara.outfits', '@lena_style', '@mathilde.ootd', '@julien.drip',
+                              '@sarah.fashion', '@lucas_streetwear', '@emilie.finds', '@hugo.styles',
+                              '@camille.looks', '@theo.vintage', '@lea.fashionista', '@max.sneakers',
+                              '@chloe.wardrobe', '@antoine.fits', '@manon.trends'
+                            ];
+                            // Pick one deterministically based on product signature/first chars
+                            const charCodeSum = (product.name + product.id).split('').reduce((sum, char) => sum + char.charCodeAt(0), 0);
+                            const username = creatorNames[charCodeSum % creatorNames.length];
 
                             return (
                               <>
@@ -288,7 +311,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                                     </svg>
                                     <span className="text-white text-[12px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                                      {Math.floor((score || 1) * 12.5)}K
+                                      {formatNum(baseLikes)}
                                     </span>
                                   </div>
 
@@ -298,7 +321,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                                       <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 9h-2V9h2v2zm-4 0h-2V9h2v2zm-4 0H7V9h2v2z" />
                                     </svg>
                                     <span className="text-white text-[12px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                                      {Math.floor((score || 1) * 2.1)}
+                                      {formatNum(baseComments)}
                                     </span>
                                   </div>
 
@@ -308,7 +331,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                                       <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
                                     </svg>
                                     <span className="text-white text-[12px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                                      {Math.floor((score || 1) * 4.3)}
+                                      {formatNum(baseBookmarks)}
                                     </span>
                                   </div>
 
@@ -318,7 +341,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                                       <path d="M11 6.914V2.586L20.414 12 11 21.414v-4.328c-4.22-.162-8.312.92-11 5.914 0-6.118 2.653-12.784 11-16.086z" />
                                     </svg>
                                     <span className="text-white text-[12px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
-                                      {Math.floor((score || 1) * 8.6)}
+                                      {formatNum(baseShares)}
                                     </span>
                                   </div>
 
@@ -339,7 +362,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                                 <div className="absolute left-3 bottom-4 right-[64px] z-20">
                                   <div className="flex items-center gap-2 mb-1">
                                     <span className="text-[15px] font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] line-clamp-1">
-                                      {brand.replace(/\s+/g, '').toLowerCase()}_style
+                                      {username}
                                     </span>
                                     <div className="px-1.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-sm text-[10px] text-white font-bold flex items-center gap-1">
                                       Viral
