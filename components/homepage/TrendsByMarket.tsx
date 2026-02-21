@@ -191,6 +191,24 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
             </div>
           </div>
 
+          <div className="flex flex-col gap-2 p-4 sm:p-5 bg-[#F5F5F7] rounded-3xl sm:rounded-full border border-black/5 w-full md:w-auto mt-6 md:mt-0">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
+                <svg className="w-4 h-4 text-black" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                </svg>
+              </div>
+              <div>
+                <div className="text-2xl sm:text-3xl font-black tracking-tight text-black leading-none">
+                  +1.4M
+                </div>
+                <div className="text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#6e6e73]">
+                  Vidéos TikTok scannées aujourd'hui
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Grille de produits animée */}
