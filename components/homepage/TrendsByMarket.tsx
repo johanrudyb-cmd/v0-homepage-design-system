@@ -368,11 +368,21 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                                   </div>
 
                                   <div className="text-[13px] lg:text-[11px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-snug line-clamp-2">
-                                    {product.name}
+                                    {(() => {
+                                      const captions = [
+                                        "Je viens de trouver la meilleure pépite 🤯 Foncez avant la rupture !!",
+                                        "POV: tu as trouvé le meilleur indispensable de la saison ✨",
+                                        "Alerte pépite !! Ça match avec absolument tout 🏃‍♂️💨",
+                                        "Comment j'ai pu vivre sans ça avant ? 😍 C'est incroyable",
+                                        "Meilleur achat de l'année, je valide à 100% 🔥",
+                                        "Le masterclass absolu pour votre prochaine tenue 💯"
+                                      ];
+                                      return captions[charCodeSum % captions.length];
+                                    })()}
                                   </div>
 
                                   <div className="text-[13px] lg:text-[11px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mt-1">
-                                    <span className="font-bold hover:underline cursor-pointer">#{brand.replace(/\s+/g, '').toLowerCase()}</span>{' '}
+                                    <span className="font-bold hover:underline cursor-pointer">#pepite</span>{' '}
                                     <span className="font-bold hover:underline cursor-pointer">#viral</span>{' '}
                                     <span className="font-bold hover:underline cursor-pointer">#fyp</span>{' '}
                                     <span className="font-bold hover:underline cursor-pointer">#pourtoi</span>{' '}
