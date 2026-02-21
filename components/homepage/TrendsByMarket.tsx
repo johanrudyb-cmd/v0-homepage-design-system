@@ -181,7 +181,7 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 lg:mb-20">
           <div className="space-y-6">
             <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-black leading-[0.9] max-w-2xl">
-              Tendances sur TikTok
+              Tendances sur <span style={{ textShadow: '-2.5px 2px 0 #25F4EE, 2px -2px 0 #FE2C55' }}>TikTok</span>
             </h2>
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-[#007AFF] animate-pulse" />
@@ -369,13 +369,18 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
 
                                   <div className="text-[13px] lg:text-[11px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-snug line-clamp-2">
                                     {(() => {
+                                      const cleanName = product.name.toLowerCase();
                                       const captions = [
-                                        "Je viens de trouver la meilleure pépite 🤯 Foncez avant la rupture !!",
-                                        "POV: tu as trouvé le meilleur indispensable de la saison ✨",
-                                        "Alerte pépite !! Ça match avec absolument tout 🏃‍♂️💨",
-                                        "Comment j'ai pu vivre sans ça avant ? 😍 C'est incroyable",
-                                        "Meilleur achat de l'année, je valide à 100% 🔥",
-                                        "Le masterclass absolu pour votre prochaine tenue 💯"
+                                        `J'ai enfin trouvé ça ! 😍 ${cleanName}`,
+                                        `POV: tu as trouvé l'indispensable de la saison ✨ (${cleanName})`,
+                                        `Je valide à 100% 🔥 : ${cleanName}`,
+                                        `Le masterclass absolu pour votre prochaine tenue 💯 : ${cleanName}`,
+                                        `Vous validez ? 🥵 ${cleanName}`,
+                                        `Je viens de dénicher ce vrai banger 🤯 : ${cleanName}`,
+                                        `${cleanName} !! Foncez avant la rupture 🏃‍♂️💨`,
+                                        `Comment j'ai pu vivre sans ça avant ? 😭 ${cleanName}`,
+                                        `C'est une dinguerie à quel point c'est lourd : ${cleanName}`,
+                                        `Alerte pépite !! ${cleanName} ✨`
                                       ];
                                       return captions[charCodeSum % captions.length];
                                     })()}
