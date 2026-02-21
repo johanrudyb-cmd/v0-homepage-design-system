@@ -1,442 +1,249 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import { useSession } from 'next-auth/react';
+import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
-import { getProductBrand } from '@/lib/brand-utils';
-import { proxyImageUrl } from '@/lib/image-proxy';
-import { Card, CardContent } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Loader2, AlertTriangle, Flame, Globe, Lock } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import { Loader2, TrendingUp, Tag, Layers, Sparkles, Shirt, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { motion, AnimatePresence } from 'framer-motion';
-import { QUOTA_CONFIG } from '@/lib/quota-config';
-import { FeatureUsageBadge } from '@/components/usage/FeatureUsageBadge';
-import { USAGE_REFRESH_EVENT } from '@/lib/hooks/useAIUsage';
+import { motion } from 'framer-motion';
 
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
+} from 'recharts';
 
-interface HybridTrend {
-  id: string;
-  name: string;
-  category: string;
-  marketZone: string | null;
-  segment: string | null;
-  cut: string | null;
-  trendScoreVisual: number | null;
-  trendScore: number;
-  averagePrice: number;
-  trendGrowthPercent: number | null;
-  trendLabel: string | null;
-  effectiveTrendGrowthPercent?: number;
-  effectiveTrendLabel?: string | null;
-  imageUrl: string | null;
-  sourceBrand: string | null;
-  sourceUrl?: string | null;
-  material?: string | null;
-  description?: string | null;
-  isGlobalTrendAlert: boolean;
-  businessAnalysis: string | null;
-}
+const CATEGORY_IMAGES: Record<string, Record<string, string>> = {
+  homme: {
+    "t-shirts": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/95c18205-935b-4139-a3f4-2ed7b8a53e4d.png",
+    "sweats": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/c4b723c8-de94-43bd-89b2-fe21f592d636.png",
+    "vestes": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/6428a082-c729-48fe-b525-7bd667c46b59.png",
+    "pantalons": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/13695bb5-a3f2-4593-a664-4ed5ff4e7387.png",
+    "jeans": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/f6ede387-9faf-4f8f-a151-4ec9e4892617.png"
+  },
+  femme: {
+    "t-shirts": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/d62090e7-8ee2-411f-b0b7-d4ab1467156d.png",
+    "sweats": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/8b393865-f928-4e40-ad7b-b0a6cae924e1.png",
+    "vestes": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/33b9ac58-b800-4172-b955-ce8bea09880a.png",
+    "pantalons": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/017bca67-2ec5-48aa-8b19-dba5d81ca9a6.png",
+    "jeans": "https://d3u0tzju9qaucj.cloudfront.net/e2403014-df89-46b9-ad7a-dab42cadbcbe/d73da759-5240-4515-9091-20eab55469bd.png",
+    "robes": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=1000&auto=format&fit=crop"
+  }
+};
 
-export function TendancesContent({ initialData }: { initialData?: { trends: HybridTrend[]; summary: any } }) {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const brandFromUrl = searchParams.get('brand');
+const MAIN_CATEGORIES: any[] = [
+  {
+    id: 't-shirts',
+    dbId: 'TSHIRT',
+    label: 'T-Shirts & Hauts',
+    icon: Shirt,
+    desc: { homme: 'Oversize, Boxy, Graphique & Polos', femme: 'Tops, Bodys & Basiques' }
+  },
+  {
+    id: 'sweats',
+    dbId: 'SWEAT',
+    label: 'Sweats & Pulls',
+    icon: Tag,
+    desc: { homme: 'Hoodies, Pulls en Maille & Cardigans', femme: 'Mailles, Cardigans & Hoodies' }
+  },
+  {
+    id: 'robes',
+    dbId: 'DRESS',
+    label: 'Robes',
+    icon: Sparkles,
+    desc: { homme: '', femme: 'Mini, Midi, Maxi & Soirée' },
+    onlyFemme: true
+  },
+  {
+    id: 'vestes',
+    dbId: 'JACKEX',
+    label: 'Vestes & Manteaux',
+    icon: Layers,
+    desc: { homme: 'Bombers, Cuir, Racing & Varsity', femme: 'Blazers, Trenchs & Cuir' }
+  },
+  {
+    id: 'pantalons',
+    dbId: 'PANT',
+    label: { homme: 'Pantalons', femme: 'Pantalons & Jupes' },
+    icon: Tag,
+    desc: { homme: 'Cargo, Large & Jogging', femme: 'Jupes, Cargos & Ensembles' }
+  },
+  {
+    id: 'jeans',
+    dbId: 'JEAN',
+    label: 'Jeans',
+    icon: Layers,
+    desc: { homme: 'Baggy & Droit', femme: 'Wide Leg, Mom & Baggy' }
+  },
+];
 
-  const [trends, setTrends] = useState<HybridTrend[]>(initialData?.trends || []);
-  const [totalTrends, setTotalTrends] = useState<number>(initialData?.summary?.total || 0);
-  const [trendsLoading, setTrendsLoading] = useState(false);
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const cache = useState<Record<string, { trends: HybridTrend[], total: number }>>({})[0]; // Simple persistent session cache
-
-  const { data: session } = useSession();
-  const user = session?.user as any;
-  const [zone, setZone] = useState<string>('EU');
-  const [homepageIds, setHomepageIds] = useState<Set<string>>(new Set());
-  const [analysesCount, setAnalysesCount] = useState<number | null>(null);
-  const limitReached = searchParams.get('limit') === 'reached';
-
-  const [ageRange, setAgeRange] = useState<'18-24' | '25-34'>(() => {
-    if (typeof window === 'undefined') return '18-24';
-    const a = sessionStorage.getItem('trends-list-ageRange');
-    if (a === '18-24' || a === '25-34') return a;
-    return '18-24';
-  });
-  const [segment, setSegment] = useState<string>(() => {
-    if (typeof window === 'undefined') return 'homme';
-    const s = sessionStorage.getItem('trends-list-segment');
-    if (s === 'femme' || s === 'homme') return s;
-    return 'homme';
-  });
-  const [sortBy, setSortBy] = useState<string>('best');
-  const [globalOnly, setGlobalOnly] = useState(false);
-  const [advancedFiltersOpen, setAdvancedFiltersOpen] = useState(false);
-
-  // Sync filters to sessionStorage
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      sessionStorage.setItem('trends-list-ageRange', ageRange);
-      sessionStorage.setItem('trends-list-segment', segment);
-    }
-  }, [ageRange, segment]);
-
-  const loadTrends = useCallback(async () => {
-    const cacheKey = `${segment}-${ageRange}-${sortBy}-${zone}-${globalOnly}-${brandFromUrl || ''}`;
-
-    // Check cache first for instant display
-    if (cache[cacheKey]) {
-      setTrends(cache[cacheKey].trends);
-      setTotalTrends(cache[cacheKey].total);
-      return;
-    }
-
-    if (trends.length > 0) {
-      setIsRefreshing(true);
-    } else {
-      setTrendsLoading(true);
-    }
-
-    try {
-      const params = new URLSearchParams();
-      if (zone) params.set('marketZone', zone);
-      params.set('ageRange', ageRange);
-      params.set('segment', segment);
-      params.set('sortBy', sortBy);
-      if (globalOnly) params.set('globalOnly', 'true');
-      if (brandFromUrl) params.set('brand', brandFromUrl);
-      params.set('limit', '15');
-
-      const res = await fetch(`/api/trends/hybrid-radar?${params.toString()}`);
-      const data = res.ok ? await res.json().catch(() => ({})) : {};
-
-      const newTrends = Array.isArray(data.trends) ? data.trends : [];
-      const newTotal = data.summary?.total || 0;
-
-      // Update state and cache
-      setTrends(newTrends);
-      setTotalTrends(newTotal);
-      cache[cacheKey] = { trends: newTrends, total: newTotal };
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setTrendsLoading(false);
-      setIsRefreshing(false);
-    }
-  }, [zone, ageRange, segment, sortBy, globalOnly, brandFromUrl, initialData, trends.length, cache]);
+export function TendancesContent({ initialData }: { initialData?: any }) {
+  const [segment, setSegment] = useState<string>('homme');
+  const [previews, setPreviews] = useState<any>(null);
+  const [realStats, setRealStats] = useState<Record<string, { score: number, diff: number, pct: string, newItems: number }>>({});
+  const [loadingStats, setLoadingStats] = useState(true);
 
   useEffect(() => {
-    loadTrends();
-  }, [ageRange, segment, sortBy, zone, globalOnly, brandFromUrl]); // loadTrends is already stable via useCallback but better to be explicit about dependencies here if needed, or keep loadTrends
+    fetch('/style-previews.json')
+      .then(res => res.ok ? res.json() : null)
+      .then(data => setPreviews(data))
+      .catch(() => null);
+  }, []);
 
   useEffect(() => {
-    fetch('/api/trends/homepage-featured').then((r) => r.ok ? r.json() : null).then((featuredData) => {
-      const ids = (featuredData?.trends ?? []).map((t: { id?: string }) => t.id).filter(Boolean);
-      setHomepageIds(new Set(ids));
-    }).catch(() => { });
+    const fetchStats = async () => {
+      setLoadingStats(true);
+      try {
+        const res = await fetch(`/api/trends/hybrid-radar?segment=${segment}&limit=500`);
+        if (res.ok) {
+          const { trends } = await res.json();
+          const statsMap: Record<string, { score: number, diff: number, pct: string, newItems: number }> = {};
 
-    const fetchCount = () => {
-      // Fetch for free users, OR if we want to support paid users seeing their usage too
-      // For now, let's keep it consistent with previous logic but allow refresh
-      if (user?.plan === 'free') {
-        fetch('/api/trends/analyses-count')
-          .then((r) => (r.ok ? r.json() : Promise.resolve({ count: 0 })))
-          .then((d) => setAnalysesCount(d.count ?? 0))
-          .catch(() => { });
+          const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
+          MAIN_CATEGORIES.forEach(cat => {
+            const catProducts = trends.filter((p: any) => p.category === cat.dbId);
+            if (catProducts.length > 0) {
+              const avgScore = catProducts.reduce((acc: number, p: any) => acc + (p.trendScore || 50), 0) / catProducts.length;
+              const volumeBonus = Math.min(15, Math.floor(catProducts.length / 5));
+              const finalScore = Math.round(avgScore + volumeBonus);
+
+              const newItems = catProducts.filter((p: any) => new Date(p.createdAt) > twentyFourHoursAgo).length;
+              const diff = newItems > 0
+                ? Math.max(1, Math.min(10, Math.floor(newItems / 2)))
+                : -0.2; // Baisse dérisoire par défaut si pas de refresh
+              const pct = ((diff / (finalScore || 1)) * 100).toFixed(1);
+
+              statsMap[cat.dbId] = { score: finalScore, diff, pct, newItems };
+            } else {
+              statsMap[cat.dbId] = { score: 50, diff: 0, pct: '0.0', newItems: 0 };
+            }
+          });
+          setRealStats(statsMap as any);
+        }
+      } catch (e) {
+        console.error('Failed to fetch real stats:', e);
+      } finally {
+        setLoadingStats(false);
       }
     };
-
-    fetchCount();
-    window.addEventListener(USAGE_REFRESH_EVENT, fetchCount);
-    return () => window.removeEventListener(USAGE_REFRESH_EVENT, fetchCount);
-  }, [user?.plan]);
-
-  const handleAnalyzeClick = () => {
-    try {
-      sessionStorage.setItem('trends-list-scroll', String(window.scrollY ?? document.documentElement.scrollTop ?? 0));
-      sessionStorage.setItem('trends-list-segment', segment || 'homme');
-      sessionStorage.setItem('trends-list-ageRange', ageRange || '25-34');
-    } catch (_) { }
-  };
+    fetchStats();
+  }, [segment]);
 
   return (
-    <div className="space-y-12 pb-24">
-      {/* Brand Filter Active Indicator */}
-      {brandFromUrl && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="p-4 rounded-2xl bg-[#007AFF]/5 border border-[#007AFF]/10 flex items-center justify-between"
-        >
-          <div className="flex items-center gap-3">
-            <div className="w-2 h-2 rounded-full bg-[#007AFF]" />
-            <span className="text-sm font-bold text-black tracking-tight">Filtre actif : {brandFromUrl}</span>
-          </div>
-          <Link href="/trends" className="text-xs font-black uppercase tracking-widest text-[#007AFF] hover:underline">
-            Réinitialiser
-          </Link>
-        </motion.div>
-      )}
-
-      {/* Modern Sticky Navigation & Utility Bar */}
-      <div className="sticky top-14 sm:top-16 z-40 -mx-4 px-4 py-4 bg-white/70 backdrop-blur-2xl border-b border-black/[0.03]">
-        <div className="max-w-7xl mx-auto flex flex-col gap-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <h2 className="text-2xl font-black tracking-tight text-black">
-                Radar Elite
-                <span className="ml-3 text-[10px] bg-[#007AFF] text-white px-2.5 py-1 rounded-full font-black tracking-widest uppercase shadow-lg shadow-[#007AFF]/20">
-                  60 Produits
-                </span>
-              </h2>
-              <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-black/5 rounded-full border border-black/5">
-                <div className="w-1.5 h-1.5 rounded-full bg-[#007AFF] animate-pulse" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-[#007AFF]">LIVE EU</span>
-              </div>
+    <div className="min-h-screen pb-32 font-sans transition-colors duration-1000 bg-[#F5F5F7]">
+      {/* 1. Static Header */}
+      <div className="backdrop-blur-xl border-b pt-16 pb-14 transition-all duration-1000 bg-white border-black/5">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-10">
+            <div>
+              <p className="font-black uppercase tracking-[0.4em] text-[11px] mb-4 transition-colors duration-500 text-[#007AFF]">Analyse Tendance</p>
+              <h1 className="text-6xl md:text-7xl font-black text-black uppercase tracking-tighter leading-[0.9]">
+                QUEL STYLE EST <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#007AFF] to-[#00C6FF]">VIRAL</span> ?
+              </h1>
             </div>
-
-            <div className="flex items-center gap-3">
-              <FeatureUsageBadge
-                featureKey="trends_hybrid_scan"
-                isFree={user?.plan === 'free'}
-              />
-            </div>
-          </div>
-
-          <div className="flex flex-wrap items-center gap-4">
-            {/* Age selector */}
-            <div className="flex p-1 bg-[#F5F5F7] rounded-full sm:min-w-[200px]">
-              {(['18-24', '25-34'] as const).map((age) => (
-                <button
-                  key={age}
-                  onClick={() => setAgeRange(age)}
-                  className={cn(
-                    "flex-1 h-9 px-4 text-[11px] font-black uppercase tracking-widest rounded-full transition-all duration-300",
-                    ageRange === age ? "bg-white text-black shadow-apple-sm" : "text-[#6e6e73] hover:text-black"
-                  )}
-                >
-                  {age} ans
-                </button>
-              ))}
-            </div>
-
-            {/* Segment selector */}
-            <div className="flex p-1 bg-[#F5F5F7] rounded-full sm:min-w-[180px]">
-              {['homme', 'femme'].map((s) => (
+            <div className="flex p-1.5 rounded-2xl w-fit transition-colors duration-700 bg-[#F5F5F7]">
+              {['homme', 'femme'].map(s => (
                 <button
                   key={s}
                   onClick={() => setSegment(s)}
                   className={cn(
-                    "flex-1 h-9 px-4 text-[11px] font-black uppercase tracking-widest rounded-full transition-all duration-300",
-                    segment === s ? "bg-white text-black shadow-apple-sm" : "text-[#6e6e73] hover:text-black"
+                    "px-10 py-4 text-[11px] font-black uppercase tracking-widest rounded-xl transition-all duration-500",
+                    segment === s
+                      ? "bg-[#007AFF] text-white shadow-[0_10px_30px_-10px_rgba(0,122,255,0.5)] scale-105"
+                      : "text-gray-400 hover:text-black"
                   )}
                 >
                   {s}
                 </button>
               ))}
             </div>
-
-            {/* Sort selector */}
-            <div className="relative group">
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="appearance-none h-11 pl-6 pr-10 rounded-full bg-[#F5F5F7] border-none text-[11px] font-black uppercase tracking-widest text-[#6e6e73] focus:ring-2 focus:ring-black/5 outline-none cursor-pointer hover:text-black transition-colors"
-              >
-                <option value="best">Meilleurs Scores IVS</option>
-                <option value="recent">Nouveautés Radar</option>
-                <option value="priceAsc">Prix : Croissant</option>
-                <option value="priceDesc">Prix : Décroissant</option>
-              </select>
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
-              </div>
-            </div>
           </div>
         </div>
       </div>
 
-      <div className="flex items-center gap-3 text-sm text-[#6e6e73]">
-        <Flame className="w-5 h-5 text-[#FF3B30] fill-[#FF3B30]" />
-        <span className="font-bold tracking-tight">Le Top 15 des tendances validées par nos algorithmes de viralité sociale.</span>
-      </div>
+      {/* 2. Menu de Catégories (Grid) */}
+      <div className="max-w-7xl mx-auto px-6 py-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+          {MAIN_CATEGORIES.filter(c => !c.onlyFemme || segment === 'femme').map((cat, idx) => {
+            const categoryImage = CATEGORY_IMAGES[segment]?.[cat.id] || '';
+            const label = typeof cat.label === 'string' ? cat.label : cat.label[segment];
+            const desc = typeof cat.desc === 'string' ? cat.desc : cat.desc[segment];
 
-      {/* Trends Grid or Loading State */}
-      <div className="relative min-h-[600px]">
-        {/* Subtle Refreshing Overlay */}
-        <AnimatePresence>
-          {isRefreshing && (
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="absolute inset-x-0 top-0 z-50 flex justify-center pt-24 pointer-events-none"
-            >
-              <div className="flex items-center gap-3 px-6 py-3 bg-white/90 backdrop-blur-xl rounded-full shadow-apple-lg border border-black/5">
-                <div className="w-4 h-4 border-2 border-[#007AFF] border-t-transparent rounded-full animate-spin" />
-                <span className="text-[10px] font-black uppercase tracking-widest text-black">Mise à jour...</span>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {trendsLoading && trends.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-40 gap-4">
-            <div className="w-12 h-12 border-4 border-black/5 border-t-black rounded-full animate-spin" />
-            <p className="text-sm font-black uppercase tracking-widest text-[#6e6e73]">Initialisation du Radar...</p>
-          </div>
-        ) : trends.length === 0 ? (
-          <div className="py-32 text-center rounded-[32px] bg-[#F5F5F7] border border-dashed border-black/10">
-            <AlertTriangle className="w-16 h-16 mx-auto mb-6 text-black/20" />
-            <h3 className="text-xl font-black text-black mb-2 uppercase tracking-tight">Aucun résultat</h3>
-            <p className="text-[#6e6e73] mb-8">Nous n'avons trouvé aucun produit correspondant à vos filtres actuels.</p>
-            <Button onClick={() => { setGlobalOnly(false); setSortBy('best'); }} variant="outline" className="rounded-full px-8 font-black uppercase tracking-widest text-xs h-12">
-              Réinitialiser les filtres
-            </Button>
-          </div>
-        ) : (
-          <motion.div
-            layout
-            className={cn(
-              "grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-8 transition-all duration-500",
-              isRefreshing ? "opacity-60 pointer-events-none" : "opacity-100"
-            )}
-          >
-            <AnimatePresence mode="popLayout">
-              {trends.map((t, index) => {
-                const isFree = user?.plan === 'free';
-                const isVisible = !isFree || homepageIds.has(t.id);
-                return (
-                  <motion.div
-                    layout
-                    key={t.id}
-                    initial={{ opacity: 0, scale: 0.9, y: 30 }}
-                    animate={{ opacity: 1, scale: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9, y: 30 }}
-                    transition={{
-                      duration: 0.6,
-                      delay: Math.min(index * 0.05, 0.4),
-                      ease: [0.23, 1, 0.32, 1]
-                    }}
-                    className="group relative"
-                  >
-                    <div className="bg-white rounded-[32px] overflow-hidden transition-all duration-500 shadow-apple border border-black/[0.03] flex flex-col h-full hover:shadow-apple-lg hover:-translate-y-2">
-                      {isFree && !isVisible && (
-                        <div className="absolute inset-0 z-40 bg-white/40 backdrop-blur-xl flex flex-col items-center justify-center p-6 text-center">
-                          <div className="w-14 h-14 bg-black rounded-full flex items-center justify-center mb-6 shadow-apple">
-                            <Lock className="w-6 h-6 text-white" />
-                          </div>
-                          <h4 className="text-lg font-black text-black mb-4 tracking-tight">Radar Elite</h4>
-                          <Link
-                            href="/auth/choose-plan"
-                            className="w-full py-3 bg-[#007AFF] text-white rounded-full text-xs font-bold hover:bg-[#007AFF]/90 transition-all active:scale-95 shadow-xl uppercase tracking-widest"
-                          >
-                            Passer au Plan Créateur
-                          </Link>
-                        </div>
-                      )}
-
-                      <div className={cn("flex flex-col h-full", isFree && !isVisible ? 'opacity-10 grayscale' : '')}>
-                        <div className="relative aspect-[3/4] overflow-hidden bg-[#F5F5F7]">
-                          <img
-                            src={proxyImageUrl(t.imageUrl) || t.imageUrl || ''}
-                            alt={t.name}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-apple group-hover:scale-110"
-                            referrerPolicy="no-referrer"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              const p = proxyImageUrl(t.imageUrl || '');
-                              if (p && target.src !== p) target.src = p;
-                            }}
-                          />
-
-                          <div className="absolute top-1.5 left-1.5 sm:top-4 sm:left-4 flex flex-col gap-1 sm:gap-2 z-20">
-                            {t.segment && (
-                              <span className="px-1.5 py-0.5 sm:px-3 sm:py-1.5 rounded-full bg-white/90 backdrop-blur-md text-black text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-apple-sm border border-black/5">
-                                {t.segment}
-                              </span>
-                            )}
-                            {t.isGlobalTrendAlert && (
-                              <span className="px-1.5 py-0.5 sm:px-3 sm:py-1.5 rounded-full bg-[#007AFF] text-white text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
-                                <Globe className="w-2 h-2 sm:w-3 sm:h-3" />
-                                Global
-                              </span>
-                            )}
-                            {((t as any).outfityIVS || t.trendScore) > 85 && (
-                              <span className="px-1.5 py-0.5 sm:px-3 sm:py-1.5 rounded-full bg-[#007AFF] text-white text-[8px] sm:text-[10px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1">
-                                <div className="w-1 h-1 rounded-full bg-white animate-pulse" />
-                                Elite
-                              </span>
-                            )}
-                          </div>
-
-                          {((t as any).outfityIVS || t.trendScore) && (
-                            <div className="absolute bottom-1.5 right-1.5 sm:bottom-4 sm:right-4 z-20">
-                              <div className="px-2 py-1 sm:px-4 sm:py-2.5 rounded-[20px] bg-black/85 backdrop-blur-xl text-white border border-white/10 shadow-apple-lg text-right flex flex-col items-end">
-                                <div className="flex gap-0.5 mb-1 text-[#FF3B30]">
-                                  {[...Array(
-                                    ((t as any).outfityIVS || t.trendScore) >= 90 ? 3 :
-                                      ((t as any).outfityIVS || t.trendScore) >= 80 ? 2 : 1
-                                  )].map((_, i) => (
-                                    <Flame key={i} className="w-2 h-2 sm:w-3.5 sm:h-3.5 fill-current" />
-                                  ))}
-                                </div>
-                                <div className="text-[9px] font-black uppercase tracking-widest text-white/50 mb-0.5 leading-none">Potentiel Viral</div>
-                              </div>
-                            </div>
-                          )}
-                        </div>
-
-                        <div className="p-3 sm:p-6 flex flex-col flex-grow">
-                          <div className="mb-4">
-                            <div className="h-[34px] sm:h-[48px] mb-1 sm:mb-2 overflow-hidden">
-                              <h3 className="text-[13px] sm:text-[17px] font-bold text-black leading-tight line-clamp-2 transition-colors group-hover:text-[#007AFF]">
-                                {t.name}
-                              </h3>
-                            </div>
-                            <div className="flex items-center gap-2 sm:gap-3">
-                              <span className="text-[8px] sm:text-[10px] font-black text-[#007AFF] bg-[#007AFF]/10 px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-[#007AFF]/10">
-                                {t.category}
-                              </span>
-                              <span className="text-[9px] sm:text-[11px] font-bold text-black/20 italic truncate">
-                                By {((t as any).productBrand || t.sourceBrand || 'Brand').substring(0, 15)}
-                              </span>
-                            </div>
-                          </div>
-
-                          {t.businessAnalysis && (
-                            <div className="hidden sm:block">
-                              <p className="text-[12px] text-[#6e6e73] line-clamp-2 mb-6 italic leading-relaxed font-medium">
-                                "{t.businessAnalysis}"
-                              </p>
-                            </div>
-                          )}
-
-                          <div className="mt-auto">
-                            <Link
-                              href={`/trends/${t.id}`}
-                              onClick={handleAnalyzeClick}
-                              className="w-full h-9 sm:h-12 rounded-full flex items-center justify-center text-[9px] sm:text-xs font-black uppercase tracking-widest bg-black text-white shadow-apple hover:bg-[#1D1D1F] active:scale-95 transition-all duration-300"
-                            >
-                              Analyse complète
-                            </Link>
-                          </div>
-                        </div>
+            return (
+              <Link key={cat.id} href={`/trends/category/${cat.id}?segment=${segment}`}>
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="group relative h-[400px] rounded-[50px] overflow-hidden bg-white shadow-sm hover:shadow-[0_30px_60px_-15px_rgba(0,0,0,0.1)] transition-all duration-700 cursor-pointer"
+                >
+                  <div className={cn(
+                    "absolute inset-0 transition-all duration-700 overflow-hidden",
+                    "grayscale-[0.2] group-hover:grayscale-0"
+                  )}>
+                    {/* Live Indicator Overlay */}
+                    <div className="absolute top-8 left-8 z-10 flex flex-col gap-2">
+                      <div className="flex items-center gap-2 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-full border border-white/10 w-fit">
+                        <div className="w-1.5 h-1.5 rounded-full bg-[#34C759] animate-pulse shadow-[0_0_8px_rgba(52,199,89,0.8)]" />
+                        <span className="text-[8px] font-black text-white uppercase tracking-widest">Tendance en Direct</span>
                       </div>
                     </div>
-                  </motion.div>
-                );
-              })}
-            </AnimatePresence>
-          </motion.div>
-        )}
+
+                    <img
+                      src={categoryImage}
+                      className={cn(
+                        "w-full h-full transition-transform duration-1000",
+                        "object-cover group-hover:scale-110"
+                      )}
+                      alt={label}
+                    />
+                    {/* Overlay Graduel */}
+                    <div className={cn(
+                      "absolute inset-0 bg-gradient-to-b",
+                      "from-black/10 via-black/20 to-black/80"
+                    )} />
+                  </div>
+
+                  {/* Content Overlay */}
+                  <div className="absolute inset-0 p-10 flex flex-col justify-end">
+                    <motion.div
+                      whileHover={{ scale: 1.1 }}
+                      className={cn(
+                        "w-14 h-14 rounded-2xl backdrop-blur-md flex items-center justify-center mb-6 transition-all duration-500",
+                        "bg-[#007AFF]/20 border border-white/20 group-hover:bg-[#007AFF] group-hover:rotate-6 shadow-xl"
+                      )}
+                    >
+                      <cat.icon className={cn("w-6 h-6", "text-white")} />
+                    </motion.div>
+
+                    <h2 className={cn(
+                      "text-4xl font-black uppercase tracking-tighter leading-none mb-3",
+                      "text-white drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)] transition-all duration-500 group-hover:translate-x-2"
+                    )}>
+                      {label}
+                    </h2>
+
+                    <p className={cn(
+                      "font-bold text-[10px] uppercase tracking-[0.2em] transition-colors",
+                      "text-white/90 drop-shadow-md group-hover:text-white"
+                    )}>
+                      {desc}
+                    </p>
+
+                    {/* Action Button Invisible by default */}
+                    <div className="mt-8 flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
+                      <div className="px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest shadow-xl transition-all bg-[#007AFF] text-white flex items-center gap-2">
+                        Diagnostic Tendance <ArrowRight className="w-3 h-3" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </Link>
+            );
+          })}
+        </div>
       </div>
 
-      <div className="py-12 border-t border-black/[0.03] text-center">
-        <p className="text-[10px] font-black uppercase tracking-[0.2em] text-[#6e6e73]">
-          Algorithme de détection Outfity v4.2 • Mise à jour hebdomadaire
-        </p>
-      </div>
     </div>
   );
 }

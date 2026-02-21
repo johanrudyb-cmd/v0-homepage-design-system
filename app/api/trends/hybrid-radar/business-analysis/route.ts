@@ -64,7 +64,8 @@ export async function POST(request: Request) {
     const analysis = await generateBusinessAnalysisForZones(
       product.name,
       zones,
-      trendScoresByZone
+      trendScoresByZone,
+      product.averagePrice
     );
 
     await prisma.trendProduct.update({

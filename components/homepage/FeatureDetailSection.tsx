@@ -42,13 +42,13 @@ const detailedFeatures = [
   },
   {
     icon: TrendingUp,
-    title: 'Analyse de tendances',
-    description: 'Découvrez les tendances émergentes avant vos concurrents. Analysez le marché et identifiez les opportunités pour votre marque.',
+    title: 'Radar Intelligence',
+    description: 'Découvrez les tendances émergentes avant vos concurrents. Notre radar IA analyse le marché en temps réel pour identifier les opportunités.',
     benefits: [
-      'Tendances en temps réel',
-      'Analyse de la concurrence',
-      'Prévisions IA',
-      'Rapports détaillés',
+      'Actualisation en temps réel',
+      'Détection de pépites virales',
+      'Prévisions de cycle de vie',
+      'Analyses régionales (EU/US/ASIA)',
     ],
     color: '#FF9500',
     image: '📈',
@@ -168,7 +168,7 @@ export function FeatureDetailSection() {
             }}
           >
             <div className="text-9xl">{feature.image}</div>
-            
+
             {/* Icône flottante */}
             <div
               className="absolute top-8 right-8 w-16 h-16 rounded-2xl flex items-center justify-center shadow-apple"

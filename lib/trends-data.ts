@@ -1,11 +1,12 @@
 import { prisma, isDatabaseAvailable } from './prisma';
-import { getProductBrand, brandsMatch } from './brand-utils';
+import { unstable_cache } from 'next/cache';
+import { getProductBrand, brandsMatch, cleanProductName } from './brand-utils';
 import { isExcludedProduct } from './hybrid-radar-scraper';
 import { estimateInternalTrendPercent, computeTrendScore } from './trend-product-kpis';
 import { Prisma } from '@prisma/client';
 
 const AGE_SOURCE_BRANDS: Record<string, string[]> = {
-    '18-24': ['ASOS', 'Zara', 'Global Partner'],
+    '18-24': ['Global Partner', 'Zara'],
     '25-34': ['Zalando', 'Zara'],
 };
 
@@ -19,6 +20,20 @@ const SORT_OPTIONS: Record<string, { orderBy: Prisma.TrendProductOrderByWithRela
         ],
     },
 };
+
+const getCachedRawTrends = unstable_cache(
+    async (where: any, orderBy: any, take: number) => {
+        try {
+            return await prisma.trendProduct.findMany({ where, orderBy, take });
+        } catch (error) {
+            console.error('🛡️ [DB SAFEGUARD] Database query failed. Returning empty list to keep site alive.', String(error).substring(0, 100)); // Log partiel pour pas spammer
+            return [];
+        }
+    },
+    // Clé changée pour forcer le refresh
+    ['raw-trends-query-v3-DEBUG'],
+    { revalidate: 300, tags: ['trends'] } // Cache 5 min
+);
 
 export async function getFeaturedTrends() {
     if (!isDatabaseAvailable()) {
@@ -39,16 +54,16 @@ export async function getFeaturedTrends() {
 
         const where: Prisma.TrendProductWhereInput = {
             sourceBrand: { in: sourceBrands },
-            sourceUrl: { not: null },
             marketZone: 'EU',
             segment: combo.segment,
         };
 
-        const products = await prisma.trendProduct.findMany({
+        // Utilisation du cache pour éviter de saturer la DB
+        const products = await getCachedRawTrends(
             where,
-            orderBy: SORT_OPTIONS.best.orderBy,
-            take: 50,
-        });
+            SORT_OPTIONS.best.orderBy,
+            50
+        );
 
         let filtered = products.filter((p) => !isExcludedProduct(p.name ?? ''));
 
@@ -101,7 +116,9 @@ export async function getFeaturedTrends() {
                 return {
                     id: p.id,
                     name: p.name ?? '',
-                    brand: getProductBrand(p.name, p.sourceBrand) ?? '',
+                    brand: p.productBrand && p.productBrand !== 'Elite'
+                        ? p.productBrand
+                        : (getProductBrand(p.name, p.sourceBrand) || ''),
                     category: p.category ?? '',
                     style: p.style ?? '',
                     material: p.material ?? '',
@@ -146,15 +163,15 @@ export async function getHybridRadarTrends(params: {
         ageRange = '18-24'
     } = params;
 
-    const sourceBrands = (AGE_SOURCE_BRANDS as any)[ageRange] || AGE_SOURCE_BRANDS['25-34'];
+    const sourceBrands = AGE_SOURCE_BRANDS[ageRange] || AGE_SOURCE_BRANDS['25-34'];
 
-    const segmentFilter = segment === 'femme' ? ['femme', 'fille'] : ['homme', 'garcon'];
+    const segmentFilter = segment;
 
     const where: any = {
         sourceBrand: { in: sourceBrands },
         sourceUrl: { not: null },
         marketZone: marketZone || 'EU',
-        segment: { in: segmentFilter },
+        segment: segmentFilter,
     };
 
     if (globalOnly) {
@@ -175,11 +192,8 @@ export async function getHybridRadarTrends(params: {
 
     const orderBy = sortOptions[sortBy] || sortOptions.best;
 
-    const products = await prisma.trendProduct.findMany({
-        where,
-        orderBy,
-        take: limit + 20,
-    });
+    // Utilisation du cache pour éviter de saturer la DB
+    const products = await getCachedRawTrends(where, orderBy, limit + 100);
 
     let filtered = products.filter((p) => !isExcludedProduct(p.name ?? ''));
 
@@ -220,18 +234,59 @@ export async function getHybridRadarTrends(params: {
             p.name ?? ''
         );
 
+        // Si productBrand est déjà une vraie marque (pas un placeholder générique), l'utiliser directement
+        const genericBrands = ['global partner', 'zalando', 'elite', 'unknown', 'asos', ''];
+        const isGenericBrand = !p.productBrand || genericBrands.includes(p.productBrand.toLowerCase().trim());
+
+        // Nettoyer le productBrand via getProductBrand pour gérer les cas encore collés (ex: "AllSaintsNATES" → "AllSaints")
+        const rawBrand = isGenericBrand
+            ? getProductBrand(p.name, p.sourceBrand)
+            : getProductBrand(p.productBrand, p.sourceBrand) || p.productBrand;
+
+        const displayBrand = rawBrand || '';
+        const cleanName = cleanProductName(p.name ?? '', displayBrand);
+
         return {
             ...p,
-            name: p.name ?? '',
+            name: cleanName,
             effectiveTrendGrowthPercent,
             effectiveTrendLabel: p.trendGrowthPercent == null && effectiveTrendGrowthPercent > 0 ? 'Estimé' : p.trendLabel,
             outfityIVS: ivsScore,
-            displayBrand: getProductBrand(p.name, p.sourceBrand) || p.sourceBrand || 'Unknown',
-            signature: p.productSignature || p.name.toLowerCase().replace(/\s+/g, '-').slice(0, 50),
+            displayBrand: displayBrand,
+            signature: p.productSignature || (p.name ?? '').toLowerCase().replace(/\s+/g, '-').slice(0, 50),
         };
     });
 
-    const validatedEnriched = enriched.filter(p => p.outfityIVS >= 65);
+    const validatedEnriched = enriched.filter(p => {
+        if (p.outfityIVS < 60) return false;
+
+        const brandLower = (p.displayBrand || '').toLowerCase();
+        const nameLower = (p.name || '').toLowerCase();
+
+        // Exclure les fallbacks (Elite, vide, inconnu)
+        if (!brandLower || brandLower === 'elite' || brandLower === 'unknown') return false;
+
+        // Exclure si la marque est la même que le nom (souvent un échec de détection)
+        if (brandLower === nameLower) return false;
+
+        // Exclure les couleurs comme titres (version plus agressive)
+        const colorWords = ['noir', 'blanc', 'bleu', 'rouge', 'vert', 'gris', 'beige', 'rose', 'marron', 'orange', 'violet', 'jaune', 'kaki', 'indigo', 'navy', 'black', 'white', 'grey', 'gray'];
+        if (colorWords.some(cw => nameLower === cw || nameLower === `${cw}/${cw}` || nameLower.includes('/') && nameLower.split('/').every(part => colorWords.includes(part.trim())))) return false;
+
+        // Exclure les marques propres des distributeurs
+        const isRetailer = brandLower === 'zalando' ||
+            brandLower === 'asos' ||
+            brandLower.includes('design') || // Catch "ASOS DESIGN"
+            brandLower.includes('4505') ||   // Catch "ASOS 4505"
+            brandLower.includes('collusion') ||
+            brandLower.includes('reclaimed') ||
+            brandLower === 'global partner' ||
+            brandLower === 'high premium';
+
+        if (isRetailer) return false;
+
+        return true;
+    });
 
     const seenSignatures = new Set<string>();
     const uniqueEnriched = validatedEnriched.filter(p => {
@@ -281,10 +336,20 @@ export async function getHybridRadarTrends(params: {
         }
     }
 
-    // TRI FINAL PAR SCORE DE VIRALITÉ pour répondre à "mis dans l'ordre"
-    const finalSorted = diversified.sort((a, b) => (b.outfityIVS || 0) - (a.outfityIVS || 0));
+    // TRI FINAL PAR SCORE DE VIRALITÉ pour répondre à "mis dans l'ordre" et limiter au Top 15
+    const finalSorted = diversified
+        .sort((a, b) => (b.outfityIVS || 0) - (a.outfityIVS || 0))
+        .slice(0, finalLimit);
 
-    const totalCount = await prisma.trendProduct.count({ where });
+    let totalCount = 0;
+    try {
+        // Only count if we successfully fetched products to avoid hammering DB if down
+        if (products.length > 0) {
+            totalCount = await prisma.trendProduct.count({ where });
+        }
+    } catch (e) {
+        // Silent fail for count
+    }
 
     return {
         trends: finalSorted,

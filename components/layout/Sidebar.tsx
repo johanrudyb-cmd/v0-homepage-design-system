@@ -10,16 +10,14 @@ import { X, Settings, LogOut, Zap } from 'lucide-react';
 
 const navigation = [
   { name: 'Dashboard', description: 'Vue d\'ensemble Outfity', href: '/dashboard', tourId: 'tour-dashboard', badge: undefined as string | undefined },
-  { name: 'Radar Elite', description: 'Le Top 15 des tendances validées par Outfity Intelligence (TikTok & Instagram)', href: '/trends', tourId: 'tour-trends', badge: undefined as string | undefined },
-  { name: 'Marques Tendances', description: 'Les marques les plus performantes de la semaine', href: '/brands', tourId: 'tour-brands', badge: undefined as string | undefined },
-  { name: 'Scanner IVS IA', description: 'Prédisez la viralité d\'un vêtement via photo', href: '/trends/visual', tourId: 'tour-spy', badge: 'NOUVEAU' },
+  { name: 'Viral sur Tiktok', description: 'Le Top 15 des tendances validées par Outfity Intelligence (TikTok & Instagram)', href: '/trends', tourId: 'tour-trends', badge: undefined as string | undefined },
+  { name: 'Détecter une tendance', description: 'Analyse la viralité d\'un vêtement par IA via photo', href: '/trends/visual', tourId: 'tour-spy', badge: 'NOUVEAU' },
 ];
 
 const tools = [
   { name: 'Gérer ma marque', description: 'Guide de lancement — identité, stratégie, design, sourcing', href: '/launch-map', tourId: 'tour-launch-map', featured: true },
   { name: 'Calculateur de marge', description: 'Calculez votre marge bénéficiaire par vêtement', href: '/calculator', tourId: 'tour-calculator' },
   { name: 'Création de contenu', description: 'Générez des posts structurés par IA et planifiez-les', href: '/content-creation', tourId: 'tour-content-creation' },
-  { name: 'Formation', description: 'Personal branding — mini formation gratuite + coaching 59€/mois', href: '/launch-map/formation', tourId: 'tour-formation' },
 ];
 
 interface SidebarProps {
@@ -62,18 +60,6 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
           <h2 className="px-4 mb-3 text-xs font-semibold text-[#1D1D1F]/40 uppercase tracking-wider">
             Navigation
           </h2>
-          {/* Switch Apps Button */}
-          <div className="mb-4">
-            <Link
-              href="/hub"
-              className="flex items-center gap-3 px-4 py-3 mx-2 rounded-xl bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold shadow-lg hover:opacity-90 transition-all"
-            >
-              <div className="p-1 bg-white/20 rounded">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-layout-grid"><rect width="7" height="7" x="3" y="3" rx="1" /><rect width="7" height="7" x="14" y="3" rx="1" /><rect width="7" height="7" x="14" y="14" rx="1" /><rect width="7" height="7" x="3" y="14" rx="1" /></svg>
-              </div>
-              <span>Changer d'App</span>
-            </Link>
-          </div>
           <div className="space-y-1">
             {navigation.map((item) => {
               const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
@@ -93,7 +79,7 @@ export function Sidebar({ open = false, onClose }: SidebarProps) {
                 >
                   <span>{item.name}</span>
                   {item.badge && (
-                    <Badge variant={item.badge === 'NEW' ? 'secondary' : 'default'} className="ml-2 text-xs">
+                    <Badge variant="secondary" className="ml-2 text-xs bg-[#007AFF] text-white hover:bg-[#007AFF]/90 border-none">
                       {item.badge}
                     </Badge>
                   )}

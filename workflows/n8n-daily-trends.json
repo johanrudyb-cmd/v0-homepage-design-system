@@ -1,0 +1,67 @@
+{
+    "name": "Outfity - Live Trend Intelligence",
+    "nodes": [
+        {
+            "parameters": {
+                "rule": {
+                    "interval": [
+                        {
+                            "field": "hours",
+                            "hoursInterval": 2
+                        }
+                    ]
+                }
+            },
+            "id": "c6a2d9e1-1b2c-4d3e-8f9g-0h1i2j3k4l5m",
+            "name": "Every 2 Hours",
+            "type": "n8n-nodes-base.scheduleTrigger",
+            "typeVersion": 1,
+            "position": [
+                250,
+                300
+            ]
+        },
+        {
+            "parameters": {
+                "method": "POST",
+                "url": "=https://outfity.fr/api/trends/brain-cycle",
+                "headerParametersUI": {
+                    "parameter": [
+                        {
+                            "name": "x-n8n-secret",
+                            "value": "bmad_n8n_secret_2024_ultra_secure"
+                        }
+                    ]
+                },
+                "options": {
+                    "timeout": 300000
+                }
+            },
+            "id": "a1b2c3d4-e5f6-4a5b-6c7d-8e9f0a1b2c3d",
+            "name": "Trigger Brain Cycle",
+            "type": "n8n-nodes-base.httpRequest",
+            "typeVersion": 4.1,
+            "position": [
+                450,
+                300
+            ]
+        }
+    ],
+    "connections": {
+        "Every 2 Hours": {
+            "main": [
+                [
+                    {
+                        "node": "Trigger Brain Cycle",
+                        "type": "main",
+                        "index": 0
+                    }
+                ]
+            ]
+        }
+    },
+    "active": true,
+    "settings": {
+        "executionOrder": "v1"
+    }
+}

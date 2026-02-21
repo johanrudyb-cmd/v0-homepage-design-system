@@ -12,6 +12,15 @@ import { getBrandLogoUrl, getBrandKey } from '@/lib/curated-brands';
 import { REFERENCE_BRAND_WEBSITES } from '@/lib/constants/audience-reference-brands';
 import { motion, AnimatePresence } from 'framer-motion';
 import { UsageBadge } from '@/components/trends/UsageBadge';
+import { safeDisplayBrand } from '@/lib/constants/retailer-exclusion';
+
+/** Badge de viralité selon le trendScore */
+function getViralityBadge(score: number): { emoji: string; label: string; color: string } {
+  if (score >= 90) return { emoji: '🔥', label: 'Viral TikTok', color: '#FF3B30' };
+  if (score >= 80) return { emoji: '📈', label: 'Tendance Instagram', color: '#007AFF' };
+  if (score >= 70) return { emoji: '⚡', label: 'En montée', color: '#FF9500' };
+  return { emoji: '🌱', label: 'Émergent', color: '#34C759' };
+}
 
 const getRefWebsite = (brandName: string) => {
   const k = getBrandKey(brandName || '');
@@ -201,12 +210,12 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-12 lg:mb-20">
           <div className="space-y-6">
             <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight text-black leading-[0.9] max-w-2xl">
-              Tendances de la semaine
+              Tendances sur TikTok
             </h2>
             <div className="flex items-center gap-3">
               <div className="w-2 h-2 rounded-full bg-[#007AFF] animate-pulse" />
               <span className="text-[12px] font-bold uppercase tracking-widest text-[#007AFF]">
-                Radar Elite : Validé sur TikTok & Instagram
+                Détection & Analyse des produits viraux en temps réel
               </span>
             </div>
           </div>
@@ -310,52 +319,52 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                             }}
                           />
 
-                          {/* Top Badges */}
-                          <div className="absolute top-4 left-4 flex flex-col gap-1.5 z-20">
-                            <span className="px-2 py-1 rounded-xl bg-white/90 backdrop-blur-md text-black text-[9px] font-black uppercase tracking-widest shadow-apple-sm">
-                              {segmentLabel}
-                            </span>
-                            {product.trendScore && product.trendScore > 85 && (
-                              <span className="px-2 py-1 rounded-xl bg-[#007AFF] text-white text-[9px] font-black uppercase tracking-widest shadow-lg flex items-center gap-1.5 animate-pulse">
-                                <div className="w-1 h-1 rounded-full bg-white" />
-                                Trending Now
-                              </span>
-                            )}
-                          </div>
-
-                          {/* IVS Index Float */}
+                          {/* Flammes viralité */}
                           {product.trendScore && (
-                            <div className="absolute bottom-4 right-4 z-20">
-                              <div className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl bg-black/80 backdrop-blur-xl text-white border border-white/20 shadow-apple-lg text-right">
-                                <div className="text-[8px] sm:text-[9px] font-bold uppercase tracking-tight text-white/50 mb-[-2px]">IVS Index</div>
-                                <div className="text-sm sm:text-lg font-black tracking-tight">{product.trendScore}%</div>
+                            <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20">
+                              <div className="px-2 py-1.5 rounded-[14px] bg-black/85 backdrop-blur-xl text-white border border-white/10 shadow-apple-lg flex items-center gap-0.5">
+                                {[...Array(
+                                  product.trendScore >= 90 ? 3 :
+                                    product.trendScore >= 80 ? 2 : 1
+                                )].map((_, i) => (
+                                  <Flame key={i} className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 fill-[#FF3B30] text-[#FF3B30]" />
+                                ))}
                               </div>
                             </div>
                           )}
                         </div>
 
-                        <div className="p-6 flex flex-col flex-grow">
-                          <div className="flex items-start justify-between gap-4 mb-4">
-                            <div className="min-w-0 flex-1">
-                              <h3 className="text-[17px] font-bold text-black leading-tight line-clamp-2 sm:line-clamp-none transition-colors group-hover:text-[#007AFF]">
-                                {product.name}
-                              </h3>
-                            </div>
-                            <BrandLogo
-                              logoUrl={getBrandLogoUrl(product.brand, getRefWebsite(product.brand))}
-                              brandName={product.brand}
-                              className="w-8 h-8 opacity-40 group-hover:opacity-100 transition-all duration-700 shrink-0"
-                            />
-                          </div>
-
-                          <div className="flex items-center gap-2 mb-6">
-                            <span className="text-[10px] font-black text-[#007AFF] bg-[#007AFF]/10 px-2 py-1 rounded-md uppercase tracking-widest border border-[#007AFF]/10">
-                              {product.category}
-                            </span>
-                            <span className="text-[11px] font-bold text-black/20 italic">
-                              By {product.brand}
-                            </span>
-                          </div>
+                        <div className="p-4 sm:p-6 flex flex-col flex-grow">
+                          {/* Marque · Badge viralité */}
+                          {(() => {
+                            const score = product.trendScore || 0;
+                            const badge = getViralityBadge(score);
+                            const brand = safeDisplayBrand(product.brand) || product.brand || '';
+                            return (
+                              <div className="mb-3">
+                                <div className="flex items-center gap-1.5 flex-wrap mb-2">
+                                  {brand && (
+                                    <span className="text-[11px] sm:text-[14px] font-black text-black tracking-tight">
+                                      {brand}
+                                    </span>
+                                  )}
+                                  {brand && <span className="text-black/20 text-[11px]">·</span>}
+                                  <span
+                                    className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest"
+                                    style={{ color: badge.color }}
+                                  >
+                                    {badge.emoji} {badge.label}
+                                  </span>
+                                </div>
+                                {/* Catégorie */}
+                                <div className="flex items-center gap-2">
+                                  <span className="text-[8px] sm:text-[10px] font-black text-[#007AFF] bg-[#007AFF]/10 px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-[#007AFF]/10">
+                                    {product.category}
+                                  </span>
+                                </div>
+                              </div>
+                            );
+                          })()}
 
                           <button
                             onClick={(e) => handleAnalyzeClick(e, product.id)}

@@ -1,0 +1,1 @@
+﻿Styles for Homme T-shirts: ["Autre","T-Shirt Basique","T-Shirt Oversize","T-Shirt","D├®bardeur","T-Shirt Graphique","T-Shirt Boxy","T-shirt en Coton"]

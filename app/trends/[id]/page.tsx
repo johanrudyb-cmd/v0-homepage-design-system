@@ -1,38 +1,38 @@
+
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { getCurrentUser } from '@/lib/auth-helpers';
+import { getCurrentUser, getIsAdmin } from '@/lib/auth-helpers';
 import { redirect } from 'next/navigation';
 import { prisma } from '@/lib/prisma';
-import { getFeatureCountThisMonth } from '@/lib/ai-usage';
 import { TrendViewRecorder } from '@/components/trends/TrendViewRecorder';
-import {
-  Package,
-  FileText,
-  ExternalLink,
-  Calendar,
-  Factory,
-  ImageIcon,
-  Lock,
-  Flame,
-} from 'lucide-react';
 import Link from 'next/link';
 import { ProductDetailImage } from '@/components/trends/ProductDetailImage';
-import { ProductDetailCharts } from '@/components/trends/ProductDetailCharts';
-import { EditTrendKpis } from '@/components/trends/EditTrendKpis';
 import { ProductDetailEnricher } from '@/components/trends/ProductDetailEnricher';
-import { BackToTrendsButton } from '@/components/trends/BackToTrendsButton';
+import { EditTrendKpis } from '@/components/trends/EditTrendKpis';
+import { ProductDetailCharts } from '@/components/trends/ProductDetailCharts';
+import { BusinessInsights } from '@/components/trends/BusinessInsights';
 import { VisualTrendScanner } from '@/components/trends/VisualTrendScanner';
-import { UsageBadge } from '@/components/trends/UsageBadge';
+import { BackToTrendsButton } from '@/components/trends/BackToTrendsButton';
+import { getFeatureCountThisMonth } from '@/lib/ai-usage';
 import {
-  inferComplexityScore,
-  inferSustainabilityScore,
-  computeSaturability,
-  computeTrendScore,
-  estimateInternalTrendPercent,
-  inferSmartDefaults,
-} from '@/lib/trend-product-kpis';
-import { isRetailerBrand } from '@/lib/constants/retailer-exclusion';
+  ArrowLeft,
+  TrendingUp,
+  Activity,
+  DollarSign,
+  BarChart3,
+  AlertTriangle,
+  CheckCircle2,
+  Lock,
+  ExternalLink,
+  ChevronRight,
+  Gauge
+} from 'lucide-react';
 import { getBaseUrl, cn } from '@/lib/utils';
+import {
+  computeSaturability,
+  estimateInternalTrendPercent,
+} from '@/lib/trend-product-kpis';
+
+export const dynamic = 'force-dynamic';
 
 export default async function ProductDetailPage({
   params,
@@ -43,7 +43,7 @@ export default async function ProductDetailPage({
   const user = await getCurrentUser();
   if (!user) redirect('/auth/signin');
 
-  // Vérifier si le produit est à la une (visible gratuitement)
+  // Logic from old page to handle view limits
   let isFeatured = false;
   try {
     const featuredRes = await fetch(`${getBaseUrl()}/api/trends/homepage-featured`);
@@ -51,330 +51,265 @@ export default async function ProductDetailPage({
       const data = await featuredRes.json();
       isFeatured = (data.trends || []).some((t: any) => t.id === id);
     }
-  } catch (e) {
-    console.error('Error fetching featured status:', e);
-  }
+  } catch (e) { }
 
   const isFree = user.plan === 'free';
   const shouldLockTrend = isFree && !isFeatured;
 
-  // Quotas réels : 3 / mois pour gratuit, 10 / mois pour Créateur
+  // Quota check
   const checkImage = await getFeatureCountThisMonth(user.id, 'trends_check_image');
   const analyse = await getFeatureCountThisMonth(user.id, 'trends_analyse');
   const detailView = await getFeatureCountThisMonth(user.id, 'trends_detail_view');
   const analysesCount = checkImage + analyse + detailView;
   const maxAnalyses = isFree ? 3 : 10;
-
   if (!isFeatured && analysesCount >= maxAnalyses) {
     redirect('/trends?limit=reached');
   }
 
-  const product = await prisma.trendProduct.findUnique({
-    where: { id },
-  });
+  const isAdmin = await getIsAdmin();
+  const product = await prisma.trendProduct.findUnique({ where: { id } });
+  if (!product) redirect('/trends');
 
-  if (!product) {
-    redirect('/trends');
-  }
-
-  // Jours depuis l'ajout dans le radar (pour calcul saturabilité)
+  // --- KPI Calculation Logic ---
   const daysInRadar = Math.floor((Date.now() - new Date(product.createdAt).getTime()) / (1000 * 60 * 60 * 24));
-
-  // Récurrence catégorie+segment pour calcul interne du % tendance (quand pas de % source)
   const recurrenceInCategory = await prisma.trendProduct.count({
-    where: {
-      category: product.category,
-      segment: product.segment ?? undefined,
-      marketZone: product.marketZone ?? undefined,
-    },
+    where: { category: product.category, segment: product.segment ?? undefined },
+  });
+  const effectiveTrendGrowthPercent = product.trendGrowthPercent ?? estimateInternalTrendPercent({
+    trendGrowthPercent: product.trendGrowthPercent ?? null,
+    trendScoreVisual: product.trendScoreVisual ?? null,
+    isGlobalTrendAlert: product.isGlobalTrendAlert ?? false,
+    daysInRadar,
+    recurrenceInCategory,
   });
 
-  const effectiveTrendGrowthPercent =
-    product.trendGrowthPercent ??
-    estimateInternalTrendPercent({
-      trendGrowthPercent: product.trendGrowthPercent ?? null,
-      trendScoreVisual: product.trendScoreVisual ?? null,
-      isGlobalTrendAlert: product.isGlobalTrendAlert ?? false,
-      daysInRadar,
-      recurrenceInCategory,
-    });
+  const displayTrendScore = (product.trendScoreVisual ?? product.trendScore ?? 50);
 
-  // Saturabilité et score tendance : calcul réaliste si valeur en base = défaut (50), sinon garder la valeur (ex. IA)
-  const isDefaultSaturability = product.saturability === 50 && (product.trendScoreVisual == null || product.trendScoreVisual === 50);
-  const displaySaturability = isDefaultSaturability && (effectiveTrendGrowthPercent > 0 || daysInRadar > 0)
-    ? computeSaturability(effectiveTrendGrowthPercent, product.trendLabel ?? null, daysInRadar)
-    : product.saturability;
-  const displayTrendScore = (product.trendScoreVisual == null || product.trendScoreVisual === 50)
-    ? computeTrendScore(effectiveTrendGrowthPercent, product.trendLabel ?? null, null, product.name ?? '')
-    : (product.trendScoreVisual ?? product.trendScore ?? 50);
+  // --- Signal Logic ---
+  let signalLabel = 'SURVEILLANCE';
+  let signalColor = 'text-gray-500 bg-gray-100';
+  let signalColorBorder = 'border-gray-200';
 
-  const getSaturabilityStyle = (score: number) => {
-    if (score < 30) return { label: 'Opportunité', class: 'text-green-600 bg-green-500/10 border-green-500/30' };
-    if (score < 60) return { label: 'Modéré', class: 'text-amber-600 bg-amber-500/10 border-amber-500/30' };
-    return { label: 'Saturé', class: 'text-red-600 bg-red-500/10 border-red-500/30' };
-  };
-
-  const saturabilityStyle = getSaturabilityStyle(displaySaturability);
-
-  // KPIs calculés ou depuis la BDD
-  // Complexité fabrication : priorité à l'IA, fallback note interne (heuristique matière/description)
-  const rawComplexity = product.complexityScore ?? inferComplexityScore(product.material, product.description, product.category);
-  const complexityScore = rawComplexity === 'Différent' || rawComplexity?.toLowerCase() === 'different' ? 'Complexe' : rawComplexity;
-  const sustainabilityScore = product.sustainabilityScore ?? inferSustainabilityScore(product.material, product.description);
-
-  // Marque de l'article uniquement — ne jamais afficher Zalando, Zara ou ASOS (distributeurs)
-  const displayBrand = (() => {
-    if (product.productBrand?.trim()) {
-      if (isRetailerBrand(product.productBrand)) return '—';
-      return product.productBrand.trim();
-    }
-    if (product.sourceBrand?.trim()) {
-      if (isRetailerBrand(product.sourceBrand)) return '—';
-      return product.sourceBrand.trim();
-    }
-    const first = product.name.trim().split(/\s+/)[0];
-    if (first && first.length >= 2 && first.length <= 25 && !isRetailerBrand(first) && !/sweat|hoodie|t-shirt|tee|cargo|pantalon|veste|jacket|short|pull|robe|blouson|polo|jean|legging/i.test(first.toLowerCase())) {
-      return first;
-    }
-    return '—';
-  })();
-
-  const infoRows: { label: string; value: string | React.ReactNode }[] = [
-    { label: 'Catégorie', value: product.category },
-    { label: 'Style', value: product.style || inferSmartDefaults(product.category, 'style') },
-    { label: 'Matière', value: (product.material && product.material !== 'Non spécifié') ? product.material : inferSmartDefaults(product.category, 'material') },
-    { label: 'Couleur', value: product.color || inferSmartDefaults(product.category, 'color') },
-    { label: 'Entretien', value: product.careInstructions || inferSmartDefaults(product.category, 'careInstructions') },
-    { label: 'Segment', value: product.segment ? String(product.segment).charAt(0).toUpperCase() + product.segment.slice(1) : '—' },
-    { label: 'Zone marché', value: product.marketZone || '—' },
-    { label: 'Marque', value: displayBrand },
-    ...(product.brandWebsiteUrl
-      ? [
-        {
-          label: 'Site marque',
-          value: (
-            <a
-              href={product.brandWebsiteUrl.startsWith('http') ? product.brandWebsiteUrl : `https://${product.brandWebsiteUrl}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#007AFF] hover:underline inline-flex items-center gap-1 text-sm font-bold"
-            >
-              Lien direct <ExternalLink className="w-3 h-3" />
-            </a>
-          ),
-        },
-      ]
-      : []),
-  ];
+  if (displayTrendScore >= 80) {
+    signalLabel = 'OPPORTUNITÉ OR';
+    signalColor = 'text-[#FF9F0A] bg-[#FF9F0A]/10';
+    signalColorBorder = 'border-[#FF9F0A]/20';
+  } else if (displayTrendScore >= 60) {
+    signalLabel = 'ACHAT FORT';
+    signalColor = 'text-[#34C759] bg-[#34C759]/10';
+    signalColorBorder = 'border-[#34C759]/20';
+  } else if (displayTrendScore >= 40) {
+    signalLabel = 'MODÉRÉ';
+    signalColor = 'text-[#007AFF] bg-[#007AFF]/10';
+    signalColorBorder = 'border-[#007AFF]/20';
+  }
 
   return (
     <DashboardLayout>
       {user.plan === 'free' && <TrendViewRecorder trendId={product.id} />}
       <ProductDetailEnricher productId={product.id} product={product}>
-        <div className="min-h-screen bg-[#F5F5F7] pb-24">
-          {/* Main Sticky Header - Apple Style */}
-          <div className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-black/[0.05] px-6 py-4">
-            <div className="max-w-6xl mx-auto flex items-center gap-4">
-              <BackToTrendsButton />
-              <div className="flex items-center gap-4 min-w-0">
-                <div className="min-w-0">
-                  <h1 className="text-xl font-bold tracking-tight text-[#1D1D1F] truncate leading-tight">
-                    {product.name}
-                  </h1>
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#6e6e73]/60 px-1.5 py-0.5 bg-black/5 rounded">
-                      Detail Report
-                    </span>
-                    <span className="text-[10px] font-bold uppercase tracking-widest text-[#007AFF] px-1.5 py-0.5 bg-[#007AFF]/10 rounded">
-                      Live
-                    </span>
-                  </div>
-                </div>
+        <div className="min-h-screen bg-[#F5F5F7] pb-24 font-sans">
+
+          {/* Header: Simple Back Navigation */}
+          <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-black/[0.05] px-4 py-4">
+            <div className="max-w-7xl mx-auto flex items-center justify-between">
+              <Link href="/trends" className="flex items-center gap-2 text-sm font-bold text-gray-500 hover:text-black transition-colors">
+                <ArrowLeft className="w-4 h-4" />
+                RETOUR AU CATALOGUE
+              </Link>
+              <div className="text-xs font-black uppercase tracking-widest text-[#007AFF]">
+                {product.id.slice(0, 8)}
               </div>
             </div>
           </div>
 
-          <div className="p-6 lg:p-12 max-w-6xl mx-auto space-y-12 animate-fade-in">
-            {/* Row 1: Widget Données & Image */}
-            <div className="grid gap-8 md:grid-cols-5">
-              {/* Product Visual - Bigger & Cleaner */}
-              <div className="md:col-span-2 space-y-4">
-                <div className="relative aspect-[3/4] rounded-[32px] overflow-hidden shadow-apple-lg bg-white group">
-                  {shouldLockTrend && (
-                    <div className="absolute inset-0 z-40 flex flex-col items-center justify-center bg-white/60 backdrop-blur-xl p-8 text-center animate-fade-in">
-                      <div className="w-16 h-16 bg-black rounded-full flex items-center justify-center mb-6 shadow-apple">
-                        <Lock className="w-8 h-8 text-white" />
-                      </div>
-                      <h3 className="text-xl font-black text-black mb-3 tracking-tight">Analyse Exclusive</h3>
-                      <p className="text-sm text-[#6e6e73] mb-8 font-medium max-w-[200px] mx-auto">
-                        Cette analyse est réservée aux membres Créateur.
-                      </p>
-                      <Link
-                        href="/auth/choose-plan"
-                        className="px-8 py-3 bg-black text-white rounded-full text-sm font-bold hover:bg-black/90 transition-all active:scale-95 shadow-xl"
-                      >
-                        Débloquer maintenant
-                      </Link>
-                    </div>
-                  )}
-                  <div className={cn("w-full h-full text-center", shouldLockTrend ? 'opacity-20 blur-sm' : '')}>
-                    <ProductDetailImage
-                      imageUrl={product.imageUrl}
-                      alt={product.name ?? ''}
-                      className="object-cover w-full h-full transition-transform duration-1000 group-hover:scale-105"
-                    />
-                  </div>
+          <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
 
-                  {/* Floating Score on Image */}
-                  {!shouldLockTrend && displayTrendScore && (
-                    <div className="absolute bottom-6 right-6 px-4 py-3 bg-black/85 backdrop-blur-md rounded-[24px] border border-white/10 shadow-apple-lg text-right flex flex-col items-end">
-                      <div className="flex gap-0.5 mb-1.5 text-[#FF3B30]">
-                        {[...Array(
-                          displayTrendScore >= 90 ? 3 :
-                            displayTrendScore >= 80 ? 2 : 1
-                        )].map((_, i) => (
-                          <Flame key={i} className="w-4 h-4 fill-current" />
-                        ))}
-                      </div>
-                      <div className="text-[9px] font-black uppercase tracking-widest text-white/50 mb-0.5 leading-none">Potentiel Viral</div>
-                    </div>
-                  )}
+            {/* --- TOP SECTION : TRADING DESK --- */}
+            <div className="grid lg:grid-cols-2 gap-8 lg:gap-16 items-start">
+
+              {/* LEFT : VISUAL ASSET */}
+              <div className="space-y-6">
+                <div className="relative aspect-[3/4] rounded-[32px] overflow-hidden shadow-2xl bg-white border border-black/[0.03]">
+                  <ProductDetailImage
+                    imageUrl={product.imageUrl}
+                    alt={product.name}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* LIVE BADGE */}
+                  <div className="absolute top-4 left-4 bg-red-600 text-white text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-lg flex items-center gap-2">
+                    <span className="w-2 h-2 bg-white rounded-full animate-pulse" />
+                    Live Market
+                  </div>
                 </div>
 
-                {/* Quick Info Grid under image */}
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-4 bg-white rounded-[24px] shadow-apple border border-black/[0.03]">
-                    <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#6e6e73] mb-1.5 text-center">Segment</p>
-                    <p className="text-sm font-black text-black capitalize text-center">{product.segment || '—'}</p>
+                {/* Visual Scanner Shortcut */}
+                <div className="p-6 bg-white rounded-[24px] shadow-sm border border-black/[0.03] flex items-center justify-between group cursor-pointer hover:shadow-md transition-all">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-black rounded-full flex items-center justify-center">
+                      <Activity className="w-5 h-5 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-black">Scanner l&apos;ADN Visuel</h3>
+                      <p className="text-xs text-gray-500">Comparer avec d&apos;autres produits</p>
+                    </div>
                   </div>
-                  <div className="p-4 bg-white rounded-[24px] shadow-apple border border-black/[0.03]">
-                    <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#6e6e73] mb-1.5 text-center">Zone</p>
-                    <p className="text-sm font-black text-black text-center">{product.marketZone || '—'}</p>
-                  </div>
+                  <ChevronRight className="w-5 h-5 text-gray-300 group-hover:text-black transition-colors" />
                 </div>
               </div>
 
-              {/* Data Widgets */}
-              <div className="md:col-span-3 flex flex-col gap-6">
-                <div className="relative flex-1">
-                  {shouldLockTrend && (
-                    <div className="absolute inset-0 z-30 bg-[#F5F5F7]/40 backdrop-blur-[2px] rounded-[24px]" />
-                  )}
-                  <div className={cn("h-full", shouldLockTrend ? 'pointer-events-none opacity-20 filter grayscale blur-sm' : '')}>
-                    <EditTrendKpis
-                      productId={product.id}
-                      trendGrowthPercent={product.trendGrowthPercent ?? (effectiveTrendGrowthPercent > 0 ? effectiveTrendGrowthPercent : null)}
-                      trendLabel={product.trendLabel ?? (product.trendGrowthPercent == null && effectiveTrendGrowthPercent > 0 ? 'Estimé' : null)}
-                      displaySaturability={displaySaturability}
-                      saturabilityStyle={saturabilityStyle}
-                      isInternalPercent={product.trendGrowthPercent == null && effectiveTrendGrowthPercent > 0}
+              {/* RIGHT : TRADING CONTROL PANEL */}
+              <div className="space-y-8 pt-4">
+
+                {/* Title Block */}
+                <div>
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="text-[10px] font-black bg-black text-white px-2 py-0.5 rounded uppercase tracking-widest">
+                      {product.category}
+                    </span>
+                    {product.segment && (
+                      <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest border border-gray-200 px-2 py-0.5 rounded">
+                        {product.segment}
+                      </span>
+                    )}
+                  </div>
+                  <h1 className="text-3xl md:text-5xl font-black text-black tracking-tighter leading-tight mb-4">
+                    {product.name}
+                  </h1>
+                  <div className="text-lg font-medium text-gray-500 max-w-md leading-relaxed">
+                    {product.description ? product.description.slice(0, 120) + '...' : 'Pas de description technique disponible.'}
+                  </div>
+                </div>
+
+                {/* --- THE GAUGE --- */}
+                <div className="p-8 bg-white rounded-[32px] shadow-xl border border-black/[0.03] relative overflow-hidden">
+                  <div className="flex items-center justify-between mb-8">
+                    <h3 className="text-sm font-black uppercase tracking-widest text-gray-400">Score de Performance</h3>
+                    <div className={cn("px-4 py-1.5 rounded-full font-black text-xs uppercase tracking-widest border", signalColor, signalColorBorder)}>
+                      Signal: {signalLabel}
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-8">
+                    {/* Big Number */}
+                    <div className="relative">
+                      <span className="text-8xl font-black text-black tracking-tighter">
+                        {displayTrendScore}
+                      </span>
+                      <span className="text-xl font-bold text-gray-300 absolute top-2 -right-6">%</span>
+                    </div>
+
+                    {/* Trend Indicator */}
+                    <div className="space-y-1">
+                      <div className="flex items-center gap-2 text-[#34C759]">
+                        <TrendingUp className="w-6 h-6" />
+                        <span className="text-lg font-black tracking-tight">
+                          {effectiveTrendGrowthPercent > 0 ? '+' : ''}{effectiveTrendGrowthPercent}%
+                        </span>
+                      </div>
+                      <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">Croissance 30j</p>
+                    </div>
+                  </div>
+
+                  {/* Forecast Line (Visual Only) */}
+                  <div className="mt-8 h-2 w-full bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-black rounded-full transition-all duration-1000"
+                      style={{ width: `${displayTrendScore}%` }}
                     />
                   </div>
                 </div>
 
-                {/* Secondary KPIs in Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div className="p-5 bg-white rounded-[24px] shadow-apple border border-black/[0.03] space-y-3">
-                    <div className="flex items-center gap-2 text-[#6e6e73]">
-                      <Calendar className="w-4 h-4" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest">Temps de suivi</span>
+                {/* --- FINANCIAL GRID --- */}
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="p-5 bg-[#F5F5F7] rounded-[24px] border border-black/[0.03]">
+                    <div className="flex items-center gap-2 mb-2 text-gray-400">
+                      <DollarSign className="w-4 h-4" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Prix Marché</span>
                     </div>
-                    <div>
-                      <p className="text-2xl font-black text-black tracking-tight">
-                        {daysInRadar <= 0 ? 'New' : daysInRadar === 1 ? '1 jour' : `${daysInRadar} jours`}
-                      </p>
-                      <p className="text-[10px] text-[#6e6e73] font-medium mt-1">Stabilité de la tendance</p>
-                    </div>
+                    <p className="text-2xl font-black text-black">{product.averagePrice} €</p>
                   </div>
-
-                  <div className="p-5 bg-white rounded-[24px] shadow-apple border border-black/[0.03] space-y-3">
-                    <div className="flex items-center gap-2 text-[#6e6e73]">
-                      <Package className="w-4 h-4" />
-                      <span className="text-[10px] font-bold uppercase tracking-widest">Attrait Visuel</span>
+                  <div className="p-5 bg-[#F5F5F7] rounded-[24px] border border-black/[0.03]">
+                    <div className="flex items-center gap-2 mb-2 text-gray-400">
+                      <AlertTriangle className="w-4 h-4" />
+                      <span className="text-[10px] font-black uppercase tracking-widest">Risque Prod.</span>
                     </div>
-                    <div>
-                      <p className="text-2xl font-black text-black tracking-tight">
-                        {product.visualAttractivenessScore ? `${product.visualAttractivenessScore}/100` : '—'}
-                      </p>
-                      <p className="text-[10px] text-[#6e6e73] font-medium mt-1">Score esthétique IA</p>
-                    </div>
+                    <p className="text-2xl font-black text-black">{product.productionSafety || 'Faible'}</p>
                   </div>
                 </div>
-              </div>
-            </div>
 
-            {/* Row 2: Charts Section */}
-            <div className="relative pt-8">
-              {!shouldLockTrend && (
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="h-px flex-1 bg-black/[0.05]" />
-                  <h2 className="text-[10px] font-extrabold uppercase tracking-[0.2em] text-[#6e6e73]/60">Visualization Analytics</h2>
-                  <div className="h-px flex-1 bg-black/[0.05]" />
-                </div>
-              )}
-
-              <div className="relative">
-                {shouldLockTrend && (
-                  <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#F5F5F7]/60 backdrop-blur-md rounded-[32px] p-8 text-center border border-white">
-                    <div className="w-12 h-12 bg-black rounded-full flex items-center justify-center mb-4 shadow-apple">
-                      <Lock className="w-6 h-6 text-white" />
-                    </div>
-                    <h3 className="text-lg font-black text-black mb-2">Visualisations détaillées</h3>
-                    <p className="text-sm text-[#6e6e73] max-w-xs mb-6 font-medium">Dépassez les chiffres avec nos graphiques de performance.</p>
+                {/* --- PRIMARY ACTION --- */}
+                {!shouldLockTrend ? (
+                  <Link
+                    href="/production/start"
+                    className="w-full py-5 bg-black text-white rounded-[20px] flex items-center justify-center gap-3 text-sm font-black uppercase tracking-widest shadow-xl hover:scale-[1.02] active:scale-95 transition-all"
+                  >
+                    Lancer la Production 🚀
+                  </Link>
+                ) : (
+                  <div className="w-full py-5 bg-gray-100 text-gray-400 rounded-[20px] flex items-center justify-center gap-3 text-sm font-black uppercase tracking-widest cursor-not-allowed">
+                    <Lock className="w-4 h-4" />
+                    Réservé Membres Pro
                   </div>
                 )}
-                <div className={cn(shouldLockTrend ? 'opacity-20 blur-md grayscale pointer-events-none' : '')}>
-                  <ProductDetailCharts
-                    saturability={displaySaturability}
-                    sustainabilityScore={sustainabilityScore ?? null}
-                    visualAttractivenessScore={product.visualAttractivenessScore ?? null}
-                    complexityScore={complexityScore}
-                  />
-                </div>
-              </div>
-            </div>
 
-            {/* Row 3: Product Info Grid (Modern replacement for table) */}
-            <div className="space-y-6 pt-8">
-              <div className="flex items-center gap-3">
-                <h2 className="text-[15px] font-black text-black tracking-tight">Développement Article</h2>
-                <div className="h-px flex-1 bg-black/[0.05]" />
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {infoRows.map((row) => (
-                  <div key={row.label as string} className="p-5 bg-white rounded-[24px] shadow-apple border border-black/[0.03] flex flex-col justify-between group transition-apple hover:scale-[1.02]">
-                    <p className="text-[9px] font-extrabold uppercase tracking-widest text-[#6e6e73] mb-3">{row.label}</p>
-                    <div className="text-sm font-black text-black group-hover:text-[#007AFF] transition-colors leading-snug">
-                      {row.value}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {product.description && (
-                <div className="p-8 bg-white rounded-[24px] shadow-apple border border-black/[0.03]">
-                  <div className="flex items-center gap-2 mb-4">
-                    <FileText className="w-4 h-4 text-[#6e6e73]" />
-                    <p className="text-[10px] font-extrabold uppercase tracking-widest text-[#6e6e73]">Analyse Contextuelle</p>
-                  </div>
-                  <p className="text-[15px] text-[#1D1D1F] leading-relaxed whitespace-pre-wrap font-medium">
-                    {product.description}
+                <div className="text-center">
+                  <p className="text-[10px] text-gray-400 font-medium">
+                    Estimation délai production: <span className="text-black font-bold">3 semaines</span>
                   </p>
                 </div>
-              )}
+              </div>
             </div>
 
-            {/* Row 4: Visual Scanner */}
+            {/* --- BOTTOM SECTION : DEEP DIVE (Optional/Admin) --- */}
             <div className="pt-12 border-t border-black/[0.05]">
-              <div className="text-center space-y-4 mb-12">
-                <h2 className="text-3xl font-black text-black tracking-tighter">Scanner Visuel Outfity</h2>
-                <p className="text-[#6e6e73] max-w-sm mx-auto text-sm font-medium">Analysez l&apos;ADN mode de n&apos;importe quelle image pour détecter les points de corrélation.</p>
-              </div>
-              <div className="bg-white rounded-[32px] shadow-apple-lg border border-black/[0.03] p-8 sm:p-12 overflow-hidden">
-                <VisualTrendScanner />
+              <div className="bg-white rounded-[32px] p-8 md:p-12 shadow-sm border border-black/[0.03]">
+                <h2 className="text-2xl font-black text-black mb-8">Analyse Technique</h2>
+                <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-[#007AFF]">Stratégie</h3>
+                    <p className="text-sm font-medium text-gray-600 leading-relaxed">
+                      {product.businessAnalysis || "Aucune analyse stratégique disponible pour le moment. Ce produit a été détecté par nos algorithmes de scrapping visuel."}
+                    </p>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-[#007AFF]">Matière & Entretien</h3>
+                    <p className="text-sm font-medium text-gray-600 leading-relaxed">
+                      {product.material || "Non spécifié"}<br />
+                      {product.careInstructions || ""}
+                    </p>
+                  </div>
+                  <div className="space-y-4">
+                    <h3 className="text-xs font-black uppercase tracking-widest text-[#007AFF]">Détails Source</h3>
+                    <p className="text-sm font-medium text-gray-600 leading-relaxed">
+                      Source: {product.sourceBrand || "Inconnue"}<br />
+                      ID: {product.id.substring(0, 8)}
+                    </p>
+                    {product.sourceUrl && (
+                      <a href={product.sourceUrl} target="_blank" className="text-xs font-bold underline flex items-center gap-1">
+                        Voir source <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
+                  </div>
+                </div>
+
+                {/* Admin Tools Hidden inside Details */}
+                {isAdmin && (
+                  <details className="mt-8 pt-8 border-t border-gray-100">
+                    <summary className="text-xs font-bold text-gray-400 cursor-pointer uppercase tracking-widest mb-4">Outils Admin</summary>
+                    <EditTrendKpis
+                      productId={product.id}
+                      trendGrowthPercent={product.trendGrowthPercent ?? null}
+                      trendLabel={product.trendLabel ?? null}
+                      displaySaturability={product.saturability}
+                      saturabilityStyle={{ label: 'N/A', class: '' }}
+                      isInternalPercent={false}
+                    />
+                  </details>
+                )}
               </div>
             </div>
+
           </div>
         </div>
       </ProductDetailEnricher>

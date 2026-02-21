@@ -13,7 +13,7 @@ import {
 
 const mobileLinks = [
     { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-    { name: 'Tendances', href: '/trends', icon: TrendingUp },
+    { name: 'Viral sur Tiktok', href: '/trends', icon: TrendingUp },
     { name: 'Launch Map', href: '/launch-map', icon: Map },
     { name: 'Compte', href: '/settings', icon: CircleUser },
 ];
@@ -38,7 +38,7 @@ export function MobileNav() {
                             )}
                         >
                             <Icon className={cn("w-5 h-5", isActive ? "fill-current/10" : "")} />
-                            <span className="text-[10px] font-medium">{link.name}</span>
+                            <span className="text-[8px] font-bold text-center leading-tight">{link.name}</span>
                         </Link>
                     );
                 })}

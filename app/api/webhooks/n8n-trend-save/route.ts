@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { inferCategory } from '@/lib/infer-trend-category';
 import { cleanProductTitle } from '@/lib/utils';
 import { computeSaturability, computeTrendScore } from '@/lib/trend-product-kpis';
-import { getProductBrand } from '@/lib/brand-utils';
+import { getProductBrand, cleanProductName } from '@/lib/brand-utils';
 
 /**
  * Webhook sécurisé pour n8n afin d'enregistrer des nouvelles tendances.
@@ -71,16 +71,17 @@ export async function POST(req: Request) {
                 continue;
             }
 
-            // 2. Nettoyage du titre (et anonymisation source)
-            let cleanName = (cleanProductTitle(item.name) || item.name).trim().slice(0, 500);
+            // 2. Identification de la marque "propre" depuis le nom original
+            // On le fait AVANT de nettoyer le nom pour avoir tous les indices
+            let finalBrand = getProductBrand(item.productBrand || item.name, item.sourceBrand);
 
-            // On retire explicitement toute mention de ASOS ou de ses sous-marques
-            const anonymizeRegex = /\b(asos design|asos edition|asos luxe|asos curve|asos unique|asos white|asos)\b/gi;
+            // 3. Nettoyage du titre (et anonymisation source)
+            // On utilise cleanProductName qui retire la marque et les prix
+            let cleanName = cleanProductName(item.name, finalBrand);
+
+            // On retire explicitement toute mention de ASOS ou de ses sous-marques résiduelles
+            const anonymizeRegex = /\b(asos design|asos edition|asos luxe|asos curve|asos unique|asos white|asos|zalando|zara)\b/gi;
             cleanName = cleanName.replace(anonymizeRegex, '').replace(/\s{2,}/g, ' ').trim();
-
-            // 3. Identification de la marque "propre"
-            // On utilise getProductBrand qui gère les exclusions distributeurs et les termes génériques
-            let finalBrand = getProductBrand(item.productBrand || cleanName, item.sourceBrand);
 
             const initialCategory = inferCategory(item.name);
 

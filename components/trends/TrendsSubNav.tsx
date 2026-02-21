@@ -11,8 +11,8 @@ interface TrendsSubNavProps {
 }
 
 const tabs: { id: Tab; label: string; href: string; badge?: string }[] = [
-  { id: 'classement', label: 'Tendances Hebdo', href: '/trends' },
-  { id: 'analyseur', label: 'Analyseur Visuel', href: '/trends/visual' },
+  { id: 'classement', label: 'Radar de Potentiel', href: '/trends' },
+  { id: 'analyseur', label: 'Scan Visuel', href: '/trends/visual', badge: 'NEW' },
 ];
 
 export function TrendsSubNav({ active }: TrendsSubNavProps) {
@@ -36,13 +36,13 @@ export function TrendsSubNav({ active }: TrendsSubNavProps) {
             {isActive && (
               <motion.div
                 layoutId="activeTab"
-                className="absolute inset-0 bg-black rounded-full shadow-apple"
+                className="absolute inset-0 bg-[#007AFF] rounded-full shadow-apple"
                 transition={{ type: "spring", bounce: 0.2, duration: 0.6 }}
               />
             )}
             <span className="relative z-10">{tab.label}</span>
             {tab.badge && (
-              <span className="relative z-10 ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-[#FF3B30] text-white">
+              <span className="relative z-10 ml-2 text-[9px] px-1.5 py-0.5 rounded-full bg-[#007AFF] text-white">
                 {tab.badge}
               </span>
             )}

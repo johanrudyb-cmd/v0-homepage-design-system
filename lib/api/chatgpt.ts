@@ -602,7 +602,8 @@ Réponds UNIQUEMENT par un objet JSON valide, sans markdown.`,
 export async function generateBusinessAnalysisForZones(
   productName: string,
   zones: string[],
-  trendScoresByZone: Record<string, number>
+  trendScoresByZone: Record<string, number>,
+  averagePrice?: number
 ): Promise<string> {
   if (process.env.ANTHROPIC_API_KEY) {
     const { generateBusinessAnalysisForZones: claudeBiz } = await import('./claude');
@@ -622,11 +623,16 @@ export async function generateBusinessAnalysisForZones(
     messages: [
       {
         role: 'system',
-        content: `Tu es un expert retail mode mondial. En 1 à 3 phrases courtes, rédige une "Analyse Business" exploitable pour un décideur : saturation par zone, opportunité de lancement (ex: "Le marché US sature sur ce produit, opportunité de lancement immédiat sur le marché EU."). Réponds en français.`,
+        content: `Tu es un expert retail mode mondial. Rédige une "Analyse Business" stratégique de 2 à 4 phrases.
+Inclus IMPÉRATIVEMENT :
+1. Analyse de saturation par zone (ex: "Le marché US sature, opportunité forte en EU").
+2. Insight financier : Estime un "Coût de production" (COGS) probable (environ 20-30% du prix retail) et un "Prix de vente conseillé" (MSRP) pour une marque DTC indépendante, basé sur le prix moyen observé (${averagePrice ? averagePrice.toFixed(2) + '€' : 'prix inconnu'}).
+3. Potentiel de marge.
+Réponds en français avec un ton expert et audacieux.`,
       },
       {
         role: 'user',
-        content: `Produit : ${productName}. Zones où la tendance est présente : ${zonesList}. Scores tendance par zone : ${scoresText}. Génère l'analyse business.`,
+        content: `Produit : ${productName}. Zones : ${zonesList}. Scores : ${scoresText}. Prix moyen observé : ${averagePrice ? averagePrice.toFixed(2) + '€' : 'N/A'}.`,
       },
     ],
     max_tokens: 200,
@@ -740,7 +746,7 @@ Voici les signaux de marché actuels à utiliser pour ta validation (Base de Vé
 ${marketSignals}
 
 Règles JSON strictes:
-- "businessAnalysis": Analyse stratégique ELITE focalisée sur la Vitesse Sociale (TikTok trends, Aesthetics). Pourquoi ce produit est-il une pépite ? Sois pro, expert, et évite les banalités de styliste. (en français).
+- "businessAnalysis": Analyse stratégique ELITE (TikTok trends, Aesthetics). INCLUS IMPÉRATIVEMENT une estimation du "Coût de production" (ex: 12-18€) et du "Prix de vente potentiel" pour une marque indépendante (ex: 45-55€) en te basant sur le prix public de ${product.averagePrice}€.
 - "dominantAttribute": Le "Killer Detail" viral (ex: "Le délavage Vintage Wash qui domine actuellement sur TikTok").
 - "style": Style précis (Streetwear, Minimaliste, Luxury, Y2K, Gorpcore, Workwear, Old Money, Clean Girl, Quiet Luxury).
 - "complexityScore": "Facile" | "Moyen" | "Complexe".
@@ -749,13 +755,14 @@ Règles JSON strictes:
 - "visualAttractivenessScore": Note IVS (Indice de Viralité Sociale) de 0 à 100.
 - "category": Type exact (Hoodie, Cargo, Veste, etc.). Jamais "Autre".
 - "material": Si non spécifié, déduis la matière probable (ex: "Coton lourd 400g", "Nylon Ripstop").
-- "productBrand": Extrait la marque réelle du produit (ex: "NIKE", "COLLUSION", "ADIDAS") et ignore le distributeur (Zalando/ASOS).
+- "productBrand": Utilise la marque fournie ("Marque fournie"). Si non fournie, extrait la marque réelle du produit (ex: "NIKE", "COLLUSION", "ADIDAS") et ignore le distributeur (Zalando/ASOS). NE PAS INVENTER de marque si elle n'est pas évidente.
 - "shorten": Analyse business concise.
 
 IMPORTANT: Ton analyse doit être "bold" (audacieuse) et experte. Ne répète jamais le nom de la marque dans le champ "businessAnalysis" ou "dominantAttribute" inutilement.`;
 
   const userContent = [
     `Produit: ${product.name}`,
+    `Marque fournie: ${product.productBrand || 'Inconnue'}`,
     `Catégorie initiale: ${product.category}`,
     `Prix public: ${product.averagePrice}€`,
     existing ? `Données existantes: ${existing}` : '',

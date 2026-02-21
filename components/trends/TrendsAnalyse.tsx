@@ -40,7 +40,7 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
     try {
       const res = await fetch('/api/health/gpt');
       const data = await res.json();
-      if (res.ok) setGptTest({ ok: true, message: data.message ?? 'API IA opérationnelle' });
+      if (res.ok) setGptTest({ ok: true, message: data.message ?? 'Moteur d\'analyse opérationnel' });
       else setGptTest({ ok: false, message: data.error ?? 'Erreur' });
     } catch (e) {
       setGptTest({ ok: false, message: e instanceof Error ? e.message : 'Erreur réseau' });
@@ -77,8 +77,8 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
             <p className="text-destructive font-medium">Erreur</p>
             <p className="text-muted-foreground mt-1">{error}</p>
             <div className="mt-4 flex flex-wrap gap-2">
-              <Button onClick={testGptConnection} variant="outline" size="sm" disabled={gptTestLoading} title="Vérifier que le service IA est configuré">
-                {gptTestLoading ? 'Test…' : 'Tester l\'API IA'}
+              <Button onClick={testGptConnection} variant="outline" size="sm" disabled={gptTestLoading} title="Vérifier l'analyse">
+                {gptTestLoading ? 'Test…' : 'Vérifier l\'analyse'}
               </Button>
               {gptTest && (
                 <span className={`text-xs px-2 py-1 rounded self-center ${gptTest.ok ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>
@@ -103,15 +103,15 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
         <div>
           <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
             <BarChart3 className="w-7 h-7" />
-            Rapport IA
+            Synthèse des tendances
           </h1>
           <p className="text-muted-foreground mt-1 text-sm max-w-xl">
-            Synthèse texte des tendances : prévisions France, tendances à venir, recommandations. Généré par l’IA à partir des données du classement.
+            Analyse contextuelle du marché à partir des données de scan mondiales.
           </p>
         </div>
         <div className="flex flex-wrap gap-2 shrink-0 items-center">
-          <Button variant="outline" size="sm" className="gap-2" onClick={testGptConnection} disabled={gptTestLoading} title="Vérifier que le service IA est configuré et répond">
-            {gptTestLoading ? 'Test…' : 'Tester l\'API IA'}
+          <Button variant="outline" size="sm" className="gap-2" onClick={testGptConnection} disabled={gptTestLoading} title="Vérifier l'analyse">
+            {gptTestLoading ? 'Test…' : 'Vérifier l\'analyse'}
           </Button>
           {gptTest && (
             <span className={`text-xs px-2 py-1 rounded ${gptTest.ok ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300' : 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300'}`}>
@@ -127,9 +127,9 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
 
       <Card>
         <CardHeader>
-          <CardTitle>Rapport d&apos;analyse IA</CardTitle>
+          <CardTitle>Synthèse des tendances</CardTitle>
           <CardDescription>
-            Synthèse des tendances, prévisions pour la France et pistes d&apos;action générées par l&apos;IA.
+            Analyse des cycles, prévisions pour la France et pistes d&apos;action générées par l&apos;analyse des tendances.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -139,10 +139,9 @@ export function TrendsAnalyse({ userId }: TrendsAnalyseProps) {
           {analysis && (
             <div className="mt-6 pt-6 border-t text-sm text-muted-foreground">
               <p>
-                Analyse générée à partir des tendances confirmées et des statistiques par pays, style et type de
-                produit. Pour des prévisions détaillées par phase (émergence, croissance, pic), utilisez la page
+                Analyse générée à partir des tendances confirmées et des statistiques mondiales. Pour des prévisions détaillées par phase (émergence, croissance, pic), utilisez la page
                 <Link href="/trends/predictions" className="mx-1 underline hover:text-foreground">
-                  Prédictions IA
+                  Prévisions des tendances
                 </Link>
                 .
               </p>

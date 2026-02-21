@@ -130,7 +130,7 @@ export function TrendRadar({ userId }: TrendRadarProps) {
         // Recharger les tendances
         await loadTrends();
         const enrichedMsg = data.trendsEnriched > 0
-          ? ` ${data.trendsEnriched} enrichie(s) par l'IA (conseils + note + image).`
+          ? ` ${data.trendsEnriched} enrichie(s) par l'analyse (recommandations + score).`
           : '';
         alert(`Scan terminé ! ${data.trendsConfirmed} tendances confirmées.${enrichedMsg}`);
       } else {
@@ -305,9 +305,9 @@ export function TrendRadar({ userId }: TrendRadarProps) {
         <div className="flex flex-wrap gap-2 shrink-0">
           <Button onClick={handleEnrichTrends} disabled={isEnriching || trends.length === 0} variant="outline" size="sm" className="gap-2">
             {isEnriching ? (
-              <>Enrichissement IA…</>
+              <>Analyse des tendances…</>
             ) : (
-              <>Enrichir les tendances (IA)</>
+              <>Analyser les tendances</>
             )}
           </Button>
           <Button onClick={handleScan} disabled={isScanning} variant="outline" size="sm" className="gap-2">
@@ -451,10 +451,9 @@ export function TrendRadar({ userId }: TrendRadarProps) {
                   <div className="mt-3 flex items-center justify-between text-sm">
                     <span className="text-muted-foreground">
                       {trend.aiRating != null ? (
-                        <span className="font-medium text-primary">Note {trend.aiRating}/10</span>
+                        <span className="font-medium text-primary">Score {trend.aiRating}/10</span>
                       ) : null}
-                      {trend.aiRating != null && trend.confirmationScore ? ' · ' : null}
-                      Score {trend.confirmationScore}/5 · {trend.brands.length} marque{trend.brands.length > 1 ? 's' : ''}
+                      {trend.brands.length} marque{trend.brands.length > 1 ? 's' : ''}
                     </span>
                   </div>
                   <Button

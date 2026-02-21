@@ -156,7 +156,7 @@ export function TrendDetailModal({
             <div className="flex flex-wrap gap-1 mt-2">
               {trend.aiRating != null && (
                 <span className="px-2 py-0.5 rounded-md bg-primary/15 text-primary text-xs font-semibold">
-                  Note IA {trend.aiRating}/10
+                  Score {trend.aiRating}/10
                 </span>
               )}
               {trend.segment && (
@@ -202,7 +202,7 @@ export function TrendDetailModal({
               ) : (
                 <>
                   <ImagePlus className="w-4 h-4" />
-                  Générer l&apos;image produit (IA)
+                  Analyse visuelle
                   <GenerationCostBadge feature="trends_generate_image" />
                 </>
               )}
@@ -260,9 +260,8 @@ export function TrendDetailModal({
                 {markets.map((c) => (
                   <span
                     key={c}
-                    className={`px-2 py-1 rounded-md text-xs font-medium ${
-                      c === 'FR' ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
-                    }`}
+                    className={`px-2 py-1 rounded-md text-xs font-medium ${c === 'FR' ? 'bg-primary/15 text-primary' : 'bg-muted text-muted-foreground'
+                      }`}
                   >
                     {countryLabel[c] || c}
                   </span>
@@ -274,7 +273,7 @@ export function TrendDetailModal({
           <div>
             <h3 className="text-sm font-semibold flex items-center gap-2 mb-2">
               <Sparkles className="w-4 h-4" />
-              Conseils IA
+              Analyses et recommandations
             </h3>
             {displayAdvice && (
               <div className="rounded-lg border bg-muted/30 p-4 text-sm text-foreground whitespace-pre-wrap leading-relaxed mb-3">
@@ -284,7 +283,7 @@ export function TrendDetailModal({
             {!hasStoredAdvice && extraAdviceLoading && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground py-4">
                 <Loader2 className="w-4 h-4 animate-spin" />
-                Génération des conseils…
+                Analyse en cours…
               </div>
             )}
             {!hasStoredAdvice && extraAdviceError && (

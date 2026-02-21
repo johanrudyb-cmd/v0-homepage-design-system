@@ -217,10 +217,10 @@ export function HybridRadarDashboard() {
       <div>
         <h1 className="text-2xl font-bold tracking-tight flex items-center gap-2">
           <Globe className="w-7 h-7" />
-          Trend Radar Hybride (Mondial)
+          Analyse de Potentiel Global
         </h1>
         <p className="text-muted-foreground mt-1 text-sm max-w-2xl">
-          Données réelles + IA Vision (analyse). Tendances par zone (France, Europe, USA, Asie). Badge Global Trend Alert si tendance présente dans 2+ zones.
+          Données réelles + Analyse Visuelle. Tendances par zone (France, Europe, USA, Asie). Badge Potentiel Global si tendance présente dans 2+ zones.
         </p>
       </div>
 
@@ -285,7 +285,7 @@ export function HybridRadarDashboard() {
                 checked={globalOnly}
                 onChange={(e) => setGlobalOnly(e.target.checked)}
               />
-              Global Trend Alert uniquement
+              Potentiel Global uniquement
             </label>
           </div>
         </CardContent>
@@ -372,7 +372,7 @@ export function HybridRadarDashboard() {
         <CardHeader>
           <CardTitle className="text-lg flex items-center gap-2">
             <Upload className="w-5 h-5" />
-            Déposer une photo : est-ce une tendance actuelle ?
+            Radar Intelligence : Détectez le potentiel d'un article
           </CardTitle>
           <p className="text-sm text-muted-foreground">
             Uploadez une image produit ; le système indique si c&apos;est une tendance en Europe, USA ou Asie.
@@ -454,7 +454,7 @@ export function HybridRadarDashboard() {
                     </span>
                     {t.isGlobalTrendAlert && (
                       <span className="px-2 py-0.5 rounded-md bg-amber-500/90 text-white text-xs font-medium">
-                        Global Trend Alert
+                        Potentiel Global
                       </span>
                     )}
                   </div>
@@ -465,7 +465,7 @@ export function HybridRadarDashboard() {
                     {t.category} · {t.cut || '—'} · {safeDisplayBrand((t as { productBrand?: string | null }).productBrand ?? getProductBrand(t.name, t.sourceBrand))}
                   </p>
                   <p className="text-sm font-medium mt-1">
-                    Score tendance : {t.trendScoreVisual ?? '—'}/100
+                    Score de Tendance : {t.trendScoreVisual ?? '—'}/100
                   </p>
                   {t.businessAnalysis ? (
                     <p className="text-xs text-muted-foreground mt-2 line-clamp-3 border-t pt-2">

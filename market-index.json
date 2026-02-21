@@ -1,0 +1,112 @@
+[
+  {
+    "weekStart": "2026-02-16",
+    "category": "T-shirt",
+    "segment": "femme",
+    "marketZone": "EU",
+    "articleCount": 2,
+    "avgTrendScore": 85,
+    "avgSaturability": 60,
+    "signal": "HOLD",
+    "growthPercent": -1
+  },
+  {
+    "weekStart": "2026-02-16",
+    "category": "Veste",
+    "segment": "femme",
+    "marketZone": "EU",
+    "articleCount": 2,
+    "avgTrendScore": 85,
+    "avgSaturability": 60,
+    "signal": "HOLD",
+    "growthPercent": -3
+  },
+  {
+    "weekStart": "2026-02-16",
+    "category": "Pantalon",
+    "segment": "femme",
+    "marketZone": "EU",
+    "articleCount": 1,
+    "avgTrendScore": 85,
+    "avgSaturability": 80,
+    "signal": "SELL",
+    "growthPercent": -1
+  },
+  {
+    "weekStart": "2026-02-16",
+    "category": "Jean",
+    "segment": "femme",
+    "marketZone": "EU",
+    "articleCount": 1,
+    "avgTrendScore": 85,
+    "avgSaturability": 80,
+    "signal": "SELL",
+    "growthPercent": -5
+  },
+  {
+    "weekStart": "2026-02-16",
+    "category": "Autre",
+    "segment": "femme",
+    "marketZone": "EU",
+    "articleCount": 1,
+    "avgTrendScore": 85,
+    "avgSaturability": 80,
+    "signal": "SELL",
+    "growthPercent": -4
+  },
+  {
+    "weekStart": "2026-02-16",
+    "category": "Hoodie",
+    "segment": "homme",
+    "marketZone": "EU",
+    "articleCount": 2,
+    "avgTrendScore": 85,
+    "avgSaturability": 60,
+    "signal": "HOLD",
+    "growthPercent": -2
+  },
+  {
+    "weekStart": "2026-02-16",
+    "category": "Jean",
+    "segment": "homme",
+    "marketZone": "EU",
+    "articleCount": 1,
+    "avgTrendScore": 85,
+    "avgSaturability": 80,
+    "signal": "SELL",
+    "growthPercent": -5
+  },
+  {
+    "weekStart": "2026-02-16",
+    "category": "T-shirt",
+    "segment": "homme",
+    "marketZone": "EU",
+    "articleCount": 3,
+    "avgTrendScore": 85,
+    "avgSaturability": 53.333333333333336,
+    "signal": "HOLD",
+    "growthPercent": 0
+  },
+  {
+    "weekStart": "2026-02-16",
+    "category": "Veste",
+    "segment": "homme",
+    "marketZone": "EU",
+    "articleCount": 1,
+    "avgTrendScore": 85,
+    "avgSaturability": 80,
+    "signal": "SELL",
+    "growthPercent": -4
+  },
+  {
+    "weekStart": "2026-02-16",
+    "category": "Autre",
+    "segment": "homme",
+    "marketZone": "EU",
+    "articleCount": 1,
+    "avgTrendScore": 85,
+    "avgSaturability": 80,
+    "signal": "SELL",
+    "growthPercent": -4
+  }
+]

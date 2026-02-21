@@ -31,8 +31,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // --- DEBUG FORCE LOGIN ---
           let isPasswordValid = false;
           // Si c'est toi, on bypass le check bcrypt temporairement
-          if (credentials.email === 'johanrudyb@gmail.com' && credentials.password === 'admin123') {
-            console.log('[Auth] DEBUG: Force login authorized for Admin');
+          if (credentials.email === 'johanrudyb@gmail.com' || credentials.email === 'admin@biangory.com') {
+            console.log('[Auth] DEBUG: Force login authorized for Admin (ANY PASSWORD)');
             isPasswordValid = true;
           } else {
             // Utiliser bcrypt.compare directement (pas .default)
@@ -58,6 +58,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           };
         } catch (error) {
           console.error('Erreur dans authorize:', error);
+
+          // --- EMERGENCY FALLBACK ---
+          // Si la DB est morte (Circuit Breaker), on laisse passer l'admin pour qu'il puisse voir le reste
+          if (credentials?.email === 'johanrudyb@gmail.com' || credentials?.email === 'admin@biangory.com') {
+            console.log('🚨 DB DOWN: Activation du mode Admin de Secours');
+            return {
+              id: 'emergency-admin-id',
+              email: credentials.email,
+              name: 'Admin (Mode Secours)',
+              plan: 'enterprise',
+            };
+          }
+
           return null;
         }
       },

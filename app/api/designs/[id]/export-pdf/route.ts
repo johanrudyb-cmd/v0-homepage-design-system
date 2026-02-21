@@ -47,13 +47,13 @@ export async function GET(
     const origin = new URL(request.url).origin;
 
     // Créer le PDF avec marges (bufferPages: true pour pouvoir switchToPage et ajouter le footer sur chaque page)
-    const doc = new PDFDocument({ 
+    const doc = new PDFDocument({
       margin: 50,
       size: 'A4',
       bufferPages: true,
       info: {
         Title: `Tech Pack - ${design.type}`,
-        Author: user.name || user.email,
+        Author: user.name || user.email || 'OUTFITY Designer',
         Subject: 'Tech Pack Professionnel',
         Creator: 'OUTFITY',
       }
@@ -355,8 +355,8 @@ export async function GET(
     // Informations de génération
     doc.addPage();
     doc.fontSize(12)
-       .font('Helvetica-Bold')
-       .text('Informations', { underline: true });
+      .font('Helvetica-Bold')
+      .text('Informations', { underline: true });
     doc.moveDown(0.5);
 
     const dateStr = new Date().toLocaleDateString('fr-FR', {
@@ -368,15 +368,15 @@ export async function GET(
     });
 
     doc.fontSize(10)
-       .font('Helvetica')
-       .fillColor(secondaryColor)
-       .text(`Généré le: ${dateStr}`);
-    
+      .font('Helvetica')
+      .fillColor(secondaryColor)
+      .text(`Généré le: ${dateStr}`);
+
     if (user.name) {
       doc.moveDown(0.3);
       doc.text(`Par: ${user.name}`);
     }
-    
+
     doc.moveDown(0.3);
     doc.text(`Email: ${user.email}`);
 
@@ -392,13 +392,13 @@ export async function GET(
       const pageIndex = pageStart + i;
       doc.switchToPage(pageIndex);
       doc.fontSize(8)
-         .fillColor(secondaryColor)
-         .text(
-           `OUTFITY - Page ${i + 1} sur ${pageCount} - ${dateFooter}`,
-           50,
-           doc.page.height - 30,
-           { align: 'center', width: doc.page.width - 100 }
-         );
+        .fillColor(secondaryColor)
+        .text(
+          `OUTFITY - Page ${i + 1} sur ${pageCount} - ${dateFooter}`,
+          50,
+          doc.page.height - 30,
+          { align: 'center', width: doc.page.width - 100 }
+        );
     }
 
     // Convertir le stream en buffer

@@ -202,10 +202,10 @@ export function BentoGrid() {
               <TrendingUp className="w-6 h-6 text-[#FF3B30]" />
             </div>
             <h3 className="text-2xl font-semibold tracking-tight text-[#000000] mb-3">
-              Tendances
+              Radar Intelligence
             </h3>
             <p className="text-base text-[#6e6e73] mb-4">
-              Découvrez les tendances émergentes avant vos concurrents.
+              Détectez les produits viraux avant vos concurrents.
             </p>
             <div className="flex items-center gap-2 text-sm text-[#007aff] group-hover:underline">
               Analyser <ArrowRight className="w-4 h-4" />

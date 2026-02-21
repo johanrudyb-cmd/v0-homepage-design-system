@@ -57,7 +57,7 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
         params.append('phase', selectedPhase);
       }
       params.append('limit', '30');
-      
+
       const response = await fetch(`/api/trends/predict?${params.toString()}`);
       const data = await response.json();
       setPredictions(data.predictions || []);
@@ -132,10 +132,10 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
             <div>
               <CardTitle className="text-2xl font-semibold flex items-center gap-2">
                 <Sparkles className="w-6 h-6" />
-                Phases des tendances
+                Cycle de Vie Radar
               </CardTitle>
               <CardDescription className="mt-2 max-w-xl">
-                Émergent → Croissance → Pic → Déclin. Scores calculés à partir des données de scan (vitesse, diversité marques/pays, émergence, stabilité des prix). Ce n’est pas un rapport texte IA ; pour ça, utilisez « Rapport IA » ou « Analyser ce produit » sur le classement.
+                Émergent → Croissance → Pic → Déclin. Scores calculés à partir des données de scan (vitesse, diversité marques/pays, émergence, stabilité des prix). Ce n’est pas un rapport texte IA ; pour ça, utilisez « Synthèse du Radar » ou « Analyser » sur le classement.
               </CardDescription>
             </div>
           </div>
@@ -195,8 +195,8 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
                         {getPhaseLabel(prediction.trendPhase)}
                       </span>
                       <span className={`text-xs font-semibold ${getConfidenceColor(prediction.confidenceLevel)}`}>
-                        {prediction.confidenceLevel === 'high' ? '🔮 Haute' : 
-                         prediction.confidenceLevel === 'medium' ? '📊 Moyenne' : '⚠️ Faible'}
+                        {prediction.confidenceLevel === 'high' ? '🔮 Haute' :
+                          prediction.confidenceLevel === 'medium' ? '📊 Moyenne' : '⚠️ Faible'}
                       </span>
                     </div>
                     <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
@@ -206,41 +206,9 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
                       {prediction.style && <span>• {prediction.style}</span>}
                     </div>
                   </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">
-                      {prediction.predictionScore}
-                    </div>
-                    <div className="text-xs text-muted-foreground">Score Prédiction</div>
-                  </div>
                 </div>
               </CardHeader>
               <CardContent>
-                {/* Scores détaillés */}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
-                  <div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                      <TrendingUp className="w-4 h-4" />
-                      Vitesse
-                    </div>
-                    <div className="text-lg font-semibold">{prediction.velocityScore}</div>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                      <Globe className="w-4 h-4" />
-                      Diversité
-                    </div>
-                    <div className="text-lg font-semibold">{prediction.diversityScore}</div>
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-1 text-sm text-muted-foreground mb-1">
-                      <Sparkles className="w-4 h-4" />
-                      Émergence
-                    </div>
-                    <div className="text-lg font-semibold">{prediction.emergenceScore}</div>
-                  </div>
-                </div>
-
-                {/* Informations */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                   <div>
                     <div className="text-muted-foreground mb-1">Marques</div>
@@ -271,7 +239,7 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
                     <div className="text-muted-foreground mb-1">Détecté il y a</div>
                     <div className="font-medium">{prediction.daysSinceFirstSeen} jours</div>
                   </div>
-                  
+
                   {/* Actions */}
                   <div className="mt-4 flex gap-2">
                     <Button
@@ -320,7 +288,7 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         const params = new URLSearchParams({
           type: data.designData.type,
@@ -328,7 +296,7 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
           material: data.designData.material || '',
           prompt: encodeURIComponent(data.designData.customPrompt),
         });
-        
+
         window.location.href = `/design-studio?${params.toString()}`;
       } else {
         throw new Error(data.error || 'Erreur lors de la création');
@@ -358,7 +326,7 @@ export function TrendPredictions({ userId }: TrendPredictionsProps) {
       });
 
       const data = await response.json();
-      
+
       if (response.ok) {
         const params = new URLSearchParams({
           trend: encodeURIComponent(JSON.stringify(data.emailData)),

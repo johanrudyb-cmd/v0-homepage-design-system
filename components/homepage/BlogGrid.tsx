@@ -3,12 +3,27 @@ import { ArrowRight, Sparkles } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { prisma } from '@/lib/prisma';
 
+import { unstable_cache } from 'next/cache';
+
+const getCachedBlogPosts = unstable_cache(
+    async () => {
+        try {
+            return await prisma.blogPost.findMany({
+                where: { published: true },
+                orderBy: { publishedAt: 'desc' },
+                take: 3,
+            });
+        } catch (e) {
+            console.error('Failed to fetch blog posts', e);
+            return [];
+        }
+    },
+    ['homepage-blog-posts'],
+    { revalidate: 3600, tags: ['blog'] } // Cache 1 heure
+);
+
 export async function BlogGrid() {
-    const posts = await prisma.blogPost.findMany({
-        where: { published: true },
-        orderBy: { publishedAt: 'desc' },
-        take: 3,
-    }).catch(() => [] as any[]);
+    const posts = await getCachedBlogPosts();
 
     // if (posts.length === 0) return null;
 

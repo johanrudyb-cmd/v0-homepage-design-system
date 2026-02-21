@@ -22,7 +22,7 @@ const TUTORIAL_STEPS: { target: string; title: string; body: string }[] = [
   },
   {
     target: 'tour-trends',
-    title: 'Radar Elite',
+    title: 'Radar',
     body: 'C\'est ici que vous captez les tendances virales avant tout le monde pour créer des produits qui se vendent.'
   },
   {

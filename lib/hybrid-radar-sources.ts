@@ -44,17 +44,17 @@ export interface HybridRadarSource {
  * Marché français en premier, marque par marque (homme / femme).
  */
 const ASOS_SELECTORS = {
-  products: 'li[class*="productTile"], article[class*="productTile"], [class*="productTile"], article',
-  name: 'div[class*="productInfo"] p:nth-of-type(1), [class*="productDescription"], [class*="productTileTitle"], a[class*="productLink"]',
-  price: 'div[class*="productInfo"] p:nth-of-type(2) span, [class*="price_"], [class*="currentPrice"], [class*="originalPrice"] span',
-  image: 'a[class*="productLink"] img, img[src*="asos-media"], img[srcset*="asos"], img[data-src*="asos"]',
+  products: 'li[class*="productTile"]',
+  name: 'p[class*="productDescription"]',
+  price: 'span[class*="price_"], span[class*="currentPrice"]',
+  image: 'img[src*="asos-media"], img[srcset*="asos"], img[data-src*="asos"]',
 };
 
 const ZARA_SELECTORS = {
-  products: 'li.product-grid-product[data-productid], li[class*="product-grid-product"], li[class*="product-grid-block-dynamic__product-info"], a[href*="/prd/"]',
-  name: 'img[data-qa-qualifier="media-image"], img[alt], a[class*="product-grid-product-info__name"], [class*="product-name"], [class*="productDescription"]',
-  price: '.money-amount__main, [class*="money-amount"], span[class*="price"], [class*="price"]',
-  image: 'img.media-image__image, img[data-qa-qualifier="media-image"], img[src*="zara"], img',
+  products: '.product-grid-product',
+  name: '.product-grid-product-info__name',
+  price: '.price-current__amount',
+  image: 'img.media-image__image, img[data-qa-qualifier="media-image"], img[src*="static.zara.net"]',
 };
 
 const ZALANDO_SELECTORS = {
@@ -64,6 +64,22 @@ const ZALANDO_SELECTORS = {
   image: '[class*="z-nvg-catalog_articles-article-image"] img, img[src*="zalando"], img[src*="img01"], img',
 };
 
+const SHOES_EXCLUDE = [
+  'chaussure', 'botte', 'mocassin', 'boot', 'basket', 'sneaker', 'sandale', 'mule', 'talon', 'escarpin', 'claquette', 'tong', 'sabot', 'derbie', 'richelieu', 'loafer', 'trainer', 'ballerine', 'espadrille', 'slides', 'flip flop', 'chausson', 'pantoufle',
+  'chau ure', 'moca in', 'ba ket'
+];
+const BEAUTY_EXCLUDE = [
+  'exfoliant', 'crème visage', 'sérum', 'teinte lèvres', 'teinte joues',
+  'blush', 'fond de teint', 'mascara', 'eyeliner', 'fard', 'highlighter',
+  'bronzer', 'démaquillant', 'gloss', 'rouge à lèvres', 'vernis à ongles',
+  'skincare', 'gommage visage', 'masque visage', 'lip tint', 'cheek tint',
+];
+const COMMON_EXCLUDE = [
+  'plus size', 'maternité', 'grossesse', 'curve', 'tall', 'petite',
+  ...SHOES_EXCLUDE,
+  ...BEAUTY_EXCLUDE,
+];
+
 export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
   // FR — ASOS Homme
   {
@@ -72,10 +88,11 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
     marketZone: 'EU',
     segment: 'homme',
     baseUrl: 'https://www.asos.com',
-    newInPath: '/fr/homme/nouveau/cat/?cid=27110&ctaref=hp|mw|prime|feature|1|category|latestdrops',
+    newInPath: '/fr/homme/nouveau/nouveau-vetements/cat/?cid=6993',
     section: 'new_in',
     selectors: ASOS_SELECTORS,
-    limit: 100,
+    limit: 60,
+    excludeKeywords: COMMON_EXCLUDE,
   },
   // FR — ASOS Femme
   {
@@ -87,7 +104,8 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
     newInPath: '/fr/femme/nouveau/nouveau-vetements/cat/?cid=2623',
     section: 'new_in',
     selectors: ASOS_SELECTORS,
-    limit: 100,
+    limit: 60,
+    excludeKeywords: COMMON_EXCLUDE,
   },
   // FR — ASOS Fille
   {
@@ -99,7 +117,8 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
     newInPath: '/fr/fille/nouveau/cat/?cid=27111',
     section: 'new_in',
     selectors: ASOS_SELECTORS,
-    limit: 50,
+    limit: 60,
+    excludeKeywords: COMMON_EXCLUDE,
   },
   // EU — ASOS 18-24 ans Homme (une page, pas de ville)
   {
@@ -108,36 +127,54 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
     marketZone: 'EU',
     segment: 'homme',
     baseUrl: 'https://www.asos.com',
-    newInPath: '/fr/homme/ctas/mode-americaine-en-ligne-14/cat/?cid=16691',
+    newInPath: '/fr/homme/ctas/mode-americaine-en-ligne-14/cat/?cid=16691&page=3&refine=floor:1001,2001',
     section: 'new_in',
     selectors: ASOS_SELECTORS,
-    limit: 80,
+    limit: 60,
+    excludeKeywords: COMMON_EXCLUDE,
   },
   // EU — ASOS Femme (mode en ligne États-Unis)
   {
     id: 'asos-18-24-femme',
-    brand: 'ASOS',
+    brand: 'Global Partner',
     marketZone: 'EU',
     segment: 'femme',
     baseUrl: 'https://www.asos.com',
     newInPath: '/fr/femme/ctas/mode-en-ligne-etats-unis-13/cat/?cid=16661',
     section: 'new_in',
     selectors: ASOS_SELECTORS,
-    limit: 80,
+    limit: 60,
+    excludeKeywords: COMMON_EXCLUDE,
   },
-  // FR — Zara Homme (lazy-load : pre-scroll pour charger plus que les 8 premiers)
+  // FR — Zara Homme
   {
     id: 'zara-homme-fr',
     brand: 'Zara',
     marketZone: 'EU',
     segment: 'homme',
     baseUrl: 'https://www.zara.com',
-    newInPath: '/fr/fr/homme-tout-l7465.html?v1=2458839',
+    newInPath: '/fr/fr/homme-nouveau-l711.html?v1=2544454',
     section: 'new_in',
     selectors: ZARA_SELECTORS,
     limit: 100,
     initialWaitMs: 9000,
     preScrollSteps: 25,
+    excludeKeywords: COMMON_EXCLUDE,
+  },
+  // FR — Zara Femme
+  {
+    id: 'zara-femme-fr',
+    brand: 'Zara',
+    marketZone: 'EU',
+    segment: 'femme',
+    baseUrl: 'https://www.zara.com',
+    newInPath: '/fr/fr/femme-nouveau-l1180.html?v1=2546081',
+    section: 'new_in',
+    selectors: ZARA_SELECTORS,
+    limit: 100,
+    initialWaitMs: 9000,
+    preScrollSteps: 25,
+    excludeKeywords: COMMON_EXCLUDE,
   },
   // FR — Zara Kids Garçon
   {
@@ -152,12 +189,13 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
     limit: 100,
     initialWaitMs: 9000,
     preScrollSteps: 25,
+    excludeKeywords: COMMON_EXCLUDE,
   },
   // FR — Zara Kids Fille
   {
     id: 'zara-kids-fille-fr',
     brand: 'Zara',
-    marketZone: 'FR',
+    marketZone: 'EU',
     segment: 'fille',
     baseUrl: 'https://www.zara.com',
     newInPath: '/fr/fr/enfants-fille-collection-l7289.html?v1=2426193',
@@ -166,40 +204,8 @@ export const HYBRID_RADAR_SOURCES: HybridRadarSource[] = [
     limit: 100,
     initialWaitMs: 9000,
     preScrollSteps: 25,
+    excludeKeywords: COMMON_EXCLUDE,
   },
-  // EU — Zalando Trend Spotter (Trend Alert) : femme + homme, 10 villes actives. Enrich "Voir l'article" pour toutes.
-  ...(['paris', 'berlin', 'milan', 'copenhagen', 'stockholm', 'antwerp', 'zurich', 'london', 'amsterdam', 'warsaw'] as const).flatMap((city) => {
-    return [
-      {
-        id: `zalando-trend-femme-${city}`,
-        brand: 'Zalando',
-        marketZone: 'EU' as const,
-        segment: 'femme' as const,
-        baseUrl: 'https://www.zalando.fr',
-        newInPath: `/trend-spotter/${city}?gender=WOMEN`,
-        section: 'new_in' as const,
-        selectors: ZALANDO_SELECTORS,
-        limit: 80,
-        initialWaitMs: 14000,
-        preScrollSteps: 25,
-        zalandoMainPageOnly: true,
-      },
-      {
-        id: `zalando-trend-homme-${city}`,
-        brand: 'Zalando',
-        marketZone: 'EU' as const,
-        segment: 'homme' as const,
-        baseUrl: 'https://www.zalando.fr',
-        newInPath: `/trend-spotter/${city}?gender=MEN`,
-        section: 'new_in' as const,
-        selectors: ZALANDO_SELECTORS,
-        limit: 80,
-        initialWaitMs: 14000,
-        preScrollSteps: 25,
-        zalandoMainPageOnly: true,
-      },
-    ];
-  }),
 ];
 
 export function getSourcesByZone(zone: MarketZone): HybridRadarSource[] {
@@ -239,7 +245,8 @@ export function createSourceFromUrl(customUrl: string): HybridRadarSource | null
         newInPath: pathAndSearch || '/',
         section: 'new_in',
         selectors: ASOS_SELECTORS,
-        limit: 80,
+        limit: 60,
+        excludeKeywords: COMMON_EXCLUDE,
       };
     }
 
@@ -261,6 +268,7 @@ export function createSourceFromUrl(customUrl: string): HybridRadarSource | null
         preScrollSteps: 25,
         zalandoMainPageOnly: true,
         zalandoTrendingItemsEnrich: true,
+        excludeKeywords: COMMON_EXCLUDE,
       };
     }
 

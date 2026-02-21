@@ -83,7 +83,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
         take: 3,
     });
 
-    const authorName = post.author?.name || 'OUTFITY Team';
+    const authorName = post.author || post.authorUser?.name || 'OUTFITY Team';
 
     return (
         <div className="min-h-screen bg-[#F5F5F7]">

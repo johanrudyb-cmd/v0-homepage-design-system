@@ -1,0 +1,33 @@
+
+name: OUTFITY - Radar Hybride Automatique
+
+on:
+  schedule:
+    - cron: '0 6 * * *' # Tourne tous les jours à 6h00 UTC (7h00 heure française)
+  workflow_dispatch: # Permet de le lancer manuellement depuis GitHub
+
+jobs:
+  scrape-trends:
+    runs-on: ubuntu-latest
+    
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }} # Votre URL Supabase stockée dans GitHub Secrets
+
+    steps:
+      - name: 🛰️ Récupération du code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Configuration de Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 📦 Installation des dépendances
+        run: npm install
+
+      - name: 🧪 Génération du client Prisma
+        run: npx prisma generate
+
+      - name: 🚀 Lancement du Scrape Radar Hybride
+        run: npx ts-node scripts/radar-hybride.ts

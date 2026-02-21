@@ -18,7 +18,13 @@ const INVALID_BRAND_PATTERNS = /^[._\-\s]+$|^\._\.$/;
 const GENERIC_FASHION_TERMS = [
   'jean', 'jeans', 't-shirt', 'tshirt', 'pull', 'sweat', 'hoodie', 'robe', 'veste', 'blouson',
   'pantalon', 'cargo', 'short', 'chemise', 'jupe', 'polo', 'legging', 'gilet', 'ensemble',
-  'body', 'pack', 'lot', 'doudoune', 'basique', 'accessoire', 'chaussettes', 'sac', 'chaussures'
+  'body', 'pack', 'lot', 'doudoune', 'basique', 'accessoire', 'chaussettes', 'sac', 'chaussures',
+  'trench', 'manteau', 'pullover', 'shirt', 'sweatshirt', 'cardigan', 'blazer', 'costume',
+  'top', 'débardeur', 'debardeur', 'pant', 'denim', 'jogging', 'leggings', 'bra', 'boxer',
+  'pyjama', 'maillot', 'bikini', 'bermuda', 'cabas', 'ceinture', 'chapeau', 'bonnet',
+  'echarpe', 'gants', 'lunettes', 'bijoux', 'montre', 'sneakers', 'bottes', 'sandales',
+  'mocassins', 'escarpins', 'manches', 'longues', 'courtes', 'col', 'v', 'zippé', 'zippee',
+  'haut', 'bas', 'coordonné', 'coordonne', 'assorti', 'mix match', 'mix & match'
 ];
 
 export function safeDisplayBrand(brand: string | null | undefined): string | null {

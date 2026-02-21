@@ -7,7 +7,7 @@ import { Users, ShoppingBag, Rocket, Star } from 'lucide-react';
 
 const stats = [
   { value: '150+', label: 'Créateurs actifs', icon: Users, color: '#007AFF' },
-  { value: 'Elite 60', label: 'Tendances / Hebdo', icon: ShoppingBag, color: '#007AFF' },
+  { value: 'Elite 60', label: 'Radar Intelligence', icon: ShoppingBag, color: '#007AFF' },
   { value: '500+', label: 'Marques créées', icon: Rocket, color: '#007AFF' },
   { value: '4.9/5', label: 'Note moyenne', icon: Star, color: '#007AFF' },
 ];

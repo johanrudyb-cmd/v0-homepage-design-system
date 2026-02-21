@@ -1,29 +1,45 @@
-import { NextResponse } from 'next/server';
-import { getHybridRadarTrends } from '@/lib/trends-data';
 
-export const runtime = 'nodejs';
+import { NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+
+const prisma = new PrismaClient();
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url);
-    const params = {
-      marketZone: searchParams.get('marketZone') || 'EU',
-      segment: searchParams.get('segment') || 'homme',
-      sortBy: searchParams.get('sortBy') || 'best',
-      limit: Math.min(parseInt(searchParams.get('limit') || '60', 10), 100),
-      globalOnly: searchParams.get('globalOnly') === 'true',
-      brandFilter: searchParams.get('brand')?.trim(),
-      ageRange: searchParams.get('ageRange')?.trim(),
-    };
+    const segment = searchParams.get('segment');
+    // On ignore ageRange volontairement pour tout afficher
+    const limit = parseInt(searchParams.get('limit') || '50', 10);
 
-    const result = await getHybridRadarTrends(params);
+    // Conditions de base
+    const where: any = {};
+    if (segment) {
+      where.segment = segment;
+    }
 
-    return NextResponse.json(result);
-  } catch (e) {
-    console.error('[Hybrid Radar GET]', e);
-    return NextResponse.json(
-      { error: e instanceof Error ? e.message : 'Erreur' },
-      { status: 500 }
-    );
+    // Récupération simple et directe
+    const products = await prisma.trendProduct.findMany({
+      where,
+      orderBy: { trendScore: 'desc' }, // Les plus "hot" en premier
+      take: limit,
+      // Pas de select restrictif, on prend tout pour l'instant
+    });
+
+    console.log(`API Hybrid Radar: Found ${products.length} products for segment ${segment}`);
+
+    return NextResponse.json({
+      trends: products,
+      summary: {
+        total: products.length,
+      }
+    });
+
+  } catch (error) {
+    console.error('API Error:', error);
+    return NextResponse.json({ trends: [], error: 'Failed' }, { status: 500 });
+  } finally {
+    await prisma.$disconnect();
   }
 }
