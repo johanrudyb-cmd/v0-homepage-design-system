@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { cn } from '@/lib/utils';
 import { proxyImageUrl } from '@/lib/image-proxy';
-import { Flame, Lock } from 'lucide-react';
+import { Flame, Lock, Music, Heart, MessageCircle, Share2, Bookmark } from 'lucide-react';
 import { BrandLogo } from '@/components/brands/BrandLogo';
 import { getBrandLogoUrl, getBrandKey } from '@/lib/curated-brands';
 import { REFERENCE_BRAND_WEBSITES } from '@/lib/constants/audience-reference-brands';
@@ -305,12 +305,12 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                         </div>
                       )}
 
-                      <div className={cn("flex flex-col h-full", isFree && !isPubliclyVisible ? 'opacity-10 grayscale' : '')}>
-                        <div className="relative aspect-[3/4] overflow-hidden bg-[#F5F5F7]">
+                      <div className={cn("relative flex flex-col h-full bg-white", isFree && !isPubliclyVisible ? 'opacity-10 grayscale' : '')}>
+                        <div className="relative aspect-[9/16] overflow-hidden bg-black group-hover:rounded-b-none transition-all">
                           <img
                             src={product.imageUrl || ''}
                             alt={product.name}
-                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 ease-apple group-hover:scale-110"
+                            className="absolute inset-0 w-full h-full object-cover transition-transform duration-1000 group-hover:scale-105"
                             referrerPolicy="no-referrer"
                             onError={(e) => {
                               const target = e.target as HTMLImageElement;
@@ -319,58 +319,123 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                             }}
                           />
 
-                          {/* Flammes viralité */}
-                          {product.trendScore && (
-                            <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 z-20">
-                              <div className="px-2 py-1.5 rounded-[14px] bg-black/85 backdrop-blur-xl text-white border border-white/10 shadow-apple-lg flex items-center gap-0.5">
-                                {[...Array(
-                                  product.trendScore >= 90 ? 3 :
-                                    product.trendScore >= 80 ? 2 : 1
-                                )].map((_, i) => (
-                                  <Flame key={i} className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 fill-[#FF3B30] text-[#FF3B30]" />
-                                ))}
+                          {/* Gradient en bas pour lire le texte proprement */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/20 to-transparent z-10" />
+
+                          {/* Interface "TikTok" - Actions à droite */}
+                          <div className="absolute right-3 bottom-24 z-20 flex flex-col items-center gap-4">
+                            <div className="flex flex-col items-center gap-1 group/btn cursor-pointer">
+                              <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center transition-transform group-hover/btn:scale-110 border border-white/5">
+                                <Heart className="w-5 h-5 text-white fill-white" />
                               </div>
+                              <span className="text-white text-[10px] font-bold drop-shadow-md">
+                                {Math.floor((product.trendScore || 0) * 12.5)}K
+                              </span>
                             </div>
-                          )}
+
+                            <div className="flex flex-col items-center gap-1 group/btn cursor-pointer">
+                              <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center transition-transform group-hover/btn:scale-110 border border-white/5">
+                                <MessageCircle className="w-5 h-5 text-white fill-white" />
+                              </div>
+                              <span className="text-white text-[10px] font-bold drop-shadow-md">
+                                {Math.floor((product.trendScore || 0) * 2.1)}
+                              </span>
+                            </div>
+
+                            <div className="flex flex-col items-center gap-1 group/btn cursor-pointer">
+                              <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center transition-transform group-hover/btn:scale-110 border border-white/5">
+                                <Bookmark className="w-5 h-5 text-white fill-white" />
+                              </div>
+                              <span className="text-white text-[10px] font-bold drop-shadow-md">
+                                {Math.floor((product.trendScore || 0) * 4.3)}
+                              </span>
+                            </div>
+
+                            <div className="flex flex-col items-center gap-1 group/btn cursor-pointer">
+                              <div className="w-10 h-10 rounded-full bg-black/40 backdrop-blur-md flex items-center justify-center transition-transform group-hover/btn:scale-110 border border-white/5">
+                                <Share2 className="w-5 h-5 text-white" />
+                              </div>
+                              <span className="text-white text-[10px] font-bold drop-shadow-md">Partager</span>
+                            </div>
+                          </div>
+
+                          {/* Disque Musique - TikTok style */}
+                          <div className="absolute right-3 bottom-6 z-20">
+                            <div className="w-10 h-10 rounded-full bg-[#1e1e1e] flex items-center justify-center border-4 border-[#2c2c2c] animate-[spin_4s_linear_infinite]">
+                              <Music className="w-4 h-4 text-white" />
+                            </div>
+                          </div>
+
+                          {/* Infos Produit en bas à gauche */}
+                          <div className="absolute left-4 bottom-6 right-16 z-20">
+                            {(() => {
+                              const score = product.trendScore || 0;
+                              const badge = getViralityBadge(score);
+                              const brand = safeDisplayBrand(product.brand) || product.brand || 'Marque Inconnue';
+
+                              return (
+                                <div className="space-y-3">
+                                  <div className="flex items-center gap-2">
+                                    <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#007AFF] to-purple-500 p-[2px] shadow-lg">
+                                      <div className="w-full h-full rounded-full bg-black flex items-center justify-center overflow-hidden">
+                                        <img
+                                          src={getBrandLogoUrl(brand) || proxyImageUrl(product.imageUrl || '') || ''}
+                                          alt={brand}
+                                          className="w-full h-full object-cover"
+                                          onError={(e) => {
+                                            (e.target as HTMLImageElement).src = 'https://ui-avatars.com/api/?name=' + brand + '&background=random&color=fff';
+                                          }}
+                                        />
+                                      </div>
+                                    </div>
+                                    <span className="text-[13px] font-bold text-white drop-shadow-md flex items-center gap-1">
+                                      @{brand.replace(/\s+/g, '').toLowerCase()}_style
+                                      <div className="w-3.5 h-3.5 bg-[#20D5EC] rounded-full flex items-center justify-center">
+                                        <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                                        </svg>
+                                      </div>
+                                    </span>
+                                  </div>
+
+                                  <div className="text-[12px] text-white/95 font-medium leading-snug line-clamp-2 drop-shadow-md pr-2">
+                                    Grosse pépite que je viens de trouver ! 🤯 {product.category.toLowerCase()} incroyable 🔥
+                                    <span className="font-bold text-white ml-1 hover:underline cursor-pointer opacity-80">
+                                      #OutfityTrends #{brand.replace(/\s+/g, '').toLowerCase()}
+                                    </span>
+                                  </div>
+
+                                  <div className="flex items-center gap-2 flex-wrap pt-1">
+                                    <span
+                                      className="px-2 py-1 rounded-sm text-[9px] font-black uppercase tracking-widest bg-black/40 backdrop-blur-md border border-white/10 shadow-lg"
+                                      style={{ color: badge.color }}
+                                    >
+                                      {badge.emoji} {badge.label}
+                                    </span>
+                                    {score >= 80 && (
+                                      <span className="px-2 py-1 rounded-sm text-[9px] font-black uppercase tracking-widest text-[#007AFF] bg-[#007AFF]/20 backdrop-blur-md border border-[#007AFF]/20 flex items-center gap-1 shadow-lg">
+                                        <Flame className="w-3 h-3" /> VIRAL TIKTOK
+                                      </span>
+                                    )}
+                                  </div>
+                                </div>
+                              );
+                            })()}
+                          </div>
                         </div>
 
-                        <div className="p-4 sm:p-6 flex flex-col flex-grow">
-                          {/* Marque · Badge viralité */}
-                          {(() => {
-                            const score = product.trendScore || 0;
-                            const badge = getViralityBadge(score);
-                            const brand = safeDisplayBrand(product.brand) || product.brand || '';
-                            return (
-                              <div className="mb-3">
-                                <div className="flex items-center gap-1.5 flex-wrap mb-2">
-                                  {brand && (
-                                    <span className="text-[11px] sm:text-[14px] font-black text-black tracking-tight">
-                                      {brand}
-                                    </span>
-                                  )}
-                                  {brand && <span className="text-black/20 text-[11px]">·</span>}
-                                  <span
-                                    className="text-[9px] sm:text-[11px] font-black uppercase tracking-widest"
-                                    style={{ color: badge.color }}
-                                  >
-                                    {badge.emoji} {badge.label}
-                                  </span>
-                                </div>
-                                {/* Catégorie */}
-                                <div className="flex items-center gap-2">
-                                  <span className="text-[8px] sm:text-[10px] font-black text-[#007AFF] bg-[#007AFF]/10 px-1.5 py-0.5 rounded-md uppercase tracking-widest border border-[#007AFF]/10">
-                                    {product.category}
-                                  </span>
-                                </div>
-                              </div>
-                            );
-                          })()}
-
+                        {/* Bouton d'Analyse */}
+                        <div className="p-3 bg-white z-30 transition-all">
                           <button
                             onClick={(e) => handleAnalyzeClick(e, product.id)}
-                            className="mt-auto w-full h-12 rounded-full text-xs font-black uppercase tracking-widest bg-black text-white shadow-apple hover:bg-[#1D1D1F] active:scale-95 transition-all duration-300"
+                            className="w-full h-12 rounded-xl text-[11px] font-black uppercase tracking-widest bg-[#EFEFF0] text-black border border-black/5 shadow-sm hover:bg-[#007AFF] hover:text-white hover:border-[#007AFF] active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 group-hover:bg-[#007AFF] group-hover:text-white"
                           >
-                            Analyse complète
+                            <span>Analyser la Tendance</span>
+                            <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                              <svg className="w-3 h-3 text-[#007AFF]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
+                              </svg>
+                            </div>
                           </button>
                         </div>
                       </div>
