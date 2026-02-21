@@ -30,7 +30,8 @@ export async function POST(req: Request) {
                 slug,
                 excerpt,
                 content,
-                author: {
+                author: user?.name || 'OUTFITY Team', // Stockage du nom en texte
+                authorUser: {
                     connect: {
                         id: user!.id
                     }

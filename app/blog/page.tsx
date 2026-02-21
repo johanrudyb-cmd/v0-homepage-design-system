@@ -26,16 +26,28 @@ export const metadata = {
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
+import { unstable_cache } from 'next/cache';
+
+const getCachedBlogPosts = unstable_cache(
+  async () => {
+    return await prisma.blogPost.findMany({
+      where: { published: true },
+      orderBy: { publishedAt: 'desc' },
+      include: { authorUser: true },
+      take: 20,
+    });
+  },
+  ['blog-page-posts-v2'], // Nouvelle clé pour invalider l'ancien cache vide
+  { revalidate: 3600, tags: ['blog'] }
+);
+
 export default async function BlogPage() {
-  const posts = await prisma.blogPost.findMany({
-    where: { published: true },
-    orderBy: { publishedAt: 'desc' },
-    include: { author: true },
-    take: 20,
-  }).catch((e) => {
-    console.error('Error fetching blog posts:', e);
-    return [];
-  });
+  let posts: any[] = [];
+  try {
+    posts = await getCachedBlogPosts();
+  } catch (e) {
+    console.error('Failed to load blog posts, temporary display empty.', e);
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -79,7 +91,7 @@ export default async function BlogPage() {
                   <div className="flex items-center gap-3 sm:gap-4 text-white/60 text-[10px] font-black uppercase tracking-widest">
                     <span className="px-2 py-0.5 sm:px-3 sm:py-1 rounded bg-[#007AFF] text-white">À LA UNE</span>
                     <span>•</span>
-                    <span>{posts[0].author?.name || 'OUTFITY Team'}</span>
+                    <span>{posts[0].author || posts[0].authorUser?.name || 'OUTFITY Team'}</span>
                   </div>
                   <h2 className="text-3xl sm:text-6xl lg:text-7xl font-black text-white leading-[1.1] tracking-tighter group-hover:text-[#007AFF] transition-colors">
                     {posts[0].title}
@@ -134,7 +146,7 @@ export default async function BlogPage() {
                     <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.2em] text-[#6e6e73]/60">
                       <span>{new Date(post.publishedAt).toLocaleDateString('fr-FR', { month: 'long', year: 'numeric' })}</span>
                       <span className="w-1 h-1 rounded-full bg-[#007AFF]" />
-                      <span>{post.author?.name || 'OUTFITY Team'}</span>
+                      <span>{post.author || post.authorUser?.name || 'OUTFITY Team'}</span>
                     </div>
                     <h3 className={cn(
                       "font-black text-black tracking-tight leading-tight group-hover:text-[#007AFF] transition-colors",

@@ -23,13 +23,13 @@ export async function generateMetadata({ params }: BlogPostPageProps): Promise<M
     const { slug } = await params;
     const post = await prisma.blogPost.findUnique({
         where: { slug },
-        include: { author: true },
+        include: { authorUser: true },
     });
 
     if (!post) return { title: 'Article non trouvé | OUTFITY' };
 
     const siteUrl = 'https://outfity.fr';
-    const authorName = post.author?.name || 'OUTFITY Team';
+    const authorName = post.author || post.authorUser?.name || 'OUTFITY Team';
 
     return {
         title: `${post.title} | OUTFITY Radar`,
@@ -68,7 +68,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
     const { slug } = await params;
     const post = await prisma.blogPost.findUnique({
         where: { slug },
-        include: { author: true },
+        include: { authorUser: true },
     });
 
     const isProd = process.env.NODE_ENV === 'production';

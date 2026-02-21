@@ -294,6 +294,7 @@ model Factory {
   quotes            Quote[]
   reviews           FactoryReview[]
   favoriteByBrands  BrandFavoriteFactory[]
+  trendProducts     TrendProduct[]
 
   @@index([country])
   @@index([specialties])
@@ -520,9 +521,10 @@ model TrendProduct {
   isGlobalTrendAlert Boolean @default(false)
   sourceBrand   String?
   productBrand  String?
-  sourceUrl     String?
+  sourceUrl     String   @unique
   brandWebsiteUrl String?
   segment       String?
+  ageRange      String?  // '18-24' | '25-34'
   trendGrowthPercent Int?
   trendLabel    String?
   businessAnalysis String? @db.Text
@@ -539,10 +541,26 @@ model TrendProduct {
   markdownPercent Float?
   visualAttractivenessScore Float?
   dominantAttribute String?
+  
+  // -- OPERATIONAL AI ENGINE FIELDS --
+  marketRegion      String?   @default("Europe")
+  weatherSignal     String?   @default("Stable")
+  predictedScore60d Int?      @default(0)
+  productionSafety  String?   @default("INCONNU") // SÛR, RISQUÉ, DANGER
+  upcomingCatalysts Json?     // [{ name, source, impact }]
+  opportunityReason String?   @db.Text
+  saturationReason  String?   @db.Text
+  lastScan          String?   @default("Just now")
+  aiConfidence      Int?      @default(0)
+
+  suggestedRetailPrice Float?
+  matchedSupplierId    String?
+
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   favorites ProductFavorite[]
+  matchedSupplier Factory? @relation(fields: [matchedSupplierId], references: [id], onDelete: SetNull)
 
   @@index([marketZone])
   @@index([segment])
@@ -643,6 +661,7 @@ model BlogPost {
   relatedBrands String[]
   published   Boolean  @default(false)
   publishedAt DateTime @default(now())
+  author      String?   // Nouveau champ texte pour n8n (ex: "OUTFITY Intelligence")
   authorId    String?
   categoryId  String?
   
@@ -650,7 +669,7 @@ model BlogPost {
   seoDescription String?
   seoKeywords    String?
 
-  author    User?     @relation(fields: [authorId], references: [id])
+  authorUser User?     @relation(fields: [authorId], references: [id])
   category  BlogCategory? @relation(fields: [categoryId], references: [id])
   
   createdAt   DateTime @default(now())

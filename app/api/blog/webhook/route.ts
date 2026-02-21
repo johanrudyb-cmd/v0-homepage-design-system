@@ -52,6 +52,10 @@ export async function POST(req: Request) {
         // 4. Opération Base de Données (Upsert)
         console.log('[N8N_WEBHOOK] Starting Database Upsert for slug:', slug);
 
+        // Optionnel: On cherche un utilisateur par défaut pour l'auteur si besoin
+        // Ici on laisse authorId à null pour l'instant car le schéma l'autorise
+        // et le post appartient à "OUTFITY Intelligence" par défaut dans l'UI.
+
         try {
             const post = await prisma.blogPost.upsert({
                 where: { slug },
@@ -63,7 +67,7 @@ export async function POST(req: Request) {
                     published,
                     publishedAt: published ? new Date() : undefined,
                     tags,
-
+                    author, // On remplit la nouvelle colonne texte
                     relatedBrands,
                     sourceUrl
                 },
@@ -73,7 +77,7 @@ export async function POST(req: Request) {
                     excerpt,
                     content,
                     coverImage,
-
+                    author, // On remplit la nouvelle colonne texte
                     published,
                     publishedAt: published ? new Date() : undefined,
                     tags,
