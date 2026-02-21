@@ -191,8 +191,6 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
             </div>
           </div>
 
-          {/* Credit System Display */}
-          <UsageBadge count={analysesCount} plan={user?.plan || 'free'} />
         </div>
 
         {/* Grille de produits animée */}
@@ -289,8 +287,8 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                                 {/* Interface "TikTok" - Actions à droite */}
                                 <div className="absolute right-2 bottom-3 z-20 flex flex-col items-center gap-3">
                                   {/* Profile Pic with Follow Button */}
-                                  <div className="relative mb-2">
-                                    <div className="w-[42px] h-[42px] rounded-full border border-white overflow-hidden bg-black flex items-center justify-center">
+                                  <div className="relative mb-2 lg:mb-1">
+                                    <div className="w-[42px] h-[42px] lg:w-[36px] lg:h-[36px] rounded-full border border-white overflow-hidden bg-black flex items-center justify-center">
                                       <img
                                         src={getBrandLogoUrl(brand) || proxyImageUrl(product.imageUrl || '') || ''}
                                         alt={brand}
@@ -300,53 +298,53 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                                         }}
                                       />
                                     </div>
-                                    <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 w-[18px] h-[18px] bg-[#FF2D55] rounded-full flex items-center justify-center cursor-pointer shadow-sm">
-                                      <span className="text-white text-xs font-bold leading-none mb-0.5">+</span>
+                                    <div className="absolute -bottom-2 lg:-bottom-1.5 left-1/2 -translate-x-1/2 w-[18px] h-[18px] lg:w-[16px] lg:h-[16px] bg-[#FF2D55] rounded-full flex items-center justify-center cursor-pointer shadow-sm">
+                                      <span className="text-white text-[12px] lg:text-[10px] font-bold leading-none mb-0.5">+</span>
                                     </div>
                                   </div>
 
                                   {/* Likes */}
                                   <div className="flex flex-col items-center gap-0.5 cursor-pointer group/btn">
-                                    <svg className="w-[32px] h-[32px] text-white transition-transform group-hover/btn:scale-110 drop-shadow-[0_2px_5px_rgba(0,0,0,0.6)]" fill="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-[32px] h-[32px] lg:w-[26px] lg:h-[26px] text-white transition-transform group-hover/btn:scale-110 drop-shadow-[0_2px_5px_rgba(0,0,0,0.6)]" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
                                     </svg>
-                                    <span className="text-white text-[12px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                    <span className="text-white text-[12px] lg:text-[10px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                                       {formatNum(baseLikes)}
                                     </span>
                                   </div>
 
                                   {/* Comments */}
                                   <div className="flex flex-col items-center gap-0.5 cursor-pointer group/btn">
-                                    <svg className="w-[32px] h-[32px] text-white transition-transform group-hover/btn:scale-110 drop-shadow-[0_2px_5px_rgba(0,0,0,0.6)]" fill="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-[32px] h-[32px] lg:w-[26px] lg:h-[26px] text-white transition-transform group-hover/btn:scale-110 drop-shadow-[0_2px_5px_rgba(0,0,0,0.6)]" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-3 9h-2V9h2v2zm-4 0h-2V9h2v2zm-4 0H7V9h2v2z" />
                                     </svg>
-                                    <span className="text-white text-[12px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                    <span className="text-white text-[12px] lg:text-[10px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                                       {formatNum(baseComments)}
                                     </span>
                                   </div>
 
                                   {/* Bookmark */}
                                   <div className="flex flex-col items-center gap-0.5 cursor-pointer group/btn">
-                                    <svg className="w-[32px] h-[32px] text-white transition-transform group-hover/btn:scale-110 drop-shadow-[0_2px_5px_rgba(0,0,0,0.6)]" fill="currentColor" viewBox="0 0 24 24">
+                                    <svg className="w-[32px] h-[32px] lg:w-[26px] lg:h-[26px] text-white transition-transform group-hover/btn:scale-110 drop-shadow-[0_2px_5px_rgba(0,0,0,0.6)]" fill="currentColor" viewBox="0 0 24 24">
                                       <path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z" />
                                     </svg>
-                                    <span className="text-white text-[12px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                    <span className="text-white text-[12px] lg:text-[10px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                                       {formatNum(baseBookmarks)}
                                     </span>
                                   </div>
 
                                   {/* Share */}
                                   <div className="flex flex-col items-center gap-0.5 cursor-pointer group/btn">
-                                    <svg className="w-[32px] h-[32px] text-white transition-transform group-hover/btn:scale-110 drop-shadow-[0_2px_5px_rgba(0,0,0,0.6)]" fill="currentColor" viewBox="0 0 24 24" style={{ transform: 'scaleX(-1)' }}>
+                                    <svg className="w-[32px] h-[32px] lg:w-[26px] lg:h-[26px] text-white transition-transform group-hover/btn:scale-110 drop-shadow-[0_2px_5px_rgba(0,0,0,0.6)]" fill="currentColor" viewBox="0 0 24 24" style={{ transform: 'scaleX(-1)' }}>
                                       <path d="M11 6.914V2.586L20.414 12 11 21.414v-4.328c-4.22-.162-8.312.92-11 5.914 0-6.118 2.653-12.784 11-16.086z" />
                                     </svg>
-                                    <span className="text-white text-[12px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                                    <span className="text-white text-[12px] lg:text-[10px] font-bold drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
                                       {formatNum(baseShares)}
                                     </span>
                                   </div>
 
                                   {/* Disque Musique - TikTok style */}
-                                  <div className="mt-2 w-[40px] h-[40px] rounded-full flex items-center justify-center border-[6px] border-[#2c2c2c] bg-black shadow-[0_0_0_1px_rgba(255,255,255,0.1)] animate-[spin_4s_linear_infinite]">
+                                  <div className="mt-2 w-[40px] h-[40px] lg:w-[34px] lg:h-[34px] rounded-full flex items-center justify-center border-[6px] lg:border-[5px] border-[#2c2c2c] bg-black shadow-[0_0_0_1px_rgba(255,255,255,0.1)] animate-[spin_4s_linear_infinite]">
                                     <img
                                       src={getBrandLogoUrl(brand) || proxyImageUrl(product.imageUrl || '') || ''}
                                       alt="Record"
@@ -359,21 +357,21 @@ export function TrendsByMarket({ initialTrends }: { initialTrends?: TrendProduct
                                 </div>
 
                                 {/* Infos Produit en bas à gauche */}
-                                <div className="absolute left-3 bottom-4 right-[64px] z-20">
+                                <div className="absolute left-3 lg:left-2 bottom-4 right-[64px] lg:right-[52px] z-20">
                                   <div className="flex items-center gap-2 mb-1">
-                                    <span className="text-[15px] font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] line-clamp-1">
+                                    <span className="text-[15px] lg:text-[13px] font-bold text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] line-clamp-1">
                                       {username}
                                     </span>
-                                    <div className="px-1.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-sm text-[10px] text-white font-bold flex items-center gap-1">
+                                    <div className="px-1.5 py-0.5 bg-white/20 backdrop-blur-sm rounded-sm text-[10px] lg:text-[8px] text-white font-bold flex items-center gap-1">
                                       Viral
                                     </div>
                                   </div>
 
-                                  <div className="text-[13px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-snug line-clamp-2">
+                                  <div className="text-[13px] lg:text-[11px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] leading-snug line-clamp-2">
                                     {product.name}
                                   </div>
 
-                                  <div className="text-[13px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mt-1">
+                                  <div className="text-[13px] lg:text-[11px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] mt-1">
                                     <span className="font-bold hover:underline cursor-pointer">#{brand.replace(/\s+/g, '').toLowerCase()}</span>{' '}
                                     <span className="font-bold hover:underline cursor-pointer">#viral</span>{' '}
                                     <span className="font-bold hover:underline cursor-pointer">#fyp</span>{' '}
