@@ -60,15 +60,6 @@ export function CreativeGrid() {
       color: 'bg-[#007AFF]/10',
       iconColor: 'text-[#007AFF]',
     },
-    {
-      title: 'Scanner visuel IA',
-      description: 'Uploadez une photo de vêtement et obtenez instantanément son potentiel de vente, son style et les produits similaires du marché.',
-      icon: Camera,
-      href: '/trends/visual',
-      isFree: false,
-      color: 'bg-[#007AFF]/20',
-      iconColor: 'text-[#007AFF]',
-    },
   ];
 
   return (
@@ -84,7 +75,7 @@ export function CreativeGrid() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
           {/* Cartes créatives - mieux mises en avant */}
           {creativeItems.map((item, index) => {
             const IconComponent = item.icon;
