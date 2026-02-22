@@ -6,28 +6,28 @@ import { ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
-    question: 'Comment fonctionne la génération de tech packs ?',
-    answer: 'Vous créez votre design dans le Design Studio (flat sketch, mockup). Le tech pack est généré à partir de votre travail : matériaux, dimensions, spécifications techniques et instructions de production. Le tout est exportable en PDF pour vos fournisseurs.',
+    question: 'Quel est l\'intérêt du radar de tendances TikTok pour ma marque ?',
+    answer: 'Le radar ne se contente pas de trouver des vidéos virales ; il sert avant tout à vous rassurer dans vos choix créatifs. En observant les variations du marché en temps réel pour un style précis, nous validons le potentiel d\'une pièce avant même de lancer sa production.',
   },
   {
-    question: 'Comment fonctionne le Sourcing Hub ?',
-    answer: 'Notre base de données contient des usines vérifiées dans le monde entier. Vous filtrez par pays, MOQ (quantité minimum), spécialités (t-shirts, hoodies, etc.) et prix. Une fois votre tech pack créé, vous pouvez l\'envoyer directement aux usines sélectionnées pour obtenir des devis. Mettez une étoile sur un fournisseur pour l\'enregistrer parmi ceux avec qui vous travaillez.',
+    question: 'Comment m\'aidez-vous à sécuriser mes lancements ?',
+    answer: 'Nous croisons les données d\'engagement avec les mouvements actuels du secteur. Cela vous permet de comprendre si un style est en pleine ascension ou s\'il s\'agit d\'un feu de paille, vous offrant ainsi une base factuelle pour décider vos prochaines collections.',
   },
   {
-    question: 'Qu\'est-ce que le Mannequin IA et comment ça marche ?',
-    answer: 'Vous uploadez une photo de votre produit (ou utilisez un mockup généré). L\'IA génère des visuels avec des mannequins virtuels dans différentes poses. Cela vous permet de créer des images professionnelles pour vos réseaux sociaux sans organiser de shooting photo coûteux.',
+    question: 'Quels sont les outils IA inclus dans la plateforme ?',
+    answer: 'Outfity propose une suite d\'outils boostés à l\'IA : générateur de logos IA, mannequin virtuel IA pour vos visuels sans shooting, et assistant script marketing IA pour vos vidéos publicitaires.',
   },
   {
-    question: 'Le Launch Map est-il obligatoire pour utiliser la plateforme ?',
-    answer: 'Non, le Launch Map est un guide optionnel pour les débutants. Vous pouvez accéder directement à chaque outil (Design Studio, Sourcing Hub, UGC Lab, Calculateur de marge, Création de contenu) indépendamment. Le Launch Map vous aide à structurer votre parcours de création de marque.',
+    question: 'Pourquoi utiliser Outfity plutôt que de scroller TikTok soi-même ?',
+    answer: 'Scroller manuellement ne donne qu\'une vision fragmentée. Nous agrégeons et structurons ces signaux pour vous donner une vue d\'ensemble cohérente de l\'évolution des styles, vous évitant de vous fier uniquement à votre intuition.',
   },
   {
-    question: 'Puis-je exporter mes tech packs pour les envoyer à mes fournisseurs ?',
-    answer: 'Oui, tous les tech packs générés peuvent être exportés en PDF avec les spécifications techniques, les flat sketches et les détails de production. Le format est professionnel et directement utilisable par vos fournisseurs.',
+    question: 'À qui s\'adresse précisément OUTFITY ?',
+    answer: 'La plateforme est conçue pour les créateurs de marques de vêtements, e-commerçants et influenceurs qui veulent sécuriser leur stratégie en s\'appuyant sur des données concrètes plutôt que sur des suppositions.',
   },
   {
-    question: 'Y a-t-il des limites sur le plan gratuit ?',
-    answer: 'Le plan gratuit vous donne accès à 3 analyses de tendances par mois et au calculateur de marge. Pour débloquer toute la puissance d\'Outfity Intelligence (Radar Elite, 10 analyses détaillées, tech packs, création de contenu), passez au plan Créateur à 34 €/mois.',
+    question: 'La plateforme possède-t-elle un plan gratuit ?',
+    answer: 'Oui, vous pouvez créer un compte gratuitement pour explorer la plateforme et accéder à un nombre limité de tendances et d\'outils de validation.',
   },
 ];
 

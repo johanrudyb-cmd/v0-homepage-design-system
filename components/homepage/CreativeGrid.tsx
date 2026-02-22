@@ -34,8 +34,8 @@ export function CreativeGrid() {
 
   const creativeItems = [
     {
-      title: 'Création de logo par IA',
-      description: 'Générez 4 propositions de logo personnalisées avec l\'IA. Choisissez celui qui correspond le mieux à votre marque et téléchargez-le en version transparente.',
+      title: 'Création de logo IA',
+      description: 'Générez 4 propositions de logo uniques pour votre marque. Choisissez celui qui vous correspond le mieux et téléchargez-le en version transparente.',
       icon: Palette,
       href: '#pricing-section',
       isFree: false,
@@ -43,8 +43,8 @@ export function CreativeGrid() {
       iconColor: 'text-[#007AFF]',
     },
     {
-      title: 'Mannequin IA',
-      description: 'Créez un mannequin IA personnalisé pour votre marque. Uploadez vos produits et générez des visuels professionnels sans shooting photo.',
+      title: 'Shooting Virtuel IA',
+      description: 'Développez vos visuels professionnels sans shooting photo. Uploadez vos produits et mettez-les en scène grâce à notre studio virtuel intelligent.',
       icon: Image,
       href: '#pricing-section',
       isFree: false,
@@ -53,7 +53,7 @@ export function CreativeGrid() {
     },
     {
       title: 'Scripts Marketing IA',
-      description: 'Générez des posts structurés pour Instagram et TikTok. Accroche, corps du texte, CTA et hashtags optimisés générés automatiquement.',
+      description: 'Obtenez des posts structurés pour Instagram et TikTok. Accroche, corps du texte, CTA et hashtags optimisés générés pour la viralité.',
       icon: FileText,
       href: '#pricing-section',
       isFree: false,
@@ -68,10 +68,10 @@ export function CreativeGrid() {
         {/* En-tête de section */}
         <div className="text-center mb-16">
           <h2 className="text-5xl lg:text-6xl font-bold tracking-tight text-[#000000] mb-4">
-            Outils de création IA
+            Outils de création
           </h2>
           <p className="text-xl text-[#6e6e73] font-light max-w-2xl mx-auto">
-            Créez vos designs, visuels marketing et contenus avec l'intelligence artificielle
+            Créez vos designs, vos visuels marketing et vos contenus professionnels sans limites.
           </p>
         </div>
 

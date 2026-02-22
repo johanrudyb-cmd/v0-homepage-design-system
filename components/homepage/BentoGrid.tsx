@@ -78,7 +78,7 @@ export function BentoGrid() {
               Stratégie de marque IA
             </h3>
             <p className="text-lg text-[#6e6e73] leading-relaxed mb-6">
-              Définissez votre identité, positionnement et stratégie marketing avec l'intelligence artificielle.
+              Définissez votre identité et votre stratégie marketing avec nos outils IA.
               Analysez vos concurrents et identifiez les opportunités de marché.
             </p>
             <div className="flex items-center gap-2">
@@ -150,10 +150,10 @@ export function BentoGrid() {
               <Sparkles className="w-6 h-6 text-[#007AFF]" />
             </div>
             <h3 className="text-2xl font-semibold tracking-tight text-[#000000] mb-3">
-              Design Studio
+              Design Studio IA
             </h3>
             <p className="text-base text-[#6e6e73] mb-4">
-              Créez des designs et tech packs professionnels avec l'IA.
+              Créez des designs et vos tech packs professionnels avec l'IA.
             </p>
             <div className="flex items-center gap-2 text-sm text-[#007aff] group-hover:underline">
               Découvrir <ArrowRight className="w-4 h-4" />

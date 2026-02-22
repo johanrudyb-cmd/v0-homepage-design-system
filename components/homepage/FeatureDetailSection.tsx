@@ -17,7 +17,7 @@ const detailedFeatures = [
   {
     icon: Sparkles,
     title: 'Design Studio IA',
-    description: 'Créez des designs professionnels en quelques clics avec notre IA avancée. Générez des mockups réalistes et des tech packs complets pour vos fournisseurs.',
+    description: 'Créez des designs professionnels en quelques clics avec notre suite d\'outils IA. Générez des mockups réalistes et des tech packs complets pour vos fournisseurs.',
     benefits: [
       'Génération de designs en quelques secondes',
       'Mockups haute qualité',
@@ -43,11 +43,11 @@ const detailedFeatures = [
   {
     icon: TrendingUp,
     title: 'Radar Intelligence',
-    description: 'Découvrez les tendances émergentes avant vos concurrents. Notre radar IA analyse le marché en temps réel pour identifier les opportunités.',
+    description: 'Découvrez les tendances émergentes avant vos concurrents. Nous analysons le marché en temps réel pour identifier les opportunités.',
     benefits: [
       'Actualisation en temps réel',
       'Détection de pépites virales',
-      'Prévisions de cycle de vie',
+      'Méthodes de détection exclusives',
       'Analyses régionales (EU/US/ASIA)',
     ],
     color: '#FF9500',
@@ -55,7 +55,7 @@ const detailedFeatures = [
   },
   {
     icon: Calendar,
-    title: 'Calendrier de contenu',
+    title: 'Contenu Marketing IA',
     description: 'Planifiez vos posts marketing et générez du contenu structuré avec l\'IA. Optimisez votre présence sur les réseaux sociaux.',
     benefits: [
       'Génération de posts IA',

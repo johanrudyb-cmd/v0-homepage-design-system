@@ -15,13 +15,13 @@ const testimonials = [
     name: 'Lucas',
     role: 'Créateur de streetwear',
     rating: 5,
-    text: 'La génération de logo par IA est incroyable. J\'ai obtenu 4 propositions parfaites en quelques minutes et j\'ai pu choisir celui qui correspondait le mieux à mon identité.',
+    text: 'L\'outil de création de logo est incroyable. J\'ai obtenu 4 propositions parfaites en quelques minutes et j\'ai pu choisir celui qui correspondait le mieux à mon identité.',
   },
   {
     name: 'Emma',
     role: 'Designer indépendante',
     rating: 5,
-    text: 'Le calendrier de contenu et la génération de posts IA m\'ont permis de me concentrer sur le design. Ma présence sur les réseaux sociaux a explosé !',
+    text: 'Le calendrier de contenu et l\'assistant de posts m\'ont permis de me concentrer sur le design. Ma présence sur les réseaux sociaux a explosé !',
   },
   {
     name: 'Thomas',

@@ -18,7 +18,7 @@ const features = [
   {
     icon: Sparkles,
     title: 'Design Studio IA',
-    description: 'Générez des tech packs professionnels et des mockups avec l\'intelligence artificielle.',
+    description: 'Générez des tech packs professionnels et des mockups à partir de vos idées.',
     color: '#007AFF',
   },
   {
@@ -29,14 +29,14 @@ const features = [
   },
   {
     icon: Camera,
-    title: 'Scanner visuel IA',
+    title: 'Scanner Visuel IA',
     description: 'Analysez instantanément le potentiel d\'un produit avec une simple photo.',
     color: '#FF9500',
   },
   {
     icon: Calendar,
-    title: 'Calendrier de contenu',
-    description: 'Planifiez vos posts marketing et générez du contenu structuré avec l\'IA.',
+    title: 'Contenu Marketing IA',
+    description: 'Planifiez vos posts marketing et générez du contenu structuré sans effort.',
     color: '#FF3B30',
   },
   {
@@ -54,7 +54,7 @@ const features = [
   {
     icon: Target,
     title: 'Stratégie de marque',
-    description: 'Définissez votre identité, positionnement et stratégie marketing avec l\'IA.',
+    description: 'Définissez votre identité, votre positionnement et votre stratégie marketing.',
     color: '#34C759',
   },
   {
