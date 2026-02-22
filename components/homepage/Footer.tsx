@@ -23,7 +23,7 @@ const footerLinks = {
     { name: 'À propos', href: '/about' },
     { name: 'Contact', href: '/contact' },
     { name: 'Support', href: '/support' },
-    { name: 'Devenir Partenaire', href: '/partners/join' },
+    { name: 'Communauté', href: '/communaute' },
   ],
   légal: [
     { name: 'CGV et CGU', href: '/legal/terms' },

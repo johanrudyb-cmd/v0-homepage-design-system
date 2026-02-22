@@ -37,7 +37,7 @@ export function AnimatedHeader() {
     { name: 'Témoignages', href: '#testimonials-section' },
     { name: 'Blog', href: '/blog' },
     { name: 'FAQ', href: '#faq-section' },
-    { name: 'Devenir Partenaire', href: '/partners/join' },
+    { name: 'Communauté', href: '/communaute' },
   ];
 
   return (
